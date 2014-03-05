@@ -10,24 +10,26 @@ function onSilverlightError(){
 
 
 function toTest() {
-	
-	/*
-	var deferred = Q.defer();
-	mediaObject.onPlayingStart = function() {
-		if (!deferred.promise.isFulfilled()) {
-			results.push(new Date() - startTime);
-			deferred.resolve();
-		}
-	};
+	console.log("toTest");
+    var deferred = Q.defer();
 
-	var startTime = new Date();
-	*/
-	var params = {
+    mediaObject.onPlayingStart = function() {
+        if (!deferred.promise.isFulfilled()) {
+            results.push(new Date() - startTime);
+            console.error(results);
+            deferred.resolve();
+        }
+    };
+
+    var startTime = new Date();
+    
+    var params = {
 		"request":'{"streamToLoad": {"url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest","autoplay": true,"smoothStreaming": true,"backURL": "","mastURL": ""}}'
 	};
 
     mediaObject.load(params);
-    /*return deferred.promise;*/
+
+    return deferred.promise;
 }
 
 function onSilverLightBoxLoad(sender){
@@ -44,11 +46,11 @@ function onSilverLightBoxLoad(sender){
 
 				
 	// mediaObject.settings.EnableFramerateCounter = true;
-/*
+
 	var result = Q(null);
-    var i = 1;
+    var i = 20;
     while(i>0) {
-            result = result.then(toTest);
+        result = result.then(toTest);
         i--;
     }
 
@@ -58,14 +60,9 @@ function onSilverLightBoxLoad(sender){
     });
 	
 	
-	toTest();
-	*/
+	// toTest();
+	
 }
-
-function startVideo() {
-	toTest();
-}
-
 
 function embedSL(){
 	

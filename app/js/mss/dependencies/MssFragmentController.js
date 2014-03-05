@@ -34,28 +34,36 @@ Mss.dependencies.MssFragmentController = function () {
 
         processTfrf = function(tfrf, adaptation) {
 
-            var segmentsUpdated = false;
+            var manifest = rslt.manifestModel.getValue(),
+                segmentsUpdated = false,
+                // Get adaptation's segment timeline (always a SegmentTimeline in Smooth Streaming use case)
+                segments = adaptation.SegmentTemplate.SegmentTimeline.S,
+                entries = tfrf.entry,
+                fragment_absolute_time = 0,
+                fragment_duration = 0,
+                segment = null,
+                r = 0,
+                t = 0,
+                i = 0,
+                availabilityStartTime = null;
 
-            // Get adaptation's segment timeline (always a SegmentTimeline in Smooth Streaming use case)
-            var segments = adaptation.SegmentTemplate.SegmentTimeline.S;
-
-            // Go through entries
-            var entries = tfrf.entry;
-            for (var i = 0; i < entries.length; i++)
+            // Go through tfrf entries
+            while (i < entries.length)
             {
-                var fragment_absolute_time = entries[i].fragment_absolute_time;
-                var fragment_duration = entries[i].fragment_duration;
+                fragment_absolute_time = entries[i].fragment_absolute_time;
+                fragment_duration = entries[i].fragment_duration;
 
                 // Get timestamp of the last segment
-                var lastSegment = segments[segments.length-1];
-                var r = (lastSegment.r === undefined)?0:lastSegment.r;
-                var t = lastSegment.t + (lastSegment.d * r);
+                segment = segments[segments.length-1];
+                r = (segment.r === undefined)?0:segment.r;
+                t = segment.t + (segment.d * r);
 
                 if (fragment_absolute_time > t)
                 {
-                    if (fragment_duration === lastSegment.d)
+                    rslt.debug.log("[MssFragmentController] Add new segment - t = " + (fragment_absolute_time / 10000000.0));
+                    if (fragment_duration === segment.d)
                     {
-                        lastSegment.r = r + 1;
+                        segment.r = r + 1;
                     }
                     else
                     {
@@ -66,21 +74,27 @@ Mss.dependencies.MssFragmentController = function () {
                     }
                     segmentsUpdated = true;
                 }
+
+                i += 1;
             }
 
             // In case we have added some segments, we also check if some out of date segments
             // may not been removed
-            if (segmentsUpdated)
-            {
-                var manifest = rslt.manifestModel.getValue();
+            if (segmentsUpdated) {
 
-                var currentTime = new Date();
-                var presentationStartTime = currentTime.getTime() - manifest.mpdLoadedTime.getTime();
-                presentationStartTime = (presentationStartTime * 10000) + adaptation.SegmentTemplate.presentationTimeOffset;
+                // Get timestamp of the last segment
+                segment = segments[segments.length-1];
+                r = (segment.r === undefined)?0:segment.r;
+                t = segment.t + (segment.d * r);
 
-                var segment = segments[0];
-                while (segment.t < presentationStartTime)
+                // Determine the segments' availability start time
+                availabilityStartTime = t - (manifest.timeShiftBufferDepth * 10000000);
+
+                // Remove segments prior to availability start time
+                segment = segments[0];
+                while (segment.t < availabilityStartTime)
                 {
+                    rslt.debug.log("[MssFragmentController] Remove segment  - t = " + (segment.t / 10000000.0));
                     if ((segment.r !== undefined) && (segment.r > 0))
                     {
                         segment.t += segment.d;
@@ -139,10 +153,8 @@ Mss.dependencies.MssFragmentController = function () {
                 for (i = 0; i < sepiff.sample_count; i++) {
                     saiz.sample_info_size[i] = 8+(sepiff.entry[i].NumberOfEntries*6)+2;
                     //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
-                    if(i>1)
-                    {
-                        if (saiz.sample_info_size[i] != saiz.sample_info_size[i-1])
-                        {
+                    if(i>1) {
+                        if (saiz.sample_info_size[i] != saiz.sample_info_size[i-1]) {
                             sizedifferent = true;
                         }
                     }
@@ -150,8 +162,7 @@ Mss.dependencies.MssFragmentController = function () {
                 
                 //all the samples have the same size
                 //det default size and remove the table.
-                if (sizedifferent === false)
-                {
+                if (sizedifferent === false) {
                     saiz.default_sample_info_size = saiz.sample_info_size[0];
                     saiz.sample_info_size = [];
                 }
@@ -192,8 +203,7 @@ Mss.dependencies.MssFragmentController = function () {
             trun.flags |= 0x000001; // set trun.data-offset-present to true
             trun.data_offset = 0;   // Set a default value for trun.data_offset
 
-            if(sepiff !== null)
-            {
+            if(sepiff !== null) {
                 //+8 => box size + type
                 var moofpositionInFragment = fragment.getBoxPositionByType("moof")+8;
                 var trafpositionInMoof = moof.getBoxPositionByType("traf")+8;
@@ -217,7 +227,8 @@ Mss.dependencies.MssFragmentController = function () {
                 for  (i = 0; i < trun.samples_table.length; i++) {
                     if (trun.samples_table[i].sample_composition_time_offset > 0) {
                         trun.samples_table[i].sample_composition_time_offset /= 1000;
-                    if (trun.samples_table[i].sample_duration > 0)
+                    }
+                    if (trun.samples_table[i].sample_duration > 0) {
                         trun.samples_table[i].sample_duration /= 1000;
                     }
                 }
@@ -253,12 +264,10 @@ Mss.dependencies.MssFragmentController = function () {
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
             var res = convertFragment(result, request, adaptation);
             result = res.bytes;
-            if (res.segmentsUpdated === true)
-            {
+            if (res.segmentsUpdated === true) {
                 // If some segments have been added or removed, then
                 // we reset the list of segments for each representation
-                for (var i = 0; i < representations.length; i++)
-                {
+                for (var i = 0; i < representations.length; i++) {
                     representations[i].segments = null;
                 }
             }
@@ -279,7 +288,6 @@ Mss.dependencies.MssFragmentController = function () {
             mdhd.timescale /= 1000;
 
             result = mp4lib.serialize(init_segment);
-
         }
       
         return Q.when(result);

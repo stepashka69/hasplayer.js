@@ -29,6 +29,7 @@ MediaPlayer.dependencies.BufferController = function () {
         //mseSetTime = false,
         seekTarget = -1,
         dataChanged = true,
+        dataIsChanging = false,
         availableRepresentations,
         currentRepresentation,
         playingTime,
@@ -36,7 +37,9 @@ MediaPlayer.dependencies.BufferController = function () {
         stalled = false,
         isDynamic = false,
         isBufferingCompleted = false,
-        deferredAppends = [],
+        // ORANGE remove unnecessary array
+        /* deferredAppends = [],*/
+        previousDeferredAppended = null,
         deferredInitAppend = null,
         deferredStreamComplete = Q.defer(),
         deferredRejectedDataAppend = null,
@@ -67,29 +70,34 @@ MediaPlayer.dependencies.BufferController = function () {
         playListTraceMetricsClosed = true,
 
         setState = function (value) {
-            var self = this;
-            self.debug.log("BufferController " + type + " setState to:" + value);
+            // ORANGE unnecessary utilisation of self
+            // var self = this;
+            this.debug.log("BufferController " + type + " setState to:" + value);
             state = value;
             // Notify the FragmentController about any state change to track the loading process of each active BufferController
             if (fragmentModel !== null) {
-                self.fragmentController.onBufferControllerStateChange();
+                this.fragmentController.onBufferControllerStateChange();
             }
         },
 
         clearPlayListTraceMetrics = function (endTime, stopreason) {
-            var duration = 0,
-                startTime = null;
+            // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
+            if (DEBUG) {
+                var duration = 0,
+                    startTime = null;
 
-            if (playListTraceMetricsClosed === false) {
-                startTime = playListTraceMetrics.start;
-                duration = endTime.getTime() - startTime.getTime();
+                if (playListTraceMetricsClosed === false) {
+                    startTime = playListTraceMetrics.start;
+                    duration = endTime.getTime() - startTime.getTime();
 
-                playListTraceMetrics.duration = duration;
-                playListTraceMetrics.stopreason = stopreason;
+                    playListTraceMetrics.duration = duration;
+                    playListTraceMetrics.stopreason = stopreason;
 
-                playListTraceMetricsClosed = true;
+                    playListTraceMetricsClosed = true;
+                }
             }
         },
+        
 /*
         setCurrentTimeOnVideo = function (time) {
             var ct = this.videoModel.getCurrentTime();
@@ -166,6 +174,7 @@ MediaPlayer.dependencies.BufferController = function () {
             var self = this,
                 deferred = Q.defer(),
                 manifest = self.manifestModel.getValue();
+
             self.manifestExt.getDataIndex(data, manifest, periodInfo.index).then(
                 function(idx) {
                     self.manifestExt.getAdaptationsForPeriod(manifest, periodInfo).then(
@@ -177,7 +186,7 @@ MediaPlayer.dependencies.BufferController = function () {
                             );
                         }
                     );
-            }
+                }
             );
 
             return deferred.promise;
@@ -188,91 +197,105 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         finishValidation = function () {
-            var self = this;
+            // ORANGE unnecessary utilisation of self
+            // var self = this;
             if (state === LOADING) {
                 if (stalled) {
                     stalled = false;
                     this.videoModel.stallStream(type, stalled);
                 }
-                setState.call(self, READY);
+                setState.call(this, READY);
             }
         },
 
         onBytesLoadingStart = function(request) {
-			if (this.fragmentController.isInitializationRequest(request)) {
-				setState.call(this, READY);
-			} else {
-				setState.call(this, LOADING);
-                var self = this,
-                    time = self.fragmentController.getLoadingTime(self);
-                setTimeout(function(){
-                    if (!data && !buffer) return;
+            if (this.fragmentController.isInitializationRequest(request)) {
+                setState.call(this, READY);
+            } else {
+                setState.call(this, LOADING);
+                var time = this.fragmentController.getLoadingTime(this),
+                    timeoutFunction = function() {
+                        if (!data && !buffer) {
+                            return;
+                        }
 
-                    setState.call(self, READY);
-                    requestNewFragment.call(self);
-                }, time);
-			}
+                        setState.call(this, READY);
+                        requestNewFragment.call(this);
+                    };
+
+
+                setTimeout(timeoutFunction.bind(this), time);
+            }
         },
 
         onBytesLoaded = function (request, response) {
-			if (this.fragmentController.isInitializationRequest(request)) {
-				onInitializationLoaded.call(this, request, response);
-			} else {
-				onMediaLoaded.call(this, request, response);
-			}
+            if (this.fragmentController.isInitializationRequest(request)) {
+                onInitializationLoaded.call(this, request, response);
+            } else {
+                onMediaLoaded.call(this, request, response);
+            }
         },
 
-		onMediaLoaded = function (request, response) {
-			var self = this;
-
-			self.debug.log(type + " Bytes finished loading: " + request.url);
+        onMediaLoaded = function (request, response) {
+            var self = this;
+            // ORANGE new variables to not use request object
+            // var quality = request.quality;
+            // var reqIx = request.index;
+            self.debug.log(type + " Bytes finished loading: " + request.url);
 
             if (!fragmentDuration && !isNaN(request.duration)) {
                 fragmentDuration = request.duration;
             }
         
             // ORANGE: add request and data in function parameters, used by MssFragmentController
-			self.fragmentController.process(response.data, request, availableRepresentations).then(
-				function (data) {
+            self.fragmentController.process(response.data, request, availableRepresentations).then(
+                function (data) {
 
-					if (data !== null && deferredInitAppend !== null) {
+                    if (data !== null && deferredInitAppend !== null) {
 
                         if (request.quality !== lastQuality) {
                             self.fragmentController.removeExecutedRequest(fragmentModel, request);
                             return;
                         }
 
-                        Q.when(deferredInitAppend.promise).then(
+                        // ORANGE unnecessary utilisation of Q.when (we have already a promise...)
+                        //Q.when(deferredInitAppend.promise).then(
+                        deferredInitAppend.promise.then(
                             function() {
                                 appendToBuffer.call(self, data, request.quality).then(
                                     function() {
-                                        deferredStreamComplete.promise.then(
-                                            function(lastRequest) {
-                                                if ((lastRequest.index - 1) === request.index && !isBufferingCompleted) {
-                                                    isBufferingCompleted = true;
-                                                    setState.call(self, READY);
-                                                    self.system.notify("bufferingCompleted");
+                                        // ORANGE unnecessary deferred in dynamic mode which produce a memoryleak, deferred is never resolve...
+                                        if (!isDynamic) {
+                                            deferredStreamComplete.promise.then(
+                                                function(lastRequest) {
+                                                    if ((lastRequest.index - 1) === request.index && !isBufferingCompleted) {
+                                                        isBufferingCompleted = true;
+                                                        setState.call(self, READY);
+                                                        self.system.notify("bufferingCompleted");
+                                                    }
                                                 }
-                                            }
-                                        );
+                                            );
+                                        }
                                     }
                                 );
                             }
                         );
-					} else {
-						self.debug.log("No " + type + " bytes to push.");
-					}
-				}
-			);
-		},
+                    } else {
+                        self.debug.log("No " + type + " bytes to push.");
+                    }
+                }
+            );
+        },
 
         appendToBuffer = function(data, quality) {
             var self = this,
                 isAppendingRejectedData = (data == rejectedBytes),
                 // if we append the rejected data we should use the stored promise instead of creating a new one
                 deferred = isAppendingRejectedData ? deferredRejectedDataAppend : Q.defer(),
-                ln = isAppendingRejectedData ? deferredAppends.length : deferredAppends.push(deferred),
-                idx = deferredAppends.indexOf(deferred),
+                // ORANGE remove unnecessary array (deferredAppends)
+                // ln = isAppendingRejectedData ? deferredAppends.length : deferredAppends.push(deferred),
+                // idx = deferredAppends.indexOf(deferred);
+
                 currentVideoTime = self.videoModel.getCurrentTime(),
                 currentTime = new Date();
 
@@ -284,9 +307,14 @@ MediaPlayer.dependencies.BufferController = function () {
                 playListTraceMetrics = self.metricsModel.appendPlayListTrace(playListMetrics, currentRepresentation.id, null, currentTime, currentVideoTime, null, 1.0, null);
             }
 
-            Q.when((isAppendingRejectedData) || ln < 2 || deferredAppends[ln - 2].promise).then(
+            
+            // ORANGE utilisation of previousDeferredAppended instead of array deferredAppends
+            // Q.when((isAppendingRejectedData) || ln < 2 || deferredAppends[ln - 2].promise).then(
+            Q.when((isAppendingRejectedData) || !previousDeferredAppended || previousDeferredAppended.promise).then(
                 function() {
-                    if (!buffer) return;
+                    if (!buffer) {
+                        return;
+                    }
                     clearBuffer.call(self).then(
                         function() {
                             if (quality !== lastQuality) {
@@ -309,7 +337,9 @@ MediaPlayer.dependencies.BufferController = function () {
 
                                             // we should resume request scheduling after all peinding segments are appended -
                                             //the last promise in the queue has been resolved
-                                            if ((state === WAITING) && ((idx + 1 === deferredAppends.length))) {
+                                            // ORANGE utilisation of previousDeferredAppended instead of array deferredAppends
+                                            // if ((state === WAITING) && ((idx + 1 === deferredAppends.length))) {
+                                            if ((state === WAITING) && ((deferred === previousDeferredAppended))) {
                                                 doStart.call(self);
                                             }
 
@@ -324,38 +354,42 @@ MediaPlayer.dependencies.BufferController = function () {
                                                 );
                                             };
 
-                                            // ORANGE: in case of live streams, remove outdated buffer parts
-                                            if (isDynamic)
-                                            {
+                                            // ORANGE: in case of live streams, remove outdated buffer parts and requests
+                                            if (isDynamic) {
+                                                self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, self.videoModel.getCurrentTime() - 4);
                                                 self.sourceBufferExt.remove(buffer, 0, self.videoModel.getCurrentTime() - 4, periodInfo.duration, mediaSource).then(
                                                     function() {
                                                         self.debug.log("[BufferController] ### " + type + " cleared buffer");
                                                         updateBuffer();
                                                     }
                                                 );
-                                            }
-                                            else
-                                            {                                                        
+                                            } else {
                                                 updateBuffer();
                                             }
+                                            
+                                            if (!buffer) {
+                                                return;
+                                            }
 
-                                            if (!buffer) return;
-                                            self.sourceBufferExt.getAllRanges(buffer).then(
-                                                function(ranges) {
-                                                    if (ranges) {
-                                                        self.debug.log("Append " + type + " complete: " + ranges.length);
-                                                        if (ranges.length > 0) {
-                                                            var i,
-                                                                len;
+                                            // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
+                                            if (DEBUG) {
+                                                self.sourceBufferExt.getAllRanges(buffer).then(
+                                                    function(ranges) {
+                                                        if (ranges) {
+                                                            self.debug.log("Append " + type + " complete: " + ranges.length);
+                                                            if (ranges.length > 0) {
+                                                                var i,
+                                                                    len;
 
-                                                            self.debug.log("Number of buffered " + type + " ranges: " + ranges.length);
-                                                            for (i = 0, len = ranges.length; i < len; i += 1) {
-                                                                self.debug.log("Buffered " + type + " Range: " + ranges.start(i) + " - " + ranges.end(i)+  " - "+self.getVideoModel().getCurrentTime());
+                                                                self.debug.log("Number of buffered " + type + " ranges: " + ranges.length);
+                                                                for (i = 0, len = ranges.length; i < len; i += 1) {
+                                                                    self.debug.log("Buffered " + type + " Range: " + ranges.start(i) + " - " + ranges.end(i)+  " - "+self.getVideoModel().getCurrentTime());
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                }
-                                            );
+                                                );
+                                            }
                                         },
                                         function(result) {
                                             // if the append has failed because the buffer is full we should store the data
@@ -379,6 +413,7 @@ MediaPlayer.dependencies.BufferController = function () {
                     );
                 }
             );
+            previousDeferredAppended = deferred;
             return deferred.promise;
         },
 
@@ -520,6 +555,7 @@ MediaPlayer.dependencies.BufferController = function () {
 
             deferredLiveEdge = Q.defer();
 
+
             return deferredLiveEdge.promise;
         },
 
@@ -613,11 +649,15 @@ MediaPlayer.dependencies.BufferController = function () {
         signalStreamComplete = function (request) {
             this.debug.log(type + " Stream is complete.");
             clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.END_OF_CONTENT_STOP_REASON);
+
             doStop.call(this);
             deferredStreamComplete.resolve(request);
         },
 
         loadInitialization = function (qualityChanged, currentQuality) {
+            if(dataChanged && dataIsChanging){
+              return  Q.when(null);
+            }
             var initializationPromise = null,
                 topQuality = this.bufferExt.getTopQualityIndex(type),
                 funcs = [],
@@ -638,6 +678,7 @@ MediaPlayer.dependencies.BufferController = function () {
             if (dataChanged) {
                 deferredInitAppend = Q.defer();
                 initializationData = [];
+                dataIsChanging = true;
                 // get initialization requests for all the qualities of this buffer type
                 for (quality = 0; quality <= topQuality; quality += 1) {
                     funcs.push(this.indexHandler.getInitRequest(availableRepresentations[quality]));
@@ -716,12 +757,13 @@ MediaPlayer.dependencies.BufferController = function () {
             var self = this;
             if (request !== null) {
                 // If we have already loaded the given fragment ask for the next one. Otherwise prepare it to get loaded
-                if (self.fragmentController.isFragmentLoadedOrPending(self, request)) {
+                if (this.fragmentController.isFragmentLoadedOrPending(this, request)) {
                     if (request.action !== "complete") {
-                        self.indexHandler.getNextSegmentRequest(currentRepresentation).then(onFragmentRequest.bind(self));
+                        this.indexHandler.getNextSegmentRequest(currentRepresentation).then(onFragmentRequest.bind(this));
                     } else {
-                        doStop.call(self);
-                        setState.call(self, READY);
+                        doStop.call(this);
+                        setState.call(this, READY);
+                        request = null;
                     }
                 } else {
                     self.debug.log("Loading an " + type + " fragment: " + request.url);
@@ -737,12 +779,14 @@ MediaPlayer.dependencies.BufferController = function () {
                 }
             } else {
                 setState.call(self, READY);
+                request = null;
             }
         },
 
         checkIfSufficientBuffer = function () {
             if (waitingForBuffer) {
-                if (bufferLevel < minBufferTime) {
+                // ORANGE : replace minBufferTime by MediaPlayer.dependencies.BufferExtensions.START_TIME 
+                if (bufferLevel < MediaPlayer.dependencies.BufferExtensions.START_TIME) {
                     if (!stalled) {
                         this.debug.log("Waiting for more " + type + " buffer before starting playback.");
                         stalled = true;
@@ -928,13 +972,16 @@ MediaPlayer.dependencies.BufferController = function () {
                 ).then(
                     function (count) {
                         fragmentsToLoad = count;
+                        if(dataIsChanging){
+                            return;
+                        }
                         loadInitialization.call(self, qualityChanged, newQuality).then(
                             function (initializationRequests) {
                                 if (initializationRequests !== null) {
                                     var ln = initializationRequests.length,
                                         request,
                                         i;
-
+                                        dataIsChanging = false;
                                     for (i = 0; i < ln; i += 1) {
                                         request = initializationRequests[i];
                                         self.debug.log("Loading " + type + " initialization: " + request.url);
@@ -1066,6 +1113,8 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         setFragmentController: function (value) {
+            // ORANGE : unnecessary utilisation of self
+            // var self = this;
             this.fragmentController = value;
         },
 
@@ -1075,8 +1124,7 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         setAutoSwitchBitrate : function (value) {
-            var self = this;
-            self.abrController.setAutoSwitchBitrate(value);
+            this.abrController.setAutoSwitchBitrate(value);
         },
 
         getData: function () {
@@ -1107,7 +1155,6 @@ MediaPlayer.dependencies.BufferController = function () {
                             var restart = function(time){
 
                                     dataChanged = true;
-                                    // playingTime = time;
                                     playingTime = time;
 
                                     currentRepresentation = getRepresentationForQuality.call(self, result.quality);
@@ -1126,9 +1173,7 @@ MediaPlayer.dependencies.BufferController = function () {
                             if(currentTime){
                                 restart(currentTime);
                             }else{
-
                                 self.indexHandler.getCurrentTime(currentRepresentation).then(restart);
-
                             }
 
                         }
@@ -1168,28 +1213,30 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         clearMetrics: function () {
-            var self = this;
+            // ORANGE : unnecessary utilisation of self
+            //var self = this;
 
             if (type === null || type === "") {
                 return;
             }
 
-            self.metricsModel.clearCurrentMetricsForType(type);
+            this.metricsModel.clearCurrentMetricsForType(type);
         },
 
         updateBufferState: function() {
-            var self = this,
-                currentTime = self.videoModel.getCurrentTime();
+            // ORANGE : unnecessary utilisation of self
+            // var self = this,
+            var currentTime = this.videoModel.getCurrentTime();
 
             // if the buffer controller is stopped and the buffer is full we should try to clear the buffer
             // before that we should make sure that we will have enough space to append the data, so we wait
             // until the video time moves forward for a value greater than rejected data duration since the last reject event or since the last seek.
             if (isQuotaExceeded && rejectedBytes && (Math.abs(currentTime - (seeking ? seekTarget : rejectTime)) > fragmentDuration)) {
                 //try to append the data that was previosly rejected
-                rejectTime = self.videoModel.getCurrentTime();
-                appendToBuffer.call(self, rejectedBytes);
+                rejectTime = this.videoModel.getCurrentTime();
+                appendToBuffer.call(this, rejectedBytes);
             } else {
-                updateBufferLevel.call(self);
+                updateBufferLevel.call(this);
             }
         },
 
@@ -1199,14 +1246,17 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         reset: function(errored) {
-            var self = this;
+            // ORANGE : unnecessary utilisation of self
+            // var self = this;
+            doStop.call(this);
 
-            doStop.call(self);
-            self.clearMetrics();
-            self.fragmentController.abortRequestsForModel(fragmentModel);
-            self.fragmentController.detachBufferController(fragmentModel);
+            this.clearMetrics();
+            this.fragmentController.abortRequestsForModel(fragmentModel);
+            this.fragmentController.detachBufferController(fragmentModel);
             fragmentModel = null;
-            deferredAppends = [];
+            // ORANGE remove unnecessary array
+             /* deferredAppends = [];*/
+            previousDeferredAppended = null;
             deferredInitAppend = null;
             initializationData = [];
             deferredStreamComplete = Q.defer();
@@ -1217,8 +1267,8 @@ MediaPlayer.dependencies.BufferController = function () {
             deferredLiveEdge = null;
 
             if (!errored) {
-                self.sourceBufferExt.abort(mediaSource, buffer);
-                self.sourceBufferExt.removeSourceBuffer(mediaSource, buffer);
+                this.sourceBufferExt.abort(mediaSource, buffer);
+                this.sourceBufferExt.removeSourceBuffer(mediaSource, buffer);
             }
             data = null;
             buffer = null;
