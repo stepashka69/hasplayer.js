@@ -105,11 +105,6 @@ mp4lib.fields.BoxTypeField.prototype.read = function(buf,pos) {
 };
 
 mp4lib.fields.BoxTypeField.prototype.write = function(buf,pos,val) {
-
-        if (val === "tfrf" || val === "uuid") {
-            debugger;
-        }
-    
     for (var i=0;i<4;i++) {
         buf[pos+i] = val.charCodeAt(i);
     }
@@ -373,7 +368,6 @@ mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
         //if uuid is defined, replace boxtype by extended value after _processFields call. => line 386
         if(uuid !== null)
         {
-            debugger;
             boxtype = box.boxtype;
         }
       

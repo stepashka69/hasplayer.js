@@ -53,7 +53,7 @@ mp4lib.boxes.Box.prototype._processFields = function(processor) {
         processor.eat('largesize',mp4lib.fields.FIELD_INT64);
     }
 
-    if /*(*/(this.boxtype=='uuid') /*|| (mp4lib.findUUIDByBoxtype(this.boxtype)))*/ {
+    if (this.boxtype=='uuid'){
         processor.eat('usertype', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16));
     }
 };
@@ -95,7 +95,7 @@ mp4lib.boxes.Box.prototype.removeBoxByType = function(boxType) {
         }
     }
     else{
-         mp4lib.warningHandler(''+this.boxtype+'does not have '+boxtype+' box, impossible to remove it');
+         mp4lib.warningHandler(''+this.boxtype+'does not have '+boxType+' box, impossible to remove it');
     }
 };
 
@@ -149,7 +149,6 @@ mp4lib.boxes.UnknownBox.prototype._processFields = function(processor) {
 // --------------------------- ftyp ----------------------------------
 
 mp4lib.boxes.FileTypeBox = function() {
-    //debugger;
     mp4lib.boxes.Box.call(this,'ftyp');
 };
 
@@ -171,15 +170,12 @@ mp4lib.boxes.FileTypeBox.prototype.getLength = function(){
     return size;
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.FileTypeBox);
-
 // --------------------------- moov ----------------------------------
 
 mp4lib.boxes.MovieBox = function() {
     mp4lib.boxes.Box.call(this,'moov');
     this.boxes = [];
 };
-
 
 mp4lib.boxes.MovieBox.prototype = Object.create(mp4lib.boxes.Box.prototype);
 mp4lib.boxes.MovieBox.prototype.constructor = mp4lib.boxes.MovieBox;
@@ -190,10 +186,7 @@ mp4lib.boxes.MovieBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieBox);
-
 // --------------------------- moof ----------------------------------
-
 mp4lib.boxes.MovieFragmentBox = function() {
     mp4lib.boxes.Box.call(this,'moof');
 };
@@ -208,10 +201,7 @@ mp4lib.boxes.MovieFragmentBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieFragmentBox);
-
 // --------------------------- mfra ----------------------------------
-
 mp4lib.boxes.MovieFragmentRandomAccessBox = function() {
     mp4lib.boxes.Box.call(this,'mfra');
 };
@@ -226,10 +216,7 @@ mp4lib.boxes.MovieFragmentRandomAccessBox.prototype._processFields = function(pr
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieFragmentRandomAccessBox);
-
 // --------------------------- udta ----------------------------------
-
 mp4lib.boxes.UserDataBox = function() {
     mp4lib.boxes.Box.call(this,'udta');
     this.boxes = [];
@@ -245,10 +232,7 @@ mp4lib.boxes.UserDataBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.UserDataBox);
-
 // --------------------------- trak ----------------------------------
-
 mp4lib.boxes.TrackBox = function() {
     mp4lib.boxes.Box.call(this,'trak');
     this.boxes = [];
@@ -263,10 +247,7 @@ mp4lib.boxes.TrackBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackBox);
-
 // --------------------------- edts ----------------------------------
-
 mp4lib.boxes.EditBox = function() {
     mp4lib.boxes.Box.call(this,'edts');
     this.boxes = [];
@@ -282,10 +263,7 @@ mp4lib.boxes.EditBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.EditBox);
-
 // --------------------------- mdia ----------------------------------
-
 mp4lib.boxes.MediaBox = function() {
     mp4lib.boxes.Box.call(this,'mdia');
     this.boxes = [];
@@ -301,10 +279,7 @@ mp4lib.boxes.MediaBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MediaBox);
-
 // --------------------------- minf ----------------------------------
-
 mp4lib.boxes.MediaInformationBox = function() {
     mp4lib.boxes.Box.call(this,'minf');
     this.boxes = [];
@@ -319,10 +294,7 @@ mp4lib.boxes.MediaInformationBox.prototype._processFields = function(processor) 
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MediaInformationBox);
-
 // --------------------------- dinf ----------------------------------
-
 mp4lib.boxes.DataInformationBox=function() {
     mp4lib.boxes.Box.call(this,'dinf');
     this.boxes = [];
@@ -338,10 +310,7 @@ mp4lib.boxes.DataInformationBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.DataInformationBox);
-
 // --------------------------- stbl ----------------------------------
-
 mp4lib.boxes.SampleTableBox = function() {
     mp4lib.boxes.Box.call(this,'stbl');
     this.boxes = [];
@@ -357,10 +326,7 @@ mp4lib.boxes.SampleTableBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SampleTableBox);
-
 // --------------------------- mvex ----------------------------------
-
 mp4lib.boxes.MovieExtendsBox=function() {
     mp4lib.boxes.Box.call(this,'mvex');
     this.boxes = [];
@@ -377,10 +343,7 @@ mp4lib.boxes.MovieExtendsBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieExtendsBox);
-
 // --------------------------- traf ----------------------------------
-
 mp4lib.boxes.TrackFragmentBox=function() {
     mp4lib.boxes.Box.call(this,'traf');
 };
@@ -395,10 +358,7 @@ mp4lib.boxes.TrackFragmentBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackFragmentBox);
-
 // --------------------------- meta -----------------------------
-
 mp4lib.boxes.MetaBox=function() {
     mp4lib.boxes.FullBox.call(this,'meta');
 };
@@ -413,10 +373,7 @@ mp4lib.boxes.MetaBox.prototype._processFields = function(processor) {
    processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MetaBox);
-
 // --------------------------- mvhd ----------------------------------
-
 mp4lib.boxes.MovieHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mvhd');
 };
@@ -449,10 +406,7 @@ mp4lib.boxes.MovieHeaderBox.prototype._processFields = function(processor) {
     processor.eat('next_track_ID',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieHeaderBox);
-
 // --------------------------- mdat ----------------------------------
-
 mp4lib.boxes.MediaDataBox=function() {
     mp4lib.boxes.Box.call(this,'mdat');
 };
@@ -468,10 +422,7 @@ mp4lib.boxes.MediaDataBox.prototype._processFields = function(processor) {
 
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MediaDataBox);
-
 // --------------------------- free ----------------------------------
-
 mp4lib.boxes.FreeSpaceBox=function() {
     mp4lib.boxes.Box.call(this,'free');
 };
@@ -487,10 +438,7 @@ mp4lib.boxes.FreeSpaceBox.prototype._processFields = function(processor) {
 
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.FreeSpaceBox);
-
 // --------------------------- sidx ----------------------------------
-
 mp4lib.boxes.SegmentIndexBox=function() {
     mp4lib.boxes.FullBox.call(this,'sidx');
 };
@@ -529,10 +477,7 @@ mp4lib.boxes.SegmentIndexBox.prototype._processReference = function(box,processo
     processor.eat('SAP',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SegmentIndexBox);
-
 // --------------------------- tkhd ----------------------------------
-
 mp4lib.boxes.TrackHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'tkhd');
 };
@@ -567,10 +512,8 @@ mp4lib.boxes.TrackHeaderBox.prototype._processFields = function(processor) {
     processor.eat('width',mp4lib.fields.FIELD_INT32);
     processor.eat('height',mp4lib.fields.FIELD_INT32);
 };
-//mp4lib.registerBoxType(mp4lib.boxes.TrackHeaderBox);
 
 // --------------------------- mdhd ----------------------------------
-
 mp4lib.boxes.MediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mdhd');
 };
@@ -597,10 +540,8 @@ mp4lib.boxes.MediaHeaderBox.prototype._processFields = function(processor) {
     processor.eat('language',mp4lib.fields.FIELD_UINT16);
     processor.eat('reserved',mp4lib.fields.FIELD_UINT16);
 };
-//mp4lib.registerBoxType(mp4lib.boxes.MediaHeaderBox);
 
 // --------------------------- mehd ----------------------------------
-
 mp4lib.boxes.MovieExtendsHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mehd');
 };
@@ -618,10 +559,8 @@ mp4lib.boxes.MovieExtendsHeaderBox.prototype._processFields = function(processor
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT32);
     }
 };
-//mp4lib.registerBoxType(mp4lib.boxes.MovieExtendsHeaderBox);
 
 // --------------------------- hdlr --------------------------------
-
 mp4lib.boxes.HandlerBox=function() {
     mp4lib.boxes.FullBox.call(this,'hdlr');
 };
@@ -646,10 +585,8 @@ mp4lib.boxes.HandlerBox.prototype._processFields = function(processor) {
     processor.eat('reserved',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT32,3));
     processor.eat('name',mp4lib.fields.FIELD_STRING);
 };
-//mp4lib.registerBoxType(mp4lib.boxes.HandlerBox);
 
 // --------------------------- stts ----------------------------------
-
 mp4lib.boxes.TimeToSampleBox=function() {
     mp4lib.boxes.FullBox.call(this,'stts');
 };
@@ -677,10 +614,7 @@ mp4lib.boxes.TimeToSampleBox.prototype._processEntry = function(box,processor) {
     processor.eat('sample_delta',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TimeToSampleBox);
-
 // --------------------------- stsc ----------------------------------
-
 mp4lib.boxes.SampleToChunkBox=function() {
     mp4lib.boxes.FullBox.call(this,'stsc');
 };
@@ -709,10 +643,7 @@ mp4lib.boxes.SampleToChunkBox.prototype._processEntry = function(box,processor) 
     processor.eat('samples_description_index',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SampleToChunkBox);
-
 // --------------------------- stco ----------------------------------
-
 mp4lib.boxes.ChunkOffsetBox=function() {
     mp4lib.boxes.FullBox.call(this,'stco');
 };
@@ -734,10 +665,7 @@ mp4lib.boxes.ChunkOffsetBox.prototype._processFields = function(processor) {
     processor.eat('chunk_offset',a);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.ChunkOffsetBox);
-
 // --------------------------- trex ----------------------------------
-
 mp4lib.boxes.TrackExtendsBox=function() {
     mp4lib.boxes.FullBox.call(this,'trex');
 };
@@ -755,10 +683,8 @@ mp4lib.boxes.TrackExtendsBox.prototype._processFields = function(processor) {
     processor.eat('default_sample_size',mp4lib.fields.FIELD_UINT32);
     processor.eat('default_sample_flags',mp4lib.fields.FIELD_UINT32);
 };
-//mp4lib.registerBoxType(mp4lib.boxes.TrackExtendsBox);
 
 // --------------------------- vmhd ----------------------------------
-
 mp4lib.boxes.VideoMediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'vmhd');
 };
@@ -774,10 +700,7 @@ mp4lib.boxes.VideoMediaHeaderBox.prototype._processFields = function(processor) 
     processor.eat('opcolor',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT16,3));
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.VideoMediaHeaderBox);
-
 // --------------------------- smhd ----------------------------------
-
 mp4lib.boxes.SoundMediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'smhd');
 };
@@ -793,10 +716,7 @@ mp4lib.boxes.SoundMediaHeaderBox.prototype._processFields = function(processor) 
     processor.eat('reserved',mp4lib.fields.FIELD_UINT16);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SoundMediaHeaderBox);
-
 // --------------------------- dref ----------------------------------
-
 mp4lib.boxes.DataReferenceBox=function() {
     mp4lib.boxes.FullBox.call(this,'dref');
     this.boxes = [];
@@ -817,10 +737,7 @@ mp4lib.boxes.DataReferenceBox.prototype._processFields = function(processor) {
     processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.DataReferenceBox);
-
 // --------------------------- url  ----------------------------------
-
 mp4lib.boxes.DataEntryUrlBox=function() {
     mp4lib.boxes.FullBox.call(this,'url ');
 };
@@ -845,10 +762,7 @@ mp4lib.boxes.DataEntryUrlBox.prototype._processFields = function(processor) {
     }
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.DataEntryUrlBox);
-
 // --------------------------- urn  ----------------------------------
-
 mp4lib.boxes.DataEntryUrnBox=function() {
     mp4lib.boxes.FullBox.call(this,'urn ');
 };
@@ -867,10 +781,7 @@ mp4lib.boxes.DataEntryUrnBox.prototype._processFields = function(processor) {
     }
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.DataEntryUrnBox);
-
 // --------------------------- mfhd ----------------------------------
-
 mp4lib.boxes.MovieFragmentHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mfhd');
 };
@@ -885,10 +796,7 @@ mp4lib.boxes.MovieFragmentHeaderBox.prototype._processFields = function(processo
     processor.eat('sequence_number',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MovieFragmentHeaderBox);
-
 // --------------------------- tfhd ----------------------------------
-
 mp4lib.boxes.TrackFragmentHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfhd');
 };
@@ -908,10 +816,7 @@ mp4lib.boxes.TrackFragmentHeaderBox.prototype._processFields = function(processo
     processor.eat_flagged(this,'flags',0x000020,'default_sample_flags',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackFragmentHeaderBox);
-
 // --------------------------- tfdt ----------------------------------
-
 mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfdt');
 };
@@ -930,10 +835,7 @@ mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype._processFields = func
     }
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox);
-
 // --------------------------- trun ----------------------------------
-
 mp4lib.boxes.TrackFragmentRunBox=function() {
     mp4lib.boxes.FullBox.call(this,'trun');
 };
@@ -971,10 +873,7 @@ mp4lib.boxes.TrackFragmentRunBox.prototype._processEntry = function(box,processo
     }
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackFragmentRunBox);
-
 // --------------------------- stts ----------------------------------
-
 mp4lib.boxes.TimeToSampleBox=function() {
     mp4lib.boxes.FullBox.call(this,'stts');
 };
@@ -1002,10 +901,7 @@ mp4lib.boxes.TimeToSampleBox.prototype._processEntry = function(box,processor) {
     processor.eat('sample_delta',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TimeToSampleBox);
-
 // --------------------------- stsd ----------------------------------
-
 mp4lib.boxes.SampleDescriptionBox=function() {
     mp4lib.boxes.FullBox.call(this,'stsd');
     this.boxes = [];
@@ -1027,10 +923,7 @@ mp4lib.boxes.SampleDescriptionBox.prototype._processFields = function(processor)
     processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SampleDescriptionBox);
-
 // --------------------------- sdtp ----------------------------------
-
 mp4lib.boxes.SampleDependencyTableBox=function() {
     mp4lib.boxes.FullBox.call(this,'sdtp');
 };
@@ -1047,10 +940,7 @@ mp4lib.boxes.SampleDependencyTableBox.prototype._processFields = function(proces
                 new mp4lib.fields.BoxFillingArrayField( mp4lib.fields.FIELD_UINT8 ));
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SampleDependencyTableBox);
-
 // --------------------------- abstract SampleEntry ----------------------------------
-
 mp4lib.boxes.SampleEntryBox=function(boxType) {
     mp4lib.boxes.Box.call(this,boxType);
 };
@@ -1065,7 +955,6 @@ mp4lib.boxes.SampleEntryBox.prototype._processFields = function(processor) {
 };
 
 // --------------------------- abstract VisualSampleEntry ----------------------------------
-
 mp4lib.boxes.VisualSampleEntryBox=function(boxType) {
     mp4lib.boxes.SampleEntryBox.call(this,boxType);
 };
@@ -1076,7 +965,7 @@ mp4lib.boxes.VisualSampleEntryBox.prototype.constructor = mp4lib.boxes.VisualSam
 mp4lib.boxes.VisualSampleEntryBox.prototype._processFields = function(processor) {
     mp4lib.boxes.SampleEntryBox.prototype._processFields.call(this,processor);
     processor.eat('pre_defined',mp4lib.fields.FIELD_UINT16);
-    processor.eat('reserved_2',mp4lib.fields.FIELD_UINT16); 
+    processor.eat('reserved_2',mp4lib.fields.FIELD_UINT16);
     // there is already field called reserved from SampleEntry, so we need to call it reserved_2
     processor.eat('pre_defined_2',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT32,3));
     processor.eat('width',mp4lib.fields.FIELD_UINT16);
@@ -1092,7 +981,6 @@ mp4lib.boxes.VisualSampleEntryBox.prototype._processFields = function(processor)
 };
 
 // --------------------------- avc1 ----------------------------------
-
 mp4lib.boxes.AVC1VisualSampleEntryBox=function() {
     mp4lib.boxes.VisualSampleEntryBox.call(this,'avc1');
     this.boxes = [];
@@ -1107,10 +995,7 @@ mp4lib.boxes.AVC1VisualSampleEntryBox.prototype._processFields = function(proces
     mp4lib.boxes.VisualSampleEntryBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.AVC1VisualSampleEntryBox);
-
 //-------------------------- encv ------------------------------------
-
 mp4lib.boxes.EncryptedVideoBox=function() {
     mp4lib.boxes.VisualSampleEntryBox.call(this,'encv');
     this.boxes = [];
@@ -1125,10 +1010,7 @@ mp4lib.boxes.EncryptedVideoBox.prototype._processFields = function(processor) {
     mp4lib.boxes.VisualSampleEntryBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.EncryptedVideoBox );
-
 // --------------------------- avcc ----------------------------------
-
 mp4lib.boxes.AVCConfigurationBox=function() {
     mp4lib.boxes.Box.call(this,'avcC');
 };
@@ -1174,10 +1056,7 @@ mp4lib.boxes.AVCConfigurationBox.prototype._processNAL = function(box,processor)
     processor.eat('NAL',new mp4lib.fields.DataField(this.NAL_length));
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.AVCConfigurationBox);
-
 // --------------------------- pasp ----------------------------------
-
 mp4lib.boxes.PixelAspectRatioBox=function() {
       mp4lib.boxes.Box.call(this,'pasp');
 };
@@ -1193,10 +1072,7 @@ mp4lib.boxes.PixelAspectRatioBox.prototype._processFields = function(processor) 
     processor.eat('vSpacing',mp4lib.fields.FIELD_INT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.PixelAspectRatioBox);
-
 // --------------------------- abstract VisualSampleEntry ----------------------------------
-
 mp4lib.boxes.AudioSampleEntryBox=function(boxType) {
     mp4lib.boxes.SampleEntryBox.call(this,boxType);
 };
@@ -1216,7 +1092,6 @@ mp4lib.boxes.AudioSampleEntryBox.prototype._processFields = function(processor) 
 };
 
 // --------------------------- mp4a ----------------------------------
-
 mp4lib.boxes.MP4AudioSampleEntryBox=function() {
     mp4lib.boxes.AudioSampleEntryBox.call(this,'mp4a');
     this.boxes = [];
@@ -1231,10 +1106,7 @@ mp4lib.boxes.MP4AudioSampleEntryBox.prototype._processFields = function(processo
     mp4lib.boxes.AudioSampleEntryBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.MP4AudioSampleEntryBox);
-
 //-------------------------- enca ------------------------------------
-
 mp4lib.boxes.EncryptedAudioBox=function() {
     mp4lib.boxes.AudioSampleEntryBox.call(this,'enca');
     this.boxes = [];
@@ -1249,10 +1121,7 @@ mp4lib.boxes.EncryptedAudioBox.prototype._processFields = function(processor) {
     mp4lib.boxes.AudioSampleEntryBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.EncryptedAudioBox );
-
 // --------------------------- esds ----------------------------
-
 mp4lib.boxes.ESDBox=function() {
     mp4lib.boxes.FullBox.call(this,'esds');
 };
@@ -1269,10 +1138,7 @@ mp4lib.boxes.ESDBox.prototype._processFields = function(processor) {
     processor.eat('ES_data', new mp4lib.fields.DataField(this.ES_length));
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.ESDBox);
-
 // --------------------------- stsz ----------------------------------
-
 mp4lib.boxes.SampleSizeBox=function() {
     mp4lib.boxes.FullBox.call(this,'stsz');
 };
@@ -1290,10 +1156,7 @@ mp4lib.boxes.SampleSizeBox.prototype._processFields = function(processor) {
     processor.eat('entries',a);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SampleSizeBox);
-
 // ------------------------- pssh ------------------------------------
-
 mp4lib.boxes.ProtectionSystemSpecificHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'pssh');
 };
@@ -1311,10 +1174,7 @@ mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype._processFields = functi
    processor.eat('Data',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT8, this.DataSize));
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.ProtectionSystemSpecificHeaderBox );
-
 // ------------------------- saiz ------------------------------------
-
 mp4lib.boxes.SampleAuxiliaryInformationSizesBox=function() {
     mp4lib.boxes.FullBox.call(this,'saiz');
 };
@@ -1340,10 +1200,7 @@ mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype._processFields = funct
     }
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.SampleAuxiliaryInformationSizesBox );
-
 //------------------------- saio ------------------------------------
-
 mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox=function() {
     mp4lib.boxes.FullBox.call(this,'saio');
 };
@@ -1369,10 +1226,7 @@ mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype._processFields = fun
     }
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox);
-
 //------------------------- sinf ------------------------------------
-
 mp4lib.boxes.ProtectionSchemeInformationBox=function() {
     mp4lib.boxes.Box.call(this,'sinf');
     this.boxes = [];
@@ -1388,10 +1242,7 @@ mp4lib.boxes.ProtectionSchemeInformationBox.prototype._processFields = function(
   processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.ProtectionSchemeInformationBox);
-
 //------------------------ schi --------------------------------------
-
 mp4lib.boxes.SchemeInformationBox=function() {
     mp4lib.boxes.Box.call(this,'schi');
     this.boxes = [];
@@ -1407,10 +1258,7 @@ mp4lib.boxes.SchemeInformationBox.prototype._processFields = function(processor)
   processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.SchemeInformationBox);
-
 //------------------------ tenc --------------------------------------
-
 mp4lib.boxes.TrackEncryptionBox=function() {
     mp4lib.boxes.FullBox.call(this,'tenc');
 };
@@ -1428,10 +1276,7 @@ mp4lib.boxes.TrackEncryptionBox.prototype._processFields = function(processor) {
   processor.eat('default_KID', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT8, 16));
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.TrackEncryptionBox);
-
 //------------------------- schm -------------------------------------
-
 mp4lib.boxes.SchemeTypeBox=function() {
     mp4lib.boxes.FullBox.call(this,'schm');
 };
@@ -1452,10 +1297,7 @@ mp4lib.boxes.SchemeTypeBox.prototype._processFields = function(processor) {
     }
 };
 
-//mp4lib.registerBoxType( mp4lib.boxes.SchemeTypeBox);
-
 // --------------------------- elst ---------------------------------- 
-
 mp4lib.boxes.EditListBox = function() {
     mp4lib.boxes.FullBox.call(this,'elst');
 };
@@ -1487,10 +1329,7 @@ mp4lib.boxes.EditListBox.prototype._processEntry = function(box,processor) {
     processor.eat('media_rate_fraction',mp4lib.fields.FIELD_UINT16);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.EditListBox);
-
 // --------------------------- hmhd ----------------------------------
-
 mp4lib.boxes.HintMediaHeaderBox = function() {
     mp4lib.boxes.FullBox.call(this,'hmhd');
 };
@@ -1509,10 +1348,7 @@ mp4lib.boxes.HintMediaHeaderBox.prototype._processFields = function(processor) {
    processor.eat('reserved'  ,mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.HintMediaHeaderBox);
-
 // --------------------------- nmhd ---------------------------------- 
-
 mp4lib.boxes.NullMediaHeaderBox = function() {
     mp4lib.boxes.FullBox.call(this,'nmhd');
 };
@@ -1526,10 +1362,7 @@ mp4lib.boxes.NullMediaHeaderBox.prototype._processFields = function(processor) {
    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.NullMediaHeaderBox);
-
 // --------------------------- ctts ---------------------------------- 
-
 mp4lib.boxes.CompositionOffsetBox = function() {
     mp4lib.boxes.FullBox.call(this,'ctts');
 };
@@ -1559,10 +1392,7 @@ mp4lib.boxes.CompositionOffsetBox.prototype._processEntry = function(box,process
     }
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.CompositionOffsetBox);
-
 // --------------------------- cslg ----------------------------------
-
 mp4lib.boxes.CompositionToDecodeBox = function() {
     mp4lib.boxes.FullBox.call(this,'cslg');
 };
@@ -1581,10 +1411,7 @@ mp4lib.boxes.CompositionToDecodeBox.prototype._processFields = function(processo
     processor.eat('compositionEndTime',mp4lib.fields.FIELD_INT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.CompositionToDecodeBox);
-
 // --------------------------- stss ----------------------------------
-
 mp4lib.boxes.SyncSampleBox = function() {
     mp4lib.boxes.FullBox.call(this,'stss');
 };
@@ -1608,10 +1435,7 @@ mp4lib.boxes.SyncSampleBox.prototype._processEntry = function(box,processor) {
         processor.eat('sample_number',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.SyncSampleBox);
-
 // --------------------------- tref ----------------------------------
-
 mp4lib.boxes.TrackReferenceBox = function() {
     mp4lib.boxes.FullBox.call(this,'tref');
 };
@@ -1626,12 +1450,7 @@ mp4lib.boxes.TrackReferenceBox.prototype._processFields = function(processor) {
    processor.eat('track_IDs',new mp4lib.fields.BoxFillingArrayField(mp4lib.fields.FIELD_UINT32));
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.TrackReferenceBox);
-    
-
-
 //---------------------------- frma ----------------------------------
-
 mp4lib.boxes.OriginalFormatBox=function() {
     mp4lib.boxes.Box.call(this,'frma');
 };
@@ -1645,11 +1464,6 @@ mp4lib.boxes.OriginalFormatBox.prototype._processFields = function(processor) {
   mp4lib.boxes.Box.prototype._processFields.call(this,processor);
   processor.eat('data_format',mp4lib.fields.FIELD_UINT32);
 };
-
-//mp4lib.registerBoxType( mp4lib.boxes.OriginalFormatBox);
-
-
-
 
 // -------------------------------------------------------------------
 // Microsoft Smooth Streaming specific boxes
@@ -1699,8 +1513,6 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype._processClearEntry = function(box
     processor.eat('BytesOfEncryptedData',mp4lib.fields.FIELD_UINT32);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.PiffSampleEncryptionBox);
-
 //PIFF Track Encryption Box
 mp4lib.boxes.PiffTrackEncryptionBox=function() {
     mp4lib.boxes.FullBox.call(this,'tepiff');
@@ -1716,8 +1528,6 @@ mp4lib.boxes.PiffTrackEncryptionBox.prototype.uuid = [0x89, 0x74, 0xDB, 0xCE, 0x
 mp4lib.boxes.PiffTrackEncryptionBox.prototype._processFields = function(processor) {
     mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
 };
-
-//mp4lib.registerBoxType(mp4lib.boxes.PiffTrackEncryptionBox);
 
 //PIFF Protection System Specific Header Box
 mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox=function() {
@@ -1735,11 +1545,7 @@ mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype._processFields = fu
     mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
 };
 
-//mp4lib.registerBoxType(mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox);
-
-
 // --------------------------- tfdx -----------------------------
-
 mp4lib.boxes.TfxdBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfxd');
     //this.uuid = [0x6D, 0x1D, 0x9B, 0x05, 0x42, 0xD5, 0x44, 0xE6, 0x80, 0xE2, 0x14, 0x1D, 0xAF, 0xF7, 0x57, 0xB2];
@@ -1762,10 +1568,8 @@ mp4lib.boxes.TfxdBox.prototype._processFields = function(processor) {
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT32);
     }
 };
-//mp4lib.registerBoxType(mp4lib.boxes.TfxdBox);
 
 // --------------------------- tfrf -----------------------------
-
 mp4lib.boxes.TfrfBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfrf');
     //this.uuid = [0xD4, 0x80, 0x7E, 0xF2, 0xCA, 0x39, 0x46, 0x95, 0x8E, 0x54, 0x26, 0xCB, 0x9E, 0x46, 0xA7, 0x9F];
@@ -1795,4 +1599,3 @@ mp4lib.boxes.TfrfBox.prototype._processEntry = function(box,processor) {
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT32);
     }
 };
-//mp4lib.registerBoxType(mp4lib.boxes.TfrfBox);

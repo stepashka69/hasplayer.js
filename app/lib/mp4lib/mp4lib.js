@@ -17,23 +17,7 @@ var mp4lib = (function() {
         // A warning is typically non-critical issue, like unknown box in data buffer.
         warningHandler:function(message){}
     };
-
-    var boxPrototypes = {};
-    var uuidToBoxTypes = {};
-    var boxTypesToUUID = {};
-
-    /**
-    register new box types to be used by library
-    */
-    mp4lib.registerBoxType = function( boxPrototype ) {
-        boxPrototypes[ boxPrototype.prototype.boxtype ] = boxPrototype;
-        if (boxPrototype.prototype.uuid) {
-            var uuidString = JSON.stringify(boxPrototype.prototype.uuid);
-            uuidToBoxTypes[uuidString] = boxPrototype.prototype.boxtype;
-            boxTypesToUUID[boxPrototype.prototype.boxtype] = uuidString;
-        }
-    };
-        
+           
     /**
     create empty box object
     TO DO : improve factory, not final version!
@@ -179,31 +163,10 @@ var mp4lib = (function() {
                 }
                 break;
             default :
-                debugger;
                 mp4lib.warningHandler('Unknown boxtype:'+boxtype+', parsing as UnknownBox');
                 return new mp4lib.boxes.UnknownBox();
         }
-
-
-        /*var box;
-        if (boxtype in boxPrototypes) {
-            box = new boxPrototypes[boxtype]();
-        } else  {
-            mp4lib.warningHandler('Unknown boxtype:'+boxtype+', parsing as UnknownBox');
-            box = new mp4lib.boxes.UnknownBox();
-        }
-        return box;*/
     };
-
-
-    /*mp4lib.findBoxtypeByUUID = function( uuid ) {
-        return uuidToBoxTypes[uuid];
-    };
-
-    mp4lib.findUUIDByBoxtype = function( boxtype ) {
-        return boxTypesToUUID[boxtype];
-    };*/
-
     
     /**
     deserialize binary data (uint8array) into mp4lib.File object
