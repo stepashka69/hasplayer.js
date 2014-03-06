@@ -105,9 +105,6 @@ mp4lib.fields.BoxTypeField.prototype.read = function(buf,pos) {
 };
 
 mp4lib.fields.BoxTypeField.prototype.write = function(buf,pos,val) {
-    if (mp4lib.findUUIDByBoxtype(val))
-        val = 'uuid';
-    
     for (var i=0;i<4;i++) {
         buf[pos+i] = val.charCodeAt(i);
     }
@@ -351,28 +348,28 @@ mp4lib.fields.readString = function( buf, pos, count ) {
 };
 
 mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
-    var res = [];
+    var res = [], size = 0, boxtype = null, uuidFieldPos = 0, uuid = null;
     while (pos<end) {
         // Read box size        
-        var size = mp4lib.fields.FIELD_UINT32.read(buf, pos);
+        size = mp4lib.fields.FIELD_UINT32.read(buf, pos);
 
         // Read boxtype
-        var boxtype = mp4lib.fields.readString(buf, pos+4, 4);
+        boxtype = mp4lib.fields.readString(buf, pos+4, 4);
 
         // Extented type?
         if (boxtype == "uuid") {
-            var uuidFieldPos = (size == 1)?16:8;
-            var uuid = new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16).read(buf, pos + uuidFieldPos, pos + uuidFieldPos + 16);
-            
-            boxtype = mp4lib.findBoxtypeByUUID(JSON.stringify(uuid));
-            
-            if (boxtype === undefined) {
-                boxtype = "uuid";
-                mp4lib.warningHandler('Unknown UUID:'+JSON.stringify(uuid));
-            }
+            uuidFieldPos = (size == 1)?16:8;
+            uuid = new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16).read(buf, pos + uuidFieldPos, pos + uuidFieldPos + 16);
+            uuid = JSON.stringify(uuid);
         }
 
-        var box = mp4lib.createBox( boxtype );
+        var box = mp4lib.createBox( boxtype, uuid);
+
+        //if uuid is defined, replace boxtype by extended value after _processFields call. => line 386
+        if(uuid !== null)
+        {
+            boxtype = box.boxtype;
+        }
       
         var p = new mp4lib.fieldProcessors.DeserializationBoxFieldsProcessor(box,buf,pos,end);
         box._processFields(p);

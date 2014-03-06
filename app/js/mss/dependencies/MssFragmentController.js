@@ -113,7 +113,7 @@ Mss.dependencies.MssFragmentController = function () {
 
         convertFragment = function (data, request, adaptation) {
 
-            var segmentsUpdated = false;
+            var segmentsUpdated = false, i = 0;
 
             // Get track id corresponding to adaptation set
             var manifest = rslt.manifestModel.getValue();
@@ -123,16 +123,15 @@ Mss.dependencies.MssFragmentController = function () {
             var fragment = new mp4lib.deserialize(data);
 
             // Get references en boxes
-            var moof = mp4lib.getBoxByType(fragment, "moof");
-            var mdat = mp4lib.getBoxByType(fragment, "mdat");
-            var traf = mp4lib.getBoxByType(moof, "traf");
-            var trun = mp4lib.getBoxByType(traf, "trun");
-            var tfhd = mp4lib.getBoxByType(traf, "tfhd");
+            var moof = fragment.getBoxByType("moof");
+            var mdat = fragment.getBoxByType("mdat");
+            var traf = moof.getBoxByType("traf");
+            var trun = traf.getBoxByType("trun");
+            var tfhd = traf.getBoxByType("tfhd");
             
             //if protected content
-            var sepiff = mp4lib.getBoxByType(traf,"sepiff");
+            var sepiff = traf.getBoxByType("sepiff");
             if(sepiff !== null) {
-
                 sepiff.boxtype = "senc";
                 // Create Sample Auxiliary Information Offsets Box box (saio) 
                 var saio = new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
@@ -151,7 +150,7 @@ Mss.dependencies.MssFragmentController = function () {
 
                 var sizedifferent = false;
                 // get for each sample_info the size
-                for (var i = 0; i < sepiff.sample_count; i++) {
+                for (i = 0; i < sepiff.sample_count; i++) {
                     saiz.sample_info_size[i] = 8+(sepiff.entry[i].NumberOfEntries*6)+2;
                     //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
                     if(i>1) {
@@ -178,10 +177,10 @@ Mss.dependencies.MssFragmentController = function () {
 
             // Process tfxd boxes
             // This box provide absolute timestamp but we take the segment start time for tfdt
-            mp4lib.removeBoxByType(traf, "tfxd");
+            traf.removeBoxByType("tfxd");
 
             // Create and add tfdt box
-            var tfdt = mp4lib.getBoxByType(traf, "tfdt");
+            var tfdt = traf.getBoxByType("tfdt");
             if (tfdt === null) {
                 tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
                 tfdt.version = 1;
@@ -190,10 +189,12 @@ Mss.dependencies.MssFragmentController = function () {
             }
 
             // Process tfrf box
-            var tfrf = mp4lib.getBoxByType(traf, "tfrf");
-            if (tfrf !== null) {
-                segmentsUpdated = processTfrf(tfrf, adaptation);
-                mp4lib.removeBoxByType(traf, "tfrf");
+            var tfrf = traf.getBoxesByType("tfrf");
+            if (tfrf.length !== 0) {
+                for (i = 0; i < tfrf.length; i++) {
+                    segmentsUpdated = processTfrf(tfrf[i], adaptation);
+                    traf.removeBoxByType("tfrf");
+                }
             }
 
             // Before determining new size of the converted fragment we update some box flags related to data offset
@@ -204,11 +205,10 @@ Mss.dependencies.MssFragmentController = function () {
 
             if(sepiff !== null) {
                 //+8 => box size + type
-                var moofpositionInFragment = mp4lib.getBoxPositionByType(fragment,"moof")+8;
-                var trafpositionInMoof = mp4lib.getBoxPositionByType(moof,"traf")+8;
-                var sencpositionInTraf = mp4lib.getBoxPositionByType(traf,"senc")+8;
+                var moofpositionInFragment = fragment.getBoxPositionByType("moof")+8;
+                var trafpositionInMoof = moof.getBoxPositionByType("traf")+8;
+                var sencpositionInTraf = traf.getBoxPositionByType("senc")+8;
                 // set offset from begin fragment to the first IV in senc box
-                // FIXME saio is out of scope, how it works ?.????
                 saio.offset[0] = moofpositionInFragment+trafpositionInMoof+sencpositionInTraf+8;//flags (3) + version (1) + sampleCount (4)
             }
 
@@ -222,9 +222,9 @@ Mss.dependencies.MssFragmentController = function () {
             trun.data_offset = lp.res - mdat.size + 8; // 8 = 'size' + 'type' mdat fields length
 
             // PATCH tfdt and trun samples timestamp values in case of live streams within chrome
-            if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
+            if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")){
                 tfdt.baseMediaDecodeTime /= 1000;
-                for  (var i = 0; i < trun.samples_table.length; i++) {
+                for  (i = 0; i < trun.samples_table.length; i++) {
                     if (trun.samples_table[i].sample_composition_time_offset > 0) {
                         trun.samples_table[i].sample_composition_time_offset /= 1000;
                     }
@@ -258,7 +258,7 @@ Mss.dependencies.MssFragmentController = function () {
             result = new Uint8Array(bytes);
         }
 
-        if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
+        if (request && (request.type === "Media Segment") && representations && (representations.length > 0)){
             // Get adaptation containing provided representations
             // (Note: here representations is of type Dash.vo.Representation)
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
@@ -278,18 +278,18 @@ Mss.dependencies.MssFragmentController = function () {
         if ((request === undefined) && (navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
             var init_segment = mp4lib.deserialize(result);
             // FIXME unused variables ?
-            var moov = mp4lib.getBoxByType(init_segment, "moov");
-            var mvhd = mp4lib.getBoxByType(moov, "mvhd");
-            var trak = mp4lib.getBoxByType(moov, "trak");
-            var mdia = mp4lib.getBoxByType(trak, "mdia");
-            var mdhd = mp4lib.getBoxByType(mdia, "mdhd");
+            var moov = init_segment.getBoxByType("moov");
+            var mvhd = moov.getBoxByType("mvhd");
+            var trak = moov.getBoxByType("trak");
+            var mdia = trak.getBoxByType("mdia");
+            var mdhd = mdia.getBoxByType("mdhd");
 
             mvhd.timescale /= 1000;
             mdhd.timescale /= 1000;
 
             result = mp4lib.serialize(init_segment);
         }
-
+      
         return Q.when(result);
     };
 

@@ -36,7 +36,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             // Create Track box (trak)
             var trak = new mp4lib.boxes.TrackBox();
-            trak.boxes = [];
 
             // Create and add TrackHeader box (trak)
             var tkhd = new mp4lib.boxes.TrackHeaderBox();
@@ -64,7 +63,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //Create container for the media information in a track (mdia)
             var mdia = new mp4lib.boxes.MediaBox();
-            mdia.boxes = [];
 
             //Create and add Media Header Box (mdhd)
             mdia.boxes.push(createMediaHeaderBox(media));
@@ -169,7 +167,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //This box contains all the objects that declare characteristic information of the media in the track.
             var minf = new mp4lib.boxes.MediaInformationBox();
-            minf.boxes = [];
             
             //Create and add the adapted media header box (vmhd, smhd or nmhd) for audio, video or text.
             switch(media.type)
@@ -199,7 +196,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //The data information box contains objects that declare the location of the media information in a track.
             var dinf = new mp4lib.boxes.DataInformationBox();
-            dinf.boxes = [];
 
             //The data reference object contains a table of data references (normally URLs) that declare the location(s) of
             //the media data used within the presentation
@@ -209,9 +205,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             dref.entry_count = 1; //is an integer that counts the actual entries
             dref.flags = 0; //default value
 
-            //The DataEntryBox within the DataReferenceBox shall be either a DataEntryUrnBox or a DataEntryUrlBox.
-            dref.boxes = [];
-            
+            //The DataEntryBox within the DataReferenceBox shall be either a DataEntryUrnBox or a DataEntryUrlBox.           
             //NAN : not used, but mandatory
             var url = new mp4lib.boxes.DataEntryUrlBox();
             url.location = "";
@@ -370,8 +364,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 avc1 = new mp4lib.boxes.AVC1VisualSampleEntryBox();
             }
 
-            avc1.boxes = [];
-
             avc1.data_reference_index = 1; //To DO... ??
             avc1.compressorname = "AVC Coding";//is a name, for informative purposes. It is formatted in a fixed 32-byte field, with the first
                                                //byte set to the number of bytes to be displayed, followed by that number of bytes of displayable data,
@@ -394,7 +386,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //create and add AVC Configuration Box (avcC)
             avc1.boxes.push(createAVCConfigurationBox(media));
 
-            if (media.contentProtection != undefined)
+            if (media.contentProtection !== undefined)
             {
                 // create and add Protection Scheme Info Box
                 avc1.boxes.push(createProtectionSchemeInfoBox(media));
@@ -423,7 +415,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
         createSchemeInformationBox = function (media) {
             var schi = new mp4lib.boxes.SchemeInformationBox();
-            schi.boxes = [];
 
             //create and add Track Encryption Box
             schi.boxes.push(createTrackEncryptionBox(media));
@@ -431,7 +422,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             return schi;
         },
 
-        createTrackEncryptionBox = function (media) {
+        createTrackEncryptionBox = function () {
             var tenc = new mp4lib.boxes.TrackEncryptionBox();
             
             tenc.default_IsEncrypted = 0x1; //default value
@@ -444,7 +435,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         createProtectionSchemeInfoBox = function (media) {
             //create Protection Scheme Info Box
             var sinf = new mp4lib.boxes.ProtectionSchemeInformationBox();
-            sinf.boxes = [];
 
             //create and add Original Format Box => indicate codec type of the encrypted content         
             sinf.boxes.push(createOriginalFormatBox(media));
@@ -471,7 +461,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         
         parseHexString = function (str) {
             var bytes = [];
-            while (str.length >= 2) { 
+            while (str.length >= 2) {
                 bytes.push(parseInt(str.substring(0, 2), 16));
                 str = str.substring(2, str.length);
             }
@@ -543,8 +533,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 mp4a = new mp4lib.boxes.MP4AudioSampleEntryBox();
             }
 
-            mp4a.boxes = [];
-
             // SampleEntry fields
             mp4a.reserved = [0x0, 0x0, 0x0, 0x0, 0x0, 0x0];
             mp4a.data_reference_index = 1;              // ??
@@ -595,7 +583,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //The sample description table gives detailed information about the coding type used, and any initialization
             //information needed for that coding.
             var stsd = new mp4lib.boxes.SampleDescriptionBox();
-            stsd.boxes = [];
              
             switch(media.type)
             {
@@ -619,7 +606,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //here, it is possible to locate samples in time, determine their type (e.g. I-frame or not), and determine their
             //size, container, and offset into that container.
             var stbl = new mp4lib.boxes.SampleTableBox();
-            stbl.boxes = [];
 
             //create and add Decoding Time to Sample Box (stts)
             stbl.boxes.push(createDecodingTimeToSampleBox(media));
@@ -694,7 +680,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // Create Movie Extends Box (mvex) 
             // This box warns readers that there might be Movie Fragment Boxes in this file
             var mvex = new mp4lib.boxes.MovieExtendsBox();
-            mvex.boxes = [];
             
             // Create Movie Extends Header Box (mehd)
             // The Movie Extends Header is optional, and provides the overall duration, including fragments, of a fragmented
@@ -748,11 +733,9 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         doGenerateInitSegment = function (media) {
             // Create file
             var moov_file = new mp4lib.boxes.File();
-            moov_file.boxes = [];
 
             // Create Movie box (moov) 
             var moov = new mp4lib.boxes.MovieBox();
-            moov.boxes = [];
 
             // Create and add MovieHeader box (mvhd)
             moov.boxes.push(createMovieHeaderBox(media));
