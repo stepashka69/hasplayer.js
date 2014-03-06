@@ -48,15 +48,12 @@ mp4lib.boxes.Box = function(boxType){
 mp4lib.boxes.Box.prototype._processFields = function(processor) {
     processor.eat('size',mp4lib.fields.FIELD_UINT32);
     processor.eat('boxtype',mp4lib.fields.FIELD_ID);
-
+    
     if (this.size==1) {
         processor.eat('largesize',mp4lib.fields.FIELD_INT64);
     }
-
-    if (this.boxtype=='uuid'){
-        processor.eat('usertype', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16));
-    }
 };
+
 
 mp4lib.boxes.Box.prototype.getBoxByType = function(boxType) {
     var i = 0;
@@ -132,10 +129,35 @@ mp4lib.boxes.FullBox.prototype._processFields = function(processor) {
     processor.eat('flags',mp4lib.fields.FIELD_BIT24);
 };
 
+// ---------- Extended Type Full Box -------------------------------
+
+mp4lib.boxes.ExtendedTypeFullBox = function(boxType){
+    mp4lib.boxes.Box.call(this,boxType);
+    this.version = null;
+    this.flags = null;
+    this.serialization_boxtype = 'uuid';
+};
+
+mp4lib.boxes.ExtendedTypeFullBox.prototype = Object.create(mp4lib.boxes.Box.prototype);
+mp4lib.boxes.ExtendedTypeFullBox.prototype.constructor = mp4lib.boxes.ExtendedTypeFullBox;
+
+mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields = function(processor) {
+    processor.eat('size',mp4lib.fields.FIELD_UINT32);
+    processor.eat('serialization_boxtype',mp4lib.fields.FIELD_ID);
+    
+    if (this.size==1) {
+        processor.eat('largesize',mp4lib.fields.FIELD_INT64);
+    }
+
+    processor.eat('usertype', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16));
+    processor.eat('version',mp4lib.fields.FIELD_INT8);
+    processor.eat('flags',mp4lib.fields.FIELD_BIT24);
+};
+
 // ----------- Unknown Box -----------------------------
 
-mp4lib.boxes.UnknownBox =  function() {
-    mp4lib.boxes.Box.call(this,null);
+mp4lib.boxes.UnknownBox =  function(boxType) {
+    mp4lib.boxes.Box.call(this,boxType);
 };
 
 mp4lib.boxes.UnknownBox.prototype = Object.create(mp4lib.boxes.Box.prototype);
@@ -1472,18 +1494,18 @@ mp4lib.boxes.OriginalFormatBox.prototype._processFields = function(processor) {
 // --------------------------- piff ----------------------------------
 //PIFF Sample Encryption box
 mp4lib.boxes.PiffSampleEncryptionBox=function() {
-    mp4lib.boxes.FullBox.call(this,'sepiff');
+    mp4lib.boxes.ExtendedTypeFullBox.call(this,'sepiff');
     //this.uuid = [0xA2, 0x39, 0x4F, 0x52, 0x5A, 0x9B, 0x4F, 0x14, 0xA2, 0x44, 0x6C, 0x42, 0x7C, 0x64, 0x8D, 0xF4];
 };
 
-mp4lib.boxes.PiffSampleEncryptionBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+mp4lib.boxes.PiffSampleEncryptionBox.prototype = Object.create(mp4lib.boxes.ExtendedTypeFullBox.prototype);
 mp4lib.boxes.PiffSampleEncryptionBox.prototype.constructor = mp4lib.boxes.PiffSampleEncryptionBox;
 
 //mp4lib.boxes.PiffSampleEncryptionBox.prototype.boxtype = 'sepiff';
 mp4lib.boxes.PiffSampleEncryptionBox.prototype.uuid = [0xA2, 0x39, 0x4F, 0x52, 0x5A, 0x9B, 0x4F, 0x14, 0xA2, 0x44, 0x6C, 0x42, 0x7C, 0x64, 0x8D, 0xF4];
 
 mp4lib.boxes.PiffSampleEncryptionBox.prototype._processFields = function(processor) {
-    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
+    mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields.call(this,processor);
     processor.eat('sample_count',mp4lib.fields.FIELD_UINT32);
 
     if (this.flags & 1)
@@ -1515,50 +1537,50 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype._processClearEntry = function(box
 
 //PIFF Track Encryption Box
 mp4lib.boxes.PiffTrackEncryptionBox=function() {
-    mp4lib.boxes.FullBox.call(this,'tepiff');
+    mp4lib.boxes.ExtendedTypeFullBox.call(this,'tepiff');
     //this.uuid = [0x89, 0x74, 0xDB, 0xCE, 0x7B, 0xE7, 0x4C, 0x51, 0x84, 0xF9, 0x71, 0x48, 0xF9, 0x88, 0x25, 0x54];
 };
 
-mp4lib.boxes.PiffTrackEncryptionBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+mp4lib.boxes.PiffTrackEncryptionBox.prototype = Object.create(mp4lib.boxes.ExtendedTypeFullBox.prototype);
 mp4lib.boxes.PiffTrackEncryptionBox.prototype.constructor = mp4lib.boxes.PiffTrackEncryptionBox;
 
 //mp4lib.boxes.PiffTrackEncryptionBox.prototype.boxtype = 'tepiff';
 mp4lib.boxes.PiffTrackEncryptionBox.prototype.uuid = [0x89, 0x74, 0xDB, 0xCE, 0x7B, 0xE7, 0x4C, 0x51, 0x84, 0xF9, 0x71, 0x48, 0xF9, 0x88, 0x25, 0x54];
 
 mp4lib.boxes.PiffTrackEncryptionBox.prototype._processFields = function(processor) {
-    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
+    mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields.call(this,processor);
 };
 
 //PIFF Protection System Specific Header Box
 mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox=function() {
-    mp4lib.boxes.FullBox.call(this,'psshpiff');
+    mp4lib.boxes.ExtendedTypeFullBox.call(this,'psshpiff');
     //this.uuid = [0xD0, 0x8A, 0x4F, 0x18, 0x10, 0xF3, 0x4A, 0x82, 0xB6, 0xC8, 0x32, 0xD8, 0xAB, 0xA1, 0x83, 0xD3];
 };
 
-mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype = Object.create(mp4lib.boxes.ExtendedTypeFullBox.prototype);
 mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype.constructor = mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox;
 
 //mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype.boxtype = 'psshpiff';
 mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype.uuid = [0xD0, 0x8A, 0x4F, 0x18, 0x10, 0xF3, 0x4A, 0x82, 0xB6, 0xC8, 0x32, 0xD8, 0xAB, 0xA1, 0x83, 0xD3];
 
 mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype._processFields = function(processor) {
-    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
+    mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields.call(this,processor);
 };
 
 // --------------------------- tfdx -----------------------------
 mp4lib.boxes.TfxdBox=function() {
-    mp4lib.boxes.FullBox.call(this,'tfxd');
+    mp4lib.boxes.ExtendedTypeFullBox.call(this,'tfxd');
     //this.uuid = [0x6D, 0x1D, 0x9B, 0x05, 0x42, 0xD5, 0x44, 0xE6, 0x80, 0xE2, 0x14, 0x1D, 0xAF, 0xF7, 0x57, 0xB2];
 };
 
-mp4lib.boxes.TfxdBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+mp4lib.boxes.TfxdBox.prototype = Object.create(mp4lib.boxes.ExtendedTypeFullBox.prototype);
 mp4lib.boxes.TfxdBox.prototype.constructor = mp4lib.boxes.TfxdBox;
 
 //mp4lib.boxes.TfxdBox.prototype.boxtype = 'tfxd';
 mp4lib.boxes.TfxdBox.prototype.uuid = [0x6D, 0x1D, 0x9B, 0x05, 0x42, 0xD5, 0x44, 0xE6, 0x80, 0xE2, 0x14, 0x1D, 0xAF, 0xF7, 0x57, 0xB2];
 
 mp4lib.boxes.TfxdBox.prototype._processFields = function(processor) {
-    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
+    mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields.call(this,processor);
     if (this.version==1) {
         processor.eat('fragment_absolute_time',mp4lib.fields.FIELD_UINT64);
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT64);
@@ -1571,18 +1593,18 @@ mp4lib.boxes.TfxdBox.prototype._processFields = function(processor) {
 
 // --------------------------- tfrf -----------------------------
 mp4lib.boxes.TfrfBox=function() {
-    mp4lib.boxes.FullBox.call(this,'tfrf');
+    mp4lib.boxes.ExtendedTypeFullBox.call(this,'tfrf');
     //this.uuid = [0xD4, 0x80, 0x7E, 0xF2, 0xCA, 0x39, 0x46, 0x95, 0x8E, 0x54, 0x26, 0xCB, 0x9E, 0x46, 0xA7, 0x9F];
 };
 
-mp4lib.boxes.TfrfBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+mp4lib.boxes.TfrfBox.prototype = Object.create(mp4lib.boxes.ExtendedTypeFullBox.prototype);
 mp4lib.boxes.TfrfBox.prototype.constructor = mp4lib.boxes.TfrfBox;
 
 //mp4lib.boxes.TfrfBox.prototype.boxtype = 'tfrf';
 mp4lib.boxes.TfrfBox.prototype.uuid = [0xD4, 0x80, 0x7E, 0xF2, 0xCA, 0x39, 0x46, 0x95, 0x8E, 0x54, 0x26, 0xCB, 0x9E, 0x46, 0xA7, 0x9F];
 
 mp4lib.boxes.TfrfBox.prototype._processFields = function(processor) {
-    mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
+    mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields.call(this,processor);
     processor.eat('fragment_count', mp4lib.fields.FIELD_UINT8);
     var entryField = new mp4lib.fields.StructureField(this, mp4lib.boxes.TfrfBox.prototype._processEntry);
     var a = new mp4lib.fields.ArrayField(entryField, this.fragment_count);

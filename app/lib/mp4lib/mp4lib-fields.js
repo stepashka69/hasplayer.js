@@ -364,12 +364,6 @@ mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
         }
 
         var box = mp4lib.createBox( boxtype, uuid);
-
-        //if uuid is defined, replace boxtype by extended value after _processFields call. => line 386
-        if(uuid !== null)
-        {
-            boxtype = box.boxtype;
-        }
       
         var p = new mp4lib.fieldProcessors.DeserializationBoxFieldsProcessor(box,buf,pos,end);
         box._processFields(p);
@@ -379,8 +373,6 @@ mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
         // source buffer with serialized box
         if (mp4lib.debug)
             box.__sourceBuffer = buf.subarray(pos,pos+box.size);
-
-        box.boxtype = boxtype;
 
         res.push(box);
         pos+=box.size;

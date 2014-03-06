@@ -160,11 +160,16 @@ var mp4lib = (function() {
                         return new mp4lib.boxes.PiffTrackEncryptionBox();
                     case JSON.stringify(mp4lib.boxes.PiffSampleEncryptionBox.prototype.uuid) :
                         return new mp4lib.boxes.PiffSampleEncryptionBox();
+
+                    default :
+                        mp4lib.warningHandler('Unknown extended type box:'+uuid+', parsing as UnknownBox');
+                        return new mp4lib.boxes.UnknownBox(boxtype);
                 }
                 break;
+
             default :
                 mp4lib.warningHandler('Unknown boxtype:'+boxtype+', parsing as UnknownBox');
-                return new mp4lib.boxes.UnknownBox();
+                return new mp4lib.boxes.UnknownBox(boxtype);
         }
     };
     
