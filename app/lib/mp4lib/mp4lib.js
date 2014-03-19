@@ -17,160 +17,107 @@ var mp4lib = (function() {
         // A warning is typically non-critical issue, like unknown box in data buffer.
         warningHandler:function(message){}
     };
-           
-    /**
-    create empty box object
-    TO DO : improve factory, not final version!
-    */
-    mp4lib.createBox = function( boxtype, uuid ) {
-        switch (boxtype) {
-            case "moov" :
-                return new mp4lib.boxes.MovieBox();
-            case "moof" :
-                return new mp4lib.boxes.MovieFragmentBox();
-            case "ftyp" :
-                return new mp4lib.boxes.FileTypeBox();
-            case "mfhd" :
-                return new mp4lib.boxes.MovieFragmentHeaderBox();
-            case "mfra" :
-                return new mp4lib.boxes.MovieFragmentRandomAccessBox();
-            case "udta" :
-                return new mp4lib.boxes.UserDataBox();
-            case "trak" :
-                return new mp4lib.boxes.TrackBox();
-            case "edts" :
-                return new mp4lib.boxes.EditBox();
-            case "mdia" :
-                return new mp4lib.boxes.MediaBox();
-            case "minf" :
-                return new mp4lib.boxes.MediaInformationBox();
-            case "dinf" :
-                return new mp4lib.boxes.DataInformationBox();
-            case "stbl" :
-                return new mp4lib.boxes.SampleTableBox();
-            case "mvex" :
-                return new mp4lib.boxes.MovieExtendsBox();
-            case "traf" :
-                return new mp4lib.boxes.TrackFragmentBox();
-            case "meta" :
-                return new mp4lib.boxes.MetaBox();
-            case "mvhd" :
-                return new mp4lib.boxes.MovieHeaderBox();
-            case "mdat" :
-                return new mp4lib.boxes.MediaDataBox();
-            case "free" :
-                return new mp4lib.boxes.FreeSpaceBox();
-            case "sidx" :
-                return new mp4lib.boxes.SegmentIndexBox();
-            case "tkhd" :
-                return new mp4lib.boxes.TrackHeaderBox();
-            case "mdhd" :
-                return new mp4lib.boxes.MediaHeaderBox();
-            case "mehd" :
-                return new mp4lib.boxes.MovieExtendsHeaderBox();
-            case "hdlr" :
-                return new mp4lib.boxes.HandlerBox();
-            case "stts" :
-                return new mp4lib.boxes.TimeToSampleBox();
-            case "sidx" :
-                return new mp4lib.boxes.SegmentIndexBox();
-            case "stsc" :
-                return new mp4lib.boxes.SampleToChunkBox();
-            case "stco" :
-                return new mp4lib.boxes.ChunkOffsetBox();
-            case "trex" :
-                return new mp4lib.boxes.TrackExtendsBox();
-            case "vmhd" :
-                return new mp4lib.boxes.VideoMediaHeaderBox();
-            case "smhd" :
-                return new mp4lib.boxes.SoundMediaHeaderBox();
-            case "dref" :
-                return new mp4lib.boxes.DataReferenceBox();
-            case "url " :
-                return new mp4lib.boxes.DataEntryUrlBox();
-            case "urn " :
-                return new mp4lib.boxes.DataEntryUrnBox();
-            case "tfhd" :
-                return new mp4lib.boxes.TrackFragmentHeaderBox();
-            case "tfdt" :
-                return new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
-            case "trun" :
-                return new mp4lib.boxes.TrackFragmentRunBox();
-            case "stts" :
-                return new mp4lib.boxes.TimeToSampleBox();
-            case "stsd" :
-                return new mp4lib.boxes.SampleDescriptionBox();
-            case "sdtp" :
-                return new mp4lib.boxes.SampleDependencyTableBox();
-            case "avc1" :
-                return new mp4lib.boxes.AVC1VisualSampleEntryBox();
-            case "encv" :
-                return new mp4lib.boxes.EncryptedVideoBox();
-            case "avcC" :
-                return new mp4lib.boxes.AVCConfigurationBox();
-            case "pasp" :
-                return new mp4lib.boxes.PixelAspectRatioBox();
-            case "mp4a" :
-                return new mp4lib.boxes.MP4AudioSampleEntryBox();
-            case "enca" :
-                return new mp4lib.boxes.EncryptedAudioBox();
-            case "esds" :
-                return new mp4lib.boxes.ESDBox();
-            case "stsz" :
-                return new mp4lib.boxes.SampleSizeBox();
-            case "pssh" :
-                return new mp4lib.boxes.ProtectionSystemSpecificHeaderBox();
-            case "saiz" :
-                return new mp4lib.boxes.SampleAuxiliaryInformationSizesBox();
-            case "saio" :
-                return new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
-            case "sinf" :
-                return new mp4lib.boxes.ProtectionSchemeInformationBox();
-            case "schi" :
-                return new mp4lib.boxes.SchemeInformationBox();
-            case "tenc" :
-                return new mp4lib.boxes.TrackEncryptionBox();
-            case "schm" :
-                return new mp4lib.boxes.SchemeTypeBox();
-            case "elst" :
-                return new mp4lib.boxes.EditListBox();
-            case "hmhd" :
-                return new mp4lib.boxes.HintMediaHeaderBox();
-            case "nmhd" :
-                return new mp4lib.boxes.NullMediaHeaderBox();
-            case "ctts" :
-                return new mp4lib.boxes.CompositionOffsetBox();
-            case "cslg" :
-                return new mp4lib.boxes.CompositionToDecodeBox();
-            case "stss" :
-                return new mp4lib.boxes.SyncSampleBox();
-            case "tref" :
-                return new mp4lib.boxes.TrackReferenceBox();
-            case "frma" :
-                return new mp4lib.boxes.OriginalFormatBox();
-            case "uuid" :
-                switch (uuid) {
-                    case JSON.stringify(mp4lib.boxes.TfxdBox.prototype.uuid) :
-                        return new mp4lib.boxes.TfxdBox();
-                    case JSON.stringify(mp4lib.boxes.TfrfBox.prototype.uuid) :
-                        return new mp4lib.boxes.TfrfBox();
-                    case JSON.stringify(mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox.prototype.uuid) :
-                        return new mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox();
-                    case JSON.stringify(mp4lib.boxes.PiffTrackEncryptionBox.prototype.uuid) :
-                        return new mp4lib.boxes.PiffTrackEncryptionBox();
-                    case JSON.stringify(mp4lib.boxes.PiffSampleEncryptionBox.prototype.uuid) :
-                        return new mp4lib.boxes.PiffSampleEncryptionBox();
 
-                    default :
-                        mp4lib.warningHandler('Unknown extended type box:'+uuid+', parsing as UnknownBox');
-                        return new mp4lib.boxes.UnknownBox(boxtype);
-                }
-                break;
+    var boxTypeArray = {};
+    var extendedBoxTypeArray = {};
 
-            default :
-                mp4lib.warningHandler('Unknown boxtype:'+boxtype+', parsing as UnknownBox');
-                return new mp4lib.boxes.UnknownBox(boxtype);
+    mp4lib.registerTypeBoxes = function() {
+        boxTypeArray["moov"] = mp4lib.boxes.MovieBox;
+        boxTypeArray["moof"] = mp4lib.boxes.MovieFragmentBox;
+        boxTypeArray["ftyp"] = mp4lib.boxes.FileTypeBox;
+        boxTypeArray["mfhd"] = mp4lib.boxes.MovieFragmentHeaderBox;
+        boxTypeArray["mfra"] = mp4lib.boxes.MovieFragmentRandomAccessBox;
+        boxTypeArray["udta"] = mp4lib.boxes.UserDataBox;
+        boxTypeArray["trak"] = mp4lib.boxes.TrackBox;
+        boxTypeArray["edts"] = mp4lib.boxes.EditBox;
+        boxTypeArray["mdia"] = mp4lib.boxes.MediaBox;
+        boxTypeArray["minf"] = mp4lib.boxes.MediaInformationBox;
+        boxTypeArray["dinf"] = mp4lib.boxes.DataInformationBox;
+        boxTypeArray["stbl"] = mp4lib.boxes.SampleTableBox;
+        boxTypeArray["mvex"] = mp4lib.boxes.MovieExtendsBox;
+        boxTypeArray["traf"] = mp4lib.boxes.TrackFragmentBox;
+        boxTypeArray["meta"] = mp4lib.boxes.MetaBox;
+        boxTypeArray["mvhd"] = mp4lib.boxes.MovieHeaderBox;
+        boxTypeArray["mdat"] = mp4lib.boxes.MediaDataBox;
+        boxTypeArray["free"] = mp4lib.boxes.FreeSpaceBox;
+        boxTypeArray["sidx"] = mp4lib.boxes.SegmentIndexBox;
+        boxTypeArray["tkhd"] = mp4lib.boxes.TrackHeaderBox;
+        boxTypeArray["mdhd"] = mp4lib.boxes.MediaHeaderBox;
+        boxTypeArray["mehd"] = mp4lib.boxes.MovieExtendsHeaderBox;
+        boxTypeArray["hdlr"] = mp4lib.boxes.HandlerBox;
+        boxTypeArray["stts"] = mp4lib.boxes.TimeToSampleBox;
+        boxTypeArray["stsc"] = mp4lib.boxes.SampleToChunkBox;
+        boxTypeArray["stco"] = mp4lib.boxes.ChunkOffsetBox;
+        boxTypeArray["trex"] = mp4lib.boxes.TrackExtendsBox;
+        boxTypeArray["vmhd"] = mp4lib.boxes.VideoMediaHeaderBox;
+        boxTypeArray["smhd"] = mp4lib.boxes.SoundMediaHeaderBox;
+        boxTypeArray["dref"] = mp4lib.boxes.DataReferenceBox;
+        boxTypeArray["url "] = mp4lib.boxes.DataEntryUrlBox;
+        boxTypeArray["urn "] = mp4lib.boxes.DataEntryUrnBox;
+        boxTypeArray["tfhd"] = mp4lib.boxes.TrackFragmentHeaderBox;
+        boxTypeArray["tfdt"] = mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox;
+        boxTypeArray["trun"] = mp4lib.boxes.TrackFragmentRunBox;
+        boxTypeArray["stsd"] = mp4lib.boxes.SampleDescriptionBox;
+        boxTypeArray["sdtp"] = mp4lib.boxes.SampleDependencyTableBox;
+        boxTypeArray["avc1"] = mp4lib.boxes.AVC1VisualSampleEntryBox;
+        boxTypeArray["encv"] = mp4lib.boxes.EncryptedVideoBox;
+        boxTypeArray["avcC"] = mp4lib.boxes.AVCConfigurationBox;
+        boxTypeArray["pasp"] = mp4lib.boxes.PixelAspectRatioBox;
+        boxTypeArray["mp4a"] = mp4lib.boxes.MP4AudioSampleEntryBox;
+        boxTypeArray["enca"] = mp4lib.boxes.EncryptedAudioBox;
+        boxTypeArray["esds"] = mp4lib.boxes.ESDBox;
+        boxTypeArray["stsz"] = mp4lib.boxes.SampleSizeBox;
+        boxTypeArray["pssh"] = mp4lib.boxes.ProtectionSystemSpecificHeaderBox;
+        boxTypeArray["saiz"] = mp4lib.boxes.SampleAuxiliaryInformationSizesBox;
+        boxTypeArray["saio"] = mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox;
+        boxTypeArray["sinf"] = mp4lib.boxes.ProtectionSchemeInformationBox;
+        boxTypeArray["schi"] = mp4lib.boxes.SchemeInformationBox;
+        boxTypeArray["tenc"] = mp4lib.boxes.TrackEncryptionBox;
+        boxTypeArray["schm"] = mp4lib.boxes.SchemeTypeBox;
+        boxTypeArray["elst"] = mp4lib.boxes.EditListBox;
+        boxTypeArray["hmhd"] = mp4lib.boxes.HintMediaHeaderBox;
+        boxTypeArray["nmhd"] = mp4lib.boxes.NullMediaHeaderBox;
+        boxTypeArray["ctts"] = mp4lib.boxes.CompositionOffsetBox;
+        boxTypeArray["cslg"] = mp4lib.boxes.CompositionToDecodeBox;
+        boxTypeArray["stss"] = mp4lib.boxes.SyncSampleBox;
+        boxTypeArray["tref"] = mp4lib.boxes.TrackReferenceBox;
+        boxTypeArray["frma"] = mp4lib.boxes.OriginalFormatBox;
+    };
+
+     mp4lib.registerExtendedTypeBoxes = function() {
+        extendedBoxTypeArray[JSON.stringify([0x6D, 0x1D, 0x9B, 0x05, 0x42, 0xD5, 0x44, 0xE6, 0x80, 0xE2, 0x14, 0x1D, 0xAF, 0xF7, 0x57, 0xB2])] = mp4lib.boxes.TfxdBox;
+        extendedBoxTypeArray[JSON.stringify([0xD4, 0x80, 0x7E, 0xF2, 0xCA, 0x39, 0x46, 0x95, 0x8E, 0x54, 0x26, 0xCB, 0x9E, 0x46, 0xA7, 0x9F])] = mp4lib.boxes.TfrfBox;
+        extendedBoxTypeArray[JSON.stringify([0xD0, 0x8A, 0x4F, 0x18, 0x10, 0xF3, 0x4A, 0x82, 0xB6, 0xC8, 0x32, 0xD8, 0xAB, 0xA1, 0x83, 0xD3])] = mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox;
+        extendedBoxTypeArray[JSON.stringify([0x89, 0x74, 0xDB, 0xCE, 0x7B, 0xE7, 0x4C, 0x51, 0x84, 0xF9, 0x71, 0x48, 0xF9, 0x88, 0x25, 0x54])] = mp4lib.boxes.PiffTrackEncryptionBox;
+        extendedBoxTypeArray[JSON.stringify([0xA2, 0x39, 0x4F, 0x52, 0x5A, 0x9B, 0x4F, 0x14, 0xA2, 0x44, 0x6C, 0x42, 0x7C, 0x64, 0x8D, 0xF4])] = mp4lib.boxes.PiffSampleEncryptionBox;
+     };
+
+    mp4lib.constructorTypeBox = function (type) {
+        var obj, args;
+        obj = Object.create(type.prototype);
+        args = Array.prototype.slice.call(arguments, 1);
+        type.apply(obj, args);
+        return obj;
+    };
+
+    mp4lib.searchBox = function ( boxtype, uuid ){
+        var boxType;
+        if (uuid) {
+            boxType = extendedBoxTypeArray[uuid];
         }
+        else {
+            boxType = boxTypeArray[boxtype];
+        }
+        
+        if (!boxType){
+            boxType = mp4lib.boxes.UnknownBox;
+        }
+
+        return boxType;
+    };
+           
+    mp4lib.createBox = function( boxtype, uuid ) { 
+        return mp4lib.constructorTypeBox.apply(null, [mp4lib.searchBox(boxtype,uuid)]);
     };
     
     /**
