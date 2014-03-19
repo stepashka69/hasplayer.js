@@ -120,7 +120,7 @@ Mss.dependencies.MssFragmentController = function () {
             var trackId = getIndex(adaptation, manifest) + 1; // +1 since track_id shall start from '1'
 
             // Create new fragment
-            var fragment = new mp4lib.deserialize(data);
+            var fragment = mp4lib.deserialize(data);
 
             // Get references en boxes
             var moof = fragment.getBoxByType("moof");
