@@ -25,6 +25,13 @@ mp4lib.fields.writeBytes = function(buf, pos, nbBytes, value) {
     }
 };
 
+mp4lib.fields.readString = function( buf, pos, count ) {
+    var res = "";
+    for (var i=pos;i<pos+count;i++) {
+        res = res+String.fromCharCode(buf[i]);
+    }
+    return res;
+};
 
 //------------------------------- NumberField -------------------------------
 
@@ -337,14 +344,6 @@ mp4lib.fields.StructureField.prototype.getLength = function(val) {
 //------------------------------- BoxesListField -------------------------------
 
 mp4lib.fields.BoxesListField = function BoxesListField() {
-};
-
-mp4lib.fields.readString = function( buf, pos, count ) {
-    var res = "";
-    for (var i=pos;i<pos+count;i++) {
-        res = res+String.fromCharCode(buf[i]);
-    }
-    return res;
 };
 
 mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
