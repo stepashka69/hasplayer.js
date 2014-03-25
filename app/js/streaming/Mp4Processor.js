@@ -126,8 +126,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         stringToCharCode = function (str) {
 
             var code = 0;
-            for (var i = 0; i < str.length; i++)
-            {
+            for (var i = 0; i < str.length; i++){
                 code |= str.charCodeAt(i) << ((str.length - i - 1) * 8);
             }
             return code;
@@ -315,24 +314,21 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             var SPS_index = 0;
             var PPS_index = 0;
-            for (var j=0;j<NALArray.length;j++)
-            {
+            for (var j=0;j<NALArray.length;j++){
                 var regexp7 = new RegExp("^[A-Z0-9]7", "gi");           //SPS
                 var regexp8 = new RegExp("^[A-Z0-9]8", "gi");           //PPS
                 
                 
                 var NALBuffer = _hexstringtoBuffer(NALArray[j]);
 
-                if (NALArray[j].match(regexp7))
-                {
+                if (NALArray[j].match(regexp7)){
                     avcC.SPS_NAL[SPS_index++] = { "NAL_length":NALBuffer.length, "NAL":NALBuffer };
                     avcC.AVCProfileIndication = parseInt(NALArray[j].substr(2,2),16); //contains the profile code as defined in ISO/IEC 14496-10.
                     avcC.profile_compatibility = parseInt(NALArray[j].substr(4,2),16); //is a byte defined exactly the same as the byte which occurs between the
                                                                                        //profile_IDC and level_IDC in a sequence parameter set (SPS), as defined in ISO/IEC 14496-10.
                     avcC.AVCLevelIndication = parseInt(NALArray[j].substr(6,2),16); //contains the level code as defined in ISO/IEC 14496-10.
                 }
-                if (NALArray[j].match(regexp8))
-                {
+                if (NALArray[j].match(regexp8)){
                     avcC.PPS_NAL[PPS_index++] =  { "NAL_length":NALBuffer.length, "NAL":NALBuffer };
                 }
 
@@ -355,12 +351,10 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //An AVC visual sample entry shall contain an AVC Configuration Box
             var avc1 = null;
 
-            if (media.contentProtection !== undefined)
-            {
+            if (media.contentProtection !== undefined){
                 avc1 = new mp4lib.boxes.EncryptedVideoBox();
             }
-            else
-            {
+            else{
                 avc1 = new mp4lib.boxes.AVC1VisualSampleEntryBox();
             }
 
@@ -386,8 +380,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //create and add AVC Configuration Box (avcC)
             avc1.boxes.push(createAVCConfigurationBox(media));
 
-            if (media.contentProtection !== undefined)
-            {
+            if (media.contentProtection !== undefined){
                 // create and add Protection Scheme Info Box
                 avc1.boxes.push(createProtectionSchemeInfoBox(media));
             }
@@ -524,12 +517,10 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         createMP4AudioSampleEntry = function (media) {
             var mp4a = null;
 
-            if (media.contentProtection !== undefined)
-            {
+            if (media.contentProtection !== undefined){
                 mp4a = new mp4lib.boxes.EncryptedAudioBox();
             }
-            else
-            {
+            else{
                 mp4a = new mp4lib.boxes.MP4AudioSampleEntryBox();
             }
 
@@ -554,8 +545,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // MP4AudioSampleEntry fields
             mp4a.boxes.push(esdBox);
             
-            if (media.contentProtection != undefined)
-            {
+            if (media.contentProtection !== undefined){
                 // create and add Protection Scheme Info Box
                 mp4a.boxes.push(createProtectionSchemeInfoBox(media));
             }
@@ -595,7 +585,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 default :
                     //NAN : To do add text entry
                     break;
-            }          
+            }
 
             return stsd;
         },
@@ -747,14 +737,13 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             moov.boxes.push(createMovieExtendsBox(media));
 
             //Create and add Protection System Specific Header box (pssh)
-            if (media.contentProtection != undefined) 
-            {
+            if (media.contentProtection !== undefined){
                 moov.boxes.push(createProtectionSystemSpecificHeaderBox(media));
             }
 
             moov_file.boxes.push(createFileTypeBox());
 
-            moov_file.boxes.push(moov);        
+            moov_file.boxes.push(moov);
 
             return mp4lib.serialize(moov_file);
         };

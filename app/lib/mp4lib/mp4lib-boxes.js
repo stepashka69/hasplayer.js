@@ -23,10 +23,10 @@ mp4lib.boxes.File.prototype.getBoxByType = function(boxType) {
 };
 
 mp4lib.boxes.File.prototype.getLength = function() {
-    debugger;
     var length=0, i=0, lengthTemp=0;
     for (i = 0; i < this.boxes.length;i++) {
         lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
         this.boxes[i].size = lengthTemp;
         length += lengthTemp;
     }
@@ -124,8 +124,11 @@ mp4lib.boxes.Box.prototype.getBoxPositionByType = function(boxType) {
 };
 
 mp4lib.boxes.Box.prototype.getLength = function () {
-    debugger;
-    return 4+4;
+    var size_origin = mp4lib.fields.FIELD_UINT32.getLength() + mp4lib.fields.FIELD_ID.getLength();
+    if (this.size==1) {
+        size_origin += mp4lib.fields.FIELD_INT64.getLength();
+    }
+    return size_origin;
 };
 
 // ---------- Abstract Container Box -------------------------------
@@ -143,13 +146,14 @@ mp4lib.boxes.ContainerBox.prototype._processFields = function(processor) {
 };
 
 mp4lib.boxes.ContainerBox.prototype.getLength = function () {
-    var length=0, i=0, lengthTemp=0;
+    var i=0, lengthTemp=0, size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
     for (i = 0; i < this.boxes.length;i++) {
         lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
         this.boxes[i].size = lengthTemp;
-        length += lengthTemp;
+        size_origin += lengthTemp;
     }
-    return length;
+    return size_origin;
 };
 
 // ---------- Full Box -------------------------------
@@ -168,6 +172,10 @@ mp4lib.boxes.FullBox.prototype._processFields = function(processor) {
     processor.eat('flags',mp4lib.fields.FIELD_BIT24);
 };
 
+mp4lib.boxes.FullBox.prototype.getLength = function () {
+    return mp4lib.boxes.Box.prototype.getLength.call(this) + mp4lib.fields.FIELD_INT8.getLength() + mp4lib.fields.FIELD_BIT24.getLength();
+};
+
 // ---------- Abstract Container FullBox -------------------------------
 mp4lib.boxes.ContainerFullBox = function(boxType){
     mp4lib.boxes.FullBox.call(this,boxType);
@@ -183,13 +191,15 @@ mp4lib.boxes.ContainerFullBox.prototype._processFields = function(processor) {
 };
 
 mp4lib.boxes.ContainerFullBox.prototype.getLength = function () {
-    var length=0, i=0, lengthTemp=0;
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    var i=0, lengthTemp=0;
     for (i = 0; i < this.boxes.length;i++) {
         lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
         this.boxes[i].size = lengthTemp;
-        length += lengthTemp;
+        size_origin += lengthTemp;
     }
-    return length;
+    return size_origin;
 };
 
 // ---------- Extended Type Full Box -------------------------------
@@ -214,6 +224,21 @@ mp4lib.boxes.ExtendedTypeFullBox.prototype._processFields = function(processor) 
     processor.eat('usertype', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_INT8, 16));
     processor.eat('version',mp4lib.fields.FIELD_INT8);
     processor.eat('flags',mp4lib.fields.FIELD_BIT24);
+};
+
+mp4lib.boxes.ExtendedTypeFullBox.prototype.getLength = function(){
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    size_origin += mp4lib.fields.FIELD_ID.getLength();
+    if (this.size == 1) {
+        size_origin += mp4lib.fields.FIELD_INT64.getLength();
+    }
+    size_origin += mp4lib.fields.FIELD_INT8.getLength() * 16;
+    size_origin += mp4lib.fields.FIELD_INT8.getLength();
+    size_origin += mp4lib.fields.FIELD_BIT24.getLength();
+
+    return size_origin;
 };
 
 // ----------- Unknown Box -----------------------------
@@ -241,7 +266,6 @@ mp4lib.boxes.FileTypeBox.prototype.constructor = mp4lib.boxes.FileTypeBox;
 //mp4lib.boxes.FileTypeBox.prototype.boxtype = 'ftyp';
 
 mp4lib.boxes.FileTypeBox.prototype._processFields = function(processor) {
-    //debugger;
     mp4lib.boxes.Box.prototype._processFields.call(this,processor);
     processor.eat('major_brand',mp4lib.fields.FIELD_INT32);
     processor.eat('minor_brand',mp4lib.fields.FIELD_INT32);
@@ -249,9 +273,9 @@ mp4lib.boxes.FileTypeBox.prototype._processFields = function(processor) {
 };
 
 mp4lib.boxes.FileTypeBox.prototype.getLength = function(){
-    var size = mp4lib.boxes.Box.prototype.getLength.call(this);
-    size += 4 + 4 /*add compatible_brands size*/;
-    return size;
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT32.getLength() * 2 + mp4lib.fields.FIELD_INT32.getLength() * this.compatible_brands.length;
+    return size_origin;
 };
 
 // --------------------------- moov ----------------------------------
@@ -468,6 +492,20 @@ mp4lib.boxes.MovieHeaderBox.prototype._processFields = function(processor) {
     processor.eat('next_track_ID',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.MovieHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT32.getLength() /*rate size*/+ mp4lib.fields.FIELD_INT16.getLength() * 2 /*volume size and reserved size*/;
+    size_origin += mp4lib.fields.FIELD_INT32.getLength() * 2 /*reserved_2 size*/+ mp4lib.fields.FIELD_INT32.getLength() * 9 /*matrix size*/;
+    size_origin += mp4lib.fields.FIELD_BIT32.getLength() * 6 /*pre_defined size*/ + mp4lib.fields.FIELD_UINT32.getLength()/*next_track_ID size*/;
+    if (this.version==1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 3 + mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 4;
+    }
+    return size_origin;
+};
+
 // --------------------------- mdat ----------------------------------
 mp4lib.boxes.MediaDataBox=function() {
     mp4lib.boxes.Box.call(this,'mdat');
@@ -484,6 +522,12 @@ mp4lib.boxes.MediaDataBox.prototype._processFields = function(processor) {
 
 };
 
+mp4lib.boxes.MediaDataBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_BOX_FILLING_DATA.getLength(this.data);
+    return size_origin;
+};
+
 // --------------------------- free ----------------------------------
 mp4lib.boxes.FreeSpaceBox=function() {
     mp4lib.boxes.Box.call(this,'free');
@@ -497,7 +541,12 @@ mp4lib.boxes.FreeSpaceBox.prototype.constructor = mp4lib.boxes.FreeSpaceBox;
 mp4lib.boxes.FreeSpaceBox.prototype._processFields = function(processor) {
     mp4lib.boxes.Box.prototype._processFields.call(this,processor);
     processor.eat('data',mp4lib.fields.FIELD_BOX_FILLING_DATA);
+};
 
+mp4lib.boxes.FreeSpaceBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_BOX_FILLING_DATA.getLength(this.data);
+    return size_origin;
 };
 
 // --------------------------- sidx ----------------------------------
@@ -539,6 +588,27 @@ mp4lib.boxes.SegmentIndexBox.prototype._processReference = function(box,processo
     processor.eat('SAP',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.SegmentIndexBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this), i = 0;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;/* reference_ID and timescale size*/
+
+    if (this.version==1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 2;/* earliest_presentation_time and first_offset size*/
+    } else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;/* earliest_presentation_time and first_offset size*/
+    }
+    
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength();/* reserved size*/
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength();/* reference_count size*/
+
+    for (i = 0; i < this.reference_count; i++) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength();/* reference_info size*/
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength();/* SAP size*/
+    }
+
+    return size_origin;
+};
+
 // --------------------------- tkhd ----------------------------------
 mp4lib.boxes.TrackHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'tkhd');
@@ -575,6 +645,18 @@ mp4lib.boxes.TrackHeaderBox.prototype._processFields = function(processor) {
     processor.eat('height',mp4lib.fields.FIELD_INT32);
 };
 
+mp4lib.boxes.TrackHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT16.getLength() * 4 + mp4lib.fields.FIELD_INT32.getLength() * 2 + mp4lib.fields.FIELD_UINT32.getLength()*2+mp4lib.fields.FIELD_INT32.getLength()*9;
+    if (this.version == 1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 3+mp4lib.fields.FIELD_UINT32.getLength() * 2;
+    }
+    else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 5;
+    }
+    return size_origin;
+};
+
 // --------------------------- mdhd ----------------------------------
 mp4lib.boxes.MediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mdhd');
@@ -603,6 +685,18 @@ mp4lib.boxes.MediaHeaderBox.prototype._processFields = function(processor) {
     processor.eat('reserved',mp4lib.fields.FIELD_UINT16);
 };
 
+mp4lib.boxes.MediaHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+     size_origin += mp4lib.fields.FIELD_UINT16.getLength() * 2;
+    if (this.version==1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 3 + mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 4;
+    }
+    return size_origin;
+};
+
 // --------------------------- mehd ----------------------------------
 mp4lib.boxes.MovieExtendsHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mehd');
@@ -620,6 +714,17 @@ mp4lib.boxes.MovieExtendsHeaderBox.prototype._processFields = function(processor
     } else {
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT32);
     }
+};
+
+mp4lib.boxes.MovieExtendsHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    if (this.version == 1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength();
+    }
+    else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    return size_origin;
 };
 
 // --------------------------- hdlr --------------------------------
@@ -648,6 +753,12 @@ mp4lib.boxes.HandlerBox.prototype._processFields = function(processor) {
     processor.eat('name',mp4lib.fields.FIELD_STRING);
 };
 
+mp4lib.boxes.HandlerBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2 + mp4lib.fields.FIELD_UINT32.getLength() * 3 + mp4lib.fields.FIELD_STRING.getLength(this.name);
+    return size_origin;
+};
+
 // --------------------------- stts ----------------------------------
 mp4lib.boxes.TimeToSampleBox=function() {
     mp4lib.boxes.FullBox.call(this,'stts');
@@ -674,6 +785,13 @@ mp4lib.boxes.TimeToSampleBox.prototype._processFields = function(processor) {
 mp4lib.boxes.TimeToSampleBox.prototype._processEntry = function(box,processor) {
     processor.eat('sample_count',mp4lib.fields.FIELD_UINT32);
     processor.eat('sample_delta',mp4lib.fields.FIELD_UINT32);
+};
+
+mp4lib.boxes.TimeToSampleBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    size_origin += this.entry_count * (mp4lib.fields.FIELD_UINT32.getLength()*2);
+    return size_origin;
 };
 
 // --------------------------- stsc ----------------------------------
@@ -705,6 +823,13 @@ mp4lib.boxes.SampleToChunkBox.prototype._processEntry = function(box,processor) 
     processor.eat('samples_description_index',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.SampleToChunkBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    size_origin += this.entry_count * (mp4lib.fields.FIELD_UINT32.getLength()*3);
+    return size_origin;
+};
+
 // --------------------------- stco ----------------------------------
 mp4lib.boxes.ChunkOffsetBox=function() {
     mp4lib.boxes.FullBox.call(this,'stco');
@@ -727,6 +852,12 @@ mp4lib.boxes.ChunkOffsetBox.prototype._processFields = function(processor) {
     processor.eat('chunk_offset',a);
 };
 
+mp4lib.boxes.ChunkOffsetBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength()+ this.entry_count * mp4lib.fields.FIELD_UINT32.getLength();
+    return size_origin;
+};
+
 // --------------------------- trex ----------------------------------
 mp4lib.boxes.TrackExtendsBox=function() {
     mp4lib.boxes.FullBox.call(this,'trex');
@@ -746,6 +877,11 @@ mp4lib.boxes.TrackExtendsBox.prototype._processFields = function(processor) {
     processor.eat('default_sample_flags',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.TrackExtendsBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 5;
+    return size_origin;
+};
 // --------------------------- vmhd ----------------------------------
 mp4lib.boxes.VideoMediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'vmhd');
@@ -762,6 +898,11 @@ mp4lib.boxes.VideoMediaHeaderBox.prototype._processFields = function(processor) 
     processor.eat('opcolor',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT16,3));
 };
 
+mp4lib.boxes.VideoMediaHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT16.getLength() + mp4lib.fields.FIELD_UINT16.getLength() * 3;
+    return size_origin;
+};
 // --------------------------- smhd ----------------------------------
 mp4lib.boxes.SoundMediaHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'smhd');
@@ -778,6 +919,11 @@ mp4lib.boxes.SoundMediaHeaderBox.prototype._processFields = function(processor) 
     processor.eat('reserved',mp4lib.fields.FIELD_UINT16);
 };
 
+mp4lib.boxes.SoundMediaHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT16.getLength() + mp4lib.fields.FIELD_UINT16.getLength();
+    return size_origin;
+};
 // --------------------------- dref ----------------------------------
 mp4lib.boxes.DataReferenceBox=function() {
     //mp4lib.boxes.ContainerFullBox.call(this,'dref');
@@ -794,11 +940,28 @@ mp4lib.boxes.DataReferenceBox.prototype.constructor = mp4lib.boxes.DataReference
 mp4lib.boxes.DataReferenceBox.prototype._processFields = function(processor) {
     //mp4lib.boxes.ContainerFullBox.prototype._processFields.call(this,processor);
     mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
-    if (!processor.isDeserializing)
+    if (!processor.isDeserializing){
         this.entry_count = this.boxes.length;
+    }
 
     processor.eat('entry_count',mp4lib.fields.FIELD_UINT32);
     processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
+};
+
+mp4lib.boxes.DataReferenceBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    var i=0, lengthTemp=0;
+
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); /*entry_count size*/
+
+    for (i = 0; i < this.boxes.length;i++){
+        lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
+        this.boxes[i].size = lengthTemp;
+        size_origin += lengthTemp;
+    }
+
+    return size_origin;
 };
 
 // --------------------------- url  ----------------------------------
@@ -826,6 +989,15 @@ mp4lib.boxes.DataEntryUrlBox.prototype._processFields = function(processor) {
     }
 };
 
+mp4lib.boxes.DataEntryUrlBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    //NAN : test on location value, not definition, probleme in IE
+    if (this.location !== undefined){
+        this.flags = this.flags | 1;
+        size_origin += mp4lib.fields.FIELD_STRING.getLength(this.location);
+    }
+    return size_origin;
+};
 // --------------------------- urn  ----------------------------------
 mp4lib.boxes.DataEntryUrnBox=function() {
     mp4lib.boxes.FullBox.call(this,'urn ');
@@ -845,6 +1017,13 @@ mp4lib.boxes.DataEntryUrnBox.prototype._processFields = function(processor) {
     }
 };
 
+mp4lib.boxes.DataEntryUrnBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    if (this.flags & '0x000001' === 0){
+        size_origin += mp4lib.fields.FIELD_STRING.getLength(this.name) + mp4lib.fields.FIELD_STRING.getLength(this.location);
+    }
+    return size_origin;
+};
 // --------------------------- mfhd ----------------------------------
 mp4lib.boxes.MovieFragmentHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'mfhd');
@@ -860,6 +1039,11 @@ mp4lib.boxes.MovieFragmentHeaderBox.prototype._processFields = function(processo
     processor.eat('sequence_number',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.MovieFragmentHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    return size_origin;
+};
 // --------------------------- tfhd ----------------------------------
 mp4lib.boxes.TrackFragmentHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfhd');
@@ -880,6 +1064,26 @@ mp4lib.boxes.TrackFragmentHeaderBox.prototype._processFields = function(processo
     processor.eat_flagged(this,'flags',0x000020,'default_sample_flags',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.TrackFragmentHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    if(this.base_data_offset !== undefined){
+       size_origin += mp4lib.fields.FIELD_UINT64.getLength();
+    }
+    if(this.sample_description_index !== undefined){
+       size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    if(this.default_sample_duration !== undefined){
+       size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    if(this.default_sample_size !== undefined){
+       size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    if(this.default_sample_flags !== undefined){
+       size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    return size_origin;
+};
 // --------------------------- tfdt ----------------------------------
 mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox=function() {
     mp4lib.boxes.FullBox.call(this,'tfdt');
@@ -899,6 +1103,16 @@ mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype._processFields = func
     }
 };
 
+mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+     if (this.version==1){
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength();
+    }
+    else{
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    return size_origin;
+};
 // --------------------------- trun ----------------------------------
 mp4lib.boxes.TrackFragmentRunBox=function() {
     mp4lib.boxes.FullBox.call(this,'trun');
@@ -937,6 +1151,41 @@ mp4lib.boxes.TrackFragmentRunBox.prototype._processEntry = function(box,processo
     }
 };
 
+mp4lib.boxes.TrackFragmentRunBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this), i = 0;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size
+    if (this.data_offset !== undefined){
+        size_origin += mp4lib.fields.FIELD_INT32.getLength();
+    }
+    if (this.first_sample_flags !== undefined){
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+
+    for (i = 0; i < this.sample_count; i++){
+        if (this.samples_table[i].sample_duration !== undefined){
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+        }
+        if (this.samples_table[i].sample_size !== undefined){
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+        }
+        if (this.samples_table[i].sample_flags !== undefined){
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+        }
+
+        if (this.version === 1){
+            if (this.samples_table[i].sample_composition_time_offset !== undefined){
+                size_origin += mp4lib.fields.FIELD_INT32.getLength();
+            }
+        }
+        else {
+            if (this.samples_table[i].sample_composition_time_offset !== undefined){
+                size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+            }
+        }
+    }
+
+    return size_origin;
+};
 // --------------------------- stsd ----------------------------------
 mp4lib.boxes.SampleDescriptionBox=function() {
     //mp4lib.boxes.ContainerFullBox.call(this,'stsd');
@@ -961,6 +1210,21 @@ mp4lib.boxes.SampleDescriptionBox.prototype._processFields = function(processor)
     processor.eat('boxes',mp4lib.fields.FIELD_CONTAINER_CHILDREN);
 };
 
+mp4lib.boxes.SampleDescriptionBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    var i=0, lengthTemp=0;
+
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    
+    for (i = 0; i < this.boxes.length;i++){
+        lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
+        this.boxes[i].size = lengthTemp;
+        size_origin += lengthTemp;
+    }
+
+    return size_origin;
+};
 // --------------------------- sdtp ----------------------------------
 mp4lib.boxes.SampleDependencyTableBox=function() {
     mp4lib.boxes.FullBox.call(this,'sdtp');
@@ -978,6 +1242,11 @@ mp4lib.boxes.SampleDependencyTableBox.prototype._processFields = function(proces
                 new mp4lib.fields.BoxFillingArrayField( mp4lib.fields.FIELD_UINT8 ));
 };
 
+mp4lib.boxes.SampleDependencyTableBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * this.sample_dependency_array.length;
+    return size_origin;
+};
 // --------------------------- abstract SampleEntry ----------------------------------
 mp4lib.boxes.SampleEntryBox=function(boxType) {
     mp4lib.boxes.Box.call(this,boxType);
@@ -992,6 +1261,11 @@ mp4lib.boxes.SampleEntryBox.prototype._processFields = function(processor) {
     processor.eat('data_reference_index',mp4lib.fields.FIELD_UINT16);
 };
 
+mp4lib.boxes.SampleEntryBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength()+ mp4lib.fields.FIELD_UINT8.getLength()*6;
+    return size_origin;
+};
 // --------------------------- abstract VisualSampleEntry ----------------------------------
 mp4lib.boxes.VisualSampleEntryBox=function(boxType) {
     mp4lib.boxes.SampleEntryBox.call(this,boxType);
@@ -1017,6 +1291,13 @@ mp4lib.boxes.VisualSampleEntryBox.prototype._processFields = function(processor)
     processor.eat('pre_defined_3',mp4lib.fields.FIELD_INT16);
 };
 
+mp4lib.boxes.VisualSampleEntryBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.SampleEntryBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength() * 7+ mp4lib.fields.FIELD_UINT32.getLength() * 3;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 3;
+    size_origin += 32; //compressorname size
+    return size_origin;
+};
 // --------------------------- abstract VisualSampleEntryContainer ----------------------------------
 mp4lib.boxes.VisualSampleEntryContainerBox=function(boxType) {
     mp4lib.boxes.VisualSampleEntryBox.call(this,boxType);
@@ -1032,13 +1313,15 @@ mp4lib.boxes.VisualSampleEntryContainerBox.prototype._processFields = function(p
 };
 
 mp4lib.boxes.VisualSampleEntryContainerBox.prototype.getLength = function () {
-    var length=0, i=0, lengthTemp=0;
-    for (i = 0; i < this.boxes.length;i++) {
+    var size_origin = mp4lib.boxes.VisualSampleEntryBox.prototype.getLength.call(this);
+    var i=0, lengthTemp=0;
+    for (i = 0; i < this.boxes.length;i++){
         lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
         this.boxes[i].size = lengthTemp;
-        length += lengthTemp;
+        size_origin += lengthTemp;
     }
-    return length;
+    return size_origin;
 };
 
 // --------------------------- avc1 ----------------------------------
@@ -1087,7 +1370,7 @@ mp4lib.boxes.AVCConfigurationBox.prototype._processFields = function(processor) 
     processor.eat('AVCLevelIndication',mp4lib.fields.FIELD_UINT8);
     
     if (processor.isDeserializing){
-        processor.eat('temp',mp4lib.fields.FIELD_UINT8);  
+        processor.eat('temp',mp4lib.fields.FIELD_UINT8);
         // 6 bits for reserved =63 and two bits for NAL length = 2-bit length byte size type
         this.lengthSizeMinusOne = this.temp & 3;
         processor.eat('numOfSequenceParameterSets_tmp',mp4lib.fields.FIELD_UINT8);
@@ -1115,6 +1398,20 @@ mp4lib.boxes.AVCConfigurationBox.prototype._processNAL = function(box,processor)
     processor.eat('NAL',new mp4lib.fields.DataField(this.NAL_length));
 };
 
+mp4lib.boxes.AVCConfigurationBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this), i = 0;
+
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 4+mp4lib.fields.FIELD_UINT8.getLength()*3;
+    for (i = 0; i < this.numOfSequenceParameterSets; i++){
+        size_origin += mp4lib.fields.FIELD_UINT16.getLength() + this.SPS_NAL[i].NAL_length;
+    }
+    for (i = 0; i < this.numOfPictureParameterSets; i++){
+        size_origin += mp4lib.fields.FIELD_UINT16.getLength() + this.PPS_NAL[i].NAL_length;
+    }
+
+    return size_origin;
+};
+
 // --------------------------- pasp ----------------------------------
 mp4lib.boxes.PixelAspectRatioBox=function() {
       mp4lib.boxes.Box.call(this,'pasp');
@@ -1131,6 +1428,11 @@ mp4lib.boxes.PixelAspectRatioBox.prototype._processFields = function(processor) 
     processor.eat('vSpacing',mp4lib.fields.FIELD_INT32);
 };
 
+mp4lib.boxes.PixelAspectRatioBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT32.getLength() * 2;
+    return size_origin;
+};
 // --------------------------- abstract VisualSampleEntry ----------------------------------
 mp4lib.boxes.AudioSampleEntryBox=function(boxType) {
     mp4lib.boxes.SampleEntryBox.call(this,boxType);
@@ -1149,6 +1451,12 @@ mp4lib.boxes.AudioSampleEntryBox.prototype._processFields = function(processor) 
     processor.eat('samplerate',mp4lib.fields.FIELD_UINT32);
 };
 
+mp4lib.boxes.AudioSampleEntryBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.SampleEntryBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength() * 4 + mp4lib.fields.FIELD_UINT32.getLength() * 3 ;
+    return size_origin;
+};
+
 // --------------------------- abstract AudioSampleEntryContainer ----------------------------------
 mp4lib.boxes.AudioSampleEntryContainerBox=function(boxType) {
     mp4lib.boxes.AudioSampleEntryBox.call(this,boxType);
@@ -1164,13 +1472,15 @@ mp4lib.boxes.AudioSampleEntryContainerBox.prototype._processFields = function(pr
 };
 
 mp4lib.boxes.AudioSampleEntryContainerBox.prototype.getLength = function () {
-    var length=0, i=0, lengthTemp=0;
-    for (i = 0; i < this.boxes.length;i++) {
+    var size_origin = mp4lib.boxes.AudioSampleEntryBox.prototype.getLength.call(this);
+    var i=0, lengthTemp=0;
+    for (i = 0; i < this.boxes.length;i++){
         lengthTemp = this.boxes[i].getLength();
+        //set size in the box container => remove it!!!!
         this.boxes[i].size = lengthTemp;
-        length += lengthTemp;
+        size_origin += lengthTemp;
     }
-    return length;
+    return size_origin;
 };
 
 // --------------------------- mp4a ----------------------------------
@@ -1218,6 +1528,12 @@ mp4lib.boxes.ESDBox.prototype._processFields = function(processor) {
     processor.eat('ES_data', new mp4lib.fields.DataField(this.ES_length));
 };
 
+mp4lib.boxes.ESDBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 2 + this.ES_length;
+    return size_origin;
+};
+
 // --------------------------- stsz ----------------------------------
 mp4lib.boxes.SampleSizeBox=function() {
     mp4lib.boxes.FullBox.call(this,'stsz');
@@ -1236,6 +1552,12 @@ mp4lib.boxes.SampleSizeBox.prototype._processFields = function(processor) {
     processor.eat('entries',a);
 };
 
+mp4lib.boxes.SampleSizeBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2 + mp4lib.fields.FIELD_UINT32.getLength() * this.sample_count;
+    return size_origin;
+};
+
 // ------------------------- pssh ------------------------------------
 mp4lib.boxes.ProtectionSystemSpecificHeaderBox=function() {
     mp4lib.boxes.FullBox.call(this,'pssh');
@@ -1252,6 +1574,14 @@ mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype._processFields = functi
    processor.eat('SystemID',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT8, 16));
    processor.eat('DataSize',mp4lib.fields.FIELD_UINT32);
    processor.eat('Data',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT8, this.DataSize));
+};
+
+mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 16;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * this.DataSize;
+    return size_origin;
 };
 
 // ------------------------- saiz ------------------------------------
@@ -1280,6 +1610,22 @@ mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype._processFields = funct
     }
 };
 
+mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    
+    if (this.flags & 1){
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;
+    }
+    
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() + mp4lib.fields.FIELD_UINT32.getLength();
+
+    if (this.default_sample_info_size === 0){
+        size_origin += mp4lib.fields.FIELD_UINT8.getLength() * this.sample_count;
+    }
+
+    return size_origin;
+};
+
 //------------------------- saio ------------------------------------
 mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox=function() {
     mp4lib.boxes.FullBox.call(this,'saio');
@@ -1304,6 +1650,21 @@ mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype._processFields = fun
     else {
         processor.eat('offset',new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT64, this.entry_count));
     }
+};
+
+mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    if (this.flags & 1){
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;
+    }
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); /*entry_count size */
+    if (this.version === 0){
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * this.entry_count;
+    }
+    else{
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * this.entry_count;
+    }
+    return size_origin;
 };
 
 //------------------------- sinf ------------------------------------
@@ -1352,6 +1713,16 @@ mp4lib.boxes.TrackEncryptionBox.prototype._processFields = function(processor) {
   processor.eat('default_KID', new mp4lib.fields.ArrayField(mp4lib.fields.FIELD_UINT8, 16));
 };
 
+mp4lib.boxes.TrackEncryptionBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    
+    size_origin += mp4lib.fields.FIELD_BIT24.getLength();
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength();
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 16;
+
+    return size_origin;
+};
+
 //------------------------- schm -------------------------------------
 mp4lib.boxes.SchemeTypeBox=function() {
     mp4lib.boxes.FullBox.call(this,'schm');
@@ -1371,6 +1742,16 @@ mp4lib.boxes.SchemeTypeBox.prototype._processFields = function(processor) {
     if (this.flags & 0x000001) {
         processor.eat('scheme_uri',mp4lib.fields.FIELD_STRING);
     }
+};
+
+mp4lib.boxes.SchemeTypeBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+   
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;
+    if (this.flags & 0x000001) {
+        size_origin += mp4lib.fields.FIELD_STRING.getLength(this.scheme_uri);
+    }
+    return size_origin;
 };
 
 // --------------------------- elst ---------------------------------- 
@@ -1405,6 +1786,23 @@ mp4lib.boxes.EditListBox.prototype._processEntry = function(box,processor) {
     processor.eat('media_rate_fraction',mp4lib.fields.FIELD_UINT16);
 };
 
+mp4lib.boxes.EditListBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this),i;
+    
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //entry_count size
+
+    for (i = 0; i < this.entry_count; i++) {
+        if (this.version == 1) {
+            size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 2; //segment_duration and media_time size
+        } else { // version==0
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2; //segment_duration and media_time size
+        }
+        size_origin += mp4lib.fields.FIELD_UINT16.getLength() * 2; //media_rate_integer and media_rate_fraction size
+    }
+
+    return size_origin;
+};
+
 // --------------------------- hmhd ----------------------------------
 mp4lib.boxes.HintMediaHeaderBox = function() {
     mp4lib.boxes.FullBox.call(this,'hmhd');
@@ -1422,6 +1820,13 @@ mp4lib.boxes.HintMediaHeaderBox.prototype._processFields = function(processor) {
    processor.eat('maxbitrate',mp4lib.fields.FIELD_UINT32);
    processor.eat('avgbitrate',mp4lib.fields.FIELD_UINT32);
    processor.eat('reserved'  ,mp4lib.fields.FIELD_UINT32);
+};
+
+mp4lib.boxes.HintMediaHeaderBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT16.getLength() * 2;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 3;
+    return size_origin;
 };
 
 // --------------------------- nmhd ---------------------------------- 
@@ -1468,6 +1873,20 @@ mp4lib.boxes.CompositionOffsetBox.prototype._processEntry = function(box,process
     }
 };
 
+mp4lib.boxes.CompositionOffsetBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this),i;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //entry_count size
+    for (i = 0; i < this.entry_count; i++) {
+        if (this.version === 0) {
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2; //sample_count and sample_offset size
+        } else { // version==1
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size
+            size_origin += mp4lib.fields.FIELD_INT32.getLength();//sample_offset size
+        }
+    }
+    return size_origin;
+};
+
 // --------------------------- cslg ----------------------------------
 mp4lib.boxes.CompositionToDecodeBox = function() {
     mp4lib.boxes.FullBox.call(this,'cslg');
@@ -1487,6 +1906,12 @@ mp4lib.boxes.CompositionToDecodeBox.prototype._processFields = function(processo
     processor.eat('compositionEndTime',mp4lib.fields.FIELD_INT32);
 };
 
+mp4lib.boxes.CompositionToDecodeBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_INT32.getLength() * 5;
+    return size_origin;
+};
+
 // --------------------------- stss ----------------------------------
 mp4lib.boxes.SyncSampleBox = function() {
     mp4lib.boxes.FullBox.call(this,'stss');
@@ -1501,14 +1926,23 @@ mp4lib.boxes.SyncSampleBox.prototype._processFields = function(processor) {
     mp4lib.boxes.FullBox.prototype._processFields.call(this,processor);
     processor.eat('entry_count',mp4lib.fields.FIELD_UINT32);
 
-        var entryField = new mp4lib.fields.StructureField(this,mp4lib.boxes.SyncSampleBox.prototype._processEntry);
+    var entryField = new mp4lib.fields.StructureField(this,mp4lib.boxes.SyncSampleBox.prototype._processEntry);
 
-        var a = new mp4lib.fields.ArrayField( entryField, this.entry_count);
-        processor.eat('entries',a);
+    var a = new mp4lib.fields.ArrayField( entryField, this.entry_count);
+    processor.eat('entries',a);
 };
 
 mp4lib.boxes.SyncSampleBox.prototype._processEntry = function(box,processor) {
         processor.eat('sample_number',mp4lib.fields.FIELD_UINT32);
+};
+
+mp4lib.boxes.SyncSampleBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this),i;
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //entry_count size
+    for (i = 0; i < this.entry_count; i++) {
+         size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    }
+    return size_origin;
 };
 
 // --------------------------- tref ----------------------------------
@@ -1526,6 +1960,12 @@ mp4lib.boxes.TrackReferenceBox.prototype._processFields = function(processor) {
    processor.eat('track_IDs',new mp4lib.fields.BoxFillingArrayField(mp4lib.fields.FIELD_UINT32));
 };
 
+mp4lib.boxes.TrackReferenceBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength() * this.track_IDs.length;
+    return size_origin;
+};
+
 //---------------------------- frma ----------------------------------
 mp4lib.boxes.OriginalFormatBox=function() {
     mp4lib.boxes.Box.call(this,'frma');
@@ -1539,6 +1979,12 @@ mp4lib.boxes.OriginalFormatBox.prototype.constructor = mp4lib.boxes.OriginalForm
 mp4lib.boxes.OriginalFormatBox.prototype._processFields = function(processor) {
   mp4lib.boxes.Box.prototype._processFields.call(this,processor);
   processor.eat('data_format',mp4lib.fields.FIELD_UINT32);
+};
+
+mp4lib.boxes.OriginalFormatBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength();
+    return size_origin;
 };
 
 // -------------------------------------------------------------------
@@ -1586,6 +2032,29 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype._processEntry = function(box,proc
 mp4lib.boxes.PiffSampleEncryptionBox.prototype._processClearEntry = function(box,processor) {
     processor.eat('BytesOfClearData',mp4lib.fields.FIELD_UINT16);
     processor.eat('BytesOfEncryptedData',mp4lib.fields.FIELD_UINT32);
+};
+
+mp4lib.boxes.PiffSampleEncryptionBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.ExtendedTypeFullBox.prototype.getLength.call(this), i = 0, j = 0;
+
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size
+    
+    if (this.flags & 1){
+        size_origin += mp4lib.fields.FIELD_UINT8.getLength(); //IV_size size
+    }
+
+    for (i = 0; i <  this.sample_count; i++) {
+        size_origin += 8; // InitializationVector size
+        if (this.flags & 2){
+            size_origin += mp4lib.fields.FIELD_UINT16.getLength(); // NumberOfEntries size
+            for (j = 0; j <  this.entry[i].NumberOfEntries; j++) {
+                size_origin += mp4lib.fields.FIELD_UINT16.getLength(); //BytesOfClearData size
+                size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //BytesOfEncryptedData size
+            }
+        }
+    }
+
+    return size_origin;
 };
 
 //PIFF Track Encryption Box
@@ -1641,6 +2110,19 @@ mp4lib.boxes.TfxdBox.prototype._processFields = function(processor) {
     }
 };
 
+mp4lib.boxes.TfxdBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.ExtendedTypeFullBox.prototype.getLength.call(this);
+   
+    if (this.version==1) {
+        size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 2;
+    }
+    else {
+        size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;
+    }
+
+    return size_origin;
+};
+
 // --------------------------- tfrf -----------------------------
 mp4lib.boxes.TfrfBox=function() {
     mp4lib.boxes.ExtendedTypeFullBox.call(this,'tfrf',[0xD4, 0x80, 0x7E, 0xF2, 0xCA, 0x39, 0x46, 0x95, 0x8E, 0x54, 0x26, 0xCB, 0x9E, 0x46, 0xA7, 0x9F]);
@@ -1669,6 +2151,20 @@ mp4lib.boxes.TfrfBox.prototype._processEntry = function(box,processor) {
         processor.eat('fragment_absolute_time',mp4lib.fields.FIELD_UINT32);
         processor.eat('fragment_duration',mp4lib.fields.FIELD_UINT32);
     }
+};
+
+mp4lib.boxes.TfrfBox.prototype.getLength = function() {
+    var size_origin = mp4lib.boxes.ExtendedTypeFullBox.prototype.getLength.call(this), i;
+    size_origin += mp4lib.fields.FIELD_UINT8.getLength(); //fragment_count size
+    for (i = 0; i < this.fragment_count; i++) {
+        if (this.version == 1) {
+            size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 2; //fragment_absolute_time and fragment_duration size
+        }
+        else {
+            size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2; //fragment_absolute_time and fragment_duration size
+        }
+    }
+    return size_origin;
 };
 
 mp4lib.registerTypeBoxes();

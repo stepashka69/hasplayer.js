@@ -214,12 +214,11 @@ Mss.dependencies.MssFragmentController = function () {
 
             // Determine new size of the converted fragment
             // and allocate new data buffer
-            var lp = new mp4lib.fieldProcessors.LengthCounterBoxFieldsProcessor(fragment);
-            fragment._processFields(lp);
-            var new_data = new Uint8Array(lp.res);
+            var fragment_size = fragment.getLength();
+            var new_data = new Uint8Array(fragment_size);
 
             // updata trun.data_offset field = offset of first data byte (inside mdat box)
-            trun.data_offset = lp.res - mdat.size + 8; // 8 = 'size' + 'type' mdat fields length
+            trun.data_offset = fragment_size - mdat.size + 8; // 8 = 'size' + 'type' mdat fields length
 
             // PATCH tfdt and trun samples timestamp values in case of live streams within chrome
             if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")){

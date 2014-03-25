@@ -15,7 +15,9 @@ var mp4lib = (function() {
 
         // A handler function may be hooked up to display warnings.
         // A warning is typically non-critical issue, like unknown box in data buffer.
-        warningHandler:function(message){}
+        warningHandler:function(message){
+            console.log(message);
+        }
     };
 
     var boxTypeArray = {};
@@ -130,14 +132,12 @@ var mp4lib = (function() {
         return f;
     };
 
-
     /**
     serialize box (or mp4lib.File) into binary data (uint8array)
     */
     mp4lib.serialize = function(f) {
-        var lp = new mp4lib.fieldProcessors.LengthCounterBoxFieldsProcessor(f);
-        f._processFields(lp);
-        var uint8array = new Uint8Array(lp.res);
+        var file_size = f.getLength();
+        var uint8array = new Uint8Array(file_size);
         var sp = new mp4lib.fieldProcessors.SerializationBoxFieldsProcessor(f, uint8array, 0);
         f._processFields(sp);
         return uint8array;

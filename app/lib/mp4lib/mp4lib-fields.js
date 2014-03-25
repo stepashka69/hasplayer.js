@@ -399,10 +399,9 @@ mp4lib.fields.BoxesListField.prototype.getLength = function(val) {
     for (i=0;i<val.length;i++)
     {
         var box = val[i];
-        var p = new mp4lib.fieldProcessors.LengthCounterBoxFieldsProcessor(box);
-        box._processFields(p);
-        box.size = p.res;
-        res = res+p.res;
+        var size_box = box.getLength();
+        box.size = size_box;
+        res = res+size_box;
     }
     return res;
 };
