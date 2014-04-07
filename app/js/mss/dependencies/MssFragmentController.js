@@ -184,6 +184,7 @@ Mss.dependencies.MssFragmentController = function () {
             if (tfdt === null) {
                 tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
                 tfdt.version = 1;
+                tfdt.flags = 0;
                 tfdt.baseMediaDecodeTime = Math.floor(request.startTime * request.timescale);
                 traf.boxes.push(tfdt);
             }
@@ -233,9 +234,9 @@ Mss.dependencies.MssFragmentController = function () {
                 }
             }
 
-            // Serialize converted fragment into output data buffer
-            var sp = new mp4lib.fieldProcessors.SerializationBoxFieldsProcessor(fragment, new_data, 0);
-            fragment._processFields(sp);
+            fragment.write(new_data);
+
+            //console.saveBinArray(new_data, adaptation.type+"_evolution.mp4");
 
             return {
                 bytes: new_data,

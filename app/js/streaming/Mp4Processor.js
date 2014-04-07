@@ -108,7 +108,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //mdhd : The media header declares overall information that is media-independent, and relevant to characteristics of
             //the media in a track.
             var mdhd = new mp4lib.boxes.MediaHeaderBox();
-
+            
+            mdhd.flags=0;
             mdhd.version = 1; // version = 1  in order to have 64bits duration value
             mdhd.creation_time = 0; // the creation time of the presentation => ignore (set to 0)
             mdhd.modification_time = 0; // the most recent time the presentation was modified => ignore (set to 0)
@@ -156,7 +157,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                     break;
             }
             hdlr.name += '\0';
-            hdlr.reserved = [0x0, 0x0]; //default value
+            hdlr.reserved = [0x0, 0x0, 0x0]; //default value
             hdlr.flags = 0; //default value
 
             return hdlr;
@@ -208,6 +209,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //NAN : not used, but mandatory
             var url = new mp4lib.boxes.DataEntryUrlBox();
             url.location = "";
+            url.version = 0;
+            url.flags = 1;
 
             //add data Entry Url Box in data Reference box
             dref.boxes.push(url);
@@ -238,6 +241,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //Samples within the media data are grouped into chunks.
             var stsc = new mp4lib.boxes.SampleToChunkBox();
                 
+            stsc.flags = 0;
             stsc.version = 0; //is an integer that specifies the version of this box. default value = 0.
             stsc.entry_count = 0; //is an integer that gives the number of entries in the following table
             
@@ -417,6 +421,9 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
         createTrackEncryptionBox = function () {
             var tenc = new mp4lib.boxes.TrackEncryptionBox();
+
+            tenc.flags = 0; //default value
+            tenc.version = 0; //default value
             
             tenc.default_IsEncrypted = 0x1; //default value
             tenc.default_IV_size = 8; //default value, NA => à préciser
@@ -541,6 +548,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             esdBox.ES_tag = ES_Descriptor[0];
             esdBox.ES_length = ES_Descriptor[1];
             esdBox.ES_data = ES_Descriptor.subarray(2, ES_Descriptor.length);
+            esdBox.version = 0;
+            esdBox.flags = 0;
 
             // MP4AudioSampleEntry fields
             mp4a.boxes.push(esdBox);
@@ -573,6 +582,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //The sample description table gives detailed information about the coding type used, and any initialization
             //information needed for that coding.
             var stsd = new mp4lib.boxes.SampleDescriptionBox();
+            stsd.version = 0;
+            stsd.flags = 0;
              
             switch(media.type)
             {
@@ -640,6 +651,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             smhd.balance = 0; //is a fixed-point 8.8 number that places mono audio tracks in a stereo space; 0 is centre (the
                            //normal value); full left is -1.0 and full right is 1.0.
             smhd.reserved = 0;
+            smhd.flags = 1;
 
             return smhd;
         },
@@ -689,6 +701,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // This sets up default values used by the movie fragments. By setting defaults in this way, space and
             // complexity can be saved in each Track Fragment Box.
             var trex = new mp4lib.boxes.TrackExtendsBox();
+            trex.version = 0;
+            trex.flags = 0;
             trex.track_ID = media.trackId;              // identifies the track; this shall be the track ID of a track in the Movie Box
             trex.default_sample_description_index = 1;  // Set default value 
             trex.default_sample_duration = 0;           // ''

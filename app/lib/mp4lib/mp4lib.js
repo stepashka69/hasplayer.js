@@ -4,7 +4,6 @@
 var mp4lib = (function() {
     var mp4lib = {
         boxes:{},
-        fieldProcessors:{},
         fields:{},
 
         // In debug mode, source data buffer is kept for each of deserialized box so any 
@@ -104,6 +103,7 @@ var mp4lib = (function() {
 
     mp4lib.searchBox = function ( boxtype, uuid ){
         var boxType;
+
         if (uuid) {
             boxType = extendedBoxTypeArray[uuid];
         }
@@ -118,8 +118,8 @@ var mp4lib = (function() {
         return boxType;
     };
            
-    mp4lib.createBox = function( boxtype, uuid ) { 
-        return mp4lib.constructorTypeBox.apply(null, [mp4lib.searchBox(boxtype,uuid)]);
+    mp4lib.createBox = function( boxtype,size, uuid) {
+        return mp4lib.constructorTypeBox.apply(null, [mp4lib.searchBox(boxtype, uuid),size]);
     };
     
     /**
@@ -127,8 +127,7 @@ var mp4lib = (function() {
     */
     mp4lib.deserialize = function(uint8array) {
         var f = new mp4lib.boxes.File();
-        var p = new mp4lib.fieldProcessors.DeserializationBoxFieldsProcessor(f, uint8array, 0, uint8array.length);
-        f._processFields(p);
+        f.read(uint8array);
         return f;
     };
 
@@ -138,8 +137,7 @@ var mp4lib = (function() {
     mp4lib.serialize = function(f) {
         var file_size = f.getLength();
         var uint8array = new Uint8Array(file_size);
-        var sp = new mp4lib.fieldProcessors.SerializationBoxFieldsProcessor(f, uint8array, 0);
-        f._processFields(sp);
+        f.write(uint8array);
         return uint8array;
     };
 

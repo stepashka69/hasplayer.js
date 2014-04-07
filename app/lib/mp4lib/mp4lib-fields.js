@@ -363,7 +363,6 @@ mp4lib.fields.BoxesListField.prototype.read = function(buf,pos,end) {
         }
 
         var box = mp4lib.createBox( boxtype, uuid);
-      
         var p = new mp4lib.fieldProcessors.DeserializationBoxFieldsProcessor(box,buf,pos,end);
         box._processFields(p);
 
