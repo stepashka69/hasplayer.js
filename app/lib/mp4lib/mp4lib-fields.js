@@ -163,24 +163,6 @@ mp4lib.fields.StringField.prototype.getLength = function(val) {
     return val.length;
 };
 
-//------------------------------- BoxFillingDataField -------------------------------
-
-mp4lib.fields.BoxFillingDataField= function() {
-};
-
-mp4lib.fields.BoxFillingDataField.prototype.read = function(buf,pos,end) {
-    var res = buf.subarray(pos,end);
-    return res;
-};
-
-mp4lib.fields.BoxFillingDataField.prototype.write = function(buf,pos,val) {
-    buf.set(val,pos);
-};
-
-mp4lib.fields.BoxFillingDataField.prototype.getLength = function(val) {
-    return val.length;
-};
-
 //------------------------------- ArrayField -------------------------------
 
 mp4lib.fields.ArrayField = function(innerField,size) {
@@ -243,4 +225,3 @@ mp4lib.fields.FIELD_BIT24 = new mp4lib.fields.NumberField(24,false);
 mp4lib.fields.FIELD_BIT32 = new mp4lib.fields.NumberField(32,false);
 mp4lib.fields.FIELD_ID = new mp4lib.fields.BoxTypeField(4);
 mp4lib.fields.FIELD_STRING = new mp4lib.fields.StringField();
-mp4lib.fields.FIELD_BOX_FILLING_DATA = new mp4lib.fields.BoxFillingDataField();
