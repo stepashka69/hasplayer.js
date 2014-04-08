@@ -20,7 +20,7 @@
 <XPD:REF name="DiagramOwner">0yNJbd+94kuQAKGy35mJgwAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLClassDiagramView" guid="P8sWnThhk0uYzPQWsI0WwAAA">
 <XPD:REF name="Diagram">BRBItcoNakOKTNKE0koBmAAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">150</XPD:ATTR>
+<XPD:ATTR name="#OwnedViews" type="integer">149</XPD:ATTR>
 <XPD:OBJ name="OwnedViews[0]" type="UMLClassView" guid="2+rt0ibuME6anYvLoxX9hQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
@@ -4153,18 +4153,7 @@
 <XPD:REF name="Model">3XMV0Gw8IE2lHBa2z9el3QAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:OBJ name="OwnedViews[145]" type="UMLNoteView" guid="apH0e6AsdEio2wK/8k+UBwAA">
-<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
-<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">1380</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">920</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">389</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">140</XPD:ATTR>
-<XPD:ATTR name="Text" type="string">Inheritance problem with SampleDescriptionBox and DataReferenceBox... :-(
-For the moment, they have their boxes attributes
-</XPD:ATTR>
-</XPD:OBJ>
-<XPD:OBJ name="OwnedViews[146]" type="UMLClassView" guid="KRiB+Qod40GIESpzP5yjUAAA">
+<XPD:OBJ name="OwnedViews[145]" type="UMLClassView" guid="KRiB+Qod40GIESpzP5yjUAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">1416</XPD:ATTR>
@@ -4195,7 +4184,7 @@ For the moment, they have their boxes attributes
 <XPD:REF name="Model">Y2rdGRtkTUWx/Z85f4PwfAAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:OBJ name="OwnedViews[147]" type="UMLGeneralizationView" guid="AEx4Lot+aUaO1MrrsYvH4wAA">
+<XPD:OBJ name="OwnedViews[146]" type="UMLGeneralizationView" guid="AEx4Lot+aUaO1MrrsYvH4wAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Points" type="Points">1463,568;1355,506</XPD:ATTR>
@@ -4221,7 +4210,7 @@ For the moment, they have their boxes attributes
 <XPD:REF name="Model">+G3kjYczfkeyBKfhIE+42AAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:OBJ name="OwnedViews[148]" type="UMLClassView" guid="Wk4PSKYUTEOIpvhAcJgJdQAA">
+<XPD:OBJ name="OwnedViews[147]" type="UMLClassView" guid="Wk4PSKYUTEOIpvhAcJgJdQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">1484</XPD:ATTR>
@@ -4231,7 +4220,7 @@ For the moment, they have their boxes attributes
 <XPD:REF name="Model">Z7TVjrgEM0qcgq7zutReagAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="MW73+bDKh0mIz2ByCRnaNgAA">
 <XPD:OBJ name="NameLabel" type="LabelView" guid="JPi4jwyrpk6GSwGMCdpeDQAA">
-<XPD:ATTR name="FontStyle" type="integer">1</XPD:ATTR>
+<XPD:ATTR name="FontStyle" type="integer">3</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">VisualSampleEntryContainerBox</XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="StereotypeLabel" type="LabelView" guid="sQGaEAbqSkKnyvuzr/fdeQAA">
@@ -4252,7 +4241,7 @@ For the moment, they have their boxes attributes
 <XPD:REF name="Model">Z7TVjrgEM0qcgq7zutReagAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
-<XPD:OBJ name="OwnedViews[149]" type="UMLGeneralizationView" guid="xmzIzg4CJ0y5AEMVMUGS4gAA">
+<XPD:OBJ name="OwnedViews[148]" type="UMLGeneralizationView" guid="xmzIzg4CJ0y5AEMVMUGS4gAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Points" type="Points">1484,368;1391,389</XPD:ATTR>
@@ -5545,6 +5534,7 @@ For the moment, they have their boxes attributes
 </XPD:OBJ>
 <XPD:OBJ name="OwnedElements[67]" type="UMLClass" guid="Z7TVjrgEM0qcgq7zutReagAA">
 <XPD:ATTR name="Name" type="string">VisualSampleEntryContainerBox</XPD:ATTR>
+<XPD:ATTR name="IsAbstract" type="boolean">True</XPD:ATTR>
 <XPD:REF name="Namespace">JmYpRUVJc06zEj4imyMTiQAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
 <XPD:REF name="Views[0]">Wk4PSKYUTEOIpvhAcJgJdQAA</XPD:REF>
