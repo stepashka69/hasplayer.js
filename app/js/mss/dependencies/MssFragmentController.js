@@ -216,7 +216,6 @@ Mss.dependencies.MssFragmentController = function () {
             // Determine new size of the converted fragment
             // and allocate new data buffer
             var fragment_size = fragment.getLength();
-            var new_data = new Uint8Array(fragment_size);
 
             // updata trun.data_offset field = offset of first data byte (inside mdat box)
             trun.data_offset = fragment_size - mdat.size + 8; // 8 = 'size' + 'type' mdat fields length
@@ -234,7 +233,7 @@ Mss.dependencies.MssFragmentController = function () {
                 }
             }
 
-            fragment.write(new_data);
+            var new_data = mp4lib.serialize(fragment);
 
             //console.saveBinArray(new_data, adaptation.type+"_evolution.mp4");
 
