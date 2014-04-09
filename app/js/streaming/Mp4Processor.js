@@ -427,7 +427,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             
             tenc.default_IsEncrypted = 0x1; //default value
             tenc.default_IV_size = 8; //default value, NA => à préciser
-            tenc.default_KID = [];
+            tenc.default_KID = [0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0];
 
             return tenc;
         },

@@ -160,7 +160,7 @@ Mss.dependencies.MssHandler = function() {
 
 	rslt.getInitRequest = function (representation) {
 			var period = null;
-			var self = this; 
+			var self = this;
 			var presentationStartTime = null;
 			var deferred = Q.defer();
             //Mss.dependencies.MssHandler.prototype.getInitRequest.call(this,quality,data).then(onGetInitRequestSuccess);

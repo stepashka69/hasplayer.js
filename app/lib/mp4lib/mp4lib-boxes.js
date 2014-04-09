@@ -32,9 +32,7 @@ mp4lib.boxes.File.prototype.getLength = function() {
 mp4lib.boxes.File.prototype.write = function(data){
     var pos = 0;
     for (var i=0;i<this.boxes.length;i++) {
-       var box = this.boxes[i];
-       box.write(data,pos);
-       pos += box.size;
+       pos = this.boxes[i].write(data,pos);
     }
 };
 
@@ -57,20 +55,19 @@ mp4lib.boxes.File.prototype.read = function(data) {
 
         var box = mp4lib.createBox( boxtype,size, uuid);
          if (boxtype === "uuid") {
-            box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
+            pos = box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
         }else {
-            box.read(data,pos+8,pos+size);
+            pos = box.read(data,pos+8,pos+size);
         }
         
         // in debug mode, sourcebuffer is copied to each box,
         // so any invalid deserializations may be found by comparing
         // source buffer with serialized box
         if (mp4lib.debug)
-            box.__sourceBuffer = data.subarray(pos,pos+box.size);
+            box.__sourceBuffer = data.subarray(pos-box.size,pos);
 
         this.boxes.push(box);
-        pos+=box.size;
-
+        
         if (box.size===0) {
             throw new mp4lib.ParseException('Zero size of box '+box.boxtype+
                                             ', parsing stopped to avoid infinite loop');
@@ -194,14 +191,12 @@ mp4lib.boxes.Box.prototype.getBoxPositionByType = function(boxType) {
 mp4lib.boxes.Box.prototype.getLength = function () {
     var size_origin = mp4lib.fields.FIELD_UINT32.getLength() + mp4lib.fields.FIELD_ID.getLength(); //size and boxtype length
     
-    if (this.size ===1) {
+    if (this.size === 1) {
         size_origin += mp4lib.fields.FIELD_INT64.getLength(); //add large_size length
     }
-
     if (this.extended_type) {
         size_origin += mp4lib.fields.FIELD_INT8.getLength() * 16; //add extended_type length.
     }
-
     return size_origin;
 };
 
@@ -221,9 +216,14 @@ mp4lib.boxes.Box.prototype._writeData = function (data,dataType,dataField) {
     }
 };
 
+mp4lib.boxes.Box.prototype._writeBuffer = function (data,dataField,size) {
+    data.set(dataField,this.localPos);
+    this.localPos += size;
+};
+
 mp4lib.boxes.Box.prototype._writeArrayData = function (data, dataArrayType,array) {
-    if (array === undefined || array === null) {
-        throw new mp4lib.ParseException('an array to write is null or undefined for box : '+this.boxtype);
+    if (array === undefined || array === null || array.length === 0) {
+        throw new mp4lib.ParseException('an array to write is null, undefined or length = 0 for box : '+this.boxtype);
     }
 
     for (var i = 0; i < array.length; i++) {
@@ -285,10 +285,10 @@ mp4lib.boxes.ContainerBox.prototype.write = function(data,pos){
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
 
     for (var i=0;i<this.boxes.length;i++) {
-       var box = this.boxes[i];
-       box.write(data,this.localPos);
-       this.localPos += box.size;
+       this.localPos = this.boxes[i].write(data,this.localPos);
     }
+
+    return this.localPos;
 };
 
 mp4lib.boxes.ContainerBox.prototype.read = function (data,pos,end) {
@@ -310,25 +310,26 @@ mp4lib.boxes.ContainerBox.prototype.read = function (data,pos,end) {
 
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
-            box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
+            pos = box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
         }else {
-            box.read(data,pos+8,pos+size);
+            pos = box.read(data,pos+8,pos+size);
         }
         
         // in debug mode, sourcebuffer is copied to each box,
         // so any invalid deserializations may be found by comparing
         // source buffer with serialized box
         if (mp4lib.debug)
-            box.__sourceBuffer = data.subarray(pos,pos+box.size);
+            box.__sourceBuffer = data.subarray(pos-box.size,pos);
 
         this.boxes.push(box);
-        pos+=box.size;
 
         if (box.size === 0){
             throw new mp4lib.ParseException('Zero size of box '+box.boxtype+
                                             ', parsing stopped to avoid infinite loop');
         }
     }
+
+    return pos;
 };
 
 // ---------- Full Box -------------------------------
@@ -412,25 +413,26 @@ mp4lib.boxes.ContainerFullBox.prototype.read = function (data,pos,end,isEntryCou
 
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
-            box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
         }else {
-            box.read(data,this.localPos+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+8,this.localPos+size);
         }
         
         // in debug mode, sourcebuffer is copied to each box,
         // so any invalid deserializations may be found by comparing
         // source buffer with serialized box
         if (mp4lib.debug)
-            box.__sourceBuffer = data.subarray(this.localPos,this.localPos+box.size);
+            box.__sourceBuffer = data.subarray(this.localPos-box.size,this.localPos);
 
         this.boxes.push(box);
-        this.localPos+=box.size;
-
+        
         if (box.size === 0){
             throw new mp4lib.ParseException('Zero size of box '+box.boxtype+
                                             ', parsing stopped to avoid infinite loop');
         }
     }
+
+    return this.localPos;
 };
 
 mp4lib.boxes.ContainerFullBox.prototype.write = function (data,pos,isEntryCount) {
@@ -441,10 +443,10 @@ mp4lib.boxes.ContainerFullBox.prototype.write = function (data,pos,isEntryCount)
     }
 
     for (var i=0;i<this.boxes.length;i++) {
-       var box = this.boxes[i];
-       box.write(data,this.localPos);
-       this.localPos += box.size;
+       this.localPos = this.boxes[i].write(data,this.localPos);
     }
+
+    return this.localPos;
 };
 
 // ----------- Unknown Box -----------------------------
@@ -462,20 +464,22 @@ mp4lib.boxes.UnknownBox.prototype.read = function (data,pos,end) {
 
     this.unrecognized_data = data.subarray(this.localPos,this.localEnd);
 
+    return this.localEnd;
 };
 
 mp4lib.boxes.UnknownBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
 
-    data.set(this.unrecognized_data,this.localPos);
-    this.localPos += this.unrecognized_data.length;
+    this._writeBuffer(data,this.unrecognized_data,this.unrecognized_data.length);
+
+    return this.localPos;
 };
 
 mp4lib.boxes.UnknownBox.prototype.getLength = function () {
     var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
 
     size_origin += this.unrecognized_data.length;
-    
+
     return size_origin;
 };
 
@@ -502,6 +506,8 @@ mp4lib.boxes.FileTypeBox.prototype.read = function (data,pos,end) {
     this.major_brand = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.minor_brand = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.compatible_brands = this._readArrayData(data,mp4lib.fields.FIELD_INT32);
+
+    return this.localPos;
 };
 
 mp4lib.boxes.FileTypeBox.prototype.write = function (data,pos) {
@@ -510,6 +516,8 @@ mp4lib.boxes.FileTypeBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.major_brand);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.minor_brand);
     this._writeArrayData(data, mp4lib.fields.FIELD_INT32, this.compatible_brands);
+
+    return this.localPos;
 };
 // --------------------------- moov ----------------------------------
 
@@ -621,11 +629,11 @@ mp4lib.boxes.MetaBox.prototype.getLength = function () {
 };
 
 mp4lib.boxes.MetaBox.prototype.read = function (data,pos,end) {
-    mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,false);
+    return mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,false);
 };
 
 mp4lib.boxes.MetaBox.prototype.write = function (data,pos) {
-    mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,false);
+    return mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,false);
 };
 
 // --------------------------- mvhd ----------------------------------
@@ -673,6 +681,8 @@ mp4lib.boxes.MovieHeaderBox.prototype.write = function (data,pos) {
     this._writeArrayData(data, mp4lib.fields.FIELD_INT32, this.matrix);
     this._writeArrayData(data, mp4lib.fields.FIELD_BIT32, this.pre_defined);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.next_track_ID);
+
+    return this.localPos;
 };
 
 mp4lib.boxes.MovieHeaderBox.prototype.read = function (data,pos,end) {
@@ -697,6 +707,8 @@ mp4lib.boxes.MovieHeaderBox.prototype.read = function (data,pos,end) {
     this.matrix = this._readArrayFieldData(data,mp4lib.fields.FIELD_INT32,9);
     this.pre_defined = this._readArrayFieldData(data,mp4lib.fields.FIELD_BIT32,6);
     this.next_track_ID = this._readData(data,mp4lib.fields.FIELD_UINT32);
+
+    return this.localPos;
 };
 
 // --------------------------- mdat ----------------------------------
@@ -715,13 +727,16 @@ mp4lib.boxes.MediaDataBox.prototype.getLength = function() {
 
 mp4lib.boxes.MediaDataBox.prototype.read = function (data,pos,end) {
     this.data = data.subarray(pos,end);
+
+    return end;
 };
 
 mp4lib.boxes.MediaDataBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
 
-    data.set(this.data,this.localPos);
-    this.localPos += this.data.length;
+    this._writeBuffer(data,this.data,this.data.length);
+
+    return this.localPos;
 };
 
 // --------------------------- free ----------------------------------
@@ -734,20 +749,24 @@ mp4lib.boxes.FreeSpaceBox.prototype.constructor = mp4lib.boxes.FreeSpaceBox;
 
 mp4lib.boxes.FreeSpaceBox.prototype.getLength = function() {
     var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
-    size_origin += mp4lib.fields.FIELD_BOX_FILLING_DATA.getLength(this.data);
+
+    size_origin += this.data.length;
     return size_origin;
 };
 
 mp4lib.boxes.FreeSpaceBox.prototype.read = function (data,pos,end) {
     this.localPos = pos;
     this.localEnd = end;
-    this.data =  this._readData(data,mp4lib.fields.FIELD_BOX_FILLING_DATA);
+    this.data =  data.subarray(this.localPos,this.localEnd);
+    return this.localEnd;
 };
 
 mp4lib.boxes.FreeSpaceBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
 
-    this._writeData(data,mp4lib.fields.FIELD_BOX_FILLING_DATA,this.data);
+    this._writeBuffer(data,this.data,this.data.length);
+
+    return this.localPos;
 };
 
 // --------------------------- sidx ----------------------------------
@@ -766,7 +785,7 @@ mp4lib.boxes.SegmentIndexBox.prototype.getLength = function() {
         size_origin += mp4lib.fields.FIELD_UINT64.getLength() * 2;/* earliest_presentation_time and first_offset size*/
     } else {
         size_origin += mp4lib.fields.FIELD_UINT32.getLength() * 2;/* earliest_presentation_time and first_offset size*/
-    }    
+    }
     size_origin += mp4lib.fields.FIELD_UINT16.getLength();/* reserved size*/
     size_origin += mp4lib.fields.FIELD_UINT16.getLength();/* reference_count size*/
     size_origin += (mp4lib.fields.FIELD_UINT64.getLength()/* reference_info size*/ + mp4lib.fields.FIELD_UINT32.getLength()/* SAP size*/) * this.reference_count;
@@ -801,6 +820,8 @@ mp4lib.boxes.SegmentIndexBox.prototype.read = function (data,pos,end) {
 
         this.references.push(struct);
     }
+
+    return this.localPos;
 };
 
 mp4lib.boxes.SegmentIndexBox.prototype.write = function (data,pos) {
@@ -824,6 +845,7 @@ mp4lib.boxes.SegmentIndexBox.prototype.write = function (data,pos) {
         this._writeData(data,mp4lib.fields.FIELD_UINT64,this.references[i].reference_info);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.references[i].SAP);
     }
+    return this.localPos;
 };
 
 // --------------------------- tkhd ----------------------------------
@@ -871,6 +893,7 @@ mp4lib.boxes.TrackHeaderBox.prototype.read = function (data,pos,end) {
     this.matrix = this._readArrayFieldData(data,mp4lib.fields.FIELD_INT32,9);
     this.width = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.height = this._readData(data,mp4lib.fields.FIELD_INT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackHeaderBox.prototype.write = function (data,pos) {
@@ -898,6 +921,7 @@ mp4lib.boxes.TrackHeaderBox.prototype.write = function (data,pos) {
     this._writeArrayData(data, mp4lib.fields.FIELD_INT32, this.matrix);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.width);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.height);
+    return this.localPos;
 };
 
 // --------------------------- mdhd ----------------------------------
@@ -937,6 +961,7 @@ mp4lib.boxes.MediaHeaderBox.prototype.read = function (data,pos,end) {
 
     this.language = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.pre_defined = this._readData(data,mp4lib.fields.FIELD_UINT16);
+    return this.localPos;
 };
 
 mp4lib.boxes.MediaHeaderBox.prototype.write = function (data,pos) {
@@ -956,6 +981,7 @@ mp4lib.boxes.MediaHeaderBox.prototype.write = function (data,pos) {
 
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.language);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.pre_defined);
+    return this.localPos;
 };
 
 // --------------------------- mehd ----------------------------------
@@ -985,6 +1011,7 @@ mp4lib.boxes.MovieExtendsHeaderBox.prototype.read = function (data,pos,end) {
     } else {
         this.fragment_duration = this._readData(data,mp4lib.fields.FIELD_UINT32);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.MovieExtendsHeaderBox.prototype.write = function (data,pos) {
@@ -995,6 +1022,7 @@ mp4lib.boxes.MovieExtendsHeaderBox.prototype.write = function (data,pos) {
     } else {
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.fragment_duration);
     }
+    return this.localPos;
 };
 
 // --------------------------- hdlr --------------------------------
@@ -1026,6 +1054,7 @@ mp4lib.boxes.HandlerBox.prototype.read = function (data,pos,end) {
     this.handler_type = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.reserved = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT32,3);
     this.name = this._readData(data,mp4lib.fields.FIELD_STRING);
+    return this.localPos;
 };
 
 mp4lib.boxes.HandlerBox.prototype.write = function (data,pos) {
@@ -1035,6 +1064,7 @@ mp4lib.boxes.HandlerBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.handler_type);
     this._writeArrayData(data, mp4lib.fields.FIELD_UINT32, this.reserved);
     this._writeData(data,mp4lib.fields.FIELD_STRING,this.name);
+    return this.localPos;
 };
 
 // --------------------------- stts ----------------------------------
@@ -1067,6 +1097,7 @@ mp4lib.boxes.TimeToSampleBox.prototype.read = function (data,pos,end) {
     
         this.entry.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TimeToSampleBox.prototype.write = function (data,pos) {
@@ -1078,6 +1109,7 @@ mp4lib.boxes.TimeToSampleBox.prototype.write = function (data,pos) {
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].sample_count);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].sample_delta);
     }
+    return this.localPos;
 };
 
 // --------------------------- stsc ----------------------------------
@@ -1111,17 +1143,19 @@ mp4lib.boxes.SampleToChunkBox.prototype.read = function (data,pos,end) {
     
         this.entry.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleToChunkBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
 
-    this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry_count); 
+    this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry_count);
     for (var i = 0; i < this.entry_count; i++){
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].first_chunk);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].samples_per_chunk);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].samples_description_index);
     }
+    return this.localPos;
 };
 
 // --------------------------- stco ----------------------------------
@@ -1143,6 +1177,7 @@ mp4lib.boxes.ChunkOffsetBox.prototype.read = function (data,pos,end) {
     
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.chunk_offset = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT32,this.entry_count);
+    return this.localPos;
 };
 
 mp4lib.boxes.ChunkOffsetBox.prototype.write = function (data,pos) {
@@ -1153,6 +1188,7 @@ mp4lib.boxes.ChunkOffsetBox.prototype.write = function (data,pos) {
     for (var i = 0; i < this.entry_count; i++){
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.chunk_offset[i]);
     }
+    return this.localPos;
 };
 
 // --------------------------- trex ----------------------------------
@@ -1177,6 +1213,7 @@ mp4lib.boxes.TrackExtendsBox.prototype.read = function (data,pos,end) {
     this.default_sample_duration = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.default_sample_size = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.default_sample_flags = this._readData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackExtendsBox.prototype.write = function (data,pos) {
@@ -1187,6 +1224,7 @@ mp4lib.boxes.TrackExtendsBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.default_sample_duration);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.default_sample_size);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.default_sample_flags);
+    return this.localPos;
 };
 
 // --------------------------- vmhd ----------------------------------
@@ -1208,6 +1246,7 @@ mp4lib.boxes.VideoMediaHeaderBox.prototype.read = function (data,pos,end) {
     
     this.graphicsmode = this._readData(data,mp4lib.fields.FIELD_INT16);
     this.opcolor = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT16,3);
+    return this.localPos;
 };
 
 mp4lib.boxes.VideoMediaHeaderBox.prototype.write = function (data,pos) {
@@ -1215,6 +1254,7 @@ mp4lib.boxes.VideoMediaHeaderBox.prototype.write = function (data,pos) {
 
     this._writeData(data,mp4lib.fields.FIELD_INT16,this.graphicsmode);
     this._writeArrayData(data, mp4lib.fields.FIELD_UINT16, this.opcolor);
+    return this.localPos;
 };
 
 // --------------------------- smhd ----------------------------------
@@ -1236,6 +1276,7 @@ mp4lib.boxes.SoundMediaHeaderBox.prototype.read = function (data,pos,end) {
     
     this.balance = this._readData(data,mp4lib.fields.FIELD_INT16);
     this.reserved = this._readData(data,mp4lib.fields.FIELD_UINT16);
+    return this.localPos;
 };
 
 mp4lib.boxes.SoundMediaHeaderBox.prototype.write = function (data,pos) {
@@ -1243,6 +1284,7 @@ mp4lib.boxes.SoundMediaHeaderBox.prototype.write = function (data,pos) {
 
     this._writeData(data,mp4lib.fields.FIELD_INT16,this.balance);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.reserved);
+    return this.localPos;
 };
 
 // --------------------------- dref ----------------------------------
@@ -1259,7 +1301,7 @@ mp4lib.boxes.DataReferenceBox.prototype.getLength = function() {
 };
 
 mp4lib.boxes.DataReferenceBox.prototype.read = function (data,pos,end) {
-    mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,true);
+   return mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,true);
 };
 
 mp4lib.boxes.DataReferenceBox.prototype.write = function (data,pos) {
@@ -1267,7 +1309,7 @@ mp4lib.boxes.DataReferenceBox.prototype.write = function (data,pos) {
         //if entry_count has not been set, set it to boxes array length
         this.entry_count = this.boxes.length;
     }
-    mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,true);
+    return mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,true);
 };
 
 // --------------------------- url  ----------------------------------
@@ -1294,6 +1336,8 @@ mp4lib.boxes.DataEntryUrlBox.prototype.read = function (data,pos,end) {
     if (this.flags & '0x000001' === 0) {
         this.location = this._readData(data,mp4lib.fields.FIELD_STRING);
     }
+
+    return this.localPos;
 };
 
 mp4lib.boxes.DataEntryUrlBox.prototype.write = function (data,pos) {
@@ -1302,6 +1346,7 @@ mp4lib.boxes.DataEntryUrlBox.prototype.write = function (data,pos) {
     if (this.location !== undefined/* && this.location !== ""*/) {
         this._writeData(data,mp4lib.fields.FIELD_STRING,this.location);
     }
+    return this.localPos;
 };
 
 // --------------------------- urn  ----------------------------------
@@ -1327,6 +1372,7 @@ mp4lib.boxes.DataEntryUrnBox.prototype.read = function (data,pos,end) {
         this.name = this._readData(data,mp4lib.fields.FIELD_STRING);
         this.location = this._readData(data,mp4lib.fields.FIELD_STRING);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.DataEntryUrnBox.prototype.write = function (data,pos) {
@@ -1336,6 +1382,7 @@ mp4lib.boxes.DataEntryUrnBox.prototype.write = function (data,pos) {
         this._writeData(data,mp4lib.fields.FIELD_STRING,this.name);
         this._writeData(data,mp4lib.fields.FIELD_STRING,this.location);
     }
+    return this.localPos;
 };
 
 // --------------------------- mfhd ----------------------------------
@@ -1355,11 +1402,13 @@ mp4lib.boxes.MovieFragmentHeaderBox.prototype.getLength = function() {
 mp4lib.boxes.MovieFragmentHeaderBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     this.sequence_number = this._readData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.MovieFragmentHeaderBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.sequence_number);
+    return this.localPos;
 };
 
 // --------------------------- tfhd ----------------------------------
@@ -1410,6 +1459,7 @@ mp4lib.boxes.TrackFragmentHeaderBox.prototype.read = function (data,pos,end) {
     if ((this.flags & 0x000020) !== 0){
         this.default_sample_flags = this._readData(data,mp4lib.fields.FIELD_UINT32);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackFragmentHeaderBox.prototype.write = function (data,pos) {
@@ -1432,6 +1482,7 @@ mp4lib.boxes.TrackFragmentHeaderBox.prototype.write = function (data,pos) {
     if ((this.flags & 0x000020) !== 0){
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.default_sample_flags);
     }
+    return this.localPos;
 };
 
 // --------------------------- tfdt ----------------------------------
@@ -1461,6 +1512,7 @@ mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype.read = function (data
     } else {
         this.baseMediaDecodeTime = this._readData(data,mp4lib.fields.FIELD_UINT32);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype.write = function (data,pos) {
@@ -1471,6 +1523,7 @@ mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox.prototype.write = function (dat
     } else {
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.baseMediaDecodeTime);
     }
+    return this.localPos;
 };
 
 // --------------------------- trun ----------------------------------
@@ -1554,6 +1607,7 @@ mp4lib.boxes.TrackFragmentRunBox.prototype.read = function (data,pos,end) {
         }
         this.samples_table.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackFragmentRunBox.prototype.write = function (data,pos) {
@@ -1590,6 +1644,7 @@ mp4lib.boxes.TrackFragmentRunBox.prototype.write = function (data,pos) {
             }
         }
     }
+    return this.localPos;
 };
 
 // --------------------------- stsd ----------------------------------
@@ -1606,12 +1661,12 @@ mp4lib.boxes.SampleDescriptionBox.prototype.getLength = function() {
 };
 
 mp4lib.boxes.SampleDescriptionBox.prototype.read = function (data,pos,end) {
-    mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,true);
+    return mp4lib.boxes.ContainerFullBox.prototype.read.call(this,data,pos,end,true);
 };
 
 mp4lib.boxes.SampleDescriptionBox.prototype.write = function (data,pos) {
     this.entry_count = this.boxes.length;
-    mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,true);
+    return mp4lib.boxes.ContainerFullBox.prototype.write.call(this,data,pos,true);
 };
 
 // --------------------------- sdtp ----------------------------------
@@ -1631,12 +1686,14 @@ mp4lib.boxes.SampleDependencyTableBox.prototype.getLength = function() {
 mp4lib.boxes.SampleDependencyTableBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     this.sample_dependency_array = this._readArrayData(data,mp4lib.fields.FIELD_UINT8);
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleDependencyTableBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
 
     this._writeArrayData(data, mp4lib.fields.FIELD_UINT8, this.sample_dependency_array);
+    return this.localPos;
 };
 
 // --------------------------- abstract SampleEntry ----------------------------------
@@ -1658,16 +1715,16 @@ mp4lib.boxes.SampleEntryBox.prototype.read = function (data,pos,end) {
     this.localEnd = end;
     
     this.reserved = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT8,6);
-    
     this.data_reference_index = this._readData(data,mp4lib.fields.FIELD_UINT16);
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleEntryBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
     
     this._writeArrayData(data, mp4lib.fields.FIELD_UINT8, this.reserved);
-
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.data_reference_index);
+    return this.localPos;
 };
 
 // --------------------------- abstract VisualSampleEntry ----------------------------------
@@ -1692,48 +1749,41 @@ mp4lib.boxes.VisualSampleEntryBox.prototype.read = function (data,pos,end) {
     this.reserved_2 = this._readData(data,mp4lib.fields.FIELD_UINT16);
     // there is already field called reserved from SampleEntry, so we need to call it reserved_2
     this.pre_defined_2 = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT32,3);
-    
     this.width = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.height = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.horizresolution = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.vertresolution = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.reserved_3 = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.frame_count = this._readData(data,mp4lib.fields.FIELD_UINT16);
-    
     this.compressorname = new mp4lib.fields.FixedLenStringField(32);
     this.compressorname = this.compressorname.read(data,this.localPos);
     this.localPos += 32;
-
     this.depth = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.pre_defined_3 = this._readData(data,mp4lib.fields.FIELD_INT16);
+    return this.localPos;
 };
 
 mp4lib.boxes.VisualSampleEntryBox.prototype.write = function (data,pos) {
     mp4lib.boxes.SampleEntryBox.prototype.write.call(this,data,pos);
-    
     var i = 0;
 
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.pre_defined);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.reserved_2);
-    
     // there is already field called reserved from SampleEntry, so we need to call it reserved_2
     this._writeArrayData(data, mp4lib.fields.FIELD_UINT32, this.pre_defined_2);
-    
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.width);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.height);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.horizresolution);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.vertresolution);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.reserved_3);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.frame_count);
-
     for (i=0;i<32;i++) {
         data[this.localPos+i] = this.compressorname.charCodeAt(i);
     }
-
     this.localPos += 32;
-    
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.depth);
     this._writeData(data,mp4lib.fields.FIELD_INT16,this.pre_defined_3);
+    return this.localPos;
 };
 
 // --------------------------- abstract VisualSampleEntryContainer ----------------------------------
@@ -1778,35 +1828,34 @@ mp4lib.boxes.VisualSampleEntryContainerBox.prototype.read = function (data,pos,e
 
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
-            box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
         }else {
-            box.read(data,this.localPos+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+8,this.localPos+size);
         }
         
         // in debug mode, sourcebuffer is copied to each box,
         // so any invalid deserializations may be found by comparing
         // source buffer with serialized box
         if (mp4lib.debug)
-            box.__sourceBuffer = data.subarray(this.localPos,this.localPos+box.size);
+            box.__sourceBuffer = data.subarray(this.localPos-box.size,this.localPos);
 
         this.boxes.push(box);
-        this.localPos+=box.size;
 
         if (box.size === 0){
             throw new mp4lib.ParseException('Zero size of box '+box.boxtype+
                                             ', parsing stopped to avoid infinite loop');
         }
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.VisualSampleEntryContainerBox.prototype.write = function (data,pos) {
     mp4lib.boxes.VisualSampleEntryBox.prototype.write.call(this,data,pos);
     
     for (var i=0;i<this.boxes.length;i++) {
-       var box = this.boxes[i];
-       box.write(data,this.localPos);
-       this.localPos += box.size;
+       this.localPos = this.boxes[i].write(data,this.localPos);
     }
+    return this.localPos;
 };
 
 // --------------------------- avc1 ----------------------------------
@@ -1834,7 +1883,7 @@ mp4lib.boxes.AVCConfigurationBox.prototype = Object.create(mp4lib.boxes.Box.prot
 mp4lib.boxes.AVCConfigurationBox.prototype.constructor = mp4lib.boxes.AVCConfigurationBox;
 
 mp4lib.boxes.AVCConfigurationBox.prototype.getLength = function() {
-    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this)/*, i = 0*/;
+    var size_origin = mp4lib.boxes.Box.prototype.getLength.call(this);
 
     size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 4+mp4lib.fields.FIELD_UINT8.getLength()*3;
     size_origin += this._getNALLength(this.numOfSequenceParameterSets,this.SPS_NAL);
@@ -1872,6 +1921,7 @@ mp4lib.boxes.AVCConfigurationBox.prototype.read = function (data,pos,end) {
     this.numOfPictureParameterSets = this._readData(data,mp4lib.fields.FIELD_UINT8);
     
     this.PPS_NAL = this._readNAL(data, this.numOfPictureParameterSets);
+    return this.localPos;
 };
 
 mp4lib.boxes.AVCConfigurationBox.prototype._readNAL = function (data, nbElements) {
@@ -1900,19 +1950,16 @@ mp4lib.boxes.AVCConfigurationBox.prototype.write = function (data,pos) {
     this.numOfSequenceParameterSets = this.SPS_NAL.length;
     this.numOfSequenceParameterSets_tmp = this.numOfSequenceParameterSets | 224;
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.numOfSequenceParameterSets_tmp);
-  
     this._writeNAL(data, this.numOfSequenceParameterSets,this.SPS_NAL);
-    
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.numOfPictureParameterSets);
-
     this._writeNAL(data, this.numOfPictureParameterSets,this.PPS_NAL);
+    return this.localPos;
 };
 
 mp4lib.boxes.AVCConfigurationBox.prototype._writeNAL = function (data, nbElements, nalArray) {
     for (var i = 0; i < nbElements; i++){
         this._writeData(data,mp4lib.fields.FIELD_UINT16, nalArray[i].NAL_length);
-        data.set(nalArray[i].NAL,this.localPos);
-        this.localPos += nalArray[i].NAL_length;
+        this._writeBuffer(data,nalArray[i].NAL,nalArray[i].NAL_length);
     }
 };
 
@@ -1936,6 +1983,7 @@ mp4lib.boxes.PixelAspectRatioBox.prototype.read = function (data,pos,end) {
     
     this.hSpacing = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.vSpacing = this._readData(data,mp4lib.fields.FIELD_INT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.PixelAspectRatioBox.prototype.write = function (data,pos) {
@@ -1943,6 +1991,7 @@ mp4lib.boxes.PixelAspectRatioBox.prototype.write = function (data,pos) {
 
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.hSpacing);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.vSpacing);
+    return this.localPos;
 };
 
 // --------------------------- abstract VisualSampleEntry ----------------------------------
@@ -1963,24 +2012,24 @@ mp4lib.boxes.AudioSampleEntryBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.SampleEntryBox.prototype.read.call(this,data,pos,end);
 
     this.reserved_2 = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT32,2);
-    
     this.channelcount = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.samplesize = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.pre_defined = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.reserved_3 = this._readData(data,mp4lib.fields.FIELD_UINT16);
     this.samplerate = this._readData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.AudioSampleEntryBox.prototype.write = function (data,pos) {
     mp4lib.boxes.SampleEntryBox.prototype.write.call(this,data,pos);
     
     this._writeArrayData(data,mp4lib.fields.FIELD_UINT32,this.reserved_2);
-
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.channelcount);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.samplesize);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.pre_defined);
     this._writeData(data,mp4lib.fields.FIELD_UINT16,this.reserved_3);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.samplerate);
+    return this.localPos;
 };
 
 // --------------------------- abstract AudioSampleEntryContainer ----------------------------------
@@ -2025,35 +2074,34 @@ mp4lib.boxes.AudioSampleEntryContainerBox.prototype.read = function (data,pos,en
 
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
-            box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
         }else {
-            box.read(data,this.localPos+8,this.localPos+size);
+            this.localPos = box.read(data,this.localPos+8,this.localPos+size);
         }
         
         // in debug mode, sourcebuffer is copied to each box,
         // so any invalid deserializations may be found by comparing
         // source buffer with serialized box
         if (mp4lib.debug)
-            box.__sourceBuffer = data.subarray(this.localPos,this.localPos+box.size);
+            box.__sourceBuffer = data.subarray(this.localPos-box.size,this.localPos);
 
         this.boxes.push(box);
-        this.localPos+=box.size;
 
         if (box.size === 0){
             throw new mp4lib.ParseException('Zero size of box '+box.boxtype+
                                             ', parsing stopped to avoid infinite loop');
         }
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.AudioSampleEntryContainerBox.prototype.write = function (data,pos) {
     mp4lib.boxes.AudioSampleEntryBox.prototype.write.call(this,data,pos);
     
     for (var i=0;i<this.boxes.length;i++) {
-       var box = this.boxes[i];
-       box.write(data,this.localPos);
-       this.localPos += box.size;
+       this.localPos = this.boxes[i].write(data,this.localPos);
     }
+    return this.localPos;
 };
 
 // --------------------------- mp4a ----------------------------------
@@ -2091,9 +2139,9 @@ mp4lib.boxes.ESDBox.prototype.read = function (data,pos,end) {
 
     this.ES_tag = this._readData(data,mp4lib.fields.FIELD_UINT8);
     this.ES_length = this._readData(data,mp4lib.fields.FIELD_UINT8);
-
     this.ES_data = data.subarray(this.localPos,this.localPos+this.ES_length);
     this.localPos += this.ES_length;
+    return this.localPos;
 };
 
 mp4lib.boxes.ESDBox.prototype.write = function (data,pos) {
@@ -2101,9 +2149,8 @@ mp4lib.boxes.ESDBox.prototype.write = function (data,pos) {
     
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.ES_tag);
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.ES_length);
-
-    data.set(this.ES_data,this.localPos);
-    this.localPos += this.ES_length;
+    this._writeBuffer(data,this.ES_data,this.ES_length);
+    return this.localPos;
 };
 
 // --------------------------- stsz ----------------------------------
@@ -2125,19 +2172,19 @@ mp4lib.boxes.SampleSizeBox.prototype.read = function (data,pos,end) {
     
     this.sample_size = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.sample_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-
     this.entries = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT32,this.sample_count);
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleSizeBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
 
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.sample_size);
-    this._writeData(data,mp4lib.fields.FIELD_UINT32,this.sample_count);
-    
+    this._writeData(data,mp4lib.fields.FIELD_UINT32,this.sample_count);    
     for (var i = 0; i < this.sample_count; i++){
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entries[i]);
     }
+    return this.localPos;
 };
 
 // ------------------------- pssh ------------------------------------
@@ -2150,6 +2197,7 @@ mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.constructor = mp4lib.bo
 
 mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.getLength = function() {
     var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this);
+
     size_origin += mp4lib.fields.FIELD_UINT8.getLength() * 16;
     size_origin += mp4lib.fields.FIELD_UINT32.getLength();
     size_origin += mp4lib.fields.FIELD_UINT8.getLength() * this.DataSize;
@@ -2160,10 +2208,9 @@ mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.read = function (data,p
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     
     this.SystemID = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT8,16);
-
     this.DataSize = this._readData(data,mp4lib.fields.FIELD_UINT32);
-
     this.Data = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT8,this.DataSize);
+    return this.localPos;
 };
 
 mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.write = function (data,pos) {
@@ -2173,12 +2220,11 @@ mp4lib.boxes.ProtectionSystemSpecificHeaderBox.prototype.write = function (data,
     for (i = 0; i < 16; i++) {
         this._writeData(data,mp4lib.fields.FIELD_UINT8,this.SystemID[i]);
     }
-
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.DataSize);
-
     for (i = 0; i < this.DataSize; i++) {
         this._writeData(data,mp4lib.fields.FIELD_UINT8,this.Data[i]);
     }
+    return this.localPos;
 };
 
 // ------------------------- saiz ------------------------------------
@@ -2219,6 +2265,7 @@ mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype.read = function (data,
     if (this.default_sample_info_size === 0) {
         this.sample_info_size = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT8,this.sample_count);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype.write = function (data,pos) {
@@ -2231,12 +2278,12 @@ mp4lib.boxes.SampleAuxiliaryInformationSizesBox.prototype.write = function (data
     }
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.default_sample_info_size);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.sample_count);
-
     if (this.default_sample_info_size === 0) {
         for (var i = 0; i < this.sample_count; i++) {
             this._writeData(data,mp4lib.fields.FIELD_UINT8,this.sample_info_size[i]);
         }
     }
+    return this.localPos;
 };
 
 //------------------------- saio ------------------------------------
@@ -2278,20 +2325,18 @@ mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype.read = function (dat
     else {
         this.offset = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT64,this.entry_count);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
 
     var i = 0;
-    
     if (this.flags & 1){
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.aux_info_type);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.aux_info_type_parameter);
     }
-    
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry_count);
-
     if (this.version === 0) {
         for (i = 0; i < this.entry_count; i++) {
             this._writeData(data,mp4lib.fields.FIELD_UINT32,this.offset[i]);
@@ -2302,6 +2347,7 @@ mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox.prototype.write = function (da
             this._writeData(data,mp4lib.fields.FIELD_UINT64,this.offset[i]);
         }
     }
+    return this.localPos;
 };
 
 //------------------------- sinf ------------------------------------
@@ -2343,6 +2389,7 @@ mp4lib.boxes.TrackEncryptionBox.prototype.read = function (data,pos,end) {
     this.default_IsEncrypted = this._readData(data,mp4lib.fields.FIELD_BIT24);
     this.default_IV_size = this._readData(data,mp4lib.fields.FIELD_UINT8);
     this.default_KID = this._readArrayFieldData(data,mp4lib.fields.FIELD_UINT8,16);
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackEncryptionBox.prototype.write = function (data,pos) {
@@ -2351,6 +2398,7 @@ mp4lib.boxes.TrackEncryptionBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_BIT24,this.default_IsEncrypted);
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.default_IV_size);
     this._writeArrayData(data,mp4lib.fields.FIELD_UINT8,this.default_KID);
+    return this.localPos;
 };
 
 //------------------------- schm -------------------------------------
@@ -2379,6 +2427,7 @@ mp4lib.boxes.SchemeTypeBox.prototype.read = function (data,pos,end) {
     if (this.flags & 0x000001){
         this.scheme_uri = this._readData(data,mp4lib.fields.FIELD_STRING);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.SchemeTypeBox.prototype.write = function (data,pos) {
@@ -2389,6 +2438,7 @@ mp4lib.boxes.SchemeTypeBox.prototype.write = function (data,pos) {
     if (this.flags & 0x000001){
         this._writeData(data,mp4lib.fields.FIELD_STRING,this.scheme_uri);
     }
+    return this.localPos;
 };
 
 // --------------------------- elst ---------------------------------- 
@@ -2435,6 +2485,7 @@ mp4lib.boxes.EditListBox.prototype.read = function (data,pos,end) {
         struct.media_rate_fraction = this._readData(data,mp4lib.fields.FIELD_UINT16);
         this.entries.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.EditListBox.prototype.write = function (data,pos) {
@@ -2453,6 +2504,7 @@ mp4lib.boxes.EditListBox.prototype.write = function (data,pos) {
         this._writeData(data,mp4lib.fields.FIELD_UINT16,this.entries[i].media_rate_integer);
         this._writeData(data,mp4lib.fields.FIELD_UINT16,this.entries[i].media_rate_fraction);
     }
+    return this.localPos;
 };
 
 // --------------------------- hmhd ----------------------------------
@@ -2479,6 +2531,7 @@ mp4lib.boxes.HintMediaHeaderBox.prototype.read = function (data,pos,end) {
     this.maxbitrate = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.avgbitrate = this._readData(data,mp4lib.fields.FIELD_UINT32);
     this.reserved = this._readData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.HintMediaHeaderBox.prototype.write = function (data,pos) {
@@ -2489,6 +2542,7 @@ mp4lib.boxes.HintMediaHeaderBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.maxbitrate);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.avgbitrate);
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.reserved);
+    return this.localPos;
 };
 
 // --------------------------- nmhd ---------------------------------- 
@@ -2526,9 +2580,7 @@ mp4lib.boxes.CompositionOffsetBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-
     this.entries = [];
-
     for (var i = 0; i < this.entry_count; i++) {
         var struct = {};
 
@@ -2541,6 +2593,7 @@ mp4lib.boxes.CompositionOffsetBox.prototype.read = function (data,pos,end) {
         }
         this.entries.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.CompositionOffsetBox.prototype.write = function (data,pos) {
@@ -2556,6 +2609,7 @@ mp4lib.boxes.CompositionOffsetBox.prototype.write = function (data,pos) {
             this._writeData(data,mp4lib.fields.FIELD_INT32,this.entries[i].sample_offset);
         }
     }
+    return this.localPos;
 };
 
 // --------------------------- cslg ----------------------------------
@@ -2581,6 +2635,7 @@ mp4lib.boxes.CompositionToDecodeBox.prototype.read = function (data,pos,end) {
     this.greatestDecodeToDisplayDelta = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.compositionStartTime = this._readData(data,mp4lib.fields.FIELD_INT32);
     this.compositionEndTime = this._readData(data,mp4lib.fields.FIELD_INT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.CompositionToDecodeBox.prototype.write = function (data,pos) {
@@ -2591,6 +2646,7 @@ mp4lib.boxes.CompositionToDecodeBox.prototype.write = function (data,pos) {
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.greatestDecodeToDisplayDelta);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.compositionStartTime);
     this._writeData(data,mp4lib.fields.FIELD_INT32,this.compositionEndTime);
+    return this.localPos;
 };
 
 // --------------------------- stss ----------------------------------
@@ -2613,14 +2669,13 @@ mp4lib.boxes.SyncSampleBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-
     this.entries = [];
-
     for (var i = 0; i < this.entry_count; i++) {
         var struct = {};
         struct.sample_number = this._readData(data,mp4lib.fields.FIELD_UINT32);
         this.entries.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.SyncSampleBox.prototype.write = function (data,pos) {
@@ -2630,6 +2685,7 @@ mp4lib.boxes.SyncSampleBox.prototype.write = function (data,pos) {
     for (var i = 0; i < this.entry_count; i++) {
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entries[i].sample_number);
     }
+    return this.localPos;
 };
 
 // --------------------------- tref ----------------------------------
@@ -2651,14 +2707,14 @@ mp4lib.boxes.TrackReferenceBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
 
     this.track_IDs = this._readArrayData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.TrackReferenceBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
-    
-    for(var i=0;i<this.track_IDs.length;i++) {
-       this._writeData(data,mp4lib.fields.FIELD_UINT32, this.track_IDs[i]);
-    }
+
+    this._writeArrayData(data,mp4lib.fields.FIELD_UINT32,this.track_IDs);
+    return this.localPos;
 };
 
 //---------------------------- frma ----------------------------------
@@ -2679,13 +2735,16 @@ mp4lib.boxes.OriginalFormatBox.prototype.getLength = function() {
 mp4lib.boxes.OriginalFormatBox.prototype.read = function (data,pos,end) {
     this.localPos = pos;
     this.localEnd = end;
+
     this.data_format = this._readData(data,mp4lib.fields.FIELD_UINT32);
+    return this.localPos;
 };
 
 mp4lib.boxes.OriginalFormatBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
     
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.data_format);
+    return this.localPos;
 };
 
 // -------------------------------------------------------------------
@@ -2704,12 +2763,10 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.constructor = mp4lib.boxes.PiffSa
 mp4lib.boxes.PiffSampleEncryptionBox.prototype.getLength = function() {
     var size_origin = mp4lib.boxes.FullBox.prototype.getLength.call(this), i = 0, j = 0;
 
-    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size
-    
+    size_origin += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size    
     if (this.flags & 1){
         size_origin += mp4lib.fields.FIELD_UINT8.getLength(); //IV_size size
     }
-
     for (i = 0; i <  this.sample_count; i++) {
         size_origin += 8; // InitializationVector size
         if (this.flags & 2){
@@ -2720,7 +2777,6 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.getLength = function() {
             }
         }
     }
-
     return size_origin;
 };
 
@@ -2731,11 +2787,9 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.write = function (data,pos) {
     if (this.flags & 1){
         this._writeData(data,mp4lib.fields.FIELD_UINT8,this.IV_size);
     }
-    
     for (var i = 0; i < this.sample_count; i++){
-        data.set(this.entry[i].InitializationVector,this.localPos);
-        this.localPos += 8;//InitializationVector size
-
+        this._writeBuffer(data,this.entry[i].InitializationVector,8);
+        
         if (this.flags & 2){
             this._writeData(data,mp4lib.fields.FIELD_UINT16,this.entry[i].NumberOfEntries);// NumberOfEntries
 
@@ -2745,6 +2799,7 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.write = function (data,pos) {
             }
         }
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.PiffSampleEncryptionBox.prototype.read = function (data,pos,end) {
@@ -2754,9 +2809,7 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.read = function (data,pos,end) {
     if (this.flags & 1){
         this.IV_size = this._readData(data,mp4lib.fields.FIELD_UINT8);
     }
-
     this.entry = [];
-
     for (var i = 0; i < this.sample_count; i++){
         var struct = {};
         struct.InitializationVector = data.subarray(this.localPos,this.localPos+8);
@@ -2774,6 +2827,7 @@ mp4lib.boxes.PiffSampleEncryptionBox.prototype.read = function (data,pos,end) {
         }
         this.entry.push(struct);
     }
+    return this.localPos;
 };
 
 //PIFF Track Encryption Box
@@ -2823,6 +2877,7 @@ mp4lib.boxes.TfxdBox.prototype.write = function (data,pos) {
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.fragment_absolute_time);
         this._writeData(data,mp4lib.fields.FIELD_UINT32,this.fragment_duration);
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TfxdBox.prototype.read = function (data,pos,end) {
@@ -2836,6 +2891,7 @@ mp4lib.boxes.TfxdBox.prototype.read = function (data,pos,end) {
         this.fragment_absolute_time = this._readData(data,mp4lib.fields.FIELD_UINT32);
         this.fragment_duration = this._readData(data,mp4lib.fields.FIELD_UINT32);
     }
+    return this.localPos;
 };
 
 // --------------------------- tfrf -----------------------------
@@ -2863,7 +2919,6 @@ mp4lib.boxes.TfrfBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
     
     this._writeData(data,mp4lib.fields.FIELD_UINT8,this.fragment_count);
-    
     for (var i = 0; i < this.fragment_count; i++){
         if (this.version === 1) {
             this._writeData(data,mp4lib.fields.FIELD_UINT64,this.entry[i].fragment_absolute_time);
@@ -2874,18 +2929,16 @@ mp4lib.boxes.TfrfBox.prototype.write = function (data,pos) {
             this._writeData(data,mp4lib.fields.FIELD_UINT32,this.entry[i].fragment_duration);
         }
     }
+    return this.localPos;
 };
 
 mp4lib.boxes.TfrfBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
       
     this.fragment_count = this._readData(data,mp4lib.fields.FIELD_UINT8);
-
     this.entry = [];
-
     for (var i = 0; i < this.fragment_count; i++){
         var struct = {};
-
         if (this.version === 1) {
             struct.fragment_absolute_time = this._readData(data,mp4lib.fields.FIELD_UINT64);
             struct.fragment_duration = this._readData(data,mp4lib.fields.FIELD_UINT64);
@@ -2894,10 +2947,9 @@ mp4lib.boxes.TfrfBox.prototype.read = function (data,pos,end) {
             struct.fragment_absolute_time = this._readData(data,mp4lib.fields.FIELD_UINT32);
             struct.fragment_duration = this._readData(data,mp4lib.fields.FIELD_UINT32);
         }
-
         this.entry.push(struct);
     }
+    return this.localPos;
 };
 
 mp4lib.registerTypeBoxes();
-mp4lib.registerExtendedTypeBoxes();
