@@ -190,7 +190,6 @@ mp4lib.fields.ArrayField.prototype.read = function(buf,pos) {
 // pre-defined shortcuts for common fields 
 // ( it is recommended to use these shortcuts to avoid constructors 
 //   being called for every field processing action )
-
 mp4lib.fields.FIELD_INT8 = new mp4lib.fields.NumberField(8,true);
 mp4lib.fields.FIELD_INT16 = new mp4lib.fields.NumberField(16,true);
 mp4lib.fields.FIELD_INT32 = new mp4lib.fields.NumberField(32,true);
