@@ -48,7 +48,7 @@ mp4lib.fields.NumberField.prototype.write = function(buf,pos,val) {
     mp4lib.fields.writeBytes(buf, pos, this.bits/8, val);
 };
 
-mp4lib.fields.NumberField.prototype.getLength = function(val) {
+mp4lib.fields.NumberField.prototype.getLength = function() {
     return this.bits/8;
 };
 
@@ -71,7 +71,7 @@ mp4lib.fields.LongNumberField.prototype.write = function(buf, pos, val) {
     mp4lib.fields.writeBytes(buf, pos + 4, 4, low);
 };
 
-mp4lib.fields.LongNumberField.prototype.getLength = function(val) {
+mp4lib.fields.LongNumberField.prototype.getLength = function() {
     return 8;
 };
 
@@ -95,7 +95,7 @@ mp4lib.fields.FixedLenStringField.prototype.write = function(buf,pos,val) {
     }
 };
 
-mp4lib.fields.FixedLenStringField.prototype.getLength = function(val) {
+mp4lib.fields.FixedLenStringField.prototype.getLength = function() {
     return this.size;
 };
 
@@ -117,7 +117,7 @@ mp4lib.fields.BoxTypeField.prototype.write = function(buf,pos,val) {
     }
 };
 
-mp4lib.fields.BoxTypeField.prototype.getLength = function(val) {
+mp4lib.fields.BoxTypeField.prototype.getLength = function() {
     return 4;
 };
 
@@ -170,7 +170,7 @@ mp4lib.fields.ArrayField = function(innerField,size) {
     this.size = size;
 };
 
-mp4lib.fields.ArrayField.prototype.read = function(buf,pos,end) {
+mp4lib.fields.ArrayField.prototype.read = function(buf,pos) {
     var innerFieldLength=-1;
     var res = [];
     for (var i=0;i<this.size;i++) {
@@ -185,26 +185,6 @@ mp4lib.fields.ArrayField.prototype.read = function(buf,pos,end) {
         pos+=innerFieldLength;
     }
     return res;
-};
-
-mp4lib.fields.ArrayField.prototype.write = function(buf,pos,val) {
-    var innerFieldLength=0;
-    if (this.size>0) {
-        innerFieldLength=this.innerField.getLength(val[0]);
-    }
-
-    for (var i=0;i<this.size;i++) {
-        this.innerField.write(buf,pos,val[i]);
-        pos+=innerFieldLength;
-    }
-};
-
-mp4lib.fields.ArrayField.prototype.getLength = function(val) {
-    var innerFieldLength=0;
-    if (this.size>0) {
-        innerFieldLength=this.innerField.getLength(val[0]);
-    }
-    return this.size*innerFieldLength;
 };
 
 // pre-defined shortcuts for common fields 
