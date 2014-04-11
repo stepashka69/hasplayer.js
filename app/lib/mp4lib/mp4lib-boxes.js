@@ -2388,6 +2388,7 @@ mp4lib.boxes.SchemeTypeBox.prototype.write = function (data,pos) {
 // --------------------------- elst ---------------------------------- 
 mp4lib.boxes.EditListBox = function(size) {
     mp4lib.boxes.FullBox.call(this,'elst',size);
+    this.entries = [];
 };
 
 mp4lib.boxes.EditListBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
@@ -2411,8 +2412,6 @@ mp4lib.boxes.EditListBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
 
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-
-    this.entries = [];
 
     for (var i = 0; i < this.entry_count; i++) {
         var struct = {};
@@ -2497,6 +2496,7 @@ mp4lib.boxes.NullMediaHeaderBox.prototype.constructor = mp4lib.boxes.NullMediaHe
 // --------------------------- ctts ---------------------------------- 
 mp4lib.boxes.CompositionOffsetBox = function(size) {
     mp4lib.boxes.FullBox.call(this,'ctts',size);
+    this.entries = [];
 };
 
 mp4lib.boxes.CompositionOffsetBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
@@ -2519,7 +2519,6 @@ mp4lib.boxes.CompositionOffsetBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
     
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-    this.entries = [];
     for (var i = 0; i < this.entry_count; i++) {
         var struct = {};
 
@@ -2589,6 +2588,7 @@ mp4lib.boxes.CompositionToDecodeBox.prototype.write = function (data,pos) {
 // --------------------------- stss ----------------------------------
 mp4lib.boxes.SyncSampleBox = function(size) {
     mp4lib.boxes.FullBox.call(this,'stss',size);
+    this.entries = [];
 };
 
 mp4lib.boxes.SyncSampleBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
@@ -2596,16 +2596,13 @@ mp4lib.boxes.SyncSampleBox.prototype.constructor = mp4lib.boxes.SyncSampleBox;
 
 mp4lib.boxes.SyncSampleBox.prototype.computeLength = function() {
     mp4lib.boxes.FullBox.prototype.computeLength.call(this);
-
     this.size += mp4lib.fields.FIELD_UINT32.getLength(); //entry_count size
     this.size += mp4lib.fields.FIELD_UINT32.getLength() * this.entry_count; //entries size
 };
 
 mp4lib.boxes.SyncSampleBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
-    
     this.entry_count = this._readData(data,mp4lib.fields.FIELD_UINT32);
-    this.entries = [];
     for (var i = 0; i < this.entry_count; i++) {
         var struct = {};
         struct.sample_number = this._readData(data,mp4lib.fields.FIELD_UINT32);
@@ -2639,14 +2636,12 @@ mp4lib.boxes.TrackReferenceBox.prototype.computeLength = function() {
 
 mp4lib.boxes.TrackReferenceBox.prototype.read = function (data,pos,end) {
     mp4lib.boxes.FullBox.prototype.read.call(this,data,pos,end);
-
     this.track_IDs = this._readArrayData(data,mp4lib.fields.FIELD_UINT32);
     return this.localPos;
 };
 
 mp4lib.boxes.TrackReferenceBox.prototype.write = function (data,pos) {
     mp4lib.boxes.FullBox.prototype.write.call(this,data,pos);
-
     this._writeArrayData(data,mp4lib.fields.FIELD_UINT32,this.track_IDs);
     return this.localPos;
 };
@@ -2667,14 +2662,12 @@ mp4lib.boxes.OriginalFormatBox.prototype.computeLength = function() {
 mp4lib.boxes.OriginalFormatBox.prototype.read = function (data,pos,end) {
     this.localPos = pos;
     this.localEnd = end;
-
     this.data_format = this._readData(data,mp4lib.fields.FIELD_UINT32);
     return this.localPos;
 };
 
 mp4lib.boxes.OriginalFormatBox.prototype.write = function (data,pos) {
     mp4lib.boxes.Box.prototype.write.call(this,data,pos);
-    
     this._writeData(data,mp4lib.fields.FIELD_UINT32,this.data_format);
     return this.localPos;
 };
