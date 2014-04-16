@@ -239,6 +239,7 @@ function updateSeekBar() {
 }
 
 function initControlBar () {
+    console.log(video);
     $("#playPauseButton").click(function() {
         isPlaying ? video.pause() : video.play();
     });
@@ -295,6 +296,20 @@ function initControlBar () {
     $("#seekBar").click(function(event) {
         video.currentTime = event.offsetX * video.duration / $("#seekBar").width();
         updateSeekBar();
+    });
+
+    video.subtitleChoice = false;
+
+    $(".subtitle").click(function() {
+        video.subtitleChoice = !video.subtitleChoice;
+    });
+
+    $(".subtitle").click(function() {
+        if(video.subtitleChoice) {
+            $(".subtitle-select").addClass("show");
+        } else {
+            $(".subtitle-select").removeClass("show");
+        }
     });
 }
 
