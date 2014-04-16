@@ -1,0 +1,91 @@
+*, *:before, *:after {
+	-moz-box-sizing: border-box; 
+	-webkit-box-sizing: border-box; 
+	box-sizing: border-box;
+}
+
+html, body {
+	font-family: Tahoma;
+	font-size: 12px;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-image:radial-gradient(#313131, #111);
+}
+
+button {
+	border: none;
+	background: transparent;
+	font-size: 13px;
+	margin: 5px;
+	padding: 7px 12px;
+	cursor: pointer;
+}
+
+.pull-right {
+	float: right;
+}
+
+.pull-left {
+	float: left;
+}
+
+.btn-valid {
+	background: #27ae60;
+	color: #fff;
+}
+
+.btn-cancel {
+	background: #e67e22;
+	color: #fff;
+}
+
+.content {
+	width: 500px;
+	margin: auto;
+	padding: 50px 0;
+}
+
+.header {
+	background: #eee;
+}
+
+.header img {
+	display: inline-block;
+}
+
+.flux {
+	display: block;
+	width: 100%;
+	margin: 10px 0;
+	padding: 10px 20px;
+	background: transparent;
+	transition: all 0.2s ease-out;
+}
+
+.flux:hover {
+	background: #212121;
+}
+
+.flux-type,
+.flux-name,
+.flux-information {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.flux-information .icon {
+	font-size: 14px;
+	width: 30px;
+	color: #eee;
+}
+
+.flux-type {
+	color: #ccc;
+}
+
+.flux-name {
+	margin-left: 20px;
+	font-size: 20px;
+	color: #fff;
+}
