@@ -13,9 +13,9 @@ angular.module('HAS').controller('homeCtrl', ['$scope', '$location', function($s
 		var pageLink = '';
 		
 		if($scope.option.debug) {
-			pageLink = '/index.html?url=';
+			pageLink = '../index.html?url=';
 		} else {
-			pageLink = '/player.html?file=';
+			pageLink = '../player.html?file=';
 		}
 
 		return pageLink + link;
