@@ -65,6 +65,13 @@ angular.module('HAS').controller('homeCtrl', ['$scope', '$location', function($s
 		'live': true,
 		'type': 'SMOOTH',
 		'DRM': false
+	}, {
+		'name': 'LIVE 3',
+		'link': 'http://161.105.176.13/Halo/ch1.isml/manifest',
+		'audioChoice': true,
+		'live': true,
+		'type': 'SMOOTH',
+		'DRM': false
 	}];
 
 }]);
