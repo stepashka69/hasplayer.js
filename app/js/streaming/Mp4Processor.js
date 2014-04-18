@@ -36,7 +36,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             // Create Track box (trak)
             var trak = new mp4lib.boxes.TrackBox();
-            trak.boxes = [];
 
             // Create and add TrackHeader box (trak)
             var tkhd = new mp4lib.boxes.TrackHeaderBox();
@@ -64,7 +63,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //Create container for the media information in a track (mdia)
             var mdia = new mp4lib.boxes.MediaBox();
-            mdia.boxes = [];
 
             //Create and add Media Header Box (mdhd)
             mdia.boxes.push(createMediaHeaderBox(media));
@@ -110,7 +108,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //mdhd : The media header declares overall information that is media-independent, and relevant to characteristics of
             //the media in a track.
             var mdhd = new mp4lib.boxes.MediaHeaderBox();
-
+            
+            mdhd.flags=0;
             mdhd.version = 1; // version = 1  in order to have 64bits duration value
             mdhd.creation_time = 0; // the creation time of the presentation => ignore (set to 0)
             mdhd.modification_time = 0; // the most recent time the presentation was modified => ignore (set to 0)
@@ -128,8 +127,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         stringToCharCode = function (str) {
 
             var code = 0;
-            for (var i = 0; i < str.length; i++)
-            {
+            for (var i = 0; i < str.length; i++){
                 code |= str.charCodeAt(i) << ((str.length - i - 1) * 8);
             }
             return code;
@@ -159,7 +157,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                     break;
             }
             hdlr.name += '\0';
-            hdlr.reserved = [0x0, 0x0]; //default value
+            hdlr.reserved = [0x0, 0x0, 0x0]; //default value
             hdlr.flags = 0; //default value
 
             return hdlr;
@@ -169,7 +167,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //This box contains all the objects that declare characteristic information of the media in the track.
             var minf = new mp4lib.boxes.MediaInformationBox();
-            minf.boxes = [];
             
             //Create and add the adapted media header box (vmhd, smhd or nmhd) for audio, video or text.
             switch(media.type)
@@ -199,7 +196,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             //The data information box contains objects that declare the location of the media information in a track.
             var dinf = new mp4lib.boxes.DataInformationBox();
-            dinf.boxes = [];
 
             //The data reference object contains a table of data references (normally URLs) that declare the location(s) of
             //the media data used within the presentation
@@ -209,12 +205,12 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             dref.entry_count = 1; //is an integer that counts the actual entries
             dref.flags = 0; //default value
 
-            //The DataEntryBox within the DataReferenceBox shall be either a DataEntryUrnBox or a DataEntryUrlBox.
-            dref.boxes = [];
-            
+            //The DataEntryBox within the DataReferenceBox shall be either a DataEntryUrnBox or a DataEntryUrlBox.           
             //NAN : not used, but mandatory
             var url = new mp4lib.boxes.DataEntryUrlBox();
             url.location = "";
+            url.version = 0;
+            url.flags = 1;
 
             //add data Entry Url Box in data Reference box
             dref.boxes.push(url);
@@ -245,6 +241,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //Samples within the media data are grouped into chunks.
             var stsc = new mp4lib.boxes.SampleToChunkBox();
                 
+            stsc.flags = 0;
             stsc.version = 0; //is an integer that specifies the version of this box. default value = 0.
             stsc.entry_count = 0; //is an integer that gives the number of entries in the following table
             
@@ -321,24 +318,21 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             var SPS_index = 0;
             var PPS_index = 0;
-            for (var j=0;j<NALArray.length;j++)
-            {
+            for (var j=0;j<NALArray.length;j++){
                 var regexp7 = new RegExp("^[A-Z0-9]7", "gi");           //SPS
                 var regexp8 = new RegExp("^[A-Z0-9]8", "gi");           //PPS
                 
                 
                 var NALBuffer = _hexstringtoBuffer(NALArray[j]);
 
-                if (NALArray[j].match(regexp7))
-                {
+                if (NALArray[j].match(regexp7)){
                     avcC.SPS_NAL[SPS_index++] = { "NAL_length":NALBuffer.length, "NAL":NALBuffer };
                     avcC.AVCProfileIndication = parseInt(NALArray[j].substr(2,2),16); //contains the profile code as defined in ISO/IEC 14496-10.
                     avcC.profile_compatibility = parseInt(NALArray[j].substr(4,2),16); //is a byte defined exactly the same as the byte which occurs between the
                                                                                        //profile_IDC and level_IDC in a sequence parameter set (SPS), as defined in ISO/IEC 14496-10.
                     avcC.AVCLevelIndication = parseInt(NALArray[j].substr(6,2),16); //contains the level code as defined in ISO/IEC 14496-10.
                 }
-                if (NALArray[j].match(regexp8))
-                {
+                if (NALArray[j].match(regexp8)){
                     avcC.PPS_NAL[PPS_index++] =  { "NAL_length":NALBuffer.length, "NAL":NALBuffer };
                 }
 
@@ -361,16 +355,12 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //An AVC visual sample entry shall contain an AVC Configuration Box
             var avc1 = null;
 
-            if (media.contentProtection !== undefined)
-            {
+            if (media.contentProtection !== undefined){
                 avc1 = new mp4lib.boxes.EncryptedVideoBox();
             }
-            else
-            {
+            else{
                 avc1 = new mp4lib.boxes.AVC1VisualSampleEntryBox();
             }
-
-            avc1.boxes = [];
 
             avc1.data_reference_index = 1; //To DO... ??
             avc1.compressorname = "AVC Coding";//is a name, for informative purposes. It is formatted in a fixed 32-byte field, with the first
@@ -394,8 +384,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //create and add AVC Configuration Box (avcC)
             avc1.boxes.push(createAVCConfigurationBox(media));
 
-            if (media.contentProtection != undefined)
-            {
+            if (media.contentProtection !== undefined){
                 // create and add Protection Scheme Info Box
                 avc1.boxes.push(createProtectionSchemeInfoBox(media));
             }
@@ -423,7 +412,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
         createSchemeInformationBox = function (media) {
             var schi = new mp4lib.boxes.SchemeInformationBox();
-            schi.boxes = [];
 
             //create and add Track Encryption Box
             schi.boxes.push(createTrackEncryptionBox(media));
@@ -431,12 +419,15 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             return schi;
         },
 
-        createTrackEncryptionBox = function (media) {
+        createTrackEncryptionBox = function () {
             var tenc = new mp4lib.boxes.TrackEncryptionBox();
+
+            tenc.flags = 0; //default value
+            tenc.version = 0; //default value
             
             tenc.default_IsEncrypted = 0x1; //default value
             tenc.default_IV_size = 8; //default value, NA => à préciser
-            tenc.default_KID = [];
+            tenc.default_KID = [0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0];
 
             return tenc;
         },
@@ -444,7 +435,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         createProtectionSchemeInfoBox = function (media) {
             //create Protection Scheme Info Box
             var sinf = new mp4lib.boxes.ProtectionSchemeInformationBox();
-            sinf.boxes = [];
 
             //create and add Original Format Box => indicate codec type of the encrypted content         
             sinf.boxes.push(createOriginalFormatBox(media));
@@ -471,7 +461,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         
         parseHexString = function (str) {
             var bytes = [];
-            while (str.length >= 2) { 
+            while (str.length >= 2) {
                 bytes.push(parseInt(str.substring(0, 2), 16));
                 str = str.substring(2, str.length);
             }
@@ -534,16 +524,12 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         createMP4AudioSampleEntry = function (media) {
             var mp4a = null;
 
-            if (media.contentProtection !== undefined)
-            {
+            if (media.contentProtection !== undefined){
                 mp4a = new mp4lib.boxes.EncryptedAudioBox();
             }
-            else
-            {
+            else{
                 mp4a = new mp4lib.boxes.MP4AudioSampleEntryBox();
             }
-
-            mp4a.boxes = [];
 
             // SampleEntry fields
             mp4a.reserved = [0x0, 0x0, 0x0, 0x0, 0x0, 0x0];
@@ -562,12 +548,13 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             esdBox.ES_tag = ES_Descriptor[0];
             esdBox.ES_length = ES_Descriptor[1];
             esdBox.ES_data = ES_Descriptor.subarray(2, ES_Descriptor.length);
+            esdBox.version = 0;
+            esdBox.flags = 0;
 
             // MP4AudioSampleEntry fields
             mp4a.boxes.push(esdBox);
             
-            if (media.contentProtection != undefined)
-            {
+            if (media.contentProtection !== undefined){
                 // create and add Protection Scheme Info Box
                 mp4a.boxes.push(createProtectionSchemeInfoBox(media));
             }
@@ -595,7 +582,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //The sample description table gives detailed information about the coding type used, and any initialization
             //information needed for that coding.
             var stsd = new mp4lib.boxes.SampleDescriptionBox();
-            stsd.boxes = [];
+            stsd.version = 0;
+            stsd.flags = 0;
              
             switch(media.type)
             {
@@ -608,7 +596,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 default :
                     //NAN : To do add text entry
                     break;
-            }          
+            }
 
             return stsd;
         },
@@ -619,7 +607,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             //here, it is possible to locate samples in time, determine their type (e.g. I-frame or not), and determine their
             //size, container, and offset into that container.
             var stbl = new mp4lib.boxes.SampleTableBox();
-            stbl.boxes = [];
 
             //create and add Decoding Time to Sample Box (stts)
             stbl.boxes.push(createDecodingTimeToSampleBox(media));
@@ -664,6 +651,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             smhd.balance = 0; //is a fixed-point 8.8 number that places mono audio tracks in a stereo space; 0 is centre (the
                            //normal value); full left is -1.0 and full right is 1.0.
             smhd.reserved = 0;
+            smhd.flags = 1;
 
             return smhd;
         },
@@ -694,7 +682,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // Create Movie Extends Box (mvex) 
             // This box warns readers that there might be Movie Fragment Boxes in this file
             var mvex = new mp4lib.boxes.MovieExtendsBox();
-            mvex.boxes = [];
             
             // Create Movie Extends Header Box (mehd)
             // The Movie Extends Header is optional, and provides the overall duration, including fragments, of a fragmented
@@ -714,6 +701,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // This sets up default values used by the movie fragments. By setting defaults in this way, space and
             // complexity can be saved in each Track Fragment Box.
             var trex = new mp4lib.boxes.TrackExtendsBox();
+            trex.version = 0;
+            trex.flags = 0;
             trex.track_ID = media.trackId;              // identifies the track; this shall be the track ID of a track in the Movie Box
             trex.default_sample_description_index = 1;  // Set default value 
             trex.default_sample_duration = 0;           // ''
@@ -748,11 +737,9 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         doGenerateInitSegment = function (media) {
             // Create file
             var moov_file = new mp4lib.boxes.File();
-            moov_file.boxes = [];
 
             // Create Movie box (moov) 
             var moov = new mp4lib.boxes.MovieBox();
-            moov.boxes = [];
 
             // Create and add MovieHeader box (mvhd)
             moov.boxes.push(createMovieHeaderBox(media));
@@ -764,14 +751,13 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             moov.boxes.push(createMovieExtendsBox(media));
 
             //Create and add Protection System Specific Header box (pssh)
-            if (media.contentProtection != undefined) 
-            {
+            if (media.contentProtection !== undefined){
                 moov.boxes.push(createProtectionSystemSpecificHeaderBox(media));
             }
 
             moov_file.boxes.push(createFileTypeBox());
 
-            moov_file.boxes.push(moov);        
+            moov_file.boxes.push(moov);
 
             return mp4lib.serialize(moov_file);
         };

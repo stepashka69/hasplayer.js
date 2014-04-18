@@ -131,10 +131,9 @@ Mss.dependencies.MssHandler = function() {
 					media.bandwidth = realRepresentation.bandwidth;
 
 					//DRM Protected Adaptation is detected
-					if (realAdaptation.ContentProtection != undefined)
-					{
+					if (realAdaptation.ContentProtection !== undefined){
 						media.contentProtection = realAdaptation.ContentProtection;
-					};
+					}
 
 					// Video related informations
 					media.width = realRepresentation.width || realAdaptation.maxWidth;
@@ -146,6 +145,8 @@ Mss.dependencies.MssHandler = function() {
 					media.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
 
 					representation.initData =  rslt.mp4Processor.generateInitSegment(media);
+
+					//console.saveBinArray(representation.initData, "init_evolution_"+media.type+"_"+media.bandwidth+".mp4");
 				}
 				return representation.initData;
 			}else{
@@ -159,7 +160,7 @@ Mss.dependencies.MssHandler = function() {
 
 	rslt.getInitRequest = function (representation) {
 			var period = null;
-			var self = this; 
+			var self = this;
 			var presentationStartTime = null;
 			var deferred = Q.defer();
             //Mss.dependencies.MssHandler.prototype.getInitRequest.call(this,quality,data).then(onGetInitRequestSuccess);
