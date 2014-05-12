@@ -2,9 +2,9 @@
 <html ng-app="DashPlayer" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>Dash JavaScript Player</title>
+    <title>HAS JavaScript Player</title>
     <meta name="description" content="" />
-    <link rel="icon" type="image/png" href="http://dashpg.com/w/2012/09/dashif.ico" />
+    <link rel="icon" type="image/png" href="app/img/orange.ico" />
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
 
     <link rel="stylesheet" href="app/lib/bootstrap/css/bootstrap.min.css">
@@ -19,7 +19,6 @@
     <script src="app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.js"></script>
 
     <!-- http://angularjs.org/ -->
-
     <script src="app/lib/angular/angular.min.js"></script>
     <script src="app/lib/angular/angular-resource.min.js"></script>
 
@@ -63,8 +62,10 @@
     <div class="container">
         <div class="row title-header">
             <a href="http://dashif.org/" target="_blank"><img class="image" src="app/img/if.png"/></a>
-            <span id="big-title">Reference Client</span>
-            <span>{{version}}</span>
+            <img class="image" src="app/img/orange.gif"/>
+            <span id="big-title">HAS Javascript Player</span>
+            <span>1.0.0</span>
+            <span style="font-size:16px">(based on dash.js {{version}})</span>
         </div>
 
         <div class="row">
@@ -150,6 +151,14 @@
                 <div class="panel">
                     <div class="panel-heading panel-top">
                         <span class="panel-title">Audio</span>
+                         <div>
+                             <select id="audioTracksSelect"
+                                    ng-model="audioData"
+                                    ng-options="track.lang +' - ' + track.id for track in audioTracks"
+                                    required="true"
+                                    ng-change="selectAudioTrack(audioData)">
+                            </select>
+                         </div>
                         <!--div class="btn-group">
                             <button
                                 type="button"
@@ -190,15 +199,29 @@
                         <button
                             type="button"
                             class="btn btn-default"
-                            ng-class="{active:showCharts == true}"
-                            ng-click="setCharts(true)">
-                            Show
+                            ng-class="{active: (switchCharts == false && showCharts == true)}"
+                            ng-click="setSwitchCharts(false)">
+                            Buffer Chart
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-default"
+                            ng-class="{active: (switchCharts == true && showCharts == true)}"
+                            ng-click="setSwitchCharts(true)">
+                            Bandwidth Chart
                         </button>
                     </div>
                 </div>
                 <div ng-switch on="showCharts">
                     <div class="panel-body panel-stats" ng-switch-when="true">
+                        <div ng-switch on="switchCharts">
+                            <div ng-switch-when="false">
                         <chart ng-model="bufferData"></chart>
+                    </div>
+                            <div ng-switch-when="true">
+                                <chart2 id="chartBandwidth" class="overlayChart" ng-model="bandwidthData"></chart2>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
