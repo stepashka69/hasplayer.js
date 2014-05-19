@@ -322,7 +322,8 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 var datas = [];
                 for (i = 0, len = results.length; i < len; i += 1) {
                     if (results[i] === true) {
-                        datas.push(self.processAdaptation(adaptations[i]));
+                       var adapt = adaptations[i];
+                       datas.push(adapt);
                     }
                 }
                 deferred.resolve(datas);

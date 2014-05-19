@@ -491,7 +491,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             decoderConfigDescriptor[0] = 0x04;      // bit(8), tag=0x04 (DecoderConfigDescrTag)
             decoderConfigDescriptor[1] = dcdLength; // bit(8), size
             decoderConfigDescriptor[2] = 0x40;      // bit(8), objectTypeIndication=0x40 (MPEG-4 AAC)
-            decoderConfigDescriptor[3] = 0x05 << 2; // bit(6), streamType=0x05 (Visualstream)
+            decoderConfigDescriptor[3] = 0x05 << 2; // bit(6), streamType=0x05 (Audiostream)
             decoderConfigDescriptor[3] |= 0 << 1;   // bit(1), upStream=0
             decoderConfigDescriptor[3] |= 1;        // bit(1), reserved=1
             decoderConfigDescriptor[4] = 0xFF;      // bit(24), buffersizeDB=undefined

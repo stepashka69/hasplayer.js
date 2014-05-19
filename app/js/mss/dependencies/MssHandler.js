@@ -17,7 +17,7 @@ Mss.dependencies.MssHandler = function() {
 			}
 
 			return -1;
-    	},
+		},
 		
 		getType = function (adaptation) {
 
@@ -88,10 +88,10 @@ Mss.dependencies.MssHandler = function() {
 		getAudioChannels = function (adaptation, representation) {
 			var channels = 1;
 
-			if (adaptation.AudioChannelConfiguration) {
-				channels = adaptation.AudioChannelConfiguration.value;
-			} else if (representation.AudioChannelConfiguration) {
-				channels = representation.AudioChannelConfiguration.value;
+			if (adaptation.audioChannels) {
+				channels = adaptation.audioChannels;
+			} else if (representation.audioChannels) {
+				channels = representation.audioChannels;
 			}
 
 			return channels;
@@ -141,6 +141,7 @@ Mss.dependencies.MssHandler = function() {
 
 					// Audio related informations
 					media.language = realAdaptation.lang ? realAdaptation.lang : 'und';
+
 					media.channels = getAudioChannels(realAdaptation, realRepresentation);
 					media.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
 
