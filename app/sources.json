@@ -16,6 +16,11 @@
             "browsers": "cdsbi"
         },
         {
+            "name": "MSS/VOD - SynchroAV 2 stream audio AAC+AACH",
+            "url": "http://161.105.194.170/VOD/VODE/Ateme3511/ATEME3511_clr_MSS_SynchroAV/Synchro_AV.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
             "name": "MSS/VOD - Big Buck Bunny",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
             "browsers": "cdsbi"
