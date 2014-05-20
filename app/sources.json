@@ -21,6 +21,11 @@
             "browsers": "cdsbi"
         },
         {
+            "name": "MSS/VOD - Audio stream AAC HE implicit mode",
+            "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_Implicit.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
             "name": "MSS/VOD - Big Buck Bunny",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
             "browsers": "cdsbi"
