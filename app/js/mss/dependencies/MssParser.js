@@ -390,12 +390,18 @@ Mss.dependencies.MssParser = function () {
                 avcoti = "40";
                 // Extract objectType from the CodecPrivateData field
                 var codecPrivateDatafield = node.CodecPrivateData.toString();
-                var objectType;
+                var objectType = 0;
                 var arr16;
                 var codecPrivateDataHex;
 
+                //chrome problem, in implicit AAC HE definition, so when AACH is detected in FourCC
+                //set objectType to 5 => strange, it should be 2
+                if (node.FourCC === "AACH") {
+                    objectType = 0x05;
+                }
+              
+                //if codecPrivateDatafield is empty, build it :
                 if (codecPrivateDatafield === "" || codecPrivateDatafield === undefined) {
-                    //if codecPrivateDatafield is empty, build it :
                     objectType = 0x02; //AAC Main Low Complexity => object Type = 2
                     var indexFreq = samplingFrequencyIndex[node.SamplingRate];
                     if (node.FourCC === "AACH") {
@@ -435,7 +441,7 @@ Mss.dependencies.MssParser = function () {
                     codecPrivateDatafield = ""+codecPrivateDataHex;
                     node.CodecPrivateData = codecPrivateDatafield.toUpperCase();
                 }
-                else
+                else if (objectType === 0)
                     objectType = (parseInt(codecPrivateDatafield.substr(0, 2), 16) & 0xF8) >> 3;
                 
                 avcoti += "." + objectType;
