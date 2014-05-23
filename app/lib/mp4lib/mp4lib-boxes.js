@@ -1392,19 +1392,21 @@ mp4lib.boxes.TrackFragmentHeaderBox.prototype.constructor = mp4lib.boxes.TrackFr
 mp4lib.boxes.TrackFragmentHeaderBox.prototype.computeLength = function() {
     mp4lib.boxes.FullBox.prototype.computeLength.call(this);
     this.size += mp4lib.fields.FIELD_UINT32.getLength();
-    if(this.base_data_offset !== undefined){
+    //even if, for example base_data_offset is defined, test the flags value
+    //to know if base_data_offset size should be added to global size.
+    if((this.flags & 0x000001)!== 0 && this.base_data_offset !== undefined){
        this.size += mp4lib.fields.FIELD_UINT64.getLength();
     }
-    if(this.sample_description_index !== undefined){
+    if((this.flags & 0x000002) !== 0 && this.sample_description_index !== undefined){
        this.size += mp4lib.fields.FIELD_UINT32.getLength();
     }
-    if(this.default_sample_duration !== undefined){
+    if((this.flags & 0x000008) !== 0 && this.default_sample_duration !== undefined){
        this.size += mp4lib.fields.FIELD_UINT32.getLength();
     }
-    if(this.default_sample_size !== undefined){
+    if((this.flags & 0x000010) !== 0 && this.default_sample_size !== undefined){
        this.size += mp4lib.fields.FIELD_UINT32.getLength();
     }
-    if(this.default_sample_flags !== undefined){
+    if((this.flags & 0x000020) !== 0 && this.default_sample_flags !== undefined){
        this.size += mp4lib.fields.FIELD_UINT32.getLength();
     }
 };
