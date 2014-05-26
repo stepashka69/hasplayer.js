@@ -25,10 +25,12 @@
         STREAM_BUFFER_END_THRESHOLD = 4,
         STREAM_END_THRESHOLD = 3,
         autoPlay = true,
-        deferredSwitch= null,
+        isPeriodSwitchingInProgress = false,
         timeupdateListener,
         seekingListener,
         progressListener,
+        pauseListener,
+        playListener,
         audioTracks,
 
         play = function () {
@@ -74,16 +76,17 @@
         attachVideoEvents = function (videoModel) {
             videoModel.listen("seeking", seekingListener);
             videoModel.listen("progress", progressListener);
-
-            if (getNextStream()) {
                 videoModel.listen("timeupdate", timeupdateListener);
-            }
+            videoModel.listen("pause", pauseListener);
+            videoModel.listen("play", playListener);
         },
 
         detachVideoEvents = function (videoModel) {
             videoModel.unlisten("seeking", seekingListener);
             videoModel.unlisten("progress", progressListener);
             videoModel.unlisten("timeupdate", timeupdateListener);
+            videoModel.unlisten("pause", pauseListener);
+            videoModel.unlisten("play", playListener);
         },
 
         copyVideoProperties = function (fromVideoElement, toVideoElement) {
@@ -122,12 +125,17 @@
          * TODO move to ???Extensions class
          */
         onTimeupdate = function() {
+            var streamEndTime  = activeStream.getStartTime() + activeStream.getDuration(),
+                currentTime = activeStream.getVideoModel().getCurrentTime(),
+                self = this;
+
+            self.metricsModel.addDroppedFrames("video", self.videoExt.getPlaybackQuality(activeStream.getVideoModel().getElement()));
+
+            if (!getNextStream()) return;
+
             // Sometimes after seeking timeUpdateHandler is called before seekingHandler and a new period starts
             // from beginning instead of from a chosen position. So we do nothing if the player is in the seeking state
             if (activeStream.getVideoModel().getElement().seeking) return;
-
-            var streamEndTime  = activeStream.getStartTime() + activeStream.getDuration(),
-                currentTime = activeStream.getVideoModel().getCurrentTime();
 
             // check if stream end is reached
             if (streamEndTime - currentTime < STREAM_END_THRESHOLD) {
@@ -146,6 +154,14 @@
             if (seekingStream && seekingStream !== activeStream) {
                 switchStream.call(this, activeStream, seekingStream, seekingTime);
             }
+        },
+
+        onPause = function() {
+            this.manifestUpdater.stop();
+        },
+
+        onPlay = function() {
+            this.manifestUpdater.start();
         },
 
         /*
@@ -198,16 +214,14 @@
 
         switchStream = function(from, to, seekTo) {
 
-            if(!from || !to || from === to) return;
+            if(isPeriodSwitchingInProgress || !from || !to || from === to) return;
 
-            var self = this;
+            isPeriodSwitchingInProgress = true;
 
-            Q.when(deferredSwitch || true).then(
-                function() {
                     from.pause();
                     activeStream = to;
 
-                    deferredSwitch = switchVideoModel.call(self, from.getVideoModel(), to.getVideoModel());
+            switchVideoModel.call(this, from.getVideoModel(), to.getVideoModel());
 
                     if (seekTo) {
                         seek(from.getVideoModel().getCurrentTime());
@@ -216,8 +230,7 @@
                     }
 
                     play();
-                }
-            );
+            isPeriodSwitchingInProgress = false;
         },
 
         composeStreams = function() {
@@ -231,6 +244,7 @@
                 sIdx,
                 period,
                 stream;
+
             if (!manifest) {
                 return Q.when(false);
             }
@@ -239,6 +253,11 @@
                 function(mpd) {
                     self.manifestExt.getRegularPeriods(manifest, mpd).then(
                         function(periods) {
+
+                            if (periods.length === 0) {
+                                return deferred.reject("There are no regular periods");
+                            }
+
                             for (pIdx = 0, pLen = periods.length; pIdx < pLen; pIdx += 1) {
                                 period = periods[pIdx];
                                 for (sIdx = 0, sLen = streams.length; sIdx < sLen; sIdx += 1) {
@@ -279,6 +298,7 @@
 
             return deferred.promise;
         },
+
         // ORANGE: create function to handle audiotracks
         updateAudioTracks = function(){
             if(activeStream){
@@ -291,6 +311,7 @@
                 });
             }
         },
+
         manifestHasUpdated = function() {
             var self = this;
             composeStreams.call(self).then(
@@ -298,6 +319,10 @@
                     // ORANGE: Update Audio Tracks List
                     updateAudioTracks.call(self);
                     self.system.notify("streamsComposed");
+                },
+                function(errMsg) {
+                    self.errHandler.manifestError(errMsg, "nostreamscomposed", self.manifestModel.getValue());
+                    self.reset();
                 }
             );
         };
@@ -317,7 +342,8 @@
         fragmentExt: undefined,
         capabilities: undefined,
         debug: undefined,
-        metricsExt: undefined,
+        metricsModel: undefined,
+        videoExt: undefined,
         errHandler: undefined,
         // ORANGE: licenser backUrl
         backUrl : undefined,
@@ -327,6 +353,8 @@
             timeupdateListener = onTimeupdate.bind(this);
             progressListener = onProgress.bind(this);
             seekingListener = onSeeking.bind(this);
+            pauseListener = onPause.bind(this);
+            playListener = onPlay.bind(this);
         },
 
         getManifestExt: function () {
@@ -354,12 +382,12 @@
             return audioTracks;
         },
 
+        // ORANGE: audioTrack Management
         setAudioTrack:function(audioTrack){
             if(activeStream){
                 activeStream.setAudioTrack(audioTrack);
             }
         },
-        // ORANGE en  of modification
         
         // ORANGE: add licenser backUrl parameter
         load: function (url, backUrl) {
@@ -377,8 +405,8 @@
                     }
                     self.manifestModel.setValue(manifest);
                     self.debug.log("Manifest has loaded.");
-                    self.debug.log(self.manifestModel.getValue());
-                    self.manifestUpdater.init();
+                    //self.debug.log(self.manifestModel.getValue());
+                    self.manifestUpdater.start();
                 },
                 function () {
                     self.reset();
@@ -404,7 +432,7 @@
             streams = [];
             this.manifestUpdater.stop();
             this.manifestModel.setValue(null);
-            deferredSwitch = null;
+            isPeriodSwitchingInProgress = false;
             activeStream = null;
         },
 

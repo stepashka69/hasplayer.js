@@ -136,7 +136,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         }
 
         if (adaptation.hasOwnProperty("mimeType")) {
-            result = adaptation.mimeType.indexOf("text") !== -1;
+            result = (adaptation.mimeType.indexOf("vtt") !== -1) || (adaptation.mimeType.indexOf("ttml") !== -1);
             found = true;
         }
 
@@ -148,7 +148,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 representation = adaptation.Representation_asArray[i];
 
                 if (representation.hasOwnProperty("mimeType")) {
-                    result = representation.mimeType.indexOf("text") !== -1;
+                    result = (representation.mimeType.indexOf("vtt") !== -1) || (representation.mimeType.indexOf("ttml") !== -1);
                     found = true;
                 }
 
@@ -209,7 +209,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
             len;
-        // ORANGE : only ciompare Data.id if exist
+        // ORANGE : only compare Data.id if exist
         if(data.id){
 
             for (i = 0, len = adaptations.length; i < len; i += 1) {
@@ -242,8 +242,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         "use strict";
         //return Q.when(null);
         //------------------------------------
-        var self = this,
-            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
             len,
             deferred = Q.defer(),
@@ -258,7 +257,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 for (i = 0, len = results.length; i < len; i += 1) {
                     if (results[i] === true) {
                         found = true;
-                        deferred.resolve(self.processAdaptation(adaptations[i]));
+                        deferred.resolve(adaptations[i]);
                     }
                 }
                 if (!found) {
@@ -274,8 +273,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         "use strict";
         //return Q.when(null);
         //------------------------------------
-        var self = this,
-            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
             len,
             deferred = Q.defer(),
@@ -287,10 +285,10 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         Q.all(funcs).then(
             function (results) {
                 var found = false;
-                for (i = 0, len = results.length; i < len; i += 1) {
+                for (i = 0, len = results.length; i < len && !found; i += 1) {
                     if (results[i] === true) {
                         found = true;
-                        deferred.resolve(self.processAdaptation(adaptations[i]));
+                        deferred.resolve(adaptations[i]);
                     }
                 }
                 if (!found) {
@@ -306,8 +304,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         "use strict";
         //return Q.when(null);
         //------------------------------------
-        var self = this,
-            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
             len,
             deferred = Q.defer(),
@@ -322,7 +319,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 var datas = [];
                 for (i = 0, len = results.length; i < len; i += 1) {
                     if (results[i] === true) {
-                        datas.push(self.processAdaptation(adaptations[i]));
+                        datas.push(adaptations[i]);
                     }
                 }
                 deferred.resolve(datas);
@@ -393,7 +390,6 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
     getContentProtectionData: function (data) {
         "use strict";
-
         if (!data || !data.hasOwnProperty("ContentProtection_asArray") || data.ContentProtection_asArray.length === 0) {
             return Q.when(null);
         }
@@ -476,8 +472,8 @@ Dash.dependencies.DashManifestExtensions.prototype = {
     },
 
     getRepresentationsForAdaptation: function(manifest, adaptation) {
-        var a = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index],
-            self = this,
+        var self = this,
+            a = self.processAdaptation(manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index]),
             representations = [],
             deferred = Q.defer(),
             representation,
@@ -632,6 +628,10 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 vo.id = p.id;
             }
 
+            if (vo !== null && p.hasOwnProperty("duration")){
+                vo.duration = p.duration;
+            }
+
             if (vo !== null){
                 vo.index = i;
                 vo.mpd = mpd;
@@ -642,6 +642,10 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             p = null;
             vo1 = vo;
             vo = null;
+        }
+
+        if (periods.length === 0) {
+            return Q.when(periods);
         }
 
         self.getCheckTime(manifest, periods[0]).then(
@@ -702,7 +706,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         // TODO The client typically should not use the time at which it actually successfully received the MPD, but should
         // take into account delay due to MPD delivery and processing. The fetch is considered successful fetching
         // either if the client obtains an updated MPD or the client verifies that the MPD has not been updated since the previous fetching.
-        var fetchTime = this.timelineConverter.calcPresentationTimeFromWallTime(manifest.mpdLoadedTime, period, true);
+        var fetchTime = this.timelineConverter.calcPresentationTimeFromWallTime(manifest.mpdLoadedTime, period);
 
         return Q.when(fetchTime);
     },
@@ -739,9 +743,11 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
         if (mpd.manifest.mediaPresentationDuration) {
             periodEnd = mpd.manifest.mediaPresentationDuration;
-        } else {
+        } else if (!isNaN(mpd.checkTime)) {
             // in this case the Period End Time should match CheckTime
             periodEnd = mpd.checkTime;
+        } else {
+            return Q.fail(new Error("Must have @mediaPresentationDuration or @minimumUpdatePeriod on MPD or an explicit @duration on the last period."));
         }
 
         return Q.when(periodEnd);

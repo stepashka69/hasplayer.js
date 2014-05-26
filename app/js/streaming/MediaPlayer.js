@@ -41,7 +41,7 @@ MediaPlayer = function (aContext) {
  * 6) Transform fragments.
  * 7) Push fragmemt bytes into SourceBuffer.
  */
-    var VERSION = "1.1.0",
+    var VERSION = "1.1.2",
         context = aContext,
         system,
         element,
@@ -55,23 +55,12 @@ MediaPlayer = function (aContext) {
         autoPlay = true,
         scheduleWhilePaused = false,
         bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
-        activeStream = null,
-       
 
         isReady = function () {
             return (!!element && !!source);
         },
 
-        initLogger = function () {
-            this.logger.addAppender();
-        },
-
         play = function () {
-
-            var self = this;
-            
-           // initLogger.call(this);
-            this.debug.log("[MediaPlayer]", "play", source);
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
@@ -86,7 +75,7 @@ MediaPlayer = function (aContext) {
             }
 
             playing = true;
-            //this.debug.log("[MediaPlayer] Playback initiated!");
+            //this.debug.log("Playback initiated!");
             streamController = system.getObject("streamController");
             streamController.setVideoModel(videoModel);
             streamController.setAutoPlay(autoPlay);
@@ -94,6 +83,7 @@ MediaPlayer = function (aContext) {
             streamController.load(source, sourceBackUrl);
             system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
             system.mapOutlet("scheduleWhilePaused", "stream");
+            system.mapOutlet("scheduleWhilePaused", "bufferController");
             system.mapValue("bufferMax", bufferMax);
             system.injectInto(this.bufferExt, "bufferMax");
         },
@@ -110,7 +100,6 @@ MediaPlayer = function (aContext) {
     system.mapOutlet("system");
     system.injectInto(context);
 
-
     return {
         debug: undefined,
         eventBus: undefined,
@@ -119,6 +108,7 @@ MediaPlayer = function (aContext) {
         metricsModel: undefined,
         metricsExt: undefined,
         bufferExt: undefined,
+        errHandler: undefined,
 
         addEventListener: function (type, listener, useCapture) {
             this.eventBus.addEventListener(type, listener, useCapture);
@@ -242,6 +232,7 @@ MediaPlayer = function (aContext) {
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
+
             source = url;
             // ORANGE: modify attachSource function to add licenser backUrl parameter
             sourceBackUrl = backUrl;
