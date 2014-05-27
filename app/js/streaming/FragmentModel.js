@@ -234,27 +234,10 @@ MediaPlayer.dependencies.FragmentModel = function () {
         },
 
         cancelPendingRequests: function() {
-            var i;
-
-            this.debug.log("[FragmentLoader] ### cancelPendingRequests");
-            if (pendingRequests.length > 0) {
-                for (i = pendingRequests; i < pendingRequests.length; i++) {
-                    this.debug.log("[FragmentLoader]["+pendingRequests[i].streamType+"] ### Cancel pending request ", pendingRequests[i].url);
-                }
-            }
             pendingRequests = [];
         },
 
         abortRequests: function() {
-            var i;
-            
-            this.debug.log("[FragmentLoader] ### abortRequests");
-            if (loadingRequests.length > 0) {
-                for (i = loadingRequests; i < loadingRequests.length; i++) {
-                    this.debug.log("[FragmentLoader]["+loadingRequests[i].streamType+"] ### Cancel loading request ", loadingRequests[i].url);
-                }
-            }
-
             this.fragmentLoader.abort();
             loadingRequests = [];
         },
@@ -294,6 +277,7 @@ MediaPlayer.dependencies.FragmentModel = function () {
             }
         },
 
+        // ORANGE
         waitForLoadingRequestsToBeExecuted: function() {
             var self = this,
                 defer = Q.defer(),

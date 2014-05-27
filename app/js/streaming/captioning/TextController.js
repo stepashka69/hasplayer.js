@@ -72,7 +72,7 @@ MediaPlayer.dependencies.TextController = function () {
          onBytesLoaded = function (request, response) {
              var self = this;
              //self.debug.log(" Text track Bytes finished loading: " + request.url);
-            // ORANGE: add request paramter to retrieve startTime and timescale in fragmentController
+            // ORANGE: add request parameter to retrieve startTime and timescale in fragmentController
              self.fragmentController.process(response.data, request).then(
                  function (data) {
                      if (data !== null) {

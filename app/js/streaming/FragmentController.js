@@ -200,6 +200,7 @@ MediaPlayer.dependencies.FragmentController = function () {
             return Q.when(true);
         },
 
+        // ORANGE
         waitForLoadingRequestsToBeExecuted: function(model) {
             if (model) {
                 model.waitForLoadingRequestsToBeExecuted();

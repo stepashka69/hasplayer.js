@@ -186,7 +186,6 @@ Dash.dependencies.DashHandler = function () {
         },
 
         getSegmentsFromTimeline = function (representation) {
-            // ORANGE: unnecessary use of self
             var self = this,
                 template = representation.adaptation.period.mpd.manifest.Period_asArray[representation.adaptation.period.index].
                     AdaptationSet_asArray[representation.adaptation.index].Representation_asArray[representation.index].SegmentTemplate,
@@ -613,7 +612,6 @@ Dash.dependencies.DashHandler = function () {
                 self = this,
                 lastIdx;
 
-            //this.debug.log("[DashHandler]["+type+"] getSegments for representation " + representation.id);
             // Already figure out the segments.
             if (!isSegmentListUpdateRequired.call(this, representation)) {
                 return Q.when(representation.segments);
@@ -630,7 +628,6 @@ Dash.dependencies.DashHandler = function () {
 
                 Q.when(segmentPromise).then(
                     function (segments) {
-                        self.debug.log("[DashHandler]["+type+"] getSegments for representation " + representation.id + " OK");
                         representation.segments = segments;
                         lastIdx = segments.length - 1;
                         if (isDynamic && isNaN(representation.adaptation.period.liveEdge)) {
@@ -706,11 +703,6 @@ Dash.dependencies.DashHandler = function () {
             }
             }
 
-            // Orange : prevent requesting null segments by setting a valid index
-            /*if(idx > segmentLastIdx){
-                idx = segmentLastIdx;
-            }*/
-
             // TODO : This is horrible.
             // Temp fix for SegmentTimeline refreshes.
             //if (idx === -1) {
@@ -766,8 +758,7 @@ Dash.dependencies.DashHandler = function () {
                 lowerIdx = segments[0].availabilityIdx;
                 upperIdx = segments[segments.length -1].availabilityIdx;
                 updateRequired = (index < lowerIdx) || (index > upperIdx);
-                if (updateRequired)
-                {
+                if (updateRequired) {
                     this.debug.log("[DashHandler]["+type+"] updateRequired index = " + index + "[" + lowerIdx + "-" + upperIdx+ "]");
                 }
             }

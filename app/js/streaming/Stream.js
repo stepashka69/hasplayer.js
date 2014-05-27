@@ -806,7 +806,8 @@ MediaPlayer.dependencies.Stream = function () {
 
             Q.when(deferredVideoUpdate.promise, deferredAudioUpdate.promise, deferredTextUpdate.promise).then(
                 function() {
-                    updateCurrentTime.call(self);
+                    // ORANGE: unnecessary since seek is performed into each BufferController
+                    //updateCurrentTime.call(self);
                     deferred.resolve();
                 }
             );
@@ -891,30 +892,20 @@ MediaPlayer.dependencies.Stream = function () {
                     function(index) {
                         audioTrackIndex = index;
 
-                        // Reset audio buffer
-                        //audioController.emptyBuffer(currentTime).then(
-                        audioController.removeBuffer(-1, currentTime).then(
-                            function() {
-                                audioController.removeBuffer(currentTime + 3).then(
-                                    function() {
-                                        // Update manifest
-                                        url = manifest.mpdUrl;
+                        // Update manifest
+                        url = manifest.mpdUrl;
 
-                                        if (manifest.hasOwnProperty("Location")) {
-                                            url = manifest.Location;
-                                        }
+                        if (manifest.hasOwnProperty("Location")) {
+                            url = manifest.Location;
+                        }
 
-                                        self.debug.log("### Refresh manifest @ " + url);
+                        self.debug.log("### Refresh manifest @ " + url);
 
-                                        self.manifestLoader.load(url).then(
-                                            function (manifestResult) {
-                                                self.manifestModel.setValue(manifestResult);
-                                                self.debug.log("### Manifest has been refreshed.");
-                                                deferredAudioUpdate.resolve();
-                                            }
-                                        );
-                                    }
-                                );
+                        self.manifestLoader.load(url).then(
+                            function (manifestResult) {
+                                self.manifestModel.setValue(manifestResult);
+                                self.debug.log("### Manifest has been refreshed.");
+                                deferredAudioUpdate.resolve();
                             }
                         );
                     }

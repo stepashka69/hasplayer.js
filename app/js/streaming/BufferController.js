@@ -96,7 +96,6 @@ MediaPlayer.dependencies.BufferController = function () {
                 }
             }
         },
-        
 /*
         setCurrentTimeOnVideo = function (time) {
             var ct = this.videoModel.getCurrentTime();
@@ -135,7 +134,7 @@ MediaPlayer.dependencies.BufferController = function () {
                 //mseSetTime = true;
             }
 
-            this.debug.log("BufferController " + type + " start.");
+            this.debug.log("[BufferController]["+type+"] ### START");
 
             started = true;
             waitingForBuffer = true;
@@ -145,7 +144,7 @@ MediaPlayer.dependencies.BufferController = function () {
         doSeek = function (time) {
             var currentTime;
 
-            this.debug.log("BufferController " + type + " seek: " + time);
+            this.debug.log("[BufferController]["+type+"] ### SEEK: " + time);
             seeking = true;
             seekTarget = time;
             currentTime = new Date();
@@ -158,7 +157,7 @@ MediaPlayer.dependencies.BufferController = function () {
         doStop = function () {
             if (state === WAITING) return;
 
-            this.debug.log("BufferController " + type + " stop.");
+            this.debug.log("[BufferController]["+type+"] ### STOP");
             setState.call(this, isBufferingCompleted ? READY : WAITING);
             this.requestScheduler.stopScheduling(this);
             // cancel the requests that have already been created, but not loaded yet.
@@ -249,12 +248,6 @@ MediaPlayer.dependencies.BufferController = function () {
                 function (data) {
                     if (data !== null && deferredInitAppend !== null) {
 
-                        // ORANGE
-                        /*if (request.quality !== lastQuality) {
-                            self.fragmentController.removeExecutedRequest(fragmentModel, request);
-                            return;
-                        }*/
-
                         // ORANGE unnecessary utilisation of Q.when (we have already a promise...)
                         //Q.when(deferredInitAppend.promise).then(
                         deferredInitAppend.promise.then(
@@ -316,6 +309,7 @@ MediaPlayer.dependencies.BufferController = function () {
                     hasEnoughSpaceToAppend.call(self).then(
                         function() {
                             if (quality !== lastQuality) {
+                                // ORANGE: !! index may be undefined
                                 if (index !== undefined)
                                 {
                                     req = fragmentModel.getExecutedRequestForQualityAndIndex(quality, index);
@@ -471,8 +465,7 @@ MediaPlayer.dependencies.BufferController = function () {
             }
 
             startClearing = function() {
-                //clearBuffer.call(self).then(
-                _clearBuffer.call(self, self.videoModel.getCurrentTime()).then(
+                clearBuffer.call(self).then(
                     function(removedTimeValue) {
                         removedTime += removedTimeValue;
                         if (removedTime >= fragmentDuration) {
@@ -523,7 +516,7 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         // ORANGE: remove buffer part, from start time to end time
-        doRemoveBuffer = function(start, end) {
+        removeBuffer = function(start, end) {
             var self = this,
                 deferred = Q.defer(),
                 removeStart,
@@ -536,7 +529,8 @@ MediaPlayer.dependencies.BufferController = function () {
 
             self.debug.log("[BufferController][" + type + "] ### Remove from " + removeStart + " to " + removeEnd +  " (" + self.getVideoModel().getCurrentTime() + ")");
 
-            self.sourceBufferExt.remove(buffer, removeStart, removeEnd, periodInfo.duration, mediaSource).then(
+            // Wait for buffer update completed, since some data can have been started to pe pushed before calling this method
+            self.sourceBufferExt.waitForUpdateEnd(buffer).then(self.sourceBufferExt.remove(buffer, removeStart, removeEnd, periodInfo.duration, mediaSource)).then(
                 function() {
                     // after the data has been removed from the buffer we should remove the requests from the list of
                     // the executed requests for which playback time is inside the time interval that has been removed from the buffer
@@ -741,8 +735,7 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         loadInitialization = function (qualityChanged, currentQuality) {
-            var initializationPromise = null,
-                self=this;
+            var initializationPromise = null;
 
             if (initialPlayback) {
                 this.debug.log("Marking a special seek for initial " + type + " playback.");
@@ -774,7 +767,6 @@ MediaPlayer.dependencies.BufferController = function () {
                     deferredInitAppend = Q.defer();
                     lastQuality = currentQuality;
                     if (initializationData[currentQuality]) {
-                        self.debug.log("[BufferController]["+type+"] Initialization cached ", currentQuality);
                         appendToBuffer.call(this, initializationData[currentQuality], currentQuality).then(
                             function() {
                                 deferredInitAppend.resolve();
@@ -1191,16 +1183,23 @@ MediaPlayer.dependencies.BufferController = function () {
             return data;
         },
 
-        // ORANGE: add currentTime option to tell the restart time when updating data
-        updateData: function(dataValue, periodInfoValue, currentTime) {
+        updateData: function(dataValue, periodInfoValue) {
             var self = this,
                 deferred = Q.defer(),
                 from = data;
+
+            self.debug.log("[BufferController]["+type+"] ========== updateData, playingTime = " + playingTime);
 
             if (!from) {
                 from = dataValue;
             }
             doStop.call(self);
+
+            // ORANGE: if data language changed (audio or text) then cancel current requests
+            if (data && (data.lang !== dataValue.lang)) {
+                self.fragmentController.cancelPendingRequestsForModel(fragmentModel);
+                self.fragmentController.abortRequestsForModel(fragmentModel);
+            }
 
             updateRepresentations.call(self, dataValue, periodInfoValue).then(
                 function(representations) {
@@ -1214,26 +1213,41 @@ MediaPlayer.dependencies.BufferController = function () {
 
                             // ORANGE: set restart time according to currentTime parameter
                             var restart = function(time) {
-                                    dataChanged = true;
-                                    playingTime = time;
-                                    currentRepresentation = getRepresentationForQuality.call(self, result.quality);
-                                    if (currentRepresentation.segmentDuration) {
-                                        fragmentDuration = currentRepresentation.segmentDuration;
-                                    }
-                                    data = dataValue;
-                                    self.bufferExt.updateData(data, type);
-                                    self.seek(time);
+                                dataChanged = true;
+                                playingTime = time;
+                                currentRepresentation = getRepresentationForQuality.call(self, result.quality);
+                                if (currentRepresentation.segmentDuration) {
+                                    fragmentDuration = currentRepresentation.segmentDuration;
+                                }
+                                data = dataValue;
+                                self.bufferExt.updateData(data, type);
+                                self.debug.log("[BufferController]["+type+"] ========== updateData, seek = " + time);
+                                self.seek(time);
 
-                                    self.indexHandler.updateSegmentList(currentRepresentation).then(
-                                        function() {
-                                            deferred.resolve();
-                                        }
-                                    );
+                                self.indexHandler.updateSegmentList(currentRepresentation).then(
+                                    function() {
+                                    self.debug.log("[BufferController]["+type+"] ========== updateData, done");
+                                        deferred.resolve();
+                                    }
+                                );
                             };
 
-
-                            if (currentTime) {
-                                restart(currentTime);
+                            // ORANGE: if data language changed (audio or text) then:
+                            // 1 - remove previous buffer parts from previous language
+                            // 2 - restart at current time + 
+                            if (data && (data.lang !== dataValue.lang)) {
+                                self.debug.log("[BufferController]["+type+"] ========== updateData, remove buffers");
+                                var currentTime = self.getVideoModel().getCurrentTime();
+                                var seekTime = currentTime + 3;
+                                removeBuffer.call(self, -1, currentTime).then(
+                                    function() {
+                                        removeBuffer.call(self, seekTime).then(
+                                            function() {
+                                                restart(seekTime - 1);
+                                            }
+                                        );
+                                    }
+                                );
                             } else {
                                 self.indexHandler.getCurrentTime(currentRepresentation).then(restart);
                             }
@@ -1308,11 +1322,6 @@ MediaPlayer.dependencies.BufferController = function () {
             }
         },
 
-        // ORANGE: remove buffer part, from start time to end time
-        removeBuffer: function(start, end) {
-            return doRemoveBuffer.call(this, start, end);
-        },
-
         updateStalledState: function() {
             stalled = this.videoModel.isStalled();
             checkIfSufficientBuffer.call(this);
@@ -1366,9 +1375,6 @@ MediaPlayer.dependencies.BufferController = function () {
         stop: doStop
     };
 };
-
-MediaPlayer.dependencies.BufferController.EPSILON = 0.003;
-
 
 MediaPlayer.dependencies.BufferController.prototype = {
     constructor: MediaPlayer.dependencies.BufferController
