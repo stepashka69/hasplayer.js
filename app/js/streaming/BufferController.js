@@ -245,7 +245,12 @@ MediaPlayer.dependencies.BufferController = function () {
         
             // ORANGE: add request and data in function parameters, used by MssFragmentController
             self.fragmentController.process(response.data, request, availableRepresentations).then(
-                function (data) {
+                function (res) {
+                    // ORANGE: add needUpdate returned parameter in order to update representations if required
+                    // (MSS live use case where future segments description ar contained in current segment data, @see MssFragmentcontroller)
+                    var data = res.data;
+                    var needUpdate = res.needUpdate;
+
                     if (data !== null && deferredInitAppend !== null) {
 
                         // ORANGE unnecessary utilisation of Q.when (we have already a promise...)
@@ -275,6 +280,12 @@ MediaPlayer.dependencies.BufferController = function () {
                                 );
                             }
                         );
+
+                        // ORANGE: update representations (MSS live use case, @see MssFragmentcontroller)
+                        if (needUpdate) {
+                            self.updateData(self.getData(), self.getPeriodInfo());
+                        }
+
                     } else {
                         self.debug.log("No " + type + " bytes to push.");
                     }
@@ -351,8 +362,7 @@ MediaPlayer.dependencies.BufferController = function () {
 
                                             // ORANGE: in case of live streams, remove outdated buffer parts and requests
                                             if (isDynamic) {
-                                                self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, self.videoModel.getCurrentTime() - 4);
-                                                self.sourceBufferExt.remove(buffer, 0, self.videoModel.getCurrentTime() - 4, periodInfo.duration, mediaSource).then(
+                                                removeBuffer.call(self, -1, self.videoModel.getCurrentTime() - 4).then(
                                                     function() {
                                                         self.debug.log("[BufferController] ### " + type + " cleared buffer");
                                                         updateBuffer();
@@ -361,10 +371,6 @@ MediaPlayer.dependencies.BufferController = function () {
                                             } else {
                                                 updateBuffer();
                                             }
-                                            
-                                            /*if (!buffer) {
-                                                return;
-                                            }*/
 
                                             // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
                                             if (DEBUG) {
@@ -378,7 +384,7 @@ MediaPlayer.dependencies.BufferController = function () {
 
                                                             //self.debug.log("Number of buffered " + type + " ranges: " + ranges.length);
                                                                 for (i = 0, len = ranges.length; i < len; i += 1) {
-                                                                    self.debug.log("[BufferController]["+type+"] ### Buffered " + type + " Range: " + ranges.start(i) + " - " + ranges.end(i)+  " - "+self.getVideoModel().getCurrentTime());
+                                                                    self.debug.log("[BufferController]["+type+"] ### Buffered " + type + " Range: " + ranges.start(i) + " - " + ranges.end(i)+  " (" + self.getVideoModel().getCurrentTime() + ")");
                                                                 }
                                                             }
                                                         }
@@ -522,7 +528,10 @@ MediaPlayer.dependencies.BufferController = function () {
                 removeStart,
                 removeEnd;
 
-            //self.debug.log("[BufferController][" + type + "] ### Remove from " + start + " to " + end +  " (" + self.getVideoModel().getCurrentTime() + ")");
+            if (buffer.buffered.length === 0) {
+                deferred.resolve(0);
+                return deferred.promise;
+            }
 
             removeStart = ((start !== undefined) && (start !== -1)) ? start : buffer.buffered.start(0);
             removeEnd = ((end !== undefined) && (end !== -1)) ? end: buffer.buffered.end(buffer.buffered.length -1 );
@@ -567,7 +576,10 @@ MediaPlayer.dependencies.BufferController = function () {
             self.debug.log("[BufferController]["+type+"] ### Initialization loaded ", quality);
 
             self.fragmentController.process(initData).then(
-                function (data) {
+                function (res) {
+                    // ORANGE: data as a parameter of returned value, @see onMedaiaLoaded() function
+                    var data = res.data;
+
                     if (data !== null) {
                         // cache the initialization data to use it next time the quality has changed
                         initializationData[quality] = data;
@@ -1095,13 +1107,51 @@ MediaPlayer.dependencies.BufferController = function () {
                         return;
                     }
 
+                    searchForLiveEdge.call(self).then(
+                        function(liveEdgeTime) {
+                            self.debug.log("[BufferController]["+type+"] ### Live edge = " + liveEdgeTime);
+                            // step back from a found live edge time to be able to buffer some data
+                            // ORANGE: (minBufferTime * 1.5) in order to ensure not requiring segments that are available yet while buffering
+                            var startTime = Math.max((liveEdgeTime - (minBufferTime * 1.5)), currentRepresentation.segmentAvailabilityRange.start),
+                                segmentStart;
+                            self.debug.log("[BufferController]["+type+"] ### Live start time = " + startTime);
+                            // get a request for a start time
+                            self.indexHandler.getSegmentRequestForTime(currentRepresentation, startTime).then(function(request) {
+                                self.system.notify("liveEdgeFound", periodInfo.liveEdge, liveEdgeTime, periodInfo);
+                                segmentStart = request.startTime;
+                                // set liveEdge to be in the middle of the segment time to avoid a possible gap between
+                                // currentTime and buffered.start(0)
+                                periodInfo.liveEdge = segmentStart + (fragmentDuration / 2);
+                                self.debug.log("[BufferController]["+type+"] ### periodInfo.liveEdge = " + periodInfo.liveEdge);
+                                ready = true;
+                                startPlayback.call(self);
+                                doSeek.call(self, segmentStart);
+                            });
+                        }
+                    );
+
                     // ORANGE: in live use case, search for live edge only for main video stream.
                     // Else do nothing. startPlayback will be called later once live edge of video stream
                     // will be found
-                    if (self.getData().contentType === "video")
+                    /*if (self.getData().contentType === "video")
                     {
                         searchForLiveEdge.call(self).then(
                             function(liveEdgeTime) {
+                                // step back from a found live edge time to be able to buffer some data
+                                var startTime = Math.max((liveEdgeTime - minBufferTime), currentRepresentation.segmentAvailabilityRange.start),
+                                    segmentStart;
+                                // get a request for a start time
+                                self.indexHandler.getSegmentRequestForTime(currentRepresentation, startTime).then(function(request) {
+                                    self.system.notify("liveEdgeFound", periodInfo.liveEdge, liveEdgeTime, periodInfo);
+                                    segmentStart = request.startTime;
+                                    // set liveEdge to be in the middle of the segment time to avoid a possible gap between
+                                    // currentTime and buffered.start(0)
+                                    periodInfo.liveEdge = segmentStart + (fragmentDuration / 2);
+                                    ready = true;
+                                    //startPlayback.call(self);
+                                    //doSeek.call(self, segmentStart);
+                                });
+
                                 // step back from a found live edge time to be able to buffer some data
                                 periodInfo.liveEdge = liveEdgeTime - minBufferTime;
                                 self.debug.log("[O][BufferController] ### (" + self.getData().contentType + ") periodInfo.liveEdge = " + periodInfo.liveEdge);
@@ -1118,7 +1168,7 @@ MediaPlayer.dependencies.BufferController = function () {
                     else
                     {
                         ready = true;
-                    }
+                    }*/
                 }
             );
 

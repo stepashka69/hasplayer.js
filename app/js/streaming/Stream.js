@@ -710,7 +710,7 @@ MediaPlayer.dependencies.Stream = function () {
         // => then seek every BufferController at the found live edge time
         onLiveEdgeFound = function() {
 
-            var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
+            /*var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
             this.debug.log("[O][Stream] ### LiveEdge = " + liveEdgeTime);
 
             if (videoController) {
@@ -718,7 +718,7 @@ MediaPlayer.dependencies.Stream = function () {
             }
             if (audioController) {
                 audioController.seek(liveEdgeTime);
-            }
+            }*/
         },
 
         updateData = function (updatedPeriodInfo) {
@@ -807,7 +807,7 @@ MediaPlayer.dependencies.Stream = function () {
             Q.when(deferredVideoUpdate.promise, deferredAudioUpdate.promise, deferredTextUpdate.promise).then(
                 function() {
                     // ORANGE: unnecessary since seek is performed into each BufferController
-                    //updateCurrentTime.call(self);
+                    updateCurrentTime.call(self);
                     deferred.resolve();
                 }
             );
