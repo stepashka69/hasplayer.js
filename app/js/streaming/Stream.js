@@ -807,7 +807,7 @@ MediaPlayer.dependencies.Stream = function () {
             Q.when(deferredVideoUpdate.promise, deferredAudioUpdate.promise, deferredTextUpdate.promise).then(
                 function() {
                     // ORANGE: unnecessary since seek is performed into each BufferController
-                    updateCurrentTime.call(self);
+                    //updateCurrentTime.call(self);
                     deferred.resolve();
                 }
             );

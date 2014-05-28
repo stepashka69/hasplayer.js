@@ -1112,7 +1112,7 @@ MediaPlayer.dependencies.BufferController = function () {
                             self.debug.log("[BufferController]["+type+"] ### Live edge = " + liveEdgeTime);
                             // step back from a found live edge time to be able to buffer some data
                             // ORANGE: (minBufferTime * 1.5) in order to ensure not requiring segments that are available yet while buffering
-                            var startTime = Math.max((liveEdgeTime - (minBufferTime * 1.5)), currentRepresentation.segmentAvailabilityRange.start),
+                            var startTime = Math.max((liveEdgeTime - (minBufferTime * 2)), currentRepresentation.segmentAvailabilityRange.start),
                                 segmentStart;
                             self.debug.log("[BufferController]["+type+"] ### Live start time = " + startTime);
                             // get a request for a start time
