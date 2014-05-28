@@ -10,6 +10,22 @@
             ]
         },
         {
+            "title": "Release Notes v1.1.2",
+            "items": [
+                "Improved support for dynamic mpd type",
+                "Added search for live edge.",
+                "Added support for overlapped segment requests.",
+                "Added support for multiple buffer levels.",
+                "Refined error type on the eventbus to be more uniform.",
+                "Added manifestLoaded type on the eventbus",
+                "Add reset() to MediaPlayer.",
+                "Added ScheduleWhilePaused property to MediaPlayer.",
+                "Added BufferMax property to MediaPlayer.",
+                "Added metricAdded, metricUpdated, metricChanged and metricsChanged events to remove polling",
+                "Fixed metrics for http requests and dropped frames"
+            ]
+        },
+        {
             "title": "Release Notes v1.0.0",
             "items": [
                 "Updated README.",

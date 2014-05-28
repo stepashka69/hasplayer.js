@@ -251,7 +251,8 @@ Mss.dependencies.MssFragmentController = function () {
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
-            manifest = this.manifestModel.getValue();
+            manifest = this.manifestModel.getValue(),
+            needUpdate = false;
 
         if (bytes !== null && bytes !== undefined && bytes.byteLength > 0) {
             result = new Uint8Array(bytes);
@@ -263,13 +264,7 @@ Mss.dependencies.MssFragmentController = function () {
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
             var res = convertFragment(result, request, adaptation);
             result = res.bytes;
-            if (res.segmentsUpdated === true) {
-                // If some segments have been added or removed, then
-                // we reset the list of segments for each representation
-                for (var i = 0; i < representations.length; i++) {
-                    representations[i].segments = null;
-                }
-            }
+            needUpdate = res.segmentsUpdated;
         }
 
         // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
@@ -289,7 +284,10 @@ Mss.dependencies.MssFragmentController = function () {
             result = mp4lib.serialize(init_segment);
         }
       
-        return Q.when(result);
+        return Q.when({
+            'data': result,
+            'needUpdate': needUpdate
+        });
     };
 
     return rslt;

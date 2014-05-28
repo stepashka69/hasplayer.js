@@ -198,6 +198,13 @@ MediaPlayer.dependencies.FragmentController = function () {
             fragmentModel.setCallbacks(startLoadingCallback, successLoadingCallback, errorLoadingCallback, streamEndCallback);
 
             return Q.when(true);
+        },
+
+        // ORANGE
+        waitForLoadingRequestsToBeExecuted: function(model) {
+            if (model) {
+                model.waitForLoadingRequestsToBeExecuted();
+            }            
         }
     };
 };

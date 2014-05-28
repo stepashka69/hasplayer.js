@@ -16,14 +16,49 @@ MediaPlayer.models.MetricsModel = function () {
 
     return {
         system : undefined,
+        eventBus: undefined,
         streamMetrics: {},
+
+        metricsChanged: function () {
+            this.eventBus.dispatchEvent({
+                type: "metricsChanged",
+                data: {}
+            });
+        },
+
+        metricChanged: function (streamType) {
+            this.eventBus.dispatchEvent({
+                type: "metricChanged",
+                data: {stream: streamType}
+            });
+            this.metricsChanged();
+        },
+
+        metricUpdated: function (streamType, metricType, vo) {
+            this.eventBus.dispatchEvent({
+                type: "metricUpdated",
+                data: {stream: streamType, metric: metricType, value: vo}
+            });
+            this.metricChanged(streamType);
+        },
+
+        metricAdded: function (streamType, metricType, vo) {
+            this.eventBus.dispatchEvent({
+                type: "metricAdded",
+                data: {stream: streamType, metric: metricType, value: vo}
+            });
+            this.metricChanged(streamType);
+        },
 
         clearCurrentMetricsForType: function (type) {
             delete this.streamMetrics[type];
+            this.metricChanged(type);
         },
 
         clearAllCurrentMetrics: function () {
+            var self = this;
             this.streamMetrics = {};
+            this.metricsChanged.call(self);
         },
 
         getReadOnlyMetricsFor: function(type) {
@@ -57,12 +92,15 @@ MediaPlayer.models.MetricsModel = function () {
             vo.tconnect = tconnect;
 
             this.getMetricsFor(streamType).TcpList.push(vo);
+
+            this.metricAdded(streamType, "TcpConnection", vo);
             return vo;
         },
 
         addHttpRequest: function (streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration) {
             var vo = new MediaPlayer.vo.metrics.HTTPRequest();
 
+            vo.stream = streamType;
             vo.tcpid = tcpid;
             vo.type = type;
             vo.url = url;
@@ -82,6 +120,7 @@ MediaPlayer.models.MetricsModel = function () {
                 this.getMetricsFor(streamType).HttpList = [vo];
             }
 
+            this.metricAdded(streamType, "HttpRequest", vo);
             return vo;
         },
 
@@ -95,6 +134,8 @@ MediaPlayer.models.MetricsModel = function () {
                 vo.b = b;
 
                 httpRequest.trace.push(vo);
+
+                this.metricUpdated(httpRequest.stream, "HttpRequestTrace", httpRequest);
                 return vo;
             }
         },
@@ -108,6 +149,8 @@ MediaPlayer.models.MetricsModel = function () {
             vo.lto = lto;
 
             this.getMetricsFor(streamType).RepSwitchList.push(vo);
+
+            this.metricAdded(streamType, "RepresentationSwitch", vo);
             return vo;
         },
 
@@ -123,6 +166,25 @@ MediaPlayer.models.MetricsModel = function () {
             } else {
                 this.getMetricsFor(streamType).BufferLevel = [vo];
             }
+
+            this.metricAdded(streamType, "BufferLevel", vo);
+            return vo;
+        },
+
+        addDroppedFrames: function (streamType, quality) {
+            var vo = new MediaPlayer.vo.metrics.DroppedFrames(),
+                list = this.getMetricsFor(streamType).DroppedFrames;
+
+            vo.time = quality.creationTime;
+            vo.droppedFrames = quality.droppedVideoFrames;
+
+            if (list.length > 0 && list[list.length - 1] == vo) {
+                return list[list.length - 1];
+            }
+
+            list.push(vo);
+
+            this.metricAdded(streamType, "DroppedFrames", vo);
             return vo;
         },
 
@@ -136,6 +198,8 @@ MediaPlayer.models.MetricsModel = function () {
                 vo.starttype = starttype;
 
                 this.getMetricsFor(streamType).PlayList.push(vo);
+
+                this.metricAdded(streamType, "PlayList", vo);
                 return vo;
             }
         },
@@ -154,6 +218,8 @@ MediaPlayer.models.MetricsModel = function () {
                 vo.stopreason = stopreason;
 
                 playList.trace.push(vo);
+
+                this.metricUpdated(playList.stream, "PlayListTrace", playList);
                 return vo;
             }
         }
