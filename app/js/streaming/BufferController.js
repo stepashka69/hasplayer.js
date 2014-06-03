@@ -212,16 +212,23 @@ MediaPlayer.dependencies.BufferController = function () {
                 setState.call(this, READY);
             } else {
                 setState.call(this, LOADING);
-                var self = this,
-                    time = self.fragmentController.getLoadingTime(self);
-                if (timeoutId !== null) return;
-                timeoutId =  setTimeout(function(){
-                    if (!hasData()) return;
 
-                    setState.call(self, READY);
-                    requestNewFragment.call(self);
-                    timeoutId = null;
-                }, time);
+                //ORANGE : check if requests are sequential or not
+                if(!this.fragmentController.isSequential()){
+                    var self = this,
+                        time = self.fragmentController.getLoadingTime(self);
+                    if (timeoutId !== null) return;
+                    timeoutId =  setTimeout(function(){
+                        if (!hasData()) return;
+
+                        setState.call(self, READY);
+                        requestNewFragment.call(self);
+                        timeoutId = null;
+                    }, time);
+                }else{
+                    if(!hasData()) return;
+                    setState.call(this, READY);
+                }
             }
         },
 
@@ -230,6 +237,10 @@ MediaPlayer.dependencies.BufferController = function () {
                 onInitializationLoaded.call(this, request, response);
             } else {
                 onMediaLoaded.call(this, request, response);
+                // ORANGE : if request are sequential we call the next fragment here
+                if(this.fragmentController.isSequential()){
+                    requestNewFragment.call(this);
+                }
             }
         },
 
