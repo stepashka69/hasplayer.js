@@ -65,7 +65,7 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
         } else if (hasMs) {
             return element.msSetMediaKeys(mediaKeys);
         } else {
-            //this.debug.log("no setmediakeys function in element");
+            this.debug.log("no setmediakeys function in element");
         }
     },
 
@@ -162,14 +162,12 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
                 };
 
                 xhr.open('POST', laURL);
-                
                 xhr.responseType = 'arraybuffer';
                 if (headers) {
                     headers.forEach(function(hdr) {
                         xhr.setRequestHeader(hdr.name, hdr.value);
                     });
                 }
-
                 xhr.send(decodedChallenge);
 
                 return deferred.promise;

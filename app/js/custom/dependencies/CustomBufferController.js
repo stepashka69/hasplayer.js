@@ -31,10 +31,10 @@ Custom.dependencies.CustomBufferController = function () {
             removeEnd = currentTime + 5;
         }
         
-        rslt.debug.log("### " + rslt.getType() + " Remove from " + removeStart + " to " + (currentTime - 1) +  " (" + rslt.getVideoModel().getCurrentTime() + ")");
+        rslt.debug.log("[BufferController][" + rslt.getType() + "] ### Remove from " + removeStart + " to " + (currentTime - 1) +  " (" + rslt.getVideoModel().getCurrentTime() + ")");
         rslt.sourceBufferExt.remove(buffer, removeStart, (currentTime - 1), selfParent.getPeriodInfo().duration, mediaSource).then(
             function(){
-                rslt.debug.log("### " + rslt.getType() + " Remove from " + (currentTime + 3) + " to " + removeEnd +  " (" + rslt.getVideoModel().getCurrentTime() + ")");
+                rslt.debug.log("[BufferController][" + rslt.getType() + "] ### Remove from " + (currentTime + 3) + " to " + removeEnd +  " (" + rslt.getVideoModel().getCurrentTime() + ")");
                 rslt.sourceBufferExt.remove(buffer, (currentTime + 3), removeEnd, selfParent.getPeriodInfo().duration, mediaSource).then(
                         function(){
                             rslt.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel,removeEnd);
@@ -48,7 +48,7 @@ Custom.dependencies.CustomBufferController = function () {
                                                 len;
 
                                             for (i = 0, len = ranges.length; i < len; i += 1) {
-                                                rslt.debug.log("### " + rslt.getType() + " R Buffered Range: " + ranges.start(i) + " - " + ranges.end(i)+  " (" + rslt.getVideoModel().getCurrentTime() + ")");
+                                                rslt.debug.log("[BufferController][" + rslt.getType() + "] ### R Buffered Range: " + ranges.start(i) + " - " + ranges.end(i)+  " (" + rslt.getVideoModel().getCurrentTime() + ")");
                                             }
                                         }
                                     }

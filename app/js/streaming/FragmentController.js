@@ -15,6 +15,8 @@ MediaPlayer.dependencies.FragmentController = function () {
     "use strict";
 
     var fragmentModels = [],
+        // ORANGE : create boolean to force request to be sequential
+        sequential = true,
 
         findModel = function(bufferController) {
             var ln = fragmentModels.length;
@@ -71,6 +73,8 @@ MediaPlayer.dependencies.FragmentController = function () {
 
             if (!model){
                 model = this.system.getObject("fragmentModel");
+                // ORANGE : set the sequential request
+                model.setSequentialRequest(sequential);
                 model.setContext(bufferController);
                 fragmentModels.push(model);
             }
@@ -198,7 +202,20 @@ MediaPlayer.dependencies.FragmentController = function () {
             fragmentModel.setCallbacks(startLoadingCallback, successLoadingCallback, errorLoadingCallback, streamEndCallback);
 
             return Q.when(true);
+        },
+
+        // ORANGE
+        waitForLoadingRequestsToBeExecuted: function(model) {
+            if (model) {
+                model.waitForLoadingRequestsToBeExecuted();
+            }
+        },
+
+        //ORANGE : accessor for the sequential boolean
+        isSequential : function(){
+            return sequential;
         }
+
     };
 };
 
