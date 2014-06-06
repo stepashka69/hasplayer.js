@@ -269,7 +269,7 @@ Mss.dependencies.MssParser = function () {
                 BaseURL: node.BaseURL,
                 Period: node,
                 Period_asArray: [node],
-                minBufferTime : 10
+                minBufferTime : MediaPlayer.dependencies.BufferExtensions.DEFAULT_MIN_BUFFER_TIME
             };
             if(node.Protection !== undefined){
                 returnNode.ContentProtection = node.Protection.ProtectionHeader;

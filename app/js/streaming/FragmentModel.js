@@ -63,12 +63,9 @@ MediaPlayer.dependencies.FragmentModel = function () {
         },
 
         removeExecutedRequest = function(request) {
-
-            this.debug.log("[FragmentModel] ### Remove Executed Request ");
             var idx = executedRequests.indexOf(request);
 
             if (idx !== -1) {
-                this.debug.log("[FragmentModel]["+request.streamType+"] ### Remove Executed Request ", request.url);
                 executedRequests.splice(idx, 1);
             }
         };
@@ -119,8 +116,8 @@ MediaPlayer.dependencies.FragmentModel = function () {
                         break;
                     } else {
                         // remove overlapping segement of a different quality
-                        //this.debug.log("[FragmentModel]["+request.streamType+"] ### Remove executed request: " + req.url);
-                        //removeExecutedRequest(request);
+                        this.debug.log("[FragmentModel]["+request.streamType+"] ### Remove executed request: " + req.url);
+                        removeExecutedRequest(request);
                     }
                 }
             }

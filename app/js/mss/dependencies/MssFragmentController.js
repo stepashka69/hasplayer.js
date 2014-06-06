@@ -264,7 +264,10 @@ Mss.dependencies.MssFragmentController = function () {
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
             var res = convertFragment(result, request, adaptation);
             result = res.bytes;
-            needUpdate = res.segmentsUpdated;
+            //needUpdate = res.segmentsUpdated;
+            if (res.segmentsUpdated) {
+                representations = [];
+            }
         }
 
         // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
@@ -283,11 +286,12 @@ Mss.dependencies.MssFragmentController = function () {
 
             result = mp4lib.serialize(init_segment);
         }
-      
-        return Q.when({
-            'data': result,
-            'needUpdate': needUpdate
-        });
+
+        if (request !== undefined) {
+            //console.saveBinArray(result, request.streamType + "_" + request.index + "_" + request.quality + ".mp4");
+        }
+
+        return Q.when(result);
     };
 
     return rslt;

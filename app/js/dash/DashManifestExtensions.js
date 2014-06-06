@@ -209,7 +209,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
             len;
-        // ORANGE : only ciompare Data.id if exist
+        // ORANGE : compare Data.id only if exist
         if(data.id){
 
             for (i = 0, len = adaptations.length; i < len; i += 1) {
@@ -231,9 +231,6 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             }
 
         }
-
-
-
 
         return Q.when(-1);
     },
@@ -452,10 +449,11 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
     getRefreshDelay: function (manifest) {
         "use strict";
-        var delay = NaN;
+        var delay = NaN,
+            minDelay = 2;
 
         if (manifest.hasOwnProperty("minimumUpdatePeriod")) {
-            delay = parseFloat(manifest.minimumUpdatePeriod);
+            delay = Math.max(parseFloat(manifest.minimumUpdatePeriod), minDelay);
         }
 
         return Q.when(delay);

@@ -151,9 +151,7 @@ Dash.dependencies.DashHandler = function () {
         },
 
         getIndexBasedSegment = function (representation, index) {
-            // ORANGE unnecessary utilisation of self
-            // var self = this,
-            var self=this,
+            var self = this,
                 seg,
                 duration,
                 presentationStartTime,
@@ -180,13 +178,12 @@ Dash.dependencies.DashHandler = function () {
             seg.replacementNumber = getNumberForSegment(seg, index);
             seg.availabilityIdx = index;
 
-            self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx);
+            this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx);
 
             return seg;
         },
 
         getSegmentsFromTimeline = function (representation) {
-            // ORANGE: unnecessary use of self
             var self = this,
                 template = representation.adaptation.period.mpd.manifest.Period_asArray[representation.adaptation.period.index].
                     AdaptationSet_asArray[representation.adaptation.index].Representation_asArray[representation.index].SegmentTemplate,
@@ -221,9 +218,6 @@ Dash.dependencies.DashHandler = function () {
                         s.mediaRange,
                         availabilityIdx);
                 };
-
-
-            self.debug.log("[DashHandler]["+type+"] getSegmentsFromTimeline");
 
             fTimescale = representation.timescale;
 
@@ -468,8 +462,7 @@ Dash.dependencies.DashHandler = function () {
         getTimeBasedSegment = function(representation, time, duration, fTimescale, url, range, index) {
             // ORANGE unnecessary utilisation of self
             // var self = this,
-            var self=this,
-                scaledTime = time / fTimescale,
+            var scaledTime = time / fTimescale,
                 scaledDuration = Math.min(duration / fTimescale, representation.adaptation.period.mpd.maxSegmentDuration),
                 presentationStartTime,
                 presentationEndTime,
@@ -506,7 +499,7 @@ Dash.dependencies.DashHandler = function () {
             seg.mediaRange = range;
             seg.availabilityIdx = index;
 
-            self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
+            this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
 
             return seg;
         },
@@ -610,7 +603,7 @@ Dash.dependencies.DashHandler = function () {
             var segmentPromise,
                 deferred = Q.defer(),
                 // ORANGE unnecessary utilisation of self
-                self = this,
+                //self = this,
                 lastIdx;
 
             //this.debug.log("[DashHandler]["+type+"] getSegments for representation " + representation.id);
@@ -630,7 +623,6 @@ Dash.dependencies.DashHandler = function () {
 
                 Q.when(segmentPromise).then(
                     function (segments) {
-                        self.debug.log("[DashHandler]["+type+"] getSegments for representation " + representation.id + " OK");
                         representation.segments = segments;
                         lastIdx = segments.length - 1;
                         if (isDynamic && isNaN(representation.adaptation.period.liveEdge)) {
@@ -681,7 +673,7 @@ Dash.dependencies.DashHandler = function () {
                     frag = segments[i];
                     ft = frag.presentationStartTime;
                     fd = frag.duration;
-                    this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd);
+                    //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd);
                     if ((time + Dash.dependencies.DashHandler.EPSILON) >= ft &&
                         (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
                         idx = frag.availabilityIdx;
@@ -835,7 +827,6 @@ Dash.dependencies.DashHandler = function () {
                 function (finished) {
                     var requestPromise = null;
 
-                    self.debug.log("[DashHandler]["+type+"] isMediaFinished: " + finished);
                     //self.debug.log("Stream finished? " + finished);
                     if (finished) {
                         request = new MediaPlayer.vo.SegmentRequest();
