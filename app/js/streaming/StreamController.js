@@ -319,8 +319,9 @@
         debug: undefined,
         metricsExt: undefined,
         errHandler: undefined,
-        // ORANGE: licenser backUrl
+        // ORANGE: licenser backUrl and customData
         backUrl : undefined,
+        customData : undefined,
 
         setup: function() {
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
@@ -362,10 +363,11 @@
         // ORANGE en  of modification
         
         // ORANGE: add licenser backUrl parameter
-        load: function (url, backUrl) {
+        load: function (url, backUrl, customData) {
             var self = this;
-            // ORANGE: add licenser backUrl parameter
+            // ORANGE: add licenser backUrl parameter and customData
             self.backUrl = backUrl;
+            self.customData = customData;
 
             self.debug.log("[StreamController]", "load url: " + url);
 
@@ -374,6 +376,9 @@
                     // ORANGE: add licenser backUrl parameter
                     if (self.backUrl) {
                         manifest.backUrl = self.backUrl;
+                    }
+                    if (self.customData) {
+                        manifest.customData = self.customData;
                     }
                     self.manifestModel.setValue(manifest);
                     self.debug.log("Manifest has loaded.");

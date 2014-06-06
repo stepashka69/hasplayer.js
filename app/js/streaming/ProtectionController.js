@@ -65,12 +65,16 @@ MediaPlayer.dependencies.ProtectionController = function () {
             }
 
             if (!!initData) {
-                session = self.protectionModel.addKeySession(kid, codec, initData);
+                session = self.protectionModel.addKeySession(kid, codec, initData, self.customData);
                 self.debug.log("DRM: Added Key Session [" + session.sessionId + "] for KID: " + kid + " type: " + codec + " initData length: " + initData.length);
             }
             else {
                 self.debug.log("DRM: initdata is null.");
             }
+        },
+
+        setCustomData = function (cdmData) {
+            this.customData = cdmData;
         },
 
         updateFromMessage = function (kid, session, msg, laURL) {
@@ -80,7 +84,12 @@ MediaPlayer.dependencies.ProtectionController = function () {
             result = self.protectionModel.updateFromMessage(kid, msg, laURL);
             result.then(
                 function (data) {
-                    session.update(data);
+                    try{
+                        session.update(data);
+                    }catch(err)
+                    {
+                        console.log(err);
+                    }
             });
             return result;
         };
@@ -93,6 +102,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         videoModel : undefined,
         protectionModel : undefined,
         protectionExt : undefined,
+        customData : undefined,
 
         setup : function () {
             keySystems = this.protectionExt.getKeySystems();
@@ -107,7 +117,8 @@ MediaPlayer.dependencies.ProtectionController = function () {
         selectKeySystem : selectKeySystem,
         ensureKeySession : ensureKeySession,
         updateFromMessage : updateFromMessage,
-        teardownKeySystem : teardownKeySystem
+        teardownKeySystem : teardownKeySystem,
+        setCustomData : setCustomData
     };
 };
 
