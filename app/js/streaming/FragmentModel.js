@@ -292,6 +292,15 @@ MediaPlayer.dependencies.FragmentModel = function () {
             checkIsExecuted();
 
             return defer.promise;
+        },
+
+        // ORANGE : force requests to be executed one by one if sequential = true
+        setSequentialRequest: function(sequential){
+            if(sequential){
+                LOADING_REQUEST_THRESHOLD = 1;
+            }else{
+                LOADING_REQUEST_THRESHOLD = 2;
+            }
         }
 
     };
