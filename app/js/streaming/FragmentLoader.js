@@ -15,7 +15,7 @@ MediaPlayer.dependencies.FragmentLoader = function () {
     "use strict";
 
     var RETRY_ATTEMPTS = 3,
-        RETRY_INTERVAL = 500,
+        RETRY_INTERVAL = 2000,
         xhrs = [],
         currentQuality =null,
 

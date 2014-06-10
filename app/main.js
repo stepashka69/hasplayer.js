@@ -641,8 +641,8 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
 
     $scope.doLoad = function () {
         initMetrics();
-        // ORANGE: add licenser backUrl parameter
-        player.attachSource($scope.selectedItem.url, $scope.selectedItem.backUrl);
+        // ORANGE: add licenser backUrl parameter and customData
+        player.attachSource($scope.selectedItem.url, $scope.selectedItem.backUrl, $scope.selectedItem.customData);
         setTimeout(update, updateInterval);
     };
 

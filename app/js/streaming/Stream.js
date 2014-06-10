@@ -104,6 +104,15 @@ MediaPlayer.dependencies.Stream = function () {
                 }
             }
 
+            var manifest = self.manifestModel.getValue();
+            
+            // ORANGE: if customData is defined, send it
+            if(manifest.customData) {
+                self.protectionController.setCustomData(manifest.customData);
+            }else {
+                self.protectionController.setCustomData(undefined);
+            }
+
             if (!!kid) {
                 self.protectionController.ensureKeySession(kid, type, event.initData);
             }
