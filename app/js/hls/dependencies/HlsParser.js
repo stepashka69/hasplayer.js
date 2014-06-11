@@ -266,8 +266,7 @@ Hls.dependencies.HlsParser = function () {
 
         var onLoaded = function(representation, response) {
 			// Parse initialization data to obtain codec information
-
-			debugger;
+			mpegts.parse(new Uint8Array(response.data));
 			deferred.resolve();
         };
 
