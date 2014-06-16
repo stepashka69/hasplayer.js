@@ -1,4 +1,17 @@
-
+/*
+ * The copyright in this software is being made available under the BSD License, included below. This software may be subject to other third party and contributor rights, including patent rights, and no such rights are granted under this license.
+ * 
+ * Copyright (c) 2013, Orange
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * •  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * •  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * •  Neither the name of the Digital Primates nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
 Mss.dependencies.MssHandler = function() {
 
 	var isDynamic=false,
@@ -121,33 +134,34 @@ Mss.dependencies.MssHandler = function() {
 					var adaptation = representation.adaptation;
 					var realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
 					var realRepresentation = realAdaptation.Representation_asArray[representation.index];
-					var media = {};
-					media.type = rslt.getType() || 'und';
-					media.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
-					media.timescale = representation.timescale;
-					media.duration = representation.adaptation.period.duration;
-					media.codecs = realRepresentation.codecs;
-					media.codecPrivateData = realRepresentation.codecPrivateData;
-					media.bandwidth = realRepresentation.bandwidth;
+
+					var track = new MediaPlayer.vo.Mp4Track();
+					track.type = rslt.getType() || 'und';
+					track.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
+					track.timescale = representation.timescale;
+					track.duration = representation.adaptation.period.duration;
+					track.codecs = realRepresentation.codecs;
+					track.codecPrivateData = realRepresentation.codecPrivateData;
+					track.bandwidth = realRepresentation.bandwidth;
 
 					//DRM Protected Adaptation is detected
 					if (realAdaptation.ContentProtection !== undefined){
-						media.contentProtection = realAdaptation.ContentProtection;
+						track.contentProtection = realAdaptation.ContentProtection;
 					}
 
 					// Video related informations
-					media.width = realRepresentation.width || realAdaptation.maxWidth;
-					media.height = realRepresentation.height || realAdaptation.maxHeight;
+					track.width = realRepresentation.width || realAdaptation.maxWidth;
+					track.height = realRepresentation.height || realAdaptation.maxHeight;
 
 					// Audio related informations
-					media.language = realAdaptation.lang ? realAdaptation.lang : 'und';
+					track.language = realAdaptation.lang ? realAdaptation.lang : 'und';
 
-					media.channels = getAudioChannels(realAdaptation, realRepresentation);
-					media.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
+					track.channels = getAudioChannels(realAdaptation, realRepresentation);
+					track.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
 
-					representation.initData =  rslt.mp4Processor.generateInitSegment(media);
+					representation.initData =  rslt.mp4Processor.generateInitSegment([track]);
 
-					//console.saveBinArray(representation.initData, "init_evolution_"+media.type+"_"+media.bandwidth+".mp4");
+					//console.saveBinArray(representation.initData, "init_evolution_"+track.type+"_"+track.bandwidth+".mp4");
 				}
 				return representation.initData;
 			}else{
