@@ -18,22 +18,6 @@ mpegts.ts.AdaptationField = function(){
     this.m_bSplicingPointFlag = null;
     this.m_bPrivateDataFlag = null;
     this.m_bAdaptationFieldExtFlag = null;
-
-    /** Optional fields */
-   /* PCR* m_pPCR;
-    PCR* m_pOPCR;
-    unsigned char  m_cSpliceCountDown;
-	unsigned char* m_pPrivateData;
-	unsigned char* m_pAFExtension;*/
-
-	/** AU_information field (private data) */
-	//AUInformation* m_pAUInformation;
-    
-    /** The number of stuffing bytes */
-    //unsigned char m_cNbStuffingBytes;
-
-	/** A boolean indicating if some fields have been modified */
-	//bool m_bDirty;
 };
 
 mpegts.ts.AdaptationField.prototype.getLength = function() {
@@ -43,7 +27,7 @@ mpegts.ts.AdaptationField.prototype.getLength = function() {
 mpegts.ts.AdaptationField.prototype.parse = function(uint8array) {
 	this.m_cAFLength = uint8array[0];
 
-	if (this.this.m_cAFLength === 0)
+	if (this.m_cAFLength === 0)
 	{
 		console.log("AdaptationField Length Problem!");
         return;
@@ -60,5 +44,5 @@ mpegts.ts.AdaptationField.prototype.parse = function(uint8array) {
 	this.m_bPrivateDataFlag			= mpegts.binary.getBitFromByte(uint8array[index], 6);
 	this.m_bAdaptationFieldExtFlag	= mpegts.binary.getBitFromByte(uint8array[index], 7);
 
-	//to complete
+	//other flags are not useful for the conversion HLS => MP4
 };

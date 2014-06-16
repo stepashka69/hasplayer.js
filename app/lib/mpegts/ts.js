@@ -7,16 +7,27 @@ var mpegts = (function() {
         psi:{},
         binary:{},
         ts:{},
+        Pts:{},
     };
     
     mpegts.parse = function (uint8array) {
-        var tspacket = new mpegts.ts.TsPacket();
-        tspacket.parse(uint8array);
+        var i = 0;
+        while(i<=uint8array.length)
+        {
+            var tsPacket = new mpegts.ts.TsPacket();
+            tsPacket.parse(uint8array.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+
+            if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
+                debugger;
+                var pesPacket = new mpegts.pes.PesPacket();
+                pesPacket.parse(uint8array.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
+            }
+            i+= mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
+        }
     };
    
     return mpegts;
 })();
-
 
 mpegts.ts.TsPacket = function(){
     this.m_cSync = null;
@@ -28,7 +39,7 @@ mpegts.ts.TsPacket = function(){
     this.m_cAdaptationFieldCtrl = null;
     this.m_cContinuityCounter = null;
     this.m_pAdaptationField = null;
-    this.m_pPayload = null;
+    this.m_IdPayload = null;
     this.m_cPayloadLength = null;
     this.m_bDirty = null;
     this.m_time = null;
@@ -64,6 +75,7 @@ mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
     // NAN => to Validate
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
+        debugger;
         // Check adaptation field length before parsing
         var cAFLength = uint8array[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
@@ -72,7 +84,7 @@ mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
             return;
         }
         this.m_pAdaptationField = new mpegts.ts.AdaptationField();
-        this.m_pAdaptationField.parse(uint8array.subarray(uint8array[byteId]));
+        this.m_pAdaptationField.parse(uint8array.subarray(byteId));
         byteId += this.m_pAdaptationField.getLength();
     }
 
@@ -87,7 +99,7 @@ mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
     if(this.m_cAdaptationFieldCtrl & 0x01)
     {
         this.m_cPayloadLength = this.TS_PACKET_SIZE - byteId;
-        this.m_pPayload = byteId;
+        this.m_IdPayload = byteId;
     }
 };
 
@@ -96,7 +108,7 @@ mpegts.ts.TsPacket.prototype.getPid = function() {
 };
 
 mpegts.ts.TsPacket.prototype.getPayloadIndex = function() {
-    return this.m_pPayload;
+    return this.m_IdPayload;
 };
 
 mpegts.ts.TsPacket.prototype.getPayloadLength = function() {
@@ -109,7 +121,15 @@ mpegts.ts.TsPacket.prototype.getPusi = function() {
 
 mpegts.ts.TsPacket.prototype.SYNC_WORD = 0x47;
 mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE = 188;
-
+mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_MAP = 0xBC;
+mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
+mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
+mpegts.ts.TsPacket.prototype.STREAM_ID_PRIVATE_STREAM_2 = 0xBF;
+mpegts.ts.TsPacket.prototype.STREAM_ID_ECM_STREAM = 0xF0;
+mpegts.ts.TsPacket.prototype.STREAM_ID_EMM_STREAM = 0xF1;
+mpegts.ts.TsPacket.prototype.STREAM_ID_DSMCC_STREAM = 0xF2;
+mpegts.ts.TsPacket.prototype.STREAM_ID_H2221_TYPE_E_STREAM = 0xF8;
+mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_DIRECTORY = 0xFF;
 
 
 // This module is intended to work both on node.js and inside browser.
