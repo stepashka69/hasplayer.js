@@ -1,0 +1,46 @@
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto" data-value="{{bandwidth}}"></div>
+
+
+<script src="app/lib/jquery/jquery-1.10.2.min.js"></script>
+<script src="app/lib/highcharts.js"></script>
+
+<script>
+	$(function () {
+		var bandwidth = jQuery.parseJSON($('#container').attr('data-value'));
+		console.log(bandwidth.playSeries);
+
+		$('#container').highcharts({
+			title: {
+				text: 'ABR'
+			},
+			xAxis: {
+				min: bandwidth.playSeries[0][0],
+			},
+			series: [{
+				type: 'area',
+				name: 'Playing',
+				color: '#16a085',
+				data: bandwidth.playSeries,
+				marker: {
+					enabled: false
+				},
+				states: {
+					hover: {
+						lineWidth: 0
+					}
+				},
+				enableMouseTracking: false
+			}, {
+				type: 'scatter',
+				name: 'Calls',
+				color: '#2c3e50',
+				data: bandwidth.requestSeries,
+				marker: {
+					radius: 2.5,
+					symbol: 'circle'
+				}
+			}]
+		});
+	});
+
+</script>

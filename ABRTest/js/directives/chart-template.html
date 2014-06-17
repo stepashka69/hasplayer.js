@@ -1,0 +1,16 @@
+<highchart config="chartConfig"></highchart>
+
+<button ng-click="getChart()">Exporter</button>
+
+<div class="spinner" ng-show="exportOngoing">
+	<div class="rect1"></div>
+	<div class="rect2"></div>
+	<div class="rect3"></div>
+	<div class="rect4"></div>
+	<div class="rect5"></div>
+</div>
+
+<div ng-show="success" class="success">
+	Export effectué : 
+	<a href="../server/export-pdf/result.pdf" target="_blank">Ouvrir le PDF</a>
+</div>
