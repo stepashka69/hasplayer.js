@@ -1,0 +1,50 @@
+[{
+    "name": "France 2",
+    "link": "http://192.168.1.1:8080/MSS/France2/Manifest.xml",
+    "audioChoice": false,
+    "live": false,
+    "type": "SMOOTH",
+    "DRM": false
+}, {
+    "name": "VOD 2 - Arte",
+    "link": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+    "audioChoice": true,
+    "live": false,
+    "type": "SMOOTH",
+    "DRM": false
+}, {
+    "name": "VOD 3 - SuperSpeedway DRM",
+    "link": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest",
+    "audioChoice": false,
+    "live": false,
+    "type": "SMOOTH",
+    "DRM": true
+}, {
+    "name": "VOD 4 - DRM",
+    "link": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
+    "audioChoice": false,
+    "live": false,
+    "type": "SMOOTH",
+    "DRM": true
+}, {
+    "name": "LIVE 1 - France 2",
+    "link": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
+    "audioChoice": false,
+    "live": true,
+    "type": "SMOOTH",
+    "DRM": false
+}, {
+    "name": "LIVE 2 - Arte",
+    "link": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest",
+    "audioChoice": true,
+    "live": true,
+    "type": "SMOOTH",
+    "DRM": false
+}, {
+    "name": "LIVE 3 - TF1",
+    "link": "http://161.105.176.13/Halo/ch1.isml/manifest",
+    "audioChoice": true,
+    "live": true,
+    "type": "SMOOTH",
+    "DRM": false
+}]
