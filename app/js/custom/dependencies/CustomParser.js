@@ -10,6 +10,9 @@ Custom.dependencies.CustomParser = function () {
             this.system.notify('setContext','MSS');
             //do some business to transform it into a Dash Manifest
             parser = this.mssParser;
+        } else if (data.indexOf("#EXTM3U")>-1) {
+            this.system.notify('setContext','HLS');
+            parser = this.hlsParser;
         } else if(data.indexOf("MPD")>-1) {
             this.system.notify('setContext','MPD');
             parser = this.dashParser;
@@ -26,6 +29,7 @@ Custom.dependencies.CustomParser = function () {
         system: undefined,
         dashParser: undefined,
         mssParser: undefined,
+        hlsParser: undefined,
         metricsModel: undefined,
 
         parse: customParse

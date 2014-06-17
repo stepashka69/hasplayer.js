@@ -33,13 +33,12 @@
     <!-- http://bseth99.github.io/jquery-ui-extensions/index.html -->
     <script src="app/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js"></script>
 
-    <!-- http://log4javascript.org/ -->
-    <script src="app/lib/log4javascript-1.4.6/log4javascript.js"></script>
+    
 
     <!-- https://github.com/kriskowal/q -->
     <script src="dash.all.js"></script>
     <script src="app/metrics.js"></script>
-    <script src="app/main.js"></script
+    <script src="app/main.js"></script>
 
 </head>
 <body ng-controller="DashController">
@@ -68,7 +67,7 @@
             <span style="font-size:16px">(based on dash.js {{version}})</span>
         </div>
 
-        <div class="row">
+         <div class="row">
             <div class="input-group">
                 <div id="desktop-streams" class="input-group-btn">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -92,6 +91,12 @@
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" ng-click="doLoad()">Load</button>
                 </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-group col-md-9">
+                <input type="text" class="form-control" placeholder="licenser" ng-model="selectedItem.backUrl">
             </div>
         </div>
 
@@ -216,8 +221,8 @@
                     <div class="panel-body panel-stats" ng-switch-when="true">
                         <div ng-switch on="switchCharts">
                             <div ng-switch-when="false">
-                        <chart ng-model="bufferData"></chart>
-                    </div>
+                                <chart ng-model="bufferData"></chart>
+                            </div>
                             <div ng-switch-when="true">
                                 <chart2 id="chartBandwidth" class="overlayChart" ng-model="bandwidthData"></chart2>
                             </div>
@@ -306,6 +311,5 @@
         </div>
     </div>
 
- 
 </body>
 </html>

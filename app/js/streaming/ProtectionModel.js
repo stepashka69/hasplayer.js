@@ -34,10 +34,10 @@ MediaPlayer.models.ProtectionModel = function () {
             element = this.videoModel.getElement();
         },
 
-        addKeySession: function (kid, mediaCodec, initData) {
+        addKeySession: function (kid, mediaCodec, initData, cdmData) {
             var session = null;
 
-            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData);
+            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, cdmData);
 
             this.protectionExt.listenToKeyAdded(session, keyAddedListener);
             this.protectionExt.listenToKeyError(session, keyErrorListener);
@@ -93,8 +93,8 @@ MediaPlayer.models.ProtectionModel = function () {
             return keySystem.keySystem.getInitData(keySystem.contentProtection);
         },
 
-        updateFromMessage: function (kid, msg, laURL) {
-            return keySystems[kid].keySystem.getUpdate(msg, laURL);
+        updateFromMessage: function (kid, msg, laURL, cdmData) {
+            return keySystems[kid].keySystem.getUpdate(msg, laURL, cdmData);
         },
 /*
         addKey: function (type, key, data, id) {

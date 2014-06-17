@@ -41,13 +41,14 @@ MediaPlayer = function (aContext) {
  * 6) Transform fragments.
  * 7) Push fragmemt bytes into SourceBuffer.
  */
-    var VERSION = "1.1.0",
+    var VERSION = "1.1.2",
         context = aContext,
         system,
         element,
         source,
-        // ORANGE: licenser backUrl
+        // ORANGE: licenser backUrl and customData
         sourceBackUrl,
+        customData,
         streamController,
         videoModel,
         initialized = false,
@@ -55,23 +56,12 @@ MediaPlayer = function (aContext) {
         autoPlay = true,
         scheduleWhilePaused = false,
         bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
-        activeStream = null,
-       
 
         isReady = function () {
             return (!!element && !!source);
         },
 
-        initLogger = function () {
-            this.logger.addAppender();
-        },
-
         play = function () {
-
-            var self = this;
-            
-           // initLogger.call(this);
-            this.debug.log("[MediaPlayer]", "play", source);
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
@@ -86,14 +76,15 @@ MediaPlayer = function (aContext) {
             }
 
             playing = true;
-            //this.debug.log("[MediaPlayer] Playback initiated!");
+            //this.debug.log("Playback initiated!");
             streamController = system.getObject("streamController");
             streamController.setVideoModel(videoModel);
             streamController.setAutoPlay(autoPlay);
-            // ORANGE: add licenser backUrl parameter
-            streamController.load(source, sourceBackUrl);
+            // ORANGE: add licenser backUrl and customData parameter
+            streamController.load(source, sourceBackUrl, customData);
             system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
             system.mapOutlet("scheduleWhilePaused", "stream");
+            system.mapOutlet("scheduleWhilePaused", "bufferController");
             system.mapValue("bufferMax", bufferMax);
             system.injectInto(this.bufferExt, "bufferMax");
         },
@@ -110,7 +101,6 @@ MediaPlayer = function (aContext) {
     system.mapOutlet("system");
     system.injectInto(context);
 
-
     return {
         debug: undefined,
         eventBus: undefined,
@@ -119,6 +109,7 @@ MediaPlayer = function (aContext) {
         metricsModel: undefined,
         metricsExt: undefined,
         bufferExt: undefined,
+        errHandler: undefined,
 
         addEventListener: function (type, listener, useCapture) {
             this.eventBus.addEventListener(type, listener, useCapture);
@@ -237,14 +228,16 @@ MediaPlayer = function (aContext) {
             }
         },
         
-        // ORANGE: modify attachSource function to add licenser backUrl parameter
-        attachSource: function (url, backUrl) {
+        // ORANGE: modify attachSource function to add licenser backUrl and customData parameter
+        attachSource: function (url, backUrl, cdmData) {
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
+
             source = url;
             // ORANGE: modify attachSource function to add licenser backUrl parameter
             sourceBackUrl = backUrl;
+            customData = cdmData;
             this.setQualityFor('video', 0);
             this.setQualityFor('audio', 0);
 

@@ -1,6 +1,11 @@
 {
     "items": [
         {
+            "name": "Apple HLS 1",
+            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
             "name": "DASH + PlayReady DRM",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
@@ -13,6 +18,13 @@
         {
             "name": "Smooth + PlayReady DRM 2",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "name": "Smooth + PlayReady DRM + CustomData",
+            "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
+            "backUrl" : "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
+            "customData" : "B2C99B73-CA41-4003-84A3AA16CE92B304",
             "browsers": "cdsbi"
         },
         {
