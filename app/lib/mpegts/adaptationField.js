@@ -24,8 +24,8 @@ mpegts.ts.AdaptationField.prototype.getLength = function() {
 	return (this.m_cAFLength + 1);
 };
 
-mpegts.ts.AdaptationField.prototype.parse = function(uint8array) {
-	this.m_cAFLength = uint8array[0];
+mpegts.ts.AdaptationField.prototype.parse = function(data) {
+	this.m_cAFLength = data[0];
 
 	if (this.m_cAFLength === 0)
 	{
@@ -35,14 +35,14 @@ mpegts.ts.AdaptationField.prototype.parse = function(uint8array) {
 
 	var index = 1;
 
-	this.m_bDiscontinuityInd		= mpegts.binary.getBitFromByte(uint8array[index], 0);
-	this.m_bRAI						= mpegts.binary.getBitFromByte(uint8array[index], 1);
-	this.m_bESPriority				= mpegts.binary.getBitFromByte(uint8array[index], 2);
-	this.m_bPCRFlag					= mpegts.binary.getBitFromByte(uint8array[index], 3);
-	this.m_bOPCRFlag				= mpegts.binary.getBitFromByte(uint8array[index], 4);
-	this.m_bSplicingPointFlag		= mpegts.binary.getBitFromByte(uint8array[index], 5);
-	this.m_bPrivateDataFlag			= mpegts.binary.getBitFromByte(uint8array[index], 6);
-	this.m_bAdaptationFieldExtFlag	= mpegts.binary.getBitFromByte(uint8array[index], 7);
+	this.m_bDiscontinuityInd		= mpegts.binary.getBitFromByte(data[index], 0);
+	this.m_bRAI						= mpegts.binary.getBitFromByte(data[index], 1);
+	this.m_bESPriority				= mpegts.binary.getBitFromByte(data[index], 2);
+	this.m_bPCRFlag					= mpegts.binary.getBitFromByte(data[index], 3);
+	this.m_bOPCRFlag				= mpegts.binary.getBitFromByte(data[index], 4);
+	this.m_bSplicingPointFlag		= mpegts.binary.getBitFromByte(data[index], 5);
+	this.m_bPrivateDataFlag			= mpegts.binary.getBitFromByte(data[index], 6);
+	this.m_bAdaptationFieldExtFlag	= mpegts.binary.getBitFromByte(data[index], 7);
 
 	//other flags are not useful for the conversion HLS => MP4
 };
