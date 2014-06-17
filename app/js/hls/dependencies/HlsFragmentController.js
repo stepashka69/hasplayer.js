@@ -12,7 +12,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-Mss.dependencies.MssFragmentController = function () {
+Mss.dependencies.HlsFragmentController = function () {
     "use strict";
 
     var getIndex = function (adaptation, manifest) {
@@ -60,7 +60,7 @@ Mss.dependencies.MssFragmentController = function () {
 
                 if (fragment_absolute_time > t)
                 {
-                    rslt.debug.log("[MssFragmentController] Add new segment - t = " + (fragment_absolute_time / 10000000.0));
+                    rslt.debug.log("[HlsFragmentController] Add new segment - t = " + (fragment_absolute_time / 10000000.0));
                     if (fragment_duration === segment.d)
                     {
                         segment.r = r + 1;
@@ -94,7 +94,7 @@ Mss.dependencies.MssFragmentController = function () {
                 segment = segments[0];
                 while (segment.t < availabilityStartTime)
                 {
-                    rslt.debug.log("[MssFragmentController] Remove segment  - t = " + (segment.t / 10000000.0));
+                    rslt.debug.log("[HlsFragmentController] Remove segment  - t = " + (segment.t / 10000000.0));
                     if ((segment.r !== undefined) && (segment.r > 0))
                     {
                         segment.t += segment.d;
@@ -241,30 +241,105 @@ Mss.dependencies.MssFragmentController = function () {
                 bytes: new_data,
                 segmentsUpdated: segmentsUpdated
             };
+        },
+
+
+
+        generateInitSegment = function(data, adaptation) {
+
+            // Initialize demux
+            this.hlsDemux.init();
+
+            // Process the HLS chunk to get media tracks description
+            this.hlsDemux.process(data);
+
+            // For each track
+        },
+
+
+        getInitData = function(representation) {
+            // return data in byte format
+            // call MP4 lib to generate the init
+            
+            // Get required media information from manifest  to generate initialisation segment
+            //var representation = getRepresentationForQuality(quality, adaptation);
+            if(representation){
+                if(!representation.initData){
+                    var manifest = rslt.manifestModel.getValue();
+                    var adaptation = representation.adaptation;
+                    var realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
+                    var realRepresentation = realAdaptation.Representation_asArray[representation.index];
+                    var media = {};
+                    media.type = rslt.getType() || 'und';
+                    media.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
+                    media.timescale = representation.timescale;
+                    media.duration = representation.adaptation.period.duration;
+                    media.codecs = realRepresentation.codecs;
+                    media.codecPrivateData = realRepresentation.codecPrivateData;
+                    media.bandwidth = realRepresentation.bandwidth;
+
+                    //DRM Protected Adaptation is detected
+                    if (realAdaptation.ContentProtection !== undefined){
+                        media.contentProtection = realAdaptation.ContentProtection;
+                    }
+
+                    // Video related informations
+                    media.width = realRepresentation.width || realAdaptation.maxWidth;
+                    media.height = realRepresentation.height || realAdaptation.maxHeight;
+
+                    // Audio related informations
+                    media.language = realAdaptation.lang ? realAdaptation.lang : 'und';
+
+                    media.channels = getAudioChannels(realAdaptation, realRepresentation);
+                    media.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
+
+                    representation.initData =  rslt.mp4Processor.generateInitSegment(media);
+
+                    //console.saveBinArray(representation.initData, "init_evolution_"+media.type+"_"+media.bandwidth+".mp4");
+                }
+                return representation.initData;
+            }else{
+                return null;
+            }
         };
+
     
     var rslt = Custom.utils.copyMethods(MediaPlayer.dependencies.FragmentController);
 
     rslt.manifestModel = undefined;
+    rslt.hlsDemux = undefined;
     rslt.mp4Processor = undefined;
 
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
             manifest = this.manifestModel.getValue(),
-            needUpdate = false;
+            adaptation = null;
 
-        if (bytes !== null && bytes !== undefined && bytes.byteLength > 0) {
-            result = new Uint8Array(bytes);
+        if ((representations === null) || (representations === undefined) || (representations.length === 0)) {
+            return Q.when(bytes);
         }
 
-        if (request && (request.type === "Media Segment") && representations && (representations.length > 0)){
-            // Get adaptation containing provided representations
-            // (Note: here representations is of type Dash.vo.Representation)
-            var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
+        if ((bytes === null) || (bytes === undefined) || (bytes.byteLength === 0)) {
+            return Q.when(bytes);
+        }
+
+        // Get current adaptation containing provided representations
+        // (Note: here representations is of type Dash.vo.Representation)
+        adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
+
+        // Intialize output data
+        result = new Uint8Array(bytes);
+
+        // Initialization segment => generate moov initialization segment from PSI tables
+        if (request && (request.type === "Initialization Segment")) {
+            result = generateInitSegment(bytes, adaptation);
+        }
+
+        // Media segment => genrate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
+        if (request && (request.type === "Media Segment")) {
             var res = convertFragment(result, request, adaptation);
             result = res.bytes;
-            //needUpdate = res.segmentsUpdated;
             if (res.segmentsUpdated) {
                 representations = [];
             }
@@ -297,6 +372,6 @@ Mss.dependencies.MssFragmentController = function () {
     return rslt;
 };
 
-Mss.dependencies.MssFragmentController.prototype = {
-    constructor: Mss.dependencies.MssFragmentController
+Mss.dependencies.HlsFragmentController.prototype = {
+    constructor: Mss.dependencies.HlsFragmentController
 };
