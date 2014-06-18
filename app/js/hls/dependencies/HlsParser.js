@@ -12,7 +12,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- Hls.dependencies.HlsParser = function () {
+Hls.dependencies.HlsParser = function () {
 	var TAG_EXTM3U = "#EXTM3U",
 		/*TAG_EXTXMEDIASEQUENCE = "#EXT-X-MEDIA-SEQUENCE",
 		TAG_EXTXKEY = "#EXT-X-KEY",
@@ -279,8 +279,10 @@
         request.range = "0-1880";
 
         var onLoaded = function(representation, response) {
+
 			// Parse initialization data to obtain codec information
-			mpegts.parse(new Uint8Array(response.data));
+			var tracks = this.hlsDemux.demux(response.data);
+
 			deferred.resolve();
         };
 
@@ -464,6 +466,8 @@
 	return {
         debug: undefined,
         fragmentLoader: undefined,
+        hlsDemux: undefined,
+
         parse: internalParse
     };
 };

@@ -113,7 +113,6 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	// DTS
 	if((this.m_cPTS_DTS_flags & mpegts.pes.PesPacket.prototype.FLAG_DTS) == mpegts.pes.PesPacket.prototype.FLAG_DTS)
 	{
-		debugger;
 		this.m_pDTS = new mpegts.Pts(data.subarray(index, index+5));
 		index += 5;
 	}
