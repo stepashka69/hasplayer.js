@@ -39,7 +39,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             return null;
-        }
+        },
 
         getPAT = function (data) {
 
@@ -50,7 +50,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // TODO: get PAT section
-        }
+        },
 
         getPMT = function (data, pid) {
 
@@ -61,7 +61,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // TODO: get PMT section
-        }
+        },
 
         demuxTsPacket = function(data, index, length) {
             var packet,
