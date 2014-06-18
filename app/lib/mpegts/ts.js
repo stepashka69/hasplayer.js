@@ -18,7 +18,6 @@ var mpegts = (function() {
             tsPacket.parse(data.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
             if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
-                debugger;
                 var pesPacket = new mpegts.pes.PesPacket();
                 pesPacket.parse(data.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
             }
@@ -70,12 +69,10 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
 
     byteId++;
 
-    debugger;
     // Adaptation field
     // NAN => to Validate
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
-        debugger;
         // Check adaptation field length before parsing
         var cAFLength = data[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
@@ -121,6 +118,7 @@ mpegts.ts.TsPacket.prototype.getPusi = function() {
 
 mpegts.ts.TsPacket.prototype.SYNC_WORD = 0x47;
 mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE = 188;
+mpegts.ts.TsPacket.prototype.PAT_PID = 0;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_MAP = 0xBC;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
