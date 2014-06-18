@@ -58,8 +58,9 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                     this.metricsModel.addDownloadSwitch(request.streamType, request.startTime, request.requestStartDate, request.quality);
                 }
 
-                req.open("GET", request.url, true);
+                req.open("GET", self.tokenAuthentication.addTokenAsQueryArg(request.url), true);
                 req.responseType = "arraybuffer";
+                req = self.tokenAuthentication.setTokenInRequestHeader(req);
 /*
                 req.setRequestHeader("Cache-Control", "no-cache");
                 req.setRequestHeader("Pragma", "no-cache");
@@ -208,6 +209,7 @@ MediaPlayer.dependencies.FragmentLoader = function () {
         metricsModel: undefined,
         errHandler: undefined,
         debug: undefined,
+        tokenAuthentication:undefined,
 
         load: function (req) {
 
