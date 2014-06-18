@@ -51,6 +51,7 @@ module.exports = function(grunt) {
             "./app/js/dash/Dash.js",
             "./app/js/dash/DashContext.js",
             "./app/js/mss/Mss.js",
+            "./app/js/hls/Hls.js",
             "./app/js/custom/Custom.js",
             "./app/js/custom/di/CustomContext.js",
             "./app/js/*/**/*.js"]
