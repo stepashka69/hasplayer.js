@@ -3,9 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "express":"3.x",
-    "request":"*",
-    "tunnel":"*",
-    "http-proxy":"*"
+    "body-parser": "^1.3.0",
+    "express": "3.x",
+    "hogan-express": "^0.5.2",
+    "http-proxy": "*",
+    "phantom": "^0.6.3",
+    "quiche": "0.0.8",
+    "request": "*",
+    "tunnel": "*"
   }
 }

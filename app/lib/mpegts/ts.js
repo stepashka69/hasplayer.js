@@ -10,16 +10,16 @@ var mpegts = (function() {
         Pts:{},
     };
     
-    mpegts.parse = function (uint8array) {
+    mpegts.parse = function (data) {
         var i = 0;
-        while(i<=uint8array.length)
+        while(i<=data.length)
         {
             var tsPacket = new mpegts.ts.TsPacket();
-            tsPacket.parse(uint8array.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+            tsPacket.parse(data.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
             if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
                 var pesPacket = new mpegts.pes.PesPacket();
-                pesPacket.parse(uint8array.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
+                pesPacket.parse(data.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
             }
             i+= mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
         }
@@ -46,9 +46,9 @@ mpegts.ts.TsPacket = function(){
     this.m_bIgnored = null;
 };
 
-mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
+mpegts.ts.TsPacket.prototype.parse = function(data) {
     var byteId = 0;
-    this.m_cSync = uint8array[byteId];
+    this.m_cSync = data[byteId];
     if (this.m_cSync !== this.SYNC_WORD) {
         console.log("TS Packet Malformed!");
         return;
@@ -56,16 +56,16 @@ mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
 
     byteId++;
 
-    this.m_bTransportError = mpegts.binary.getBitFromByte(uint8array[byteId], 0);
-    this.m_bPUSI = mpegts.binary.getBitFromByte(uint8array[byteId], 1);
-    this.m_bTransportPriority = mpegts.binary.getBitFromByte(uint8array[byteId], 2);
-    this.m_nPID = mpegts.binary.getValueFrom2Bytes(uint8array.subarray(byteId, byteId+2), 3, 13);
+    this.m_bTransportError = mpegts.binary.getBitFromByte(data[byteId], 0);
+    this.m_bPUSI = mpegts.binary.getBitFromByte(data[byteId], 1);
+    this.m_bTransportPriority = mpegts.binary.getBitFromByte(data[byteId], 2);
+    this.m_nPID = mpegts.binary.getValueFrom2Bytes(data.subarray(byteId, byteId+2), 3, 13);
     
     byteId += 2;
 
-    this.m_cTransportScramblingCtrl = mpegts.binary.getValueFromByte(uint8array[byteId], 0, 2);
-    this.m_cAdaptationFieldCtrl = mpegts.binary.getValueFromByte(uint8array[byteId], 2, 2);
-    this.m_cContinuityCounter = mpegts.binary.getValueFromByte(uint8array[byteId], 4, 4);
+    this.m_cTransportScramblingCtrl = mpegts.binary.getValueFromByte(data[byteId], 0, 2);
+    this.m_cAdaptationFieldCtrl = mpegts.binary.getValueFromByte(data[byteId], 2, 2);
+    this.m_cContinuityCounter = mpegts.binary.getValueFromByte(data[byteId], 4, 4);
 
     byteId++;
 
@@ -74,14 +74,14 @@ mpegts.ts.TsPacket.prototype.parse = function(uint8array) {
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
         // Check adaptation field length before parsing
-        var cAFLength = uint8array[byteId];
+        var cAFLength = data[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
         {
             console.log("TS Packet Size Problem!");
             return;
         }
         this.m_pAdaptationField = new mpegts.ts.AdaptationField();
-        this.m_pAdaptationField.parse(uint8array.subarray(byteId));
+        this.m_pAdaptationField.parse(data.subarray(byteId));
         byteId += this.m_pAdaptationField.getLength();
     }
 
