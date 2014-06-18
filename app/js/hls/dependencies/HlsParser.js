@@ -281,7 +281,7 @@ Hls.dependencies.HlsParser = function () {
         var onLoaded = function(representation, response) {
 
 			// Parse initialization data to obtain codec information
-			var tracks = this.hlsDemux.demux(response.data);
+			var tracks = this.hlsDemux.demux(new Uint8Array(response.data));
 
 			deferred.resolve();
         };
