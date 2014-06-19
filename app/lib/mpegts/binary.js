@@ -1,10 +1,4 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
 // ----------  ----------
-
 mpegts.binary.readBytes = function(buf, pos, nbBytes) {
     var value = 0;
     for (var i = 0; i < nbBytes; i++) {

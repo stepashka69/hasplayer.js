@@ -1,20 +1,6 @@
 // TS trame manipulation library
 // (C) 2014 Orange
 
-var mpegts = (function() {
-    var mpegts = {
-        pes:{},
-        si:{},
-        binary:{},
-        ts:{},
-        Pts:{},
-        aac:{},
-        h264:{}
-    };
-   
-    return mpegts;
-})();
-
 mpegts.ts.TsPacket = function(){
     this.m_cSync = null;
     this.m_bTransportError = null;
@@ -120,14 +106,3 @@ mpegts.ts.TsPacket.prototype.STREAM_ID_EMM_STREAM = 0xF1;
 mpegts.ts.TsPacket.prototype.STREAM_ID_DSMCC_STREAM = 0xF2;
 mpegts.ts.TsPacket.prototype.STREAM_ID_H2221_TYPE_E_STREAM = 0xF8;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_DIRECTORY = 0xFF;
-
-
-// This module is intended to work both on node.js and inside browser.
-// Since these environments differ in a way modules are stored/accessed,
-// we need to export the module in the environment-dependant way
-
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
-    module.exports = mpegts; // node.js
-else
-    window.mpegts = mpegts;  // browser
-

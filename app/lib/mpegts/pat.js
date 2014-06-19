@@ -1,10 +1,4 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
 // ----------  ----------
-
 mpegts.si.PAT = function(){
 	mpegts.si.PSISection.call(this,mpegts.si.PAT.prototype.TABLE_ID);
 	this.m_listOfProgramAssociation = [];

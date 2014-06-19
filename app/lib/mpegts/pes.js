@@ -1,8 +1,3 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
 // ---------- PES Packet class ----------
 
 mpegts.pes.PesPacket = function(){
@@ -31,7 +26,7 @@ mpegts.pes.PesPacket = function(){
 	this.m_cNbStuffingBytes				= null;
 	this.m_pPESExtension				= null;
 	this.m_pPrivateData					= null;
-	this.m_IdPayload					= null;
+	this.m_payloadArray					= null;
 	this.m_nPayloadLength				= null;
 	this.m_bDirty						= null;
 	this.m_bValid						= false;
@@ -70,7 +65,7 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	if (!this.hasOptionalPESHeader()) {
 		//NAN => to Validate!!!!
 		// no more header field, only payload
-		this.m_IdPayload = index + mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH;
+		this.m_payloadArray = data.subarray(index + mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH);
 		this.m_nPayloadLength = this.m_nLength - mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH;
 		this.m_bValid = true;
 		return;
@@ -166,8 +161,8 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	index += this.m_cNbStuffingBytes;
 
 	// Payload
-	this.m_IdPayload = uiHeaderLength;
 	this.m_nPayloadLength = this.m_nLength - uiHeaderLength;
+	this.m_payloadArray = data.subarray(uiHeaderLength,uiHeaderLength + this.m_cPayloadLength);
 
 	this.m_bValid = true;
 };
@@ -197,12 +192,16 @@ mpegts.pes.PesPacket.prototype.getHeaderLength = function() {
     //return m_nPID;
 };
 
-mpegts.pes.PesPacket.prototype.getPTS = function() {
-    //return m_nPID;
+mpegts.pes.PesPacket.prototype.getPayload = function() {
+	return this.m_payloadArray;
 };
 
-mpegts.pes.PesPacket.prototype.getDTS = function() {
-    //return m_nPID;
+mpegts.pes.PesPacket.prototype.getPts = function() {
+	return this.m_pPTS;
+};
+
+mpegts.pes.PesPacket.prototype.getDts = function() {
+	return this.m_pDTS;
 };
 
 /** The start code prefix */
