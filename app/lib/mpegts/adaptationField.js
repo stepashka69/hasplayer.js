@@ -1,10 +1,4 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
 // ---------- Adaptation Field class ----------
-
 mpegts.ts.AdaptationField = function(){
  	/** adaptation field fields */
     this.m_cAFLength = null;

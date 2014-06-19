@@ -1,8 +1,3 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
 // ----------  ----------
 
 mpegts.si.PSISection = function(table_id){
