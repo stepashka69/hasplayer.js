@@ -46,7 +46,6 @@ mpegts.si.PMT.prototype.parse = function (data) {
 	id += 2;
 	this.m_program_info_length = mpegts.binary.getValueFrom2Bytes(data.subarray(id, id+2), 4);
 	id += 2;
-	debugger;
 	
 	// Parse program descriptors
 	id += this.m_program_info_length;

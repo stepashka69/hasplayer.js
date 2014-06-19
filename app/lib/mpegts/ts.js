@@ -4,7 +4,7 @@
 var mpegts = (function() {
     var mpegts = {
         pes:{},
-        psi:{},
+        si:{},
         binary:{},
         ts:{},
         Pts:{},
@@ -19,7 +19,7 @@ var mpegts = (function() {
 
             if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
                 var pesPacket = new mpegts.pes.PesPacket();
-                pesPacket.parse(data.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
+                pesPacket.parse(tsPacket.getPayload());
             }
             i+= mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
         }
@@ -38,7 +38,7 @@ mpegts.ts.TsPacket = function(){
     this.m_cAdaptationFieldCtrl = null;
     this.m_cContinuityCounter = null;
     this.m_pAdaptationField = null;
-    this.m_IdPayload = null;
+    this.m_payloadArray = null;
     this.m_cPayloadLength = null;
     this.m_bDirty = null;
     this.m_time = null;
@@ -73,6 +73,7 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     // NAN => to Validate
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
+        debugger;
         // Check adaptation field length before parsing
         var cAFLength = data[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
@@ -88,6 +89,7 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     // Check packet validity
     if (this.m_cAdaptationFieldCtrl === 0x00)
     {
+        debugger;
         console.log("TS Packet is invalid!");
         return;
     }
@@ -96,7 +98,7 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     if(this.m_cAdaptationFieldCtrl & 0x01)
     {
         this.m_cPayloadLength = this.TS_PACKET_SIZE - byteId;
-        this.m_IdPayload = byteId;
+        this.m_payloadArray = data.subarray(byteId,byteId + this.m_cPayloadLength);
     }
 };
 
@@ -104,8 +106,8 @@ mpegts.ts.TsPacket.prototype.getPid = function() {
     return this.m_nPID;
 };
 
-mpegts.ts.TsPacket.prototype.getPayloadIndex = function() {
-    return this.m_IdPayload;
+mpegts.ts.TsPacket.prototype.getPayload = function() {
+    return this.m_payloadArray;
 };
 
 mpegts.ts.TsPacket.prototype.getPayloadLength = function() {
@@ -118,6 +120,7 @@ mpegts.ts.TsPacket.prototype.getPusi = function() {
 
 mpegts.ts.TsPacket.prototype.SYNC_WORD = 0x47;
 mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE = 188;
+mpegts.ts.TsPacket.prototype.UNDEFINED_PID = 0xFFFF;
 mpegts.ts.TsPacket.prototype.PAT_PID = 0;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_MAP = 0xBC;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;

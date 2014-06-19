@@ -29,13 +29,13 @@ Hls.dependencies.HlsDemux = function () {
 
             while (i < data.length) {
                 var tsPacket = new mpegts.ts.TsPacket();
-                tsPacket.parse(new Uint8Array(data, i, mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+                tsPacket.parse(data.subarray(i, i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
                 if (tsPacket.getPid() === pid) {
                     return tsPacket;
                 }
                 
-                i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
+                i += mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             return null;
@@ -49,7 +49,9 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            // TODO: get PAT section
+            var pat = new mpegts.si.PAT(tsPacket.getPayload());
+
+            return pat;
         },
 
         getPMT = function (data, pid) {
@@ -60,7 +62,9 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            // TODO: get PMT section
+            var pmt = new mpegts.si.PMT(tsPacket.getPayload());
+
+            return pmt;
         },
 
         demuxTsPacket = function(data, index, length) {
