@@ -9,21 +9,6 @@ var mpegts = (function() {
         ts:{},
         Pts:{},
     };
-    
-    mpegts.parse = function (data) {
-        var i = 0;
-        while(i<=data.length)
-        {
-            var tsPacket = new mpegts.ts.TsPacket();
-            tsPacket.parse(data.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
-
-            if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
-                var pesPacket = new mpegts.pes.PesPacket();
-                pesPacket.parse(tsPacket.getPayload());
-            }
-            i+= mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
-        }
-    };
    
     return mpegts;
 })();
