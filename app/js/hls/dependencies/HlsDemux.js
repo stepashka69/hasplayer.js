@@ -23,7 +23,7 @@ Hls.dependencies.HlsDemux = function () {
         pidToTrackId = [],
         tracks = [],
 
-        getTsPacket = function (data, pid) {
+        getTsPacket = function (data, pid, pusi) {
 
             var i = 0;
 
@@ -31,7 +31,9 @@ Hls.dependencies.HlsDemux = function () {
                 var tsPacket = new mpegts.ts.TsPacket();
                 tsPacket.parse(data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
-                if (tsPacket.getPid() === pid) {
+                this.debug.log("[HlsDemux] TS packet: pid=" + tsPacket.getPid() + ", pusi = " + tsPacket.getPusi());
+                
+                if ((tsPacket.getPid() === pid) && ((pusi === undefined) || (tsPacket.getPusi() === pusi))) {
                     return tsPacket;
                 }
                 
@@ -43,21 +45,24 @@ Hls.dependencies.HlsDemux = function () {
 
         getPAT = function (data) {
 
-            var tsPacket = getTsPacket(data, mpegts.ts.TsPacket.prototype.PAT_PID);
+            var tsPacket = getTsPacket.call(this, data, mpegts.ts.TsPacket.prototype.PAT_PID);
 
             if (tsPacket === null) {
                 return null;
             }
 
+
             pat = new mpegts.si.PAT();
             pat.parse(tsPacket.getPayload());
+
+            this.debug.log("[HlsDemux] PAT: PMT_PID=" + pat.getPmtPid());
 
             return pat;
         },
 
         getPMT = function (data, pid) {
 
-            var tsPacket = getTsPacket(data, pid);
+            var tsPacket = getTsPacket.call(this, data, pid);
 
             if (tsPacket === null) {
                 return null;
@@ -66,12 +71,35 @@ Hls.dependencies.HlsDemux = function () {
             var pmt = new mpegts.si.PMT();
             pmt.parse(tsPacket.getPayload());
 
+            this.debug.log("[HlsDemux] PMT");
+
+            var track = new MediaPlayer.vo.Mp4Track();
+            track.type = 'video';
+            track.trackId = 0;
+            track.codecs="h264";
+            track.timescale = 90000;
+
+            pidToTrackId[257] = 0;
+            track.pid = 257;
+            tracks.push(track);
+
+            track = new MediaPlayer.vo.Mp4Track();
+            track.type = 'audio';
+            track.trackId = 1;
+            track.codecs="aac";
+            track.timescale = 90000;
+
+            pidToTrackId[256] = 1;
+            track.pid = 256;
+            tracks.push(track);
+
             return pmt;
         },
 
         demuxTsPacket = function(data) {
             var tsPacket,
                 pid,
+                trackId,
                 track,
                 sample = null;
 
@@ -79,13 +107,18 @@ Hls.dependencies.HlsDemux = function () {
             tsPacket.parse(data);
 
             // If packet has only adaptation field, then ignore
-            /*if (tsPacket.hasAdaptationFieldOnly()) {
+            if (tsPacket.hasAdaptationFieldOnly()) {
                 return;
-            }*/
+            }
 
             // Get PID and corresponding track
             pid = tsPacket.getPid();
-            track = tracks[pidToTrackId[pid]];
+            trackId = pidToTrackId[pid];
+            if (trackId === undefined) {
+                return;
+            }
+
+            track = tracks[trackId];
 
             // PUSI => start storing new AU
             if (tsPacket.getPusi()) {
@@ -159,6 +192,52 @@ Hls.dependencies.HlsDemux = function () {
             tracks = [];
         },
 
+        getTrackCodecInfo = function (data, track) {
+
+            var tsPacket;
+
+            // Get first TS packet containing start of a PES/sample
+            tsPacket = getTsPacket.call(this, data, track.pid, true);
+
+            // Get PES packet
+            var pesPacket = new mpegts.pes.PesPacket();
+            pesPacket.parse(tsPacket.getPayload());
+
+            if (track.codecs === "h264") {
+                track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
+            }
+
+        },
+
+        doGetTracks = function (data) {
+
+            var i;
+
+            // Parse PSI (PAT, PMT) if not yet received
+            if (pat === null) {
+                pat = getPAT.call(this, data);
+                if (pat === null) {
+                    return;
+                }
+            }
+
+            if (pmt === null) {
+                pmt = getPMT.call(this, data, pat.getPmtPid());
+                if (pmt === null) {
+                    return;
+                }
+            }
+
+            // Get track information
+            for (i = 0; i < tracks.length; i++) {
+                if (tracks[i].codecPrivateData === "") {
+                    //getTrackCodecInfo.call(this, data, tracks[i]);
+                }
+            }
+
+            return tracks;
+        },
+
         doDemux = function (data) {
 
             var nbPackets = data.length / mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE,
@@ -167,46 +246,36 @@ Hls.dependencies.HlsDemux = function () {
             this.debug.log("[HlsDemux] Demux chunk, size = " + data.length + ", nb packets = " + nbPackets);
             debugger;
 
-            // Parse PSI (PAT, PMT) if not yet received
-            if (pat === null) {
-                pat = getPAT(data);
-                if (pat === null) {
-                    return;
-                }
-            }
+            // Get PAT, PMT and tracks information if not yet received
+            doGetTracks.call(this, data);
 
+            // If PMT not received, then unable to demux
             if (pmt === null) {
-                pmt = getPMT(data, pat.getPmtPid());
-                if (pmt === null) {
-                    return;
-                }
+                return tracks;
             }
 
             // Parse and demux TS packets
             i = 0;
             while (i < data.length) {
 
-                demuxTsPacket(data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+                demuxTsPacket.call(this, data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
                 i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             // Re-assemble samples from sub-samples
             for (i = 0; i < tracks.length; i++) {
-                postProcess(tracks[i]);
+                postProcess.call(this, tracks[i]);
             }
 
-
+            return tracks;
         };
 
     return {
         debug: undefined,
 
         init: doInit,
-        demux: doDemux,
-
-        getTracks: function() {
-            return tracks;
-        }
+        getTracks: doGetTracks,
+        demux: doDemux
     };
 };
 

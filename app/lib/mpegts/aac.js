@@ -27,7 +27,8 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
 
     // - adts_frame()
     while (i < data.length) {
-        var i_frame = 0;
+        var i_frame = 0,
+        blockLength;
 
         // -- adts_fixed_header()
         // --- sync_word
@@ -53,16 +54,18 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
                 i += 2;
             }
             // ---- raw_data_block()
-            var blockLength = aac_frame_length - i_frame;
+            blockLength = aac_frame_length - i_frame;
 
             // Create AAC frame
-            sample = new Sample();
+            samples.push(new Uint8Array(data, i+i_frame, blockLength));
+
+            /*sample = new Sample();
             sample.dts = sample.pts = pes.getPts();
-            sample.duration = (1.0 / AAC_SAMPLING_FREQUENCY[sampling_frequency_index]) * 1024.0 /** * timescale */;
+            sample.duration = (1.0 / AAC_SAMPLING_FREQUENCY[sampling_frequency_index]) * 1024.0 * timescale;
             sample.size = 0;
             sample.data = new Uint8Array(data, i+i_frame, blockLength);
 
-            pts += sample.duration;
+            pts += sample.duration;*/
             i_frame+=blockLength;
 
             /*SAUSample aacFrame;
@@ -82,10 +85,11 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
         }
         else {
             var raw_data_block_position = new Array(num_raw_data_blocks);
+            var j;
 
             // ---- adts_header_error_check()
             if (protection_absent === 0) {
-                for (var j = 1; j <= num_raw_data_blocks; j++) {
+                for (j = 1; j <= num_raw_data_blocks; j++) {
                     raw_data_block_position[j] = mpegts.binary.getValueFrom2Bytes(data[i+i_frame]);
                     i_frame+=2;
                 }
@@ -93,9 +97,9 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
                 i_frame+=2;
             }
 
-            for (var j = 1; j <= num_raw_data_blocks; j++) {
+            for (j = 1; j <= num_raw_data_blocks; j++) {
                 // ---- raw_data_block()
-                var blockLength = (j === num_raw_data_blocks)?
+                blockLength = (j === num_raw_data_blocks)?
                     (raw_data_block_position[j+1] - raw_data_block_position[j]):
                     (aac_frame_length - raw_data_block_position[j]);
                 i_frame+=blockLength;
@@ -103,15 +107,6 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
         }
 
         i += aac_frame_length;
-
-        // Initialize codec information from ADTS header
-        if (track.codecs === "") {
-            track.codecs = "mp4a.";
-            track.codecPrivateData;
-            track.channels = channel_configuration;
-            track.samplingRate = 0;
-            track.bandwidth = 0;                    
-        }
     }
 
 };

@@ -60,7 +60,6 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     // NAN => to Validate
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
-        debugger;
         // Check adaptation field length before parsing
         var cAFLength = data[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
@@ -76,7 +75,6 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     // Check packet validity
     if (this.m_cAdaptationFieldCtrl === 0x00)
     {
-        debugger;
         console.log("TS Packet is invalid!");
         return;
     }

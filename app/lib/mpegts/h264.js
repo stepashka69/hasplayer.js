@@ -18,17 +18,17 @@ mpegts.h264.getSequenceHeader = function (data) { // data as Uint8Array
 
     var pos = -1,
         length = -1,
-        i = 0
+        i = 0,
         naluType,
         sequenceHeader = null;
 
     while (i < data.length) {
-        if ((data[i] == 0x00) && (data[i+1] == 0x00) && (data[i+2] == 0x00) && (data[i+3] == 0x01)) {
+        if ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01)) {
 
             naluType = data[i + 4] & 0x1F;
 
             // Start of SPS or PPS
-            if ((naluType >= NALUTYPE_SPS) && (naluType <= NALUTYPE_PPS) && (pos === -1) ) {
+            if ((naluType >= mpegts.h264.NALUTYPE_SPS) && (naluType <= mpegts.h264.NALUTYPE_PPS) && (pos === -1) ) {
                 pos = i;
             }
             else if (pos > 0)
@@ -51,18 +51,18 @@ mpegts.h264.getSequenceHeader = function (data) { // data as Uint8Array
 mpegts.h264.bytestreamToMp4 = function (data) { // data as Uint8Array
 
     var i = 0,
-        startCodeOffset = 0;
+        startCodeOffset = 0,
         naluSize = 0;
 
     while (i < data.length) {
-        if ((i == length) || ((data[i] == 0x00) && (data[i+1] == 0x00) && (data[i+2] == 0x00) && (data[i+3] == 0x01))) {
+        if ((i == length) || ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01))) {
 
             if (startCodeOffset > 0) {
                 naluSize = (i - startCodeOffset - 4); // 4 = start code length or NALU-size field length
-                data[startCodeOffset] = (nalusize & 0xFF000000) >> 24;
-                data[startCodeOffset+1] = (nalusize & 0x00FF0000) >> 16;
-                data[startCodeOffset+2] = (nalusize & 0x0000FF00) >> 8;
-                data[startCodeOffset+3] = (nalusize & 0x000000FF);
+                data[startCodeOffset] = (naluSize & 0xFF000000) >> 24;
+                data[startCodeOffset+1] = (naluSize & 0x00FF0000) >> 16;
+                data[startCodeOffset+2] = (naluSize & 0x0000FF00) >> 8;
+                data[startCodeOffset+3] = (naluSize & 0x000000FF);
             }
 
             startCodeOffset = i;
