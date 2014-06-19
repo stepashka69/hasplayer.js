@@ -49,8 +49,10 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            // TODO: get PAT section
+            pat = new mpegts.si.PAT();
+            pat.parse(tsPacket.getPayload());
 
+            return pat;
         },
 
         getPMT = function (data, pid) {
@@ -61,28 +63,10 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            // TODO: get PMT section
+            var pmt = new mpegts.si.PMT();
+            pmt.parse(tsPacket.getPayload());
 
-            var track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'video';
-            track.trackId = 0;
-            track.codecs="avc";
-            track.timescale = 90000;
-
-            pidToTrackId[257] = 0;
-            tracks.push(track);
-
-            track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'audio';
-            track.trackId = 1;
-            track.codecs="aac";
-            track.timescale = 90000;
-
-            pidToTrackId[256] = 1;
-            tracks.push(track);
-
-
-
+            return pmt;
         },
 
         demuxTsPacket = function(data) {
