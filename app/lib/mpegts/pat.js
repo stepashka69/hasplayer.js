@@ -5,11 +5,10 @@ if (typeof require !== 'undefined') {
 
 // ----------  ----------
 
-mpegts.si.PAT = function(data){
+mpegts.si.PAT = function(){
 	mpegts.si.PSISection.call(this,mpegts.si.PAT.prototype.TABLE_ID);
 	this.m_listOfProgramAssociation = [];
 	this.m_network_pid = null;
-	this.parse(data);
 };
 
 mpegts.si.PAT.prototype = Object.create(mpegts.si.PSISection.prototype);

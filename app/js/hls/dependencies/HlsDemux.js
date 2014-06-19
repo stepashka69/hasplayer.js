@@ -176,7 +176,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             if (pmt === null) {
-                pmt = getPMT(data, 4096/*pat.getPmtPid()*/);
+                pmt = getPMT(data, pat.getPmtPid());
                 if (pmt === null) {
                     return;
                 }

@@ -5,12 +5,11 @@ if (typeof require !== 'undefined') {
 
 // ----------  ----------
 
-mpegts.si.PMT = function(data){
+mpegts.si.PMT = function(){
 	mpegts.si.PSISection.call(this,mpegts.si.PMT.prototype.TABLE_ID);
 	this.m_listOfComponents = [];
 	this.m_PCR_PID = null;
 	this.m_program_info_length = null;
-	this.parse(data);
 };
 
 mpegts.si.PMT.prototype = Object.create(mpegts.si.PSISection.prototype);

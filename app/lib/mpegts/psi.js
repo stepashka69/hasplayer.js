@@ -60,7 +60,7 @@ mpegts.si.PSISection.prototype.parse = function (data) {
 
 mpegts.si.PSISection.prototype.getSectionLength = function() {
 	return this.m_section_length;
-}
+};
 
 mpegts.si.PSISection.prototype.SECTION_LENGTH = 9;
 mpegts.si.PSISection.prototype.HEADER_LENGTH = 8;
