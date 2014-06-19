@@ -103,6 +103,10 @@ mpegts.ts.TsPacket.prototype.getPusi = function() {
     return this.m_bPUSI;
 };
 
+mpegts.ts.TsPacket.prototype.hasAdaptationFieldOnly = function() {
+    return (this.m_cAdaptationFieldCtrl == 0x02);
+}
+
 mpegts.ts.TsPacket.prototype.SYNC_WORD = 0x47;
 mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE = 188;
 mpegts.ts.TsPacket.prototype.UNDEFINED_PID = 0xFFFF;
