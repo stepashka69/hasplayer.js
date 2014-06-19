@@ -230,7 +230,7 @@ Hls.dependencies.HlsParser = function () {
 				segmentList.SegmentURL_asArray.push(segment);
 				duration += media.duration;
 			} else if (_containsTag(data[i], TAG_EXTXENDLIST)) {
-				// "static" playliast => set duration
+				// "static" playlist => set duration
 				representation.duration = duration;
 			}
 		}
@@ -256,6 +256,11 @@ Hls.dependencies.HlsParser = function () {
 
 		// Set manifest type, "static" vs "dynamic"
 		manifest.type = (manifest.mediaPresentationDuration === 0) ? "dynamic": "static";
+
+		// Dynamic use case => set manifest refresh period as the duration of 1 fragment/chunk
+		if (manifest.type === "dynamic") {
+			manifest.minimumUpdatePeriod = adaptationSet.Representation_asArray[0].SegmentList.duration;
+		}
 
 		// Set initialization segment for each representation
 		// And download initialization data (PSI, IDR...) to obtain codec information
