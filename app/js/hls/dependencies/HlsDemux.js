@@ -29,13 +29,13 @@ Hls.dependencies.HlsDemux = function () {
 
             while (i < data.length) {
                 var tsPacket = new mpegts.ts.TsPacket();
-                tsPacket.parse(new Uint8Array(data, i, mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+                tsPacket.parse(data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
                 if (tsPacket.getPid() === pid) {
                     return tsPacket;
                 }
                 
-                i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
+                i += mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             return null;
@@ -50,6 +50,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // TODO: get PAT section
+
         },
 
         getPMT = function (data, pid) {
@@ -61,120 +62,74 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // TODO: get PMT section
+
+            var track = new MediaPlayer.vo.Mp4Track();
+            track.type = 'video';
+            track.trackId = 0;
+            track.codecs="avc";
+            track.timescale = 90000;
+
+            pidToTrackId[257] = 0;
+            tracks.push(track);
+
+            track = new MediaPlayer.vo.Mp4Track();
+            track.type = 'audio';
+            track.trackId = 1;
+            track.codecs="aac";
+            track.timescale = 90000;
+
+            pidToTrackId[256] = 1;
+            tracks.push(track);
+
+
+
         },
 
-        demuxTsPacket = function(data, index, length) {
-            var packet,
+        demuxTsPacket = function(data) {
+            var tsPacket,
                 pid,
                 track,
-                sample = null,
-                offset = 0;
+                sample = null;
 
-            packet = mpegts.ts.TsPacket.parse(data, index, length);
+            tsPacket = new mpegts.ts.TsPacket();
+            tsPacket.parse(data);
 
             // If packet has only adaptation field, then ignore
-            if (packet.hasAdaptationFieldOnly()) {
+            /*if (tsPacket.hasAdaptationFieldOnly()) {
                 return;
-            }
+            }*/
 
             // Get PID and corresponding track
-            pid = packet.getPid();
+            pid = tsPacket.getPid();
             track = tracks[pidToTrackId[pid]];
 
             // PUSI => start storing new AU
-            if (packet.getPusi()) {
+            if (tsPacket.getPusi()) {
 
                 // Parse PES header
-                pes = mpegts.pes.parse(data, index + packet.getHeaderLength(), packet.getPayloadLength());
+                var pesPacket = new mpegts.pes.PesPacket();
+                pesPacket.parse(tsPacket.getPayload());
 
                 // Store new access unit
-                sample = new Sample();
-                sample.dts = pes.getDts();
-                sample.pts = pes.getPts();
+                sample = new MediaPlayer.vo.Mp4Track.Sample();
+                sample.dts = pesPacket.getDts();
+                sample.pts = pesPacket.getPts();
                 sample.size = 0;
                 sample.subSamples = [];
 
+                // Store payload of PES packet as a subsample
+                sample.subSamples.push(pesPacket.getPayload());
+
                 track.samples.push(sample);
-
-                // Get start offset of sample data and length
-                offset = index + packet.getHeaderLength() + pes.getHeaderLength();
-
             }
             else {
                 // Get currently buffered access unit
                 if (track.samples.length > 0) {
-                    sample = track.samples[track.samples.length - 1];                
+                    sample = track.samples[track.samples.length - 1];
                 }
 
-                // Get start offset of sample data and length
-                offset = index + packet.getHeaderLength();
-            }
-
-            // Store AU part
-            if (sample) {
-                var subSample = new subSample();
-                subSample.data = data;
-                subSample.offset = offset;
-                subSample.length = length - au_index;
-                sample.subSamples.push(subSample);
-            }
-
-        },
-
-        h264GetSequenceHeader = function(data) {
-
-            var pos = -1,
-                length = -1,
-                i = 0
-                naluType,
-                sequenceHeader = null;
-
-            while (i < data.length) {
-                if ((data[i] == 0x00) && (data[i+1] == 0x00) && (data[i+2] == 0x00) && (data[i+3] == 0x01)) {
-
-                    naluType = data[i + 4] & 0x1F;
-
-                    // Start of SPS or PPS
-                    if ((naluType >= H264_NALUTYPE_SPS) && (naluType <= H264_NALUTYPE_PPS) && (pos === -1) ) {
-                        pos = i;
-                    }
-                    else if (pos > 0)
-                    {
-                        length = i - pos;
-                    }
-                }
-                i++;
-            }
-
-            if (pos > 0) {
-                sequenceHeader = new Uint8Array(length);
-                sequenceHeader.set(data.subarray(pos, length));
-            }
-
-            return sequenceHeader;
-        },
-
-
-        h264BytestreamToMp4 = function(data) {
-
-            var i = 0,
-                startCodeOffset = 0;
-                naluSize = 0;
-
-            while (i < data.length) {
-                if ((i == length) || ((data[i] == 0x00) && (data[i+1] == 0x00) && (data[i+2] == 0x00) && (data[i+3] == 0x01))) {
-
-                    if (startCodeOffset > 0) {
-                        naluSize = (i - startCodeOffset - 4); // 4 = start code length or NALU-size field length
-                        data[startCodeOffset] = (nalusize & 0xFF000000) >> 24;
-                        data[startCodeOffset+1] = (nalusize & 0x00FF0000) >> 16;
-                        data[startCodeOffset+2] = (nalusize & 0x0000FF00) >> 8;
-                        data[startCodeOffset+3] = (nalusize & 0x000000FF);
-                    }
-
-                    startCodeOffset = i;
-                }
-                i++;
+                // Store payload of TS packet as a subsample
+                sample.subSamples.push(tsPacket.getPayload());
             }
         },
 
@@ -183,7 +138,7 @@ Hls.dependencies.HlsDemux = function () {
             var sample,
                 length = 0,
                 offset = 0,
-                i, s
+                i, s;
 
             // Re-assemble sub-sample parts into
             for (i = 0; i < track.samples.length; i++) {
@@ -202,13 +157,13 @@ Hls.dependencies.HlsDemux = function () {
 
                 // Copy all sub-sample parts into track data
                 for (s = 0; s < sample.subSamples.length; s++) {
-                    track.data.set(data.subarray(sample.subSamples[s].offset, sample.subSamples[s].length), offset);
+                    track.data.set(sample.subSamples[s], offset);
                     offset += sample.subSamples[s].length;
                 }
 
                 // 
                 if (track.codecs.contains('avc')) {
-                    h264BytestreamToMp4(track.data);
+                    mpegts.h264.bytestreamToMp4(track.data);
                 }
             }
 
@@ -223,11 +178,10 @@ Hls.dependencies.HlsDemux = function () {
         doDemux = function (data) {
 
             var nbPackets = data.length / mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE,
-                i = 0,
-                packet = null,
-                elementaryStream;
+                i = 0;
 
             this.debug.log("[HlsDemux] Demux chunk, size = " + data.length + ", nb packets = " + nbPackets);
+            debugger;
 
             // Parse PSI (PAT, PMT) if not yet received
             if (pat === null) {
@@ -238,7 +192,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             if (pmt === null) {
-                pmt = getPMT(data, pat.getPmtPid());
+                pmt = getPMT(data, 4096/*pat.getPmtPid()*/);
                 if (pmt === null) {
                     return;
                 }
@@ -248,13 +202,13 @@ Hls.dependencies.HlsDemux = function () {
             i = 0;
             while (i < data.length) {
 
-                demuxTsPacket(new Uint8Array(data, i, mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
+                demuxTsPacket(data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
                 i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             // Re-assemble samples from sub-samples
             for (i = 0; i < tracks.length; i++) {
-
+                postProcess(tracks[i]);
             }
 
 
@@ -264,7 +218,11 @@ Hls.dependencies.HlsDemux = function () {
         debug: undefined,
 
         init: doInit,
-        demux: doDemux
+        demux: doDemux,
+
+        getTracks: function() {
+            return tracks;
+        }
     };
 };
 
@@ -272,20 +230,4 @@ Hls.dependencies.HlsDemux.prototype = {
     constructor: Hls.dependencies.HlsDemux
 };
 
-
-
-Hls.dependencies.HlsDemux.SubSample = function () {
-    "use strict";
-
-    this.data = null; // the data array containing thr subsample
-    this.offset = 0; // the offset of the first byte at which starts the sample data
-    this.length = 0; // the length of the data
-};
-
-Hls.dependencies.HlsDemux.H264_NALUTYPE_NONIDR = 1;
-Hls.dependencies.HlsDemux.H264_NALUTYPE_IDR = 5;
-Hls.dependencies.HlsDemux.H264_NALUTYPE_SEI = 6;
-Hls.dependencies.HlsDemux.H264_NALUTYPE_SPS = 7;
-Hls.dependencies.HlsDemux.H264_NALUTYPE_PPS = 8;
-Hls.dependencies.HlsDemux.H264_NALUTYPE_AU_DELIMITER = 9;
 

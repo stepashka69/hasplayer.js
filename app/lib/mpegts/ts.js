@@ -8,6 +8,8 @@ var mpegts = (function() {
         binary:{},
         ts:{},
         Pts:{},
+        aac:{},
+        h264:{}
     };
     
     mpegts.parse = function (data) {

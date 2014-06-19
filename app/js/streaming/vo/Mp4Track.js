@@ -51,7 +51,7 @@ MediaPlayer.vo.Mp4Track.Sample = function () {
     this.dts = 0;
     this.pts = 0;
     this.duration = 0;
-    this.size = 0;
+    this.data = 0;
 };
 
 MediaPlayer.vo.Mp4Track.Sample.prototype = {
