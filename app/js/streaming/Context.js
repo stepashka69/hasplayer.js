@@ -20,6 +20,7 @@ MediaPlayer.di.Context = function () {
             this.system.autoMapOutlets = true;
 
             this.system.mapSingleton('debug', MediaPlayer.utils.Debug);
+            this.system.mapSingleton('tokenAuthentication', MediaPlayer.utils.TokenAuthentication);
             this.system.mapSingleton('eventBus', MediaPlayer.utils.EventBus);
             this.system.mapSingleton('capabilities', MediaPlayer.utils.Capabilities);
             this.system.mapSingleton('textTrackExtensions', MediaPlayer.utils.TextTrackExtensions);
@@ -48,6 +49,7 @@ MediaPlayer.di.Context = function () {
             this.system.mapClass('limitSwitchesRule', MediaPlayer.rules.LimitSwitchesRule);
             this.system.mapClass('abrRulesCollection', MediaPlayer.rules.BaseRulesCollection);
 
+            this.system.mapClass('eventController', MediaPlayer.dependencies.EventController);
             this.system.mapClass('textController', MediaPlayer.dependencies.TextController);
             this.system.mapClass('bufferController', MediaPlayer.dependencies.BufferController);
             this.system.mapClass('manifestLoader', MediaPlayer.dependencies.ManifestLoader);
