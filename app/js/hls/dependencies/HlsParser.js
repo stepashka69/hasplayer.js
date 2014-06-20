@@ -281,7 +281,7 @@ Hls.dependencies.HlsParser = function () {
 		representation = adaptationSet.Representation_asArray[0];
         request.type = "Initialization Segment";
         request.url = initialization.sourceURL;
-        request.range = "0-1880";
+        request.range = "0-18799";
 
         var onLoaded = function(representation, response) {
 
@@ -296,6 +296,7 @@ Hls.dependencies.HlsParser = function () {
 			deferred.resolve();
         };
 
+		self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
 		self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));
 
 

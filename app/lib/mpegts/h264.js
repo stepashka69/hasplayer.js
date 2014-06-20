@@ -28,20 +28,37 @@ mpegts.h264.getSequenceHeader = function (data) { // data as Uint8Array
             naluType = data[i + 4] & 0x1F;
 
             // Start of SPS or PPS
-            if ((naluType >= mpegts.h264.NALUTYPE_SPS) && (naluType <= mpegts.h264.NALUTYPE_PPS) && (pos === -1) ) {
-                pos = i;
+            if ((naluType >= mpegts.h264.NALUTYPE_SPS) && (naluType <= mpegts.h264.NALUTYPE_PPS)) {
+                // First NALU of this type => we start storing the sequence header
+                if (pos === -1) {
+                    pos = i;
+                }
             }
-            else if (pos > 0)
-            {
+            else if (pos > 0) {
                 length = i - pos;
             }
+
+            // Start of coded picture NALU
+            if ((naluType === mpegts.h264.NALUTYPE_IDR) || (naluType === mpegts.h264.NALUTYPE_NONIDR)) {
+                break;
+            }
+
+            i+=4;
         }
-        i++;
+        else if ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x01)) {
+            if (pos > 0) {
+                length = i - pos;
+            }
+            break;
+        }
+        else {
+            i++;
+        }
     }
 
     if (pos > 0) {
         sequenceHeader = new Uint8Array(length);
-        sequenceHeader.set(data.subarray(pos, length));
+        sequenceHeader.set(data.subarray(pos, pos + length));
     }
 
     return sequenceHeader;

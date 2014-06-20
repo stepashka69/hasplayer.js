@@ -76,7 +76,7 @@ Hls.dependencies.HlsDemux = function () {
             var track = new MediaPlayer.vo.Mp4Track();
             track.type = 'video';
             track.trackId = 0;
-            track.codecs="h264";
+            track.streamType="h264";
             track.timescale = 90000;
 
             pidToTrackId[257] = 0;
@@ -86,7 +86,7 @@ Hls.dependencies.HlsDemux = function () {
             track = new MediaPlayer.vo.Mp4Track();
             track.type = 'audio';
             track.trackId = 1;
-            track.codecs="aac";
+            track.streamType="aac";
             track.timescale = 90000;
 
             pidToTrackId[256] = 1;
@@ -186,6 +186,18 @@ Hls.dependencies.HlsDemux = function () {
 
         },
 
+        arrayToHexString = function(array) {
+            var str = "";
+            for(var i = 0; i < array.length; i++) {
+                var h = array[i].toString(16);
+                if (h.length < 2) {
+                    h = "0" + h;
+                }
+                str += h;
+            }
+            return str;
+        },
+
         doInit = function () {
             pat = null;
             pmt = null;
@@ -199,14 +211,41 @@ Hls.dependencies.HlsDemux = function () {
             // Get first TS packet containing start of a PES/sample
             tsPacket = getTsPacket.call(this, data, track.pid, true);
 
+            // We have no packet of track's PID , need some more packets to get track info
+            if (tsPacket === null) {
+                return null;
+            }
+
             // Get PES packet
             var pesPacket = new mpegts.pes.PesPacket();
             pesPacket.parse(tsPacket.getPayload());
 
-            if (track.codecs === "h264") {
-                track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
+            // H264
+            if (track.streamType === "h264") {
+
+                track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
+                track.codecs = "avc1.";
+
+                // Extract from the CodecPrivateData field the hexadecimal representation of the following
+                // three bytes in the sequence parameter set NAL unit.
+                // => Find the SPS nal header
+                var nalHeader = /00000001[0-9]7/.exec(track.codecPrivateData);
+                if (nalHeader && nalHeader[0]) {
+                    // => Take the 6 characters after the SPS nalHeader (if it exists)
+                    track.codecs += track.codecPrivateData.substr(track.codecPrivateData.indexOf(nalHeader[0])+10, 6);
+                }
             }
 
+            // AAC
+            if (track.streamType === "aac") {
+                track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
+                track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
+            }
+
+            this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
+            this.debug.log("[HlsDemux] track codecs = " + track.codecs);
+
+            return track;
         },
 
         doGetTracks = function (data) {
@@ -230,8 +269,10 @@ Hls.dependencies.HlsDemux = function () {
 
             // Get track information
             for (i = 0; i < tracks.length; i++) {
-                if (tracks[i].codecPrivateData === "") {
-                    //getTrackCodecInfo.call(this, data, tracks[i]);
+                if (tracks[i].codecs === "") {
+                    if (getTrackCodecInfo.call(this, data, tracks[i]) === null) {
+                        return null;
+                    }
                 }
             }
 
@@ -244,10 +285,11 @@ Hls.dependencies.HlsDemux = function () {
                 i = 0;
 
             this.debug.log("[HlsDemux] Demux chunk, size = " + data.length + ", nb packets = " + nbPackets);
-            debugger;
 
             // Get PAT, PMT and tracks information if not yet received
-            doGetTracks.call(this, data);
+            if (doGetTracks.call(this, data) === null) {
+                return null;
+            }
 
             // If PMT not received, then unable to demux
             if (pmt === null) {
