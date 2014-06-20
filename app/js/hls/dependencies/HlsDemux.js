@@ -68,30 +68,53 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            var pmt = new mpegts.si.PMT();
+            pmt = new mpegts.si.PMT();
             pmt.parse(tsPacket.getPayload());
 
             this.debug.log("[HlsDemux] PMT");
 
-            var track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'video';
-            track.trackId = 0;
-            track.streamType="h264";
-            track.timescale = 90000;
-
-            pidToTrackId[257] = 0;
-            track.pid = 257;
-            tracks.push(track);
-
-            track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'audio';
-            track.trackId = 1;
-            track.streamType="aac";
-            track.timescale = 90000;
-
-            pidToTrackId[256] = 1;
-            track.pid = 256;
-            tracks.push(track);
+            var trackIdCounter = 1;// start at 1
+            for (var i = 0; i < pmt.m_listOfComponents.length; i++) {
+                var elementStream = pmt.m_listOfComponents[i];
+                var track = new MediaPlayer.vo.Mp4Track();
+                switch (elementStream.m_stream_type) {
+                    case mpegts.si.PMT.prototype.MPEG2_VIDEO_STREAM_TYPE ://0x02
+                        //track.type = 'video';
+                        console.log("HlsDemux.getPMT() => MPEG2_VIDEO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.AVC_VIDEO_STREAM_TYPE ://0x1B
+                        track.type = 'video';
+                        track.streamType="h264";
+                        break;
+                    case mpegts.si.PMT.prototype.MPEG1_AUDIO_STREAM_TYPE ://0x03
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => MPEG1_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.MPEG2_AUDIO_STREAM_TYPE ://0x04
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => MPEG2_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.AAC_AUDIO_STREAM_TYPE  ://0x11
+                        track.type = 'audio';
+                        track.streamType="aac";
+                        break;
+                    case mpegts.si.PMT.prototype.AC3_AUDIO_STREAM_TYPE  ://0x06
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => AC3_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.SUB_STREAM_TYPE ://0x06
+                        console.log("HlsDemux.getPMT() => SUB_STREAM_TYPE detected but not implemented!");
+                        break;
+                    default :
+                        console.log("HlsDemux.getPMT() => unknown stream type ="+elementStream.m_stream_type+" detected but not implemented!");
+                }
+                track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
+                track.pid = elementStream.m_elementary_PID;
+                track.trackId = trackIdCounter;
+                pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
+                tracks.push(track);
+                trackIdCounter ++;
+            }
 
             return pmt;
         },
@@ -220,6 +243,7 @@ Hls.dependencies.HlsDemux = function () {
             var pesPacket = new mpegts.pes.PesPacket();
             pesPacket.parse(tsPacket.getPayload());
 
+<<<<<<< HEAD
             // H264
             if (track.streamType === "h264") {
 
@@ -240,6 +264,11 @@ Hls.dependencies.HlsDemux = function () {
             if (track.streamType === "aac") {
                 track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
                 track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
+=======
+            if (track.streamType === "h264") {
+                //track.codecs
+                track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
+>>>>>>> 2f493b297cb55152b024a57668c01dbd4a1d2468
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);

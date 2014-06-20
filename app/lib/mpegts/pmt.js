@@ -40,7 +40,7 @@ mpegts.si.PMT.prototype.parse = function (data) {
 		return;
 	}
 
-	var remainingBytes = this.getSectionLength() - this.SECTION_LENGTH; 
+	var remainingBytes = this.getSectionLength() - this.SECTION_LENGTH;
 
 	// check if we have almost PCR_PID and program_info_length fields
 	if (remainingBytes < 4)
@@ -72,6 +72,13 @@ mpegts.si.PMT.prototype.parse = function (data) {
 };
 
 mpegts.si.PMT.prototype.TABLE_ID	= 0x02;
+mpegts.si.PMT.prototype.MPEG2_VIDEO_STREAM_TYPE	= 0x02;
+mpegts.si.PMT.prototype.AVC_VIDEO_STREAM_TYPE	= 0x1B;
+mpegts.si.PMT.prototype.MPEG1_AUDIO_STREAM_TYPE	= 0x03;
+mpegts.si.PMT.prototype.MPEG2_AUDIO_STREAM_TYPE	= 0x04;
+mpegts.si.PMT.prototype.AAC_AUDIO_STREAM_TYPE	= 0x11;
+mpegts.si.PMT.prototype.AC3_AUDIO_STREAM_TYPE	= 0x06;
+mpegts.si.PMT.prototype.SUB_STREAM_TYPE			= 0x06;
 
 mpegts.si.ESDescription = function(data){
 	/** ES description fields */
