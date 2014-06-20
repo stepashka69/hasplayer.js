@@ -249,6 +249,9 @@ Hls.dependencies.HlsParser = function () {
 			request = new MediaPlayer.vo.SegmentRequest(),
 			self = this;
 
+
+		period.start = 0;
+
 		// Copy duration from first representation's duration
 		adaptationSet.duration = representation.duration;
 		period.duration = representation.duration;
@@ -257,9 +260,15 @@ Hls.dependencies.HlsParser = function () {
 		// Set manifest type, "static" vs "dynamic"
 		manifest.type = (manifest.mediaPresentationDuration === 0) ? "dynamic": "static";
 
-		// Dynamic use case => set manifest refresh period as the duration of 1 fragment/chunk
+		// Dynamic use case
 		if (manifest.type === "dynamic") {
+			// => set manifest refresh period as the duration of 1 fragment/chunk
 			manifest.minimumUpdatePeriod = adaptationSet.Representation_asArray[0].SegmentList.duration;
+
+			// => set availabilityStartTime property
+			var mpdLoadedTime = new Date();
+			var manifestDuration = representation.SegmentList.duration * representation.SegmentList.SegmentURL_asArray.length;
+			manifest.availabilityStartTime = new Date(mpdLoadedTime.getTime() - manifestDuration);
 		}
 
 		// Set initialization segment for each representation
