@@ -77,7 +77,6 @@ Hls.dependencies.HlsDemux = function () {
             for (var i = 0; i < pmt.m_listOfComponents.length; i++) {
                 var elementStream = pmt.m_listOfComponents[i];
                 var track = new MediaPlayer.vo.Mp4Track();
-                debugger;
                 var streamTypeDesc = pmt.gStreamTypes[elementStream.m_stream_type];
                 if (streamTypeDesc !== null) {
                     track.streamType = streamTypeDesc.name;
@@ -130,7 +129,7 @@ Hls.dependencies.HlsDemux = function () {
             if (trackId === undefined) {
                 return;
             }
-            debugger;
+
             //get track from tracks list
             //trackId start from 1, id in tab start from 0
             track = tracks[trackId-1];
@@ -192,7 +191,7 @@ Hls.dependencies.HlsDemux = function () {
                     track.data.set(sample.subSamples[s], offset);
                     offset += sample.subSamples[s].length;
                 }
-debugger;
+
                 // 
                 if (track.streamType.search('avc') !== -1) {
                     debugger;
