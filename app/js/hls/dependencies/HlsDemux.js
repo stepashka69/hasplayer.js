@@ -68,30 +68,53 @@ Hls.dependencies.HlsDemux = function () {
                 return null;
             }
 
-            var pmt = new mpegts.si.PMT();
+            pmt = new mpegts.si.PMT();
             pmt.parse(tsPacket.getPayload());
 
             this.debug.log("[HlsDemux] PMT");
 
-            var track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'video';
-            track.trackId = 0;
-            track.codecs="h264";
-            track.timescale = 90000;
-
-            pidToTrackId[257] = 0;
-            track.pid = 257;
-            tracks.push(track);
-
-            track = new MediaPlayer.vo.Mp4Track();
-            track.type = 'audio';
-            track.trackId = 1;
-            track.codecs="aac";
-            track.timescale = 90000;
-
-            pidToTrackId[256] = 1;
-            track.pid = 256;
-            tracks.push(track);
+            var trackIdCounter = 1;// start at 1
+            for (var i = 0; i < pmt.m_listOfComponents.length; i++) {
+                var elementStream = pmt.m_listOfComponents[i];
+                var track = new MediaPlayer.vo.Mp4Track();
+                switch (elementStream.m_stream_type) {
+                    case mpegts.si.PMT.prototype.MPEG2_VIDEO_STREAM_TYPE ://0x02
+                        //track.type = 'video';
+                        console.log("HlsDemux.getPMT() => MPEG2_VIDEO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.AVC_VIDEO_STREAM_TYPE ://0x1B
+                        track.type = 'video';
+                        track.streamType="h264";
+                        break;
+                    case mpegts.si.PMT.prototype.MPEG1_AUDIO_STREAM_TYPE ://0x03
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => MPEG1_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.MPEG2_AUDIO_STREAM_TYPE ://0x04
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => MPEG2_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.AAC_AUDIO_STREAM_TYPE  ://0x11
+                        track.type = 'audio';
+                        track.streamType="aac";
+                        break;
+                    case mpegts.si.PMT.prototype.AC3_AUDIO_STREAM_TYPE  ://0x06
+                        //track.type = 'audio';
+                        console.log("HlsDemux.getPMT() => AC3_AUDIO_STREAM_TYPE detected but not implemented!");
+                        break;
+                    case mpegts.si.PMT.prototype.SUB_STREAM_TYPE ://0x06
+                        console.log("HlsDemux.getPMT() => SUB_STREAM_TYPE detected but not implemented!");
+                        break;
+                    default :
+                        console.log("HlsDemux.getPMT() => unknown stream type ="+elementStream.m_stream_type+" detected but not implemented!");
+                }
+                track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
+                track.pid = elementStream.m_elementary_PID;
+                track.trackId = trackIdCounter;
+                pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
+                tracks.push(track);
+                trackIdCounter ++;
+            }
 
             return pmt;
         },
@@ -203,7 +226,8 @@ Hls.dependencies.HlsDemux = function () {
             var pesPacket = new mpegts.pes.PesPacket();
             pesPacket.parse(tsPacket.getPayload());
 
-            if (track.codecs === "h264") {
+            if (track.streamType === "h264") {
+                //track.codecs
                 track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
             }
 
@@ -244,7 +268,6 @@ Hls.dependencies.HlsDemux = function () {
                 i = 0;
 
             this.debug.log("[HlsDemux] Demux chunk, size = " + data.length + ", nb packets = " + nbPackets);
-            debugger;
 
             // Get PAT, PMT and tracks information if not yet received
             doGetTracks.call(this, data);
@@ -259,7 +282,7 @@ Hls.dependencies.HlsDemux = function () {
             while (i < data.length) {
 
                 demuxTsPacket.call(this, data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
-                i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
+                i += mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             // Re-assemble samples from sub-samples
