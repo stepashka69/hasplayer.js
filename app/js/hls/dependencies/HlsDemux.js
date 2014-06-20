@@ -77,36 +77,26 @@ Hls.dependencies.HlsDemux = function () {
             for (var i = 0; i < pmt.m_listOfComponents.length; i++) {
                 var elementStream = pmt.m_listOfComponents[i];
                 var track = new MediaPlayer.vo.Mp4Track();
-                switch (elementStream.m_stream_type) {
-                    case mpegts.si.PMT.prototype.MPEG2_VIDEO_STREAM_TYPE ://0x02
-                        //track.type = 'video';
-                        console.log("HlsDemux.getPMT() => MPEG2_VIDEO_STREAM_TYPE detected but not implemented!");
-                        break;
-                    case mpegts.si.PMT.prototype.AVC_VIDEO_STREAM_TYPE ://0x1B
-                        track.type = 'video';
-                        track.streamType="h264";
-                        break;
-                    case mpegts.si.PMT.prototype.MPEG1_AUDIO_STREAM_TYPE ://0x03
-                        //track.type = 'audio';
-                        console.log("HlsDemux.getPMT() => MPEG1_AUDIO_STREAM_TYPE detected but not implemented!");
-                        break;
-                    case mpegts.si.PMT.prototype.MPEG2_AUDIO_STREAM_TYPE ://0x04
-                        //track.type = 'audio';
-                        console.log("HlsDemux.getPMT() => MPEG2_AUDIO_STREAM_TYPE detected but not implemented!");
-                        break;
-                    case mpegts.si.PMT.prototype.AAC_AUDIO_STREAM_TYPE  ://0x11
-                        track.type = 'audio';
-                        track.streamType="aac";
-                        break;
-                    case mpegts.si.PMT.prototype.AC3_AUDIO_STREAM_TYPE  ://0x06
-                        //track.type = 'audio';
-                        console.log("HlsDemux.getPMT() => AC3_AUDIO_STREAM_TYPE detected but not implemented!");
-                        break;
-                    case mpegts.si.PMT.prototype.SUB_STREAM_TYPE ://0x06
-                        console.log("HlsDemux.getPMT() => SUB_STREAM_TYPE detected but not implemented!");
-                        break;
-                    default :
-                        console.log("HlsDemux.getPMT() => unknown stream type ="+elementStream.m_stream_type+" detected but not implemented!");
+                debugger;
+                var streamTypeDesc = pmt.gStreamTypes[elementStream.m_stream_type];
+                if (streamTypeDesc !== null) {
+                    track.streamType = streamTypeDesc.name;
+                    switch (streamTypeDesc.value) {
+                        case 0xE0 :
+                            track.type = "video";
+                            break;
+                        case 0xC0 :
+                            track.type = "audio";
+                            break;
+                        case 0xFC :
+                            track.type = "data";
+                            break;
+                        default :
+                            track.type = "und";
+                    }
+                }
+                else {
+                    console.log("Stream Type "+elementStream.m_stream_type+" unknown!");
                 }
                 track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
                 track.pid = elementStream.m_elementary_PID;
@@ -140,8 +130,10 @@ Hls.dependencies.HlsDemux = function () {
             if (trackId === undefined) {
                 return;
             }
-
-            track = tracks[trackId];
+            debugger;
+            //get track from tracks list
+            //trackId start from 1, id in tab start from 0
+            track = tracks[trackId-1];
 
             // PUSI => start storing new AU
             if (tsPacket.getPusi()) {
@@ -200,9 +192,10 @@ Hls.dependencies.HlsDemux = function () {
                     track.data.set(sample.subSamples[s], offset);
                     offset += sample.subSamples[s].length;
                 }
-
+debugger;
                 // 
-                if (track.codecs.contains('avc')) {
+                if (track.streamType.search('avc') !== -1) {
+                    debugger;
                     mpegts.h264.bytestreamToMp4(track.data);
                 }
             }
@@ -244,7 +237,7 @@ Hls.dependencies.HlsDemux = function () {
             pesPacket.parse(tsPacket.getPayload());
 
             // H264
-            if (track.streamType === "h264") {
+            if (track.streamType.search('H.264') !== -1) {
 
                 track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
                 track.codecs = "avc1.";
@@ -260,7 +253,7 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // AAC
-            if (track.streamType === "aac") {
+            if (track.streamType.search('AAC') !== -1) {
                 track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
                 track.codecs = "mp4a.40." + track.codecPrivateData;
             }
