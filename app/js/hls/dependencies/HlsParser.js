@@ -281,12 +281,12 @@ Hls.dependencies.HlsParser = function () {
 		representation = adaptationSet.Representation_asArray[0];
         request.type = "Initialization Segment";
         request.url = initialization.sourceURL;
-        request.range = "0-18799";
+        //request.range = "0-18799";
 
         var onLoaded = function(representation, response) {
 
 			// Parse initialization data to obtain codec information
-			var tracks = this.hlsDemux.demux(new Uint8Array(response.data));
+			var tracks = this.hlsDemux.getTracks(new Uint8Array(response.data));
 
 			deferred.resolve();
         };

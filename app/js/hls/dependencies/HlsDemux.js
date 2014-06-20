@@ -243,7 +243,6 @@ Hls.dependencies.HlsDemux = function () {
             var pesPacket = new mpegts.pes.PesPacket();
             pesPacket.parse(tsPacket.getPayload());
 
-<<<<<<< HEAD
             // H264
             if (track.streamType === "h264") {
 
@@ -264,11 +263,6 @@ Hls.dependencies.HlsDemux = function () {
             if (track.streamType === "aac") {
                 track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
                 track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
-=======
-            if (track.streamType === "h264") {
-                //track.codecs
-                track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
->>>>>>> 2f493b297cb55152b024a57668c01dbd4a1d2468
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
