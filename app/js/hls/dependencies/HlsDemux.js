@@ -31,7 +31,7 @@ Hls.dependencies.HlsDemux = function () {
                 var tsPacket = new mpegts.ts.TsPacket();
                 tsPacket.parse(data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
 
-                this.debug.log("[HlsDemux] TS packet: pid=" + tsPacket.getPid() + ", pusi = " + tsPacket.getPusi());
+                //this.debug.log("[HlsDemux] TS packet: pid=" + tsPacket.getPid() + ", pusi = " + tsPacket.getPusi());
                 
                 if ((tsPacket.getPid() === pid) && ((pusi === undefined) || (tsPacket.getPusi() === pusi))) {
                     return tsPacket;
@@ -254,7 +254,7 @@ Hls.dependencies.HlsDemux = function () {
             // AAC
             if (track.streamType.search('AAC') !== -1) {
                 track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
-                track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
+                track.codecs = "mp4a.40." + track.codecPrivateData;
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
