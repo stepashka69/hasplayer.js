@@ -129,8 +129,8 @@ Hls.dependencies.HlsDemux = function () {
 
                 // Store new access unit
                 sample = new MediaPlayer.vo.Mp4Track.Sample();
-                sample.dts = pesPacket.getDts();
-                sample.pts = pesPacket.getPts();
+                sample.pts = pesPacket.getPts().getValue();
+                sample.dts = (pesPacket.getDts() !== null) ? pesPacket.getDts().getValue() : sample.pts;
                 sample.size = 0;
                 sample.subSamples = [];
 
@@ -259,7 +259,7 @@ Hls.dependencies.HlsDemux = function () {
             while (i < data.length) {
 
                 demuxTsPacket.call(this, data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
-                i += mpegts.ts.mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
+                i += mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }
 
             // Re-assemble samples from sub-samples

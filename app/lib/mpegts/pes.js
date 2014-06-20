@@ -162,7 +162,7 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 
 	// Payload
 	this.m_nPayloadLength = this.m_nLength - uiHeaderLength;
-	this.m_payloadArray = data.subarray(uiHeaderLength,uiHeaderLength + this.m_cPayloadLength);
+	this.m_payloadArray = data.subarray(uiHeaderLength,uiHeaderLength + this.m_nPayloadLength);
 
 	this.m_bValid = true;
 };
