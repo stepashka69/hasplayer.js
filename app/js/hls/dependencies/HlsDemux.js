@@ -144,8 +144,8 @@ Hls.dependencies.HlsDemux = function () {
 
                 // Store new access unit
                 sample = new MediaPlayer.vo.Mp4Track.Sample();
-                sample.dts = pesPacket.getDts();
-                sample.pts = pesPacket.getPts();
+                sample.pts = pesPacket.getPts().getValue();
+                sample.dts = (pesPacket.getDts() !== null) ? pesPacket.getDts().getValue() : sample.pts;
                 sample.size = 0;
                 sample.subSamples = [];
 
@@ -202,6 +202,18 @@ debugger;
 
         },
 
+        arrayToHexString = function(array) {
+            var str = "";
+            for(var i = 0; i < array.length; i++) {
+                var h = array[i].toString(16);
+                if (h.length < 2) {
+                    h = "0" + h;
+                }
+                str += h;
+            }
+            return str;
+        },
+
         doInit = function () {
             pat = null;
             pmt = null;
@@ -215,15 +227,41 @@ debugger;
             // Get first TS packet containing start of a PES/sample
             tsPacket = getTsPacket.call(this, data, track.pid, true);
 
+            // We have no packet of track's PID , need some more packets to get track info
+            if (tsPacket === null) {
+                return null;
+            }
+
             // Get PES packet
             var pesPacket = new mpegts.pes.PesPacket();
             pesPacket.parse(tsPacket.getPayload());
 
+            // H264
             if (track.streamType === "h264") {
-                //track.codecs
-                track.codecPrivateData = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
+
+                track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
+                track.codecs = "avc1.";
+
+                // Extract from the CodecPrivateData field the hexadecimal representation of the following
+                // three bytes in the sequence parameter set NAL unit.
+                // => Find the SPS nal header
+                var nalHeader = /00000001[0-9]7/.exec(track.codecPrivateData);
+                if (nalHeader && nalHeader[0]) {
+                    // => Take the 6 characters after the SPS nalHeader (if it exists)
+                    track.codecs += track.codecPrivateData.substr(track.codecPrivateData.indexOf(nalHeader[0])+10, 6);
+                }
             }
 
+            // AAC
+            if (track.streamType === "aac") {
+                track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
+                track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
+            }
+
+            this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
+            this.debug.log("[HlsDemux] track codecs = " + track.codecs);
+
+            return track;
         },
 
         doGetTracks = function (data) {
@@ -247,8 +285,10 @@ debugger;
 
             // Get track information
             for (i = 0; i < tracks.length; i++) {
-                if (tracks[i].codecPrivateData === "") {
-                    //getTrackCodecInfo.call(this, data, tracks[i]);
+                if (tracks[i].codecs === "") {
+                    if (getTrackCodecInfo.call(this, data, tracks[i]) === null) {
+                        return null;
+                    }
                 }
             }
 
@@ -263,7 +303,9 @@ debugger;
             this.debug.log("[HlsDemux] Demux chunk, size = " + data.length + ", nb packets = " + nbPackets);
 
             // Get PAT, PMT and tracks information if not yet received
-            doGetTracks.call(this, data);
+            if (doGetTracks.call(this, data) === null) {
+                return null;
+            }
 
             // If PMT not received, then unable to demux
             if (pmt === null) {

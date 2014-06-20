@@ -16,6 +16,27 @@
 
 mpegts.aac.getAudioSpecificConfig = function (data) { // data as Uint8Array
 
+    // We need to parse the beginning of the adts_frame in order to get
+    // object type, sampling frequency and channel configuration
+
+    var profile = mpegts.binary.getValueFromByte(data[2], 0, 2);
+    var sampling_frequency_index = mpegts.binary.getValueFromByte(data[2], 2, 4);
+    var channel_configuration = mpegts.binary.getValueFrom2Bytes(data.subarray(2, 5), 7, 3);
+
+    var audioSpecificConfig = new Uint8Array(2);
+    audioSpecificConfig[0] = audioSpecificConfig[1] = 0;
+
+    // audioObjectType = profile
+    audioSpecificConfig[0] = profile << 3;
+
+    // samplingFrequencyIndex
+    audioSpecificConfig[0] |= (sampling_frequency_index & 0x0E) >> 1;
+    audioSpecificConfig[1] |= (sampling_frequency_index & 0x01) << 7;
+
+    // channelConfiguration
+    audioSpecificConfig[1] |= channel_configuration << 3;
+
+    return audioSpecificConfig;
 };
 
 mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
@@ -38,7 +59,8 @@ mpegts.aac.demuxADTS = function (data) { // data as Uint8Array
         var layer = mpegts.binary.getValueFromByte(data[i+i_frame], 5, 2);
         var protection_absent = mpegts.binary.getBitFromByte(data[i+i_frame], 7);
         i_frame++;
-        var sampling_frequency_index = mpegts.binary.getValueFromByte(data[i+i_frame], 2, 4);   
+        var profile = mpegts.binary.getValueFromByte(data[i+i_frame], 0, 2);
+        var sampling_frequency_index = mpegts.binary.getValueFromByte(data[i+i_frame], 2, 4);
         var channel_configuration = mpegts.binary.getValueFrom2Bytes(data[i+i_frame], 7, 3);
         i_frame++;
 
