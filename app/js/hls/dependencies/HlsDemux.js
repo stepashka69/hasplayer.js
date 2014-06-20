@@ -237,7 +237,7 @@ debugger;
             pesPacket.parse(tsPacket.getPayload());
 
             // H264
-            if (track.streamType === "h264") {
+            if (track.streamType.search('H.264') !== -1) {
 
                 track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
                 track.codecs = "avc1.";
@@ -253,7 +253,7 @@ debugger;
             }
 
             // AAC
-            if (track.streamType === "aac") {
+            if (track.streamType.search('AAC') !== -1) {
                 track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
                 track.codecs = "mp4a.40." + parseInt(track.codecPrivateData, 16);
             }
