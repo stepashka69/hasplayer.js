@@ -32,7 +32,7 @@ mpegts.si.PSISection.prototype.parse = function (data) {
 	var pointerField = data[id];
 
 	//if pointerField = 0 payload data start immediately otherwise, shift pointerField value
-	pointerField === 0? id++:id += pointerField;
+	id = pointerField === 0? id+1 : id+pointerField;
 
 	this.m_table_id					= data[id];
 	id++;
