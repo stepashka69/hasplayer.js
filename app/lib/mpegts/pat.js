@@ -48,7 +48,6 @@ mpegts.si.PAT.prototype.parse = function (data) {
 		{
 			// Network PID
 			this.m_network_pid = prog.getProgramMapPid();
-			SAFE_DELETE(aProgramAssociation);
 		}
 		else
 		{
