@@ -250,10 +250,16 @@ Hls.dependencies.HlsFragmentController = function () {
             // Initialize demux
             //rslt.hlsDemux.init();
 
+            var manifest = rslt.manifestModel.getValue();
+
             // Process the HLS chunk to get media tracks description
             //var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
             var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
 
+            //add track duration
+            for (var i = 0; i < tracks.length; i++) {
+                tracks[i].duration = manifest.mediaPresentationDuration;
+            }
             // Generate init segment (moov)
             return rslt.mp4Processor.generateInitSegment(tracks);
         },
