@@ -61,7 +61,6 @@ mpegts.si.PMT.prototype.parse = function (data) {
 	var pESDescription = null;
 	while (remainingBytes > 0)
 	{
-		//to do
 		pESDescription = new mpegts.si.ESDescription(data.subarray(id, id+remainingBytes));
 		this.m_listOfComponents.push(pESDescription);
 		remainingBytes -= pESDescription.getLength();

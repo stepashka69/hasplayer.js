@@ -193,7 +193,7 @@ Hls.dependencies.HlsDemux = function () {
                 }
 
                 // 
-                if (track.streamType.search('avc') !== -1) {
+                if (track.streamType.search('H.264') !== -1) {
                     debugger;
                     mpegts.h264.bytestreamToMp4(track.data);
                 }
