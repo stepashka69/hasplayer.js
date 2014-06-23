@@ -150,7 +150,7 @@ Hls.dependencies.HlsDemux = function () {
 
                 // In case the whole sample data is in current TS packet, do not create a sub-sample
                 if ((pesPacket.getPayload().length  + pesPacket.getHeaderLength()) <= tsPacket.getPayload().length) {
-                    sample.data.set(pesPacket.getPayload());
+                    sample.data = new Uint8Array(pesPacket.getPayload());
                 } else {
                     // Store payload of PES packet as a subsample
                     sample.subSamples.push(pesPacket.getPayload());
@@ -198,7 +198,6 @@ Hls.dependencies.HlsDemux = function () {
 
                 // 
                 if (track.streamType.search('H.264') !== -1) {
-                    debugger;
                     mpegts.h264.bytestreamToMp4(track.data);
                 }
             }
@@ -244,6 +243,10 @@ Hls.dependencies.HlsDemux = function () {
 
                 track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
                 track.codecs = "avc1.";
+
+                //test for track dimension...
+                track.width = 960;
+                track.height = 540;
 
                 // Extract from the CodecPrivateData field the hexadecimal representation of the following
                 // three bytes in the sequence parameter set NAL unit.
@@ -345,5 +348,3 @@ Hls.dependencies.HlsDemux = function () {
 Hls.dependencies.HlsDemux.prototype = {
     constructor: Hls.dependencies.HlsDemux
 };
-
-

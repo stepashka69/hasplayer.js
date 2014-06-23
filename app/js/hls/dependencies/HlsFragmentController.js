@@ -118,7 +118,7 @@ Hls.dependencies.HlsFragmentController = function () {
             // Get track id corresponding to adaptation set
             var manifest = rslt.manifestModel.getValue();
             var trackId = getIndex(adaptation, manifest) + 1; // +1 since track_id shall start from '1'
-
+            debugger;
             // Create new fragment
             var fragment = mp4lib.deserialize(data);
 
@@ -264,6 +264,17 @@ Hls.dependencies.HlsFragmentController = function () {
             return rslt.mp4Processor.generateInitSegment(tracks);
         },
 
+        generateMediaSegment = function(data) {
+            // Initialize demux
+            //rslt.hlsDemux.init();
+
+            // Process the HLS chunk to get media tracks description
+            //var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
+            var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
+
+            // Generate media segment (moov)
+            return rslt.mp4Processor.generateMediaSegment(tracks);
+        },
 
         getInitData = function(representation) {
             // return data in byte format
@@ -337,11 +348,13 @@ Hls.dependencies.HlsFragmentController = function () {
             // (Note: here representations is of type Dash.vo.Representation)
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
 
-            var res = convertFragment(result, request, adaptation);
-            result = res.bytes;
+            //var res = convertFragment(result, request, adaptation);
+debugger;
+            result = generateMediaSegment(bytes);
+           /* result = res.bytes;
             if (res.segmentsUpdated) {
                 representations = [];
-            }
+            }*/
         }
 
         // Note: request = 'undefined' in case of initialization segments

@@ -13,7 +13,7 @@
  */
 
 mpegts.ts.AdaptationField = function(){
- 	/** adaptation field fields */
+	/** adaptation field fields */
     this.m_cAFLength = null;
     this.m_bDiscontinuityInd = null;
     this.m_bRAI = null;
@@ -36,6 +36,7 @@ mpegts.ts.AdaptationField.prototype.parse = function(data) {
 
 	if (this.m_cAFLength === 0)
 	{
+		debugger;
 		console.log("AdaptationField Length Problem!");
         return;
 	}
