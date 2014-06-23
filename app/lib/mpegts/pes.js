@@ -201,7 +201,9 @@ mpegts.pes.PesPacket.prototype.hasOptionalPESHeader = function() {
 };
 
 mpegts.pes.PesPacket.prototype.getHeaderLength = function() {
-    //return m_nPID;
+    return 	mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH +
+    		mpegts.pes.PesPacket.prototype.FIXED_OPTIONAL_HEADER_LENGTH + 
+    		this.m_cPES_header_data_length;
 };
 
 mpegts.pes.PesPacket.prototype.getPayload = function() {

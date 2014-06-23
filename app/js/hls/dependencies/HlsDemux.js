@@ -148,9 +148,13 @@ Hls.dependencies.HlsDemux = function () {
                 sample.size = 0;
                 sample.subSamples = [];
 
-                // Store payload of PES packet as a subsample
-                sample.subSamples.push(pesPacket.getPayload());
-
+                // In case the whole sample data is in current TS packet, do not create a sub-sample
+                if ((pesPacket.getPayload().length  + pesPacket.getHeaderLength()) <= tsPacket.getPayload().length) {
+                    sample.data.set(pesPacket.getPayload());
+                } else {
+                    // Store payload of PES packet as a subsample
+                    sample.subSamples.push(pesPacket.getPayload());
+                }
                 track.samples.push(sample);
             }
             else {
@@ -253,8 +257,10 @@ Hls.dependencies.HlsDemux = function () {
 
             // AAC
             if (track.streamType.search('AAC') !== -1) {
-                track.codecPrivateData = arrayToHexString(mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload()));
-                track.codecs = "mp4a.40." + track.codecPrivateData;
+                var codecPrivateData = mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload());
+                var objectType = (codecPrivateData[0] & 0xF8) >> 3;
+                track.codecPrivateData = arrayToHexString(codecPrivateData);
+                track.codecs = "mp4a.40.2";// + objectType;
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);

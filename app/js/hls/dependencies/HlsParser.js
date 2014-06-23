@@ -305,6 +305,14 @@ Hls.dependencies.HlsParser = function () {
 			// Parse initialization data to obtain codec information
 			var tracks = this.hlsDemux.getTracks(new Uint8Array(response.data));
 
+			representation.codecs = "";
+			for (var i = 0; i < tracks.length; i++) {
+				representation.codecs += tracks[i].codecs;
+				if (i < (tracks.length - 1)) {
+					representation.codecs += ", ";
+				}
+			}
+
 			deferred.resolve();
         };
 
@@ -407,10 +415,10 @@ Hls.dependencies.HlsParser = function () {
 					// children: [],
 					id: representationId.toString(),
 					mimeType: "video/mp4",
-					codecs: "avc1.42E01E, mp4a.40.2",
+					codecs: "", // Completed at initialization segment parsing
 					bandwidth: stream.bandwidth,
-					width: parseInt(stream.resolution.split('x')[0], 10),
-					height: parseInt(stream.resolution.split('x')[1], 10),
+					width: 0, //parseInt(stream.resolution.split('x')[0], 10),
+					height: 0, //parseInt(stream.resolution.split('x')[1], 10),
 					BaseURL: adaptationSet.BaseURL,
 					url: (stream.uri.indexOf('http') > -1) ? stream.uri : adaptationSet.BaseURL + stream.uri
 				};

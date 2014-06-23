@@ -787,7 +787,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         // MOOF
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        createMovieHeaderBoxFragment = function(sequenceNumber) {
+        createMovieFragmentHeaderBox = function(sequenceNumber) {
 
             // Movie Fragment Header Box
             // The movie fragment header contains a sequence number, as a safety check. The sequence number usually
