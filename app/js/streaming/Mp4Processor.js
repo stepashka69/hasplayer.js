@@ -721,8 +721,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 trex.default_sample_size = 0;               // ''
                 
                 // add trex box in mvex box
-                mvex.boxes.push(trex);                
-            }  
+                mvex.boxes.push(trex);
+            }
 
             return mvex;
         },
@@ -763,7 +763,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             for (i = 0; i < tracks.length; i++) {
                 // Create and add Track box (trak)
-                moov.boxes.push(createTrackBox(tracks[i]));                
+                moov.boxes.push(createTrackBox(tracks[i]));
             }
 
             // Create and add MovieExtends box (mvex)

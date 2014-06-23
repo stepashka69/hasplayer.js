@@ -13,8 +13,8 @@
  */
 
 mpegts.pes.PesPacket = function(){
-	this.m_cStreamID					= null;            
-	this.m_nPESPacketLength				= null;        
+	this.m_cStreamID					= null;
+	this.m_nPESPacketLength				= null;
 	this.m_cPESScramblingCtrl			= null;
 	this.m_bPESpriority					= null;
 	this.m_bDataAlignement				= null;
