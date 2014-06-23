@@ -182,8 +182,10 @@ Hls.dependencies.HlsParser = function () {
 			version,
 			media,
 			duration = 0,
-			i;
+			i,
+			self = this;
 
+		console.log(data);
 		data = _splitLines(data);
 
 		// Check playlist header
@@ -235,6 +237,9 @@ Hls.dependencies.HlsParser = function () {
 			}
 		}
 
+		// PATCH Live = VOD
+		representation.duration = duration;
+
 		deferred.resolve();
 	};
 
@@ -271,6 +276,9 @@ Hls.dependencies.HlsParser = function () {
 			manifest.availabilityStartTime = new Date(mpdLoadedTime.getTime() - manifestDuration);
 		}
 
+		// Set minBufferTime            
+		manifest.minBufferTime = representation.SegmentList.duration - 1;//MediaPlayer.dependencies.BufferExtensions.DEFAULT_MIN_BUFFER_TIME
+
 		// Set initialization segment for each representation
 		// And download initialization data (PSI, IDR...) to obtain codec information
 		var requestPromiseArray = [];
@@ -279,10 +287,10 @@ Hls.dependencies.HlsParser = function () {
 			
 			// Set initialization segment info
 			initialization = {
-				name: "InitializationSegment",
+				name: "Initialization",
 				sourceURL: representation.SegmentList.SegmentURL_asArray[0].media
 			};
-			representation.SegmentList.InitializationSegment = initialization;
+			representation.SegmentList.Initialization = initialization;
 
 		}
 
@@ -475,6 +483,7 @@ Hls.dependencies.HlsParser = function () {
 
 	var internalParse = function(data, baseUrl) {
 		this.debug.log("[HlsParser]", "Doing parse.");
+		console.log(data);
 		return processManifest.call(this, _splitLines(data),baseUrl);
 	};
 

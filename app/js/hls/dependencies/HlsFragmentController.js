@@ -245,15 +245,16 @@ Hls.dependencies.HlsFragmentController = function () {
 
 
 
-        generateInitSegment = function(data, adaptation) {
+        generateInitSegment = function(data) {
 
             // Initialize demux
-            this.hlsDemux.init();
+            rslt.hlsDemux.init();
 
             // Process the HLS chunk to get media tracks description
-            this.hlsDemux.process(data);
+            var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
 
-            // For each track
+            // Generate init segment (moov)
+            return rslt.mp4Processor.generateInitSegment(tracks);
         },
 
 
@@ -313,31 +314,22 @@ Hls.dependencies.HlsFragmentController = function () {
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
-            manifest = this.manifestModel.getValue(),
-            adaptation = null;
-
-        if ((representations === null) || (representations === undefined) || (representations.length === 0)) {
-            return Q.when(bytes);
-        }
+            manifest = this.manifestModel.getValue();
 
         if ((bytes === null) || (bytes === undefined) || (bytes.byteLength === 0)) {
             return Q.when(bytes);
         }
 
-        // Get current adaptation containing provided representations
-        // (Note: here representations is of type Dash.vo.Representation)
-        adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
-
         // Intialize output data
         result = new Uint8Array(bytes);
 
-        // Initialization segment => generate moov initialization segment from PSI tables
-        if (request && (request.type === "Initialization Segment")) {
-            result = generateInitSegment(bytes, adaptation);
-        }
-
         // Media segment => genrate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
-        if (request && (request.type === "Media Segment")) {
+        if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
+
+            // Get current adaptation containing provided representations
+            // (Note: here representations is of type Dash.vo.Representation)
+            var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
+
             var res = convertFragment(result, request, adaptation);
             result = res.bytes;
             if (res.segmentsUpdated) {
@@ -345,21 +337,27 @@ Hls.dependencies.HlsFragmentController = function () {
             }
         }
 
-        // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
         // Note: request = 'undefined' in case of initialization segments
-        if ((request === undefined) && (navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
-            var init_segment = mp4lib.deserialize(result);
-            // FIXME unused variables ?
-            var moov = init_segment.getBoxByType("moov");
-            var mvhd = moov.getBoxByType("mvhd");
-            var trak = moov.getBoxByType("trak");
-            var mdia = trak.getBoxByType("mdia");
-            var mdhd = mdia.getBoxByType("mdhd");
+        if ((request === undefined)) {
 
-            mvhd.timescale /= 1000;
-            mdhd.timescale /= 1000;
+            // Initialization segment => generate moov initialization segment from PSI tables
+            result = generateInitSegment(bytes);
 
-            result = mp4lib.serialize(init_segment);
+            // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
+            /*if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
+                var init_segment = mp4lib.deserialize(result);
+                // FIXME unused variables ?
+                var moov = init_segment.getBoxByType("moov");
+                var mvhd = moov.getBoxByType("mvhd");
+                var trak = moov.getBoxByType("trak");
+                var mdia = trak.getBoxByType("mdia");
+                var mdhd = mdia.getBoxByType("mdhd");
+
+                mvhd.timescale /= 1000;
+                mdhd.timescale /= 1000;
+
+                result = mp4lib.serialize(init_segment);
+            }*/
         }
 
         if (request !== undefined) {
