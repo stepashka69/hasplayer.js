@@ -150,6 +150,7 @@ Hls.dependencies.HlsDemux = function () {
 
                 // In case the whole sample data is in current TS packet, do not create a sub-sample
                 if ((pesPacket.getPayload().length  + pesPacket.getHeaderLength()) <= tsPacket.getPayload().length) {
+                    sample.data = new Uint8Array(pesPacket.getPayload().length);
                     sample.data.set(pesPacket.getPayload());
                 } else {
                     // Store payload of PES packet as a subsample
@@ -198,7 +199,6 @@ Hls.dependencies.HlsDemux = function () {
 
                 // 
                 if (track.streamType.search('H.264') !== -1) {
-                    debugger;
                     mpegts.h264.bytestreamToMp4(track.data);
                 }
             }
@@ -242,7 +242,8 @@ Hls.dependencies.HlsDemux = function () {
             // H264
             if (track.streamType.search('H.264') !== -1) {
 
-                track.codecPrivateData = arrayToHexString(mpegts.h264.getSequenceHeader(pesPacket.getPayload()));
+                var sequenceHeader = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
+                track.codecPrivateData = arrayToHexString(sequenceHeader.bytes);
                 track.codecs = "avc1.";
 
                 // Extract from the CodecPrivateData field the hexadecimal representation of the following
@@ -253,6 +254,10 @@ Hls.dependencies.HlsDemux = function () {
                     // => Take the 6 characters after the SPS nalHeader (if it exists)
                     track.codecs += track.codecPrivateData.substr(track.codecPrivateData.indexOf(nalHeader[0])+10, 6);
                 }
+
+                // Extract width and height from SPS
+                track.width = sequenceHeader.width;
+                track.height = sequenceHeader.height;
             }
 
             // AAC
