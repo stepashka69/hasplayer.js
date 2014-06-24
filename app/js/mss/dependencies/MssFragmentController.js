@@ -133,6 +133,7 @@ Mss.dependencies.MssFragmentController = function () {
             var sepiff = traf.getBoxByType("sepiff");
             if(sepiff !== null) {
                 sepiff.boxtype = "senc";
+                sepiff.extended_type = undefined;
                 // Create Sample Auxiliary Information Offsets Box box (saio) 
                 var saio = new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
                 saio.version = 0;
