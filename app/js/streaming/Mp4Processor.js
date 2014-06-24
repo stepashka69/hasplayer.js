@@ -837,8 +837,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             tfhd.version = 0;
             tfhd.flags = 0x020000; // set tfhd.default-base-is-moof to true
 
-            tfhd.track_ID = track.trakId;
-
+            tfhd.track_ID = track.trackId;
 
             return tfhd;
         },
@@ -887,6 +886,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
             trun.samples_table = [];
 
+            trun.sample_count = track.samples.length;
+
             for (i = 0; i < track.samples.length; i++) {
                 trun.samples_table.push({
                     sample_duration: track.samples[i].duration,
@@ -932,6 +933,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 moof.boxes.push(createTrackFragmentBox(tracks[i]));
             }
 
+            moof_file.boxes.push(moof);
             // Determine total length of output fragment file
             length = moof_file.getLength();
 
