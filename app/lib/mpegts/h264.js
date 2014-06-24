@@ -265,11 +265,12 @@ mpegts.h264.parseSPS = function (data) {
 mpegts.h264.bytestreamToMp4 = function (data) { // data as Uint8Array
 
     var i = 0,
-        startCodeOffset = 0,
+        length = data.length,
+        startCodeOffset = -1,
         naluSize = 0;
 
-    while (i < data.length) {
-        if ((i == length) || ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01))) {
+    while (i < length) {
+        if ((i === (length - 1)) || ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01))) {
 
             if (startCodeOffset > 0) {
                 naluSize = (i - startCodeOffset - 4); // 4 = start code length or NALU-size field length

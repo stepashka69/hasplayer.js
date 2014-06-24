@@ -148,14 +148,9 @@ Hls.dependencies.HlsDemux = function () {
                 sample.size = 0;
                 sample.subSamples = [];
 
-                // In case the whole sample data is in current TS packet, do not create a sub-sample
-                if ((pesPacket.getPayload().length  + pesPacket.getHeaderLength()) <= tsPacket.getPayload().length) {
-                    sample.data = new Uint8Array(pesPacket.getPayload().length);
-                    sample.data.set(pesPacket.getPayload());
-                } else {
-                    // Store payload of PES packet as a subsample
-                    sample.subSamples.push(pesPacket.getPayload());
-                }
+                // Store payload of PES packet as a subsample
+                sample.subSamples.push(pesPacket.getPayload());
+
                 track.samples.push(sample);
             }
             else {
@@ -196,13 +191,12 @@ Hls.dependencies.HlsDemux = function () {
                     track.data.set(sample.subSamples[s], offset);
                     offset += sample.subSamples[s].length;
                 }
-
-                // 
-                if (track.streamType.search('H.264') !== -1) {
-                    mpegts.h264.bytestreamToMp4(track.data);
-                }
             }
 
+            // In case of H.264 stream, convert bytestream to MP4 format (NALU size field instead of start codes)
+            if (track.streamType.search('H.264') !== -1) {
+                mpegts.h264.bytestreamToMp4(track.data);
+            }
         },
 
         arrayToHexString = function(array) {
@@ -227,6 +221,10 @@ Hls.dependencies.HlsDemux = function () {
 
             var tsPacket;
 
+            if (track.codecs !== "") {
+                return track;
+            }
+
             // Get first TS packet containing start of a PES/sample
             tsPacket = getTsPacket.call(this, data, track.pid, true);
 
@@ -241,7 +239,6 @@ Hls.dependencies.HlsDemux = function () {
 
             // H264
             if (track.streamType.search('H.264') !== -1) {
-
                 var sequenceHeader = mpegts.h264.getSequenceHeader(pesPacket.getPayload());
                 track.codecPrivateData = arrayToHexString(sequenceHeader.bytes);
                 track.codecs = "avc1.";
@@ -276,8 +273,6 @@ Hls.dependencies.HlsDemux = function () {
 
         doGetTracks = function (data) {
 
-            var i;
-
             // Parse PSI (PAT, PMT) if not yet received
             if (pat === null) {
                 pat = getPAT.call(this, data);
@@ -293,12 +288,11 @@ Hls.dependencies.HlsDemux = function () {
                 }
             }
 
-            // Get track information
-            for (i = 0; i < tracks.length; i++) {
+            // Get track information and remove tracks for which we did not manage to get codec information (no packet ?!)
+            for(var i = tracks.length - 1; i >= 0; i--) {
+                getTrackCodecInfo.call(this, data, tracks[i]);
                 if (tracks[i].codecs === "") {
-                    if (getTrackCodecInfo.call(this, data, tracks[i]) === null) {
-                        return null;
-                    }
+                    tracks.splice(i, 1);
                 }
             }
 
@@ -322,10 +316,15 @@ Hls.dependencies.HlsDemux = function () {
                 return tracks;
             }
 
+            // Clear current tracks' data
+            for (i = 0; i < tracks.length; i++) {
+                tracks[i].samples = [];
+                tracks[i].data = null;
+            }
+
             // Parse and demux TS packets
             i = 0;
             while (i < data.length) {
-
                 demuxTsPacket.call(this, data.subarray(i, i + mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
                 i += mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
             }

@@ -36,8 +36,7 @@ mpegts.ts.AdaptationField.prototype.parse = function(data) {
 
 	if (this.m_cAFLength === 0)
 	{
-		debugger;
-		console.log("AdaptationField Length Problem!");
+		// = exactly 1 stuffing byte
         return;
 	}
 

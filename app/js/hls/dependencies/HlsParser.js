@@ -297,7 +297,7 @@ Hls.dependencies.HlsParser = function () {
 		// Download initialization data (PSI, IDR...) of 1st representation to obtain codec information
 		representation = adaptationSet.Representation_asArray[0];
         request.type = "Initialization Segment";
-        request.url = initialization.sourceURL;
+        request.url = representation.SegmentList.Initialization.sourceURL;
         //request.range = "0-18799";
 
         var onLoaded = function(representation, response) {

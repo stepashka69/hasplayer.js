@@ -256,7 +256,7 @@ Hls.dependencies.HlsFragmentController = function () {
             //var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
             var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
 
-            //add track duration
+            // Add track duration
             for (var i = 0; i < tracks.length; i++) {
                 tracks[i].duration = manifest.mediaPresentationDuration;
             }
@@ -349,7 +349,6 @@ Hls.dependencies.HlsFragmentController = function () {
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
 
             //var res = convertFragment(result, request, adaptation);
-debugger;
             result = generateMediaSegment(bytes);
            /* result = res.bytes;
             if (res.segmentsUpdated) {

@@ -6,6 +6,11 @@
             "browsers": "cdsbi"
         },
         {
+            "name": "Apple HLS Envivo",
+            "url": "http://localhost/VIDEO/HLS/Envivio/index.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
             "name": "DASH + PlayReady DRM",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
