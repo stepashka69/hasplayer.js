@@ -13,8 +13,8 @@
  */
 
 mpegts.pes.PesPacket = function(){
-	this.m_cStreamID					= null;            
-	this.m_nPESPacketLength				= null;        
+	this.m_cStreamID					= null;
+	this.m_nPESPacketLength				= null;
 	this.m_cPESScramblingCtrl			= null;
 	this.m_bPESpriority					= null;
 	this.m_bDataAlignement				= null;
@@ -202,8 +202,8 @@ mpegts.pes.PesPacket.prototype.hasOptionalPESHeader = function() {
 
 mpegts.pes.PesPacket.prototype.getHeaderLength = function() {
     return 	mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH +
-    		mpegts.pes.PesPacket.prototype.FIXED_OPTIONAL_HEADER_LENGTH + 
-    		this.m_cPES_header_data_length;
+			mpegts.pes.PesPacket.prototype.FIXED_OPTIONAL_HEADER_LENGTH + 
+			this.m_cPES_header_data_length;
 };
 
 mpegts.pes.PesPacket.prototype.getPayload = function() {

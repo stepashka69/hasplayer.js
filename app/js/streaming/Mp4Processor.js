@@ -721,8 +721,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 trex.default_sample_size = 0;               // ''
                 
                 // add trex box in mvex box
-                mvex.boxes.push(trex);                
-            }  
+                mvex.boxes.push(trex);
+            }
 
             return mvex;
         },
@@ -763,7 +763,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             for (i = 0; i < tracks.length; i++) {
                 // Create and add Track box (trak)
-                moov.boxes.push(createTrackBox(tracks[i]));                
+                moov.boxes.push(createTrackBox(tracks[i]));
             }
 
             // Create and add MovieExtends box (mvex)
@@ -818,7 +818,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             traf.boxes.push(createTrackFragmentHeaderBox(track));
 
             // Add Track Fragment Decode Time box (tfdt)
-            traf.boxes.push(createTrackFragmentDecodeTimeBox(track));
+            traf.boxes.push(createTrackFragmentBaseMediaDecodeTimeBox(track));
 
             // Add Track Fragment Run box (tfdt)
             traf.boxes.push(createTrackFragmentRunBox(track));
@@ -843,7 +843,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             return tfhd;
         },
 
-        createTrackFragmentDecodeTimeBox = function(track) {
+        createTrackFragmentBaseMediaDecodeTimeBox = function(track) {
 
             // Track Fragment Base Media Decode Time Box
             // The Track Fragment Base Media Decode Time Box provides the absolute decode time, measured on the
@@ -854,7 +854,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // The Track Fragment Base Media Decode Time Box, if present, shall be positioned after the Track Fragment
             // Header Box and before the first Track Fragment Run box.
 
-            var tfdt = new mp4lib.boxes.TrackFragmentDecodeTimeBox();
+            var tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
 
             tfdt.version = 0;
             tfdt.flags = 1; // baseMediaDecodeTime on 64 bits
@@ -885,9 +885,10 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
 
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
+            trun.samples_table = [];
 
             for (i = 0; i < track.samples.length; i++) {
-                track.samples_table.push({
+                trun.samples_table.push({
                     sample_duration: track.samples[i].duration,
                     sample_size: track.samples[i].size,
                     sample_composition_time_offset: track.samples[i].cts - 0
@@ -947,7 +948,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 length += tracks[i].data.length;
 
                 // Create mdat
-                moof.boxes.push(createMdatBox(tracks[i]));
+                moof.boxes.push(createMediaDataBox(tracks[i]));
             }
 
             data = mp4lib.serialize(moof_file);

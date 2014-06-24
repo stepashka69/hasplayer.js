@@ -350,5 +350,3 @@ Hls.dependencies.HlsDemux = function () {
 Hls.dependencies.HlsDemux.prototype = {
     constructor: Hls.dependencies.HlsDemux
 };
-
-
