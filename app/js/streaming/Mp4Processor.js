@@ -950,7 +950,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 length += tracks[i].data.length;
 
                 // Create mdat
-                moof.boxes.push(createMediaDataBox(tracks[i]));
+                moof_file.boxes.push(createMediaDataBox(tracks[i]));
             }
 
             data = mp4lib.serialize(moof_file);
