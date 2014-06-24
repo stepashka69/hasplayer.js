@@ -150,21 +150,27 @@ Mss.dependencies.MssFragmentController = function () {
 
                 var sizedifferent = false;
                 // get for each sample_info the size
-                for (i = 0; i < sepiff.sample_count; i++) {
-                    saiz.sample_info_size[i] = 8+(sepiff.entry[i].NumberOfEntries*6)+2;
-                    //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
-                    if(i>1) {
-                        if (saiz.sample_info_size[i] != saiz.sample_info_size[i-1]) {
-                            sizedifferent = true;
+                if (sepiff.flags & 2) {
+                    for (i = 0; i < sepiff.sample_count; i++) {
+                        saiz.sample_info_size[i] = 8+(sepiff.entry[i].NumberOfEntries*6)+2;
+                        //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
+                        if(i>1) {
+                            if (saiz.sample_info_size[i] != saiz.sample_info_size[i-1]) {
+                                sizedifferent = true;
+                            }
                         }
                     }
+
+                    //all the samples have the same size
+                    //set default size and remove the table.
+                    if (sizedifferent === false) {
+                        saiz.default_sample_info_size = saiz.sample_info_size[0];
+                        saiz.sample_info_size = [];
+                    }
                 }
-                
-                //all the samples have the same size
-                //det default size and remove the table.
-                if (sizedifferent === false) {
-                    saiz.default_sample_info_size = saiz.sample_info_size[0];
-                    saiz.sample_info_size = [];
+                else{
+                    //if flags === 0 (ex: audio data), default sample size = Init Vector size (8)
+                    saiz.default_sample_info_size = 8;
                 }
 
                 //add saio and saiz box
