@@ -820,7 +820,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // Add Track Fragment Decode Time box (tfdt)
             traf.boxes.push(createTrackFragmentBaseMediaDecodeTimeBox(track));
 
-            // Add Track Fragment Run box (tfdt)
+            // Add Track Fragment Run box (trun)
             traf.boxes.push(createTrackFragmentRunBox(track));
 
             return traf;
