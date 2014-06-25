@@ -855,8 +855,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             var tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
 
-            tfdt.version = 0;
-            tfdt.flags = 1; // baseMediaDecodeTime on 64 bits
+            tfdt.version = 1;// baseMediaDecodeTime on 64 bits
+            tfdt.flags = 0;
 
             tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].cts : 0;
 
