@@ -143,8 +143,8 @@ Hls.dependencies.HlsDemux = function () {
 
                 // Store new access unit
                 sample = new MediaPlayer.vo.Mp4Track.Sample();
-                sample.pts = pesPacket.getPts().getValue();
-                sample.dts = (pesPacket.getDts() !== null) ? pesPacket.getDts().getValue() : sample.pts;
+                sample.cts = pesPacket.getPts().getValue();
+                sample.dts = (pesPacket.getDts() !== null) ? pesPacket.getDts().getValue() : sample.cts;
                 sample.size = 0;
                 sample.subSamples = [];
 

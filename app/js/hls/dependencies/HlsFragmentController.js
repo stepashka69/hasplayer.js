@@ -273,7 +273,7 @@ Hls.dependencies.HlsFragmentController = function () {
             var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
 
             // Generate media segment (moov)
-            return rslt.mp4Processor.generateMediaSegment(tracks);
+            return rslt.mp4Processor.generateMediaSegment(tracks, rslt.sequenceNumber++);
         },
 
         getInitData = function(representation) {
@@ -328,6 +328,8 @@ Hls.dependencies.HlsFragmentController = function () {
     rslt.manifestModel = undefined;
     rslt.hlsDemux = undefined;
     rslt.mp4Processor = undefined;
+
+    rslt.sequenceNumber = 0;
 
     rslt.process = function (bytes, request, representations) {
 
