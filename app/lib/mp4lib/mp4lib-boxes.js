@@ -1508,10 +1508,10 @@ mp4lib.boxes.TrackFragmentRunBox.prototype.computeLength = function() {
     mp4lib.boxes.FullBox.prototype.computeLength.call(this);
     var i = 0;
     this.size += mp4lib.fields.FIELD_UINT32.getLength(); //sample_count size
-    if (this.data_offset !== undefined){
+    if ((this.flags & 0x000001) !== 0 && this.data_offset !== undefined){
         this.size += mp4lib.fields.FIELD_INT32.getLength();
     }
-    if (this.first_sample_flags !== undefined){
+    if ((this.flags & 0x000004) !== 0 && this.first_sample_flags !== undefined){
         this.size += mp4lib.fields.FIELD_UINT32.getLength();
     }
 
