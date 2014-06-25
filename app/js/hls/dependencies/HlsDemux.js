@@ -169,15 +169,19 @@ Hls.dependencies.HlsDemux = function () {
             var sample,
                 length = 0,
                 offset = 0,
+                subSamplesLength,
                 i, s;
 
             // Re-assemble sub-sample parts into
             for (i = 0; i < track.samples.length; i++) {
+                subSamplesLength = 0;
                 sample = track.samples[i];
 
                 for (s = 0; s < sample.subSamples.length; s++) {
-                    length += sample.subSamples[s].length;
+                    subSamplesLength += sample.subSamples[s].length;
                 }
+                sample.size = subSamplesLength;
+                length += subSamplesLength;
             }
 
             // Allocate track data

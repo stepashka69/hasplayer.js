@@ -886,8 +886,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             trun.flags = 0x000001 | // data-offset-present
                          sample_duration_present_flag | // sample-duration-present
                          0x000200 | // sample-size-present
-                         (track.type === 'video') ? 0x000800 : 0x000000; // sample-composition-time-offsets-present
-
+                         ((track.type === 'video') ? 0x000800 : 0x000000); // sample-composition-time-offsets-present
 
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
             trun.samples_table = [];
