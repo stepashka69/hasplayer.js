@@ -1516,23 +1516,23 @@ mp4lib.boxes.TrackFragmentRunBox.prototype.computeLength = function() {
     }
 
     for (i = 0; i < this.sample_count; i++){
-        if (this.samples_table[i].sample_duration !== undefined){
+        if ((this.flags & 0x000100) !== 0 && this.samples_table[i].sample_duration !== undefined){
             this.size += mp4lib.fields.FIELD_UINT32.getLength();
         }
-        if (this.samples_table[i].sample_size !== undefined){
+        if ((this.flags & 0x000200) !== 0 && this.samples_table[i].sample_size !== undefined){
             this.size += mp4lib.fields.FIELD_UINT32.getLength();
         }
-        if (this.samples_table[i].sample_flags !== undefined){
+        if ((this.flags & 0x000400) !== 0 && this.samples_table[i].sample_flags !== undefined){
             this.size += mp4lib.fields.FIELD_UINT32.getLength();
         }
 
         if (this.version === 1){
-            if (this.samples_table[i].sample_composition_time_offset !== undefined){
+            if ((this.flags & 0x000800) !== 0 && this.samples_table[i].sample_composition_time_offset !== undefined){
                 this.size += mp4lib.fields.FIELD_INT32.getLength();
             }
         }
         else {
-            if (this.samples_table[i].sample_composition_time_offset !== undefined){
+            if ((this.flags & 0x000800) !== 0 && this.samples_table[i].sample_composition_time_offset !== undefined){
                 this.size += mp4lib.fields.FIELD_UINT32.getLength();
             }
         }
