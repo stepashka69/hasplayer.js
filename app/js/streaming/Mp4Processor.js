@@ -874,25 +874,30 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // new fields to be defined.
 
             var trun = new mp4lib.boxes.TrackFragmentRunBox(),
-                i;
+                i,
+                cts_base,
+                sample_duration_present_flag;
+
+            cts_base = track.samples[0].cts;
+             sample_duration_present_flag = (track.samples[0].duration > 0) ? 0x000100 : 0x000000;
+
 
             trun.version = 0;
             trun.flags = 0x000001 | // data-offset-present
-                         0x000100 | // sample-duration-present
+                         sample_duration_present_flag | // sample-duration-present
                          0x000200 | // sample-size-present
                          (track.type === 'video') ? 0x000100 : 0x000000; // sample-composition-time-offsets-present
 
 
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
             trun.samples_table = [];
-
             trun.sample_count = track.samples.length;
 
             for (i = 0; i < track.samples.length; i++) {
                 trun.samples_table.push({
                     sample_duration: track.samples[i].duration,
                     sample_size: track.samples[i].size,
-                    sample_composition_time_offset: track.samples[i].cts - 0
+                    sample_composition_time_offset: track.samples[i].cts - cts_base
                 });
             }
 
@@ -934,6 +939,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             }
 
             moof_file.boxes.push(moof);
+
             // Determine total length of output fragment file
             length = moof_file.getLength();
 

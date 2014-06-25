@@ -49,7 +49,7 @@ MediaPlayer.vo.Mp4Track.Sample = function () {
     "use strict";
 
     this.dts = 0;
-    this.pts = 0;
+    this.cts = 0;
     this.duration = 0;
     this.data = null;
 };
