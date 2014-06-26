@@ -174,20 +174,25 @@ Hls.dependencies.HlsDemux = function () {
             var sample,
                 length = 0,
                 offset = 0,
+                subSamplesLength,
                 i, s;
 
             // Determine total length of track samples data
-            // And set samples duration
+            // Set samples duration and size
             for (i = 0; i < track.samples.length; i++) {
+                subSamplesLength = 0;
                 sample = track.samples[i];
 
                 for (s = 0; s < sample.subSamples.length; s++) {
-                    length += sample.subSamples[s].length;
+                    subSamplesLength += sample.subSamples[s].length;
                 }
 
                 if (i > 0) {
                     track.samples[i-1].duration = track.samples[i].dts - track.samples[i-1].dts;
                 }
+
+                sample.size = subSamplesLength;
+                length += subSamplesLength;
             }
             track.samples[track.samples.length-1].duration = track.samples[track.samples.length-2].duration;
 

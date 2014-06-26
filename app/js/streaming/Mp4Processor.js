@@ -855,10 +855,10 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             var tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
 
-            tfdt.version = 0;
-            tfdt.flags = 1; // baseMediaDecodeTime on 64 bits
+            tfdt.version = 1;// baseMediaDecodeTime on 64 bits
+            tfdt.flags = 0;
 
-            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].pts : 0;
+            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].cts : 0;
 
             return tfdt;
         },
@@ -885,8 +885,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             trun.flags = 0x000001 | // data-offset-present
                          sample_duration_present_flag | // sample-duration-present
                          0x000200 | // sample-size-present
-                         (track.type === 'video') ? 0x000100 : 0x000000; // sample-composition-time-offsets-present
-
+                         ((track.type === 'video') ? 0x000800 : 0x000000); // sample-composition-time-offsets-present
 
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
             trun.samples_table = [];
