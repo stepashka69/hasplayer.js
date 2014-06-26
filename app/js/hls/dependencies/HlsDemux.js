@@ -149,10 +149,6 @@ Hls.dependencies.HlsDemux = function () {
                 sample.duration = 0;
                 sample.subSamples = [];
 
-                if (track.samples.length > 0) {
-                    track.s
-                }
-
                 // Store payload of PES packet as a subsample
                 sample.subSamples.push(pesPacket.getPayload());
 
