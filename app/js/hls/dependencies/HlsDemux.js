@@ -146,7 +146,12 @@ Hls.dependencies.HlsDemux = function () {
                 sample.cts = pesPacket.getPts().getValue();
                 sample.dts = (pesPacket.getDts() !== null) ? pesPacket.getDts().getValue() : sample.cts;
                 sample.size = 0;
+                sample.duration = 0;
                 sample.subSamples = [];
+
+                if (track.samples.length > 0) {
+                    track.s
+                }
 
                 // Store payload of PES packet as a subsample
                 sample.subSamples.push(pesPacket.getPayload());
@@ -171,14 +176,20 @@ Hls.dependencies.HlsDemux = function () {
                 offset = 0,
                 i, s;
 
-            // Re-assemble sub-sample parts into
+            // Determine total length of track samples data
+            // And set samples duration
             for (i = 0; i < track.samples.length; i++) {
                 sample = track.samples[i];
 
                 for (s = 0; s < sample.subSamples.length; s++) {
                     length += sample.subSamples[s].length;
                 }
+
+                if (i > 0) {
+                    track.samples[i-1].duration = track.samples[i].dts - track.samples[i-1].dts;
+                }
             }
+            track.samples[track.samples.length-1].duration = track.samples[track.samples.length-2].duration;
 
             // Allocate track data
             track.data = new Uint8Array(length);

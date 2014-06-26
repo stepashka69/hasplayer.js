@@ -89,34 +89,40 @@ Hls.dependencies.HlsParser = function () {
 
 		for (i = streamParams.length - 1; i >= 0; i--) {
 
-			name = streamParams[i].trim().split('=')[0];
-			value = streamParams[i].trim().split('=')[1];
+			// Check if '=' character is present. If not, it means that there was
+			// a ',' in the parameter value
+			if ((streamParams[i].indexOf('=') === -1) && (i > 0)) {
+				streamParams[i-1] += "," + streamParams[i];
+			} else {
+				name = streamParams[i].trim().split('=')[0];
+				value = streamParams[i].trim().split('=')[1];
 
-			switch (name) {
-				case ATTR_PROGRAMID:
-					stream.programId = value;
-					break;
-				case ATTR_BANDWIDTH:
-					stream.bandwidth = parseInt(value, 10);
-					break;
-				case ATTR_RESOLUTION:
-					stream.resolution = value;
-					break;
-				case ATTR_CODECS:
-					stream.codecs = value;
-					break;
+				switch (name) {
+					case ATTR_PROGRAMID:
+						stream.programId = value;
+						break;
+					case ATTR_BANDWIDTH:
+						stream.bandwidth = parseInt(value, 10);
+						break;
+					case ATTR_RESOLUTION:
+						stream.resolution = value;
+						break;
+					case ATTR_CODECS:
+						stream.codecs = value.replace("\"","");
+						break;
 
-				// > HLD v3
-				case ATTR_AUDIO:
-					stream.audioId = value;
-					break;
-				case ATTR_SUBTITLES:
-					stream.subtitlesId = value;
-					break;
+					// > HLD v3
+					case ATTR_AUDIO:
+						stream.audioId = value;
+						break;
+					case ATTR_SUBTITLES:
+						stream.subtitlesId = value;
+						break;
 
-				default:
-					break;
+					default:
+						break;
 
+				}
 			}
 		}
 
@@ -321,9 +327,12 @@ Hls.dependencies.HlsParser = function () {
 			deferred.resolve();
         };
 
-		self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
-		self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));
-
+        if (representation.codecs === "") {
+			self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
+			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));        	
+        } else {
+        	deferred.resolve();
+        }
 
         return deferred.promise;
 	};
@@ -415,10 +424,10 @@ Hls.dependencies.HlsParser = function () {
 					// children: [],
 					id: representationId.toString(),
 					mimeType: "video/mp4",
-					codecs: "", // Completed at initialization segment parsing
+					codecs: stream.codecs,
 					bandwidth: stream.bandwidth,
-					width: 0, //parseInt(stream.resolution.split('x')[0], 10),
-					height: 0, //parseInt(stream.resolution.split('x')[1], 10),
+					width: parseInt(stream.resolution.split('x')[0], 10),
+					height: parseInt(stream.resolution.split('x')[1], 10),
 					BaseURL: adaptationSet.BaseURL,
 					url: (stream.uri.indexOf('http') > -1) ? stream.uri : adaptationSet.BaseURL + stream.uri
 				};

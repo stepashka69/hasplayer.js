@@ -879,8 +879,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 sample_duration_present_flag;
 
             cts_base = track.samples[0].cts;
-             sample_duration_present_flag = (track.samples[0].duration > 0) ? 0x000100 : 0x000000;
-
+            sample_duration_present_flag = (track.samples[0].duration > 0) ? 0x000100 : 0x000000;
 
             trun.version = 0;
             trun.flags = 0x000001 | // data-offset-present
@@ -894,11 +893,17 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             trun.sample_count = track.samples.length;
 
             for (i = 0; i < track.samples.length; i++) {
-                trun.samples_table.push({
+                var sample = {
                     sample_duration: track.samples[i].duration,
                     sample_size: track.samples[i].size,
-                    sample_composition_time_offset: track.samples[i].cts - cts_base
-                });
+                    sample_composition_time_offset: track.samples[i].cts - track.samples[i].dts
+                };
+
+                if (sample.sample_composition_time_offset < 0) {
+                    trun.version = 1;
+                }
+
+                trun.samples_table.push(sample);
             }
 
             return trun;
