@@ -329,7 +329,7 @@ Hls.dependencies.HlsFragmentController = function () {
     rslt.hlsDemux = undefined;
     rslt.mp4Processor = undefined;
 
-    rslt.sequenceNumber = 0;
+    rslt.sequenceNumber = 1;
 
     rslt.process = function (bytes, request, representations) {
 
@@ -352,6 +352,8 @@ Hls.dependencies.HlsFragmentController = function () {
 
             //var res = convertFragment(result, request, adaptation);
             result = generateMediaSegment(bytes);
+            //console.saveBinArray(result, "moof_" + rslt.sequenceNumber + ".mp4");
+
            /* result = res.bytes;
             if (res.segmentsUpdated) {
                 representations = [];
@@ -363,6 +365,8 @@ Hls.dependencies.HlsFragmentController = function () {
 
             // Initialization segment => generate moov initialization segment from PSI tables
             result = generateInitSegment(bytes);
+            //console.saveBinArray(result, "moov.mp4");
+
 
             // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
             /*if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
