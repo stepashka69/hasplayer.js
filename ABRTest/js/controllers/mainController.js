@@ -6,6 +6,7 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
     dlSeries = [],
     playSeries = [],
     requestSeries = [],
+    calcBandwidthSeries = [],
     audioSeries = [],
     qualityChangements = [],
     previousPlayedQuality = 0,
@@ -78,9 +79,8 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
         videoWidthValue = 0,
         videoHeightValue = 0,
         codecsValue,
-        dwnldSwitch;
-
-
+        dwnldSwitch,
+        calcBandwidth;
 
         if (metrics && metricsExt) {
             repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
@@ -89,6 +89,8 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
             droppedFramesMetrics = metricsExt.getCurrentDroppedFrames(metrics);
 
             dwnldSwitch = metricsExt.getCurrentDownloadSwitch(metrics);
+            calcBandwidth = metricsExt.getCurrentBandwidth(metrics);
+
             if (repSwitch !== null) {
                 bitrateIndexValue = metricsExt.getIndexForRepresentation(repSwitch.to);
                 bandwidthValue = metricsExt.getBandwidthForRepresentation(repSwitch.to);
@@ -155,7 +157,8 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
                 videoWidthValue: videoWidthValue,
                 videoHeightValue: videoHeightValue,
                 codecsValue: codecsValue,
-                dwnldSwitch: dwnldSwitch
+                dwnldSwitch: dwnldSwitch,
+                calcBandwidth: calcBandwidth
             };
         }
         else {
@@ -165,9 +168,9 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
 
     function update() {
         var metrics;
-        console.log(requestSeries.length);
 
         metrics = getCribbedMetricsFor("video");
+
         if (metrics && metrics.dwnldSwitch) {
             $scope.videoBitrate = metrics.bandwidthValue;
             $scope.videoIndex = metrics.bitrateIndexValue;
@@ -206,8 +209,10 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
 
             if(metrics.httpRequest !== null) {
                 if(previousRequest !== metrics.httpRequest.url) {
-                    console.log(metrics.httpRequest.url);
                     requestSeries.push([video.currentTime, Math.round(previousDownloadedQuality/1000)])
+                    if(metrics.calcBandwidth !== null && metrics.calcBandwidth.value < 10000) {
+                        calcBandwidthSeries.push([video.currentTime, metrics.calcBandwidth.value]);
+                    }
                 }
 
                 previousRequest = metrics.httpRequest.url;
@@ -217,8 +222,11 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
             
             var dlPoint = [video.currentTime, Math.round(previousDownloadedQuality/1000)];
             dlSeries.push(dlPoint);
-            var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
-            playSeries.push(playPoint);
+
+            if(playSeries.length < 1) {
+               var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
+                playSeries.push(playPoint); 
+            }
             
             videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
 
@@ -270,6 +278,7 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
     $scope.bandwidthData = {};
     $scope.bandwidthData.playSeries = playSeries;
     $scope.bandwidthData.requestSeries = requestSeries;
+    $scope.bandwidthData.calcBandwidthSeries = calcBandwidthSeries;
 
     ////////////////////////////////////////
     //
