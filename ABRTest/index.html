@@ -74,12 +74,17 @@
     <script src="../app/lib/mp4lib/mp4lib-fields.js"></script>
 
     <!-- mpegts -->
+    <script src="../app/lib/mpegts/mpegts.js"></script>
     <script src="../app/lib/mpegts/ts.js"></script>
     <script src="../app/lib/mpegts/binary.js"></script>
     <script src="../app/lib/mpegts/pes.js"></script>
     <script src="../app/lib/mpegts/psi.js"></script>
     <script src="../app/lib/mpegts/adaptationField.js"></script>
     <script src="../app/lib/mpegts/pts.js"></script>
+    <script src="../app/lib/mpegts/pat.js"></script>
+    <script src="../app/lib/mpegts/pmt.js"></script>
+    <script src="../app/lib/mpegts/aac.js"></script>
+    <script src="../app/lib/mpegts/h264.js"></script>
 
     <!-- Player -->
     <script src="../app/js/streaming/MediaPlayer.js"></script>
@@ -89,6 +94,7 @@
     <script src="../app/js/streaming/EventBus.js"></script>
     <script src="../app/js/streaming/Debug.js"></script>
     <script src="../app/js/streaming/Logger.js"></script>
+    <script src="../app/js/streaming/TokenAuthentication.js"></script>
     <script src="../app/js/streaming/VideoModel.js"></script>
     <script src="../app/js/streaming/vo/SegmentRequest.js"></script>
     <script src="../app/js/streaming/ManifestLoader.js"></script>
@@ -116,6 +122,7 @@
     <script src="../app/js/streaming/rules/InsufficientBufferRule.js"></script>
     <script src="../app/js/streaming/rules/LimitSwitchesRule.js"></script>
     <script src="../app/js/streaming/rules/BaseRulesCollection.js"></script>
+    <script src="../app/js/streaming/EventController.js"></script>
 
     <!--Mp4-->
     <script src="../app/js/streaming/vo/Mp4Track.js"></script>
@@ -147,6 +154,8 @@
     <script src="../app/js/dash/vo/AdaptationSet.js"></script>
     <script src="../app/js/dash/vo/Representation.js"></script>
     <script src="../app/js/dash/vo/Segment.js"></script>
+    <script src="../app/js/dash/vo/Event.js"></script>
+    <script src="../app/js/dash/vo/EventStream.js"></script>
     <script src="../app/js/dash/DashParser.js"></script>
     <script src="../app/js/dash/DashHandler.js"></script>
     <script src="../app/js/dash/BaseURLExtensions.js"></script>
@@ -163,8 +172,10 @@
     
     <!-- HLS -->
     <script src="../app/js/hls/Hls.js"></script>
+    <script src="../app/js/hls/dependencies/HlsDemux.js"></script>
     <script src="../app/js/hls/dependencies/HlsParser.js"></script>
     <script src="../app/js/hls/dependencies/HlsHandler.js"></script>
+    <script src="../app/js/hls/dependencies/HlsFragmentController.js"></script>
     
     <!-- Custom -->
     <script src="../app/js/custom/Custom.js"></script>
