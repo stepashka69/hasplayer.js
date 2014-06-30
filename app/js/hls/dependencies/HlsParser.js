@@ -12,7 +12,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- Hls.dependencies.HlsParser = function () {
+Hls.dependencies.HlsParser = function () {
 	var TAG_EXTM3U = "#EXTM3U",
 		/*TAG_EXTXMEDIASEQUENCE = "#EXT-X-MEDIA-SEQUENCE",
 		TAG_EXTXKEY = "#EXT-X-KEY",
@@ -23,7 +23,7 @@
 		TAG_EXTXVERSION	= "#EXT-X-VERSION",
 		TAG_EXTXTARGETDURATION = "#EXT-X-TARGETDURATION",
 		TAG_EXTXMEDIA = "#EXT-X-MEDIA",
-		TAG_EXTXMEDIASEQUENCE = "#EXT-X-MEDIA-SEQUENCE";
+		TAG_EXTXMEDIASEQUENCE = "#EXT-X-MEDIA-SEQUENCE",
 		TAG_EXTXSTREAMINF = "#EXT-X-STREAM-INF",
 		TAG_EXTXENDLIST = "#EXT-X-ENDLIST",
 		ATTR_BANDWIDTH = "BANDWIDTH",
@@ -89,34 +89,40 @@
 
 		for (i = streamParams.length - 1; i >= 0; i--) {
 
-			name = streamParams[i].trim().split('=')[0];
-			value = streamParams[i].trim().split('=')[1];
+			// Check if '=' character is present. If not, it means that there was
+			// a ',' in the parameter value
+			if ((streamParams[i].indexOf('=') === -1) && (i > 0)) {
+				streamParams[i-1] += "," + streamParams[i];
+			} else {
+				name = streamParams[i].trim().split('=')[0];
+				value = streamParams[i].trim().split('=')[1];
 
-			switch (name) {
-				case ATTR_PROGRAMID:
-					stream.programId = value;
-					break;
-				case ATTR_BANDWIDTH:
-					stream.bandwidth = parseInt(value, 10);
-					break;
-				case ATTR_RESOLUTION:
-					stream.resolution = value;
-					break;
-				case ATTR_CODECS:
-					stream.codecs = value;
-					break;
+				switch (name) {
+					case ATTR_PROGRAMID:
+						stream.programId = value;
+						break;
+					case ATTR_BANDWIDTH:
+						stream.bandwidth = parseInt(value, 10);
+						break;
+					case ATTR_RESOLUTION:
+						stream.resolution = value;
+						break;
+					case ATTR_CODECS:
+						stream.codecs = value.replace("\"","");
+						break;
 
-				// > HLD v3
-				case ATTR_AUDIO:
-					stream.audioId = value;
-					break;
-				case ATTR_SUBTITLES:
-					stream.subtitlesId = value;
-					break;
+					// > HLD v3
+					case ATTR_AUDIO:
+						stream.audioId = value;
+						break;
+					case ATTR_SUBTITLES:
+						stream.subtitlesId = value;
+						break;
 
-				default:
-					break;
+					default:
+						break;
 
+				}
 			}
 		}
 
@@ -182,8 +188,10 @@
 			version,
 			media,
 			duration = 0,
-			i;
+			i,
+			self = this;
 
+		console.log(data);
 		data = _splitLines(data);
 
 		// Check playlist header
@@ -230,10 +238,13 @@
 				segmentList.SegmentURL_asArray.push(segment);
 				duration += media.duration;
 			} else if (_containsTag(data[i], TAG_EXTXENDLIST)) {
-				// "static" playliast => set duration
+				// "static" playlist => set duration
 				representation.duration = duration;
 			}
 		}
+
+		// PATCH Live = VOD
+		representation.duration = duration;
 
 		deferred.resolve();
 	};
@@ -249,6 +260,9 @@
 			request = new MediaPlayer.vo.SegmentRequest(),
 			self = this;
 
+
+		period.start = 0;
+
 		// Copy duration from first representation's duration
 		adaptationSet.duration = representation.duration;
 		period.duration = representation.duration;
@@ -256,6 +270,20 @@
 
 		// Set manifest type, "static" vs "dynamic"
 		manifest.type = (manifest.mediaPresentationDuration === 0) ? "dynamic": "static";
+
+		// Dynamic use case
+		if (manifest.type === "dynamic") {
+			// => set manifest refresh period as the duration of 1 fragment/chunk
+			manifest.minimumUpdatePeriod = adaptationSet.Representation_asArray[0].SegmentList.duration;
+
+			// => set availabilityStartTime property
+			var mpdLoadedTime = new Date();
+			var manifestDuration = representation.SegmentList.duration * representation.SegmentList.SegmentURL_asArray.length;
+			manifest.availabilityStartTime = new Date(mpdLoadedTime.getTime() - manifestDuration);
+		}
+
+		// Set minBufferTime            
+		manifest.minBufferTime = representation.SegmentList.duration - 1;//MediaPlayer.dependencies.BufferExtensions.DEFAULT_MIN_BUFFER_TIME
 
 		// Set initialization segment for each representation
 		// And download initialization data (PSI, IDR...) to obtain codec information
@@ -265,22 +293,32 @@
 			
 			// Set initialization segment info
 			initialization = {
-				name: "InitializationSegment",
+				name: "Initialization",
 				sourceURL: representation.SegmentList.SegmentURL_asArray[0].media
 			};
-			representation.SegmentList.InitializationSegment = initialization;
+			representation.SegmentList.Initialization = initialization;
 
 		}
 
 		// Download initialization data (PSI, IDR...) of 1st representation to obtain codec information
 		representation = adaptationSet.Representation_asArray[0];
         request.type = "Initialization Segment";
-        request.url = initialization.sourceURL;
-        request.range = "0-1880";
+        request.url = representation.SegmentList.Initialization.sourceURL;
+        //request.range = "0-18799";
 
         var onLoaded = function(representation, response) {
+
 			// Parse initialization data to obtain codec information
-			mpegts.parse(new Uint8Array(response.data));
+			var tracks = this.hlsDemux.getTracks(new Uint8Array(response.data));
+
+			representation.codecs = "";
+			for (var i = 0; i < tracks.length; i++) {
+				representation.codecs += tracks[i].codecs;
+				if (i < (tracks.length - 1)) {
+					representation.codecs += ", ";
+				}
+			}
+
 			deferred.resolve();
         };
 
@@ -289,8 +327,12 @@
 			deferred.resolve();
         };
 
-		self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));
-
+        if (representation.codecs === "") {
+			self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
+			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));        	
+        } else {
+        	deferred.resolve();
+        }
 
         return deferred.promise;
 	};
@@ -382,7 +424,7 @@
 					// children: [],
 					id: representationId.toString(),
 					mimeType: "video/mp4",
-					codecs: "avc1.42E01E, mp4a.40.2",
+					codecs: stream.codecs,
 					bandwidth: stream.bandwidth,
 					width: parseInt(stream.resolution.split('x')[0], 10),
 					height: parseInt(stream.resolution.split('x')[1], 10),
@@ -458,12 +500,15 @@
 
 	var internalParse = function(data, baseUrl) {
 		this.debug.log("[HlsParser]", "Doing parse.");
+		console.log(data);
 		return processManifest.call(this, _splitLines(data),baseUrl);
 	};
 
 	return {
         debug: undefined,
         fragmentLoader: undefined,
+        hlsDemux: undefined,
+
         parse: internalParse
     };
 };

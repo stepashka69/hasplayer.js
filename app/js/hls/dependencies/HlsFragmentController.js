@@ -12,7 +12,7 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-Mss.dependencies.HlsFragmentController = function () {
+Hls.dependencies.HlsFragmentController = function () {
     "use strict";
 
     var getIndex = function (adaptation, manifest) {
@@ -111,151 +111,35 @@ Mss.dependencies.HlsFragmentController = function () {
             return segmentsUpdated;
         },
 
-        convertFragment = function (data, request, adaptation) {
-
-            var segmentsUpdated = false, i = 0;
-
-            // Get track id corresponding to adaptation set
-            var manifest = rslt.manifestModel.getValue();
-            var trackId = getIndex(adaptation, manifest) + 1; // +1 since track_id shall start from '1'
-
-            // Create new fragment
-            var fragment = mp4lib.deserialize(data);
-
-            // Get references en boxes
-            var moof = fragment.getBoxByType("moof");
-            var mdat = fragment.getBoxByType("mdat");
-            var traf = moof.getBoxByType("traf");
-            var trun = traf.getBoxByType("trun");
-            var tfhd = traf.getBoxByType("tfhd");
-            
-            //if protected content
-            var sepiff = traf.getBoxByType("sepiff");
-            if(sepiff !== null) {
-                sepiff.boxtype = "senc";
-                // Create Sample Auxiliary Information Offsets Box box (saio) 
-                var saio = new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
-                saio.version = 0;
-                saio.flags = 0;
-                saio.entry_count = 1;
-                saio.offset = [];
-                
-                var saiz = new mp4lib.boxes.SampleAuxiliaryInformationSizesBox();
-                saiz.version = 0;
-                saiz.flags = 0;
-                saiz.sample_count = sepiff.sample_count;
-                saiz.default_sample_info_size = 0;
-
-                saiz.sample_info_size = [];
-
-                var sizedifferent = false;
-                // get for each sample_info the size
-                for (i = 0; i < sepiff.sample_count; i++) {
-                    saiz.sample_info_size[i] = 8+(sepiff.entry[i].NumberOfEntries*6)+2;
-                    //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
-                    if(i>1) {
-                        if (saiz.sample_info_size[i] != saiz.sample_info_size[i-1]) {
-                            sizedifferent = true;
-                        }
-                    }
-                }
-                
-                //all the samples have the same size
-                //det default size and remove the table.
-                if (sizedifferent === false) {
-                    saiz.default_sample_info_size = saiz.sample_info_size[0];
-                    saiz.sample_info_size = [];
-                }
-
-                //add saio and saiz box
-                traf.boxes.push(saiz);
-                traf.boxes.push(saio);
-            }
-
-            // Update tfhd.track_ID field
-            tfhd.track_ID = trackId;
-
-            // Process tfxd boxes
-            // This box provide absolute timestamp but we take the segment start time for tfdt
-            traf.removeBoxByType("tfxd");
-
-            // Create and add tfdt box
-            var tfdt = traf.getBoxByType("tfdt");
-            if (tfdt === null) {
-                tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
-                tfdt.version = 1;
-                tfdt.flags = 0;
-                tfdt.baseMediaDecodeTime = Math.floor(request.startTime * request.timescale);
-                traf.boxes.push(tfdt);
-            }
-
-            // Process tfrf box
-            var tfrf = traf.getBoxesByType("tfrf");
-            if (tfrf.length !== 0) {
-                for (i = 0; i < tfrf.length; i++) {
-                    segmentsUpdated = processTfrf(tfrf[i], adaptation);
-                    traf.removeBoxByType("tfrf");
-                }
-            }
-
-            // Before determining new size of the converted fragment we update some box flags related to data offset
-            tfhd.flags &= 0xFFFFFE; // set tfhd.base-data-offset-present to false
-            tfhd.flags |= 0x020000; // set tfhd.default-base-is-moof to true
-            trun.flags |= 0x000001; // set trun.data-offset-present to true
-            trun.data_offset = 0;   // Set a default value for trun.data_offset
-
-            if(sepiff !== null) {
-                //+8 => box size + type
-                var moofpositionInFragment = fragment.getBoxPositionByType("moof")+8;
-                var trafpositionInMoof = moof.getBoxPositionByType("traf")+8;
-                var sencpositionInTraf = traf.getBoxPositionByType("senc")+8;
-                // set offset from begin fragment to the first IV in senc box
-                saio.offset[0] = moofpositionInFragment+trafpositionInMoof+sencpositionInTraf+8;//flags (3) + version (1) + sampleCount (4)
-            }
-
-            // Determine new size of the converted fragment
-            // and allocate new data buffer
-            var fragment_size = fragment.getLength();
-
-            // updata trun.data_offset field = offset of first data byte (inside mdat box)
-            trun.data_offset = fragment_size - mdat.size + 8; // 8 = 'size' + 'type' mdat fields length
-
-            // PATCH tfdt and trun samples timestamp values in case of live streams within chrome
-            if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")){
-                tfdt.baseMediaDecodeTime /= 1000;
-                for  (i = 0; i < trun.samples_table.length; i++) {
-                    if (trun.samples_table[i].sample_composition_time_offset > 0) {
-                        trun.samples_table[i].sample_composition_time_offset /= 1000;
-                    }
-                    if (trun.samples_table[i].sample_duration > 0) {
-                        trun.samples_table[i].sample_duration /= 1000;
-                    }
-                }
-            }
-
-            var new_data = mp4lib.serialize(fragment);
-
-            //console.saveBinArray(new_data, adaptation.type+"_evolution.mp4");
-
-            return {
-                bytes: new_data,
-                segmentsUpdated: segmentsUpdated
-            };
-        },
-
-
-
-        generateInitSegment = function(data, adaptation) {
+        generateInitSegment = function(data) {
 
             // Initialize demux
-            this.hlsDemux.init();
+            //rslt.hlsDemux.init();
+
+            var manifest = rslt.manifestModel.getValue();
 
             // Process the HLS chunk to get media tracks description
-            this.hlsDemux.process(data);
+            var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
 
-            // For each track
+            // Add track duration
+            for (var i = 0; i < tracks.length; i++) {
+                tracks[i].duration = manifest.mediaPresentationDuration;
+            }
+            // Generate init segment (moov)
+            return rslt.mp4Processor.generateInitSegment(tracks);
         },
 
+        generateMediaSegment = function(data) {
+            // Initialize demux
+            //rslt.hlsDemux.init();
+
+            // Process the HLS chunk to get media tracks description
+            //var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
+            var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
+
+            // Generate media segment (moov)
+            return rslt.mp4Processor.generateMediaSegment(tracks, rslt.sequenceNumber++);
+        },
 
         getInitData = function(representation) {
             // return data in byte format
@@ -310,56 +194,60 @@ Mss.dependencies.HlsFragmentController = function () {
     rslt.hlsDemux = undefined;
     rslt.mp4Processor = undefined;
 
+    rslt.sequenceNumber = 1;
+
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
-            manifest = this.manifestModel.getValue(),
-            adaptation = null;
-
-        if ((representations === null) || (representations === undefined) || (representations.length === 0)) {
-            return Q.when(bytes);
-        }
+            manifest = this.manifestModel.getValue();
 
         if ((bytes === null) || (bytes === undefined) || (bytes.byteLength === 0)) {
             return Q.when(bytes);
         }
 
-        // Get current adaptation containing provided representations
-        // (Note: here representations is of type Dash.vo.Representation)
-        adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
-
         // Intialize output data
         result = new Uint8Array(bytes);
 
-        // Initialization segment => generate moov initialization segment from PSI tables
-        if (request && (request.type === "Initialization Segment")) {
-            result = generateInitSegment(bytes, adaptation);
-        }
-
         // Media segment => genrate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
-        if (request && (request.type === "Media Segment")) {
-            var res = convertFragment(result, request, adaptation);
-            result = res.bytes;
+        if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
+
+            // Get current adaptation containing provided representations
+            // (Note: here representations is of type Dash.vo.Representation)
+            var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
+
+            //var res = convertFragment(result, request, adaptation);
+            result = generateMediaSegment(bytes);
+            //console.saveBinArray(result, "moof_" + rslt.sequenceNumber + ".mp4");
+
+           /* result = res.bytes;
             if (res.segmentsUpdated) {
                 representations = [];
-            }
+            }*/
         }
 
-        // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
         // Note: request = 'undefined' in case of initialization segments
-        if ((request === undefined) && (navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
-            var init_segment = mp4lib.deserialize(result);
-            // FIXME unused variables ?
-            var moov = init_segment.getBoxByType("moov");
-            var mvhd = moov.getBoxByType("mvhd");
-            var trak = moov.getBoxByType("trak");
-            var mdia = trak.getBoxByType("mdia");
-            var mdhd = mdia.getBoxByType("mdhd");
+        if ((request === undefined)) {
 
-            mvhd.timescale /= 1000;
-            mdhd.timescale /= 1000;
+            // Initialization segment => generate moov initialization segment from PSI tables
+            result = generateInitSegment(bytes);
+            //console.saveBinArray(result, "moov.mp4");
 
-            result = mp4lib.serialize(init_segment);
+
+            // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
+            /*if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
+                var init_segment = mp4lib.deserialize(result);
+                // FIXME unused variables ?
+                var moov = init_segment.getBoxByType("moov");
+                var mvhd = moov.getBoxByType("mvhd");
+                var trak = moov.getBoxByType("trak");
+                var mdia = trak.getBoxByType("mdia");
+                var mdhd = mdia.getBoxByType("mdhd");
+
+                mvhd.timescale /= 1000;
+                mdhd.timescale /= 1000;
+
+                result = mp4lib.serialize(init_segment);
+            }*/
         }
 
         if (request !== undefined) {
@@ -372,6 +260,6 @@ Mss.dependencies.HlsFragmentController = function () {
     return rslt;
 };
 
-Mss.dependencies.HlsFragmentController.prototype = {
-    constructor: Mss.dependencies.HlsFragmentController
+Hls.dependencies.HlsFragmentController.prototype = {
+    constructor: Hls.dependencies.HlsFragmentController
 };

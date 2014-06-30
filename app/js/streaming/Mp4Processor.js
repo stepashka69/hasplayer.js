@@ -721,8 +721,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 trex.default_sample_size = 0;               // ''
                 
                 // add trex box in mvex box
-                mvex.boxes.push(trex);                
-            }  
+                mvex.boxes.push(trex);
+            }
 
             return mvex;
         },
@@ -763,7 +763,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             for (i = 0; i < tracks.length; i++) {
                 // Create and add Track box (trak)
-                moov.boxes.push(createTrackBox(tracks[i]));                
+                moov.boxes.push(createTrackBox(tracks[i]));
             }
 
             // Create and add MovieExtends box (mvex)
@@ -787,7 +787,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
         // MOOF
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        createMovieHeaderBoxFragment = function(sequenceNumber) {
+        createMovieFragmentHeaderBox = function(sequenceNumber) {
 
             // Movie Fragment Header Box
             // The movie fragment header contains a sequence number, as a safety check. The sequence number usually
@@ -818,9 +818,9 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             traf.boxes.push(createTrackFragmentHeaderBox(track));
 
             // Add Track Fragment Decode Time box (tfdt)
-            traf.boxes.push(createTrackFragmentDecodeTimeBox(track));
+            traf.boxes.push(createTrackFragmentBaseMediaDecodeTimeBox(track));
 
-            // Add Track Fragment Run box (tfdt)
+            // Add Track Fragment Run box (trun)
             traf.boxes.push(createTrackFragmentRunBox(track));
 
             return traf;
@@ -837,13 +837,12 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             tfhd.version = 0;
             tfhd.flags = 0x020000; // set tfhd.default-base-is-moof to true
 
-            tfhd.track_ID = track.trakId;
-
+            tfhd.track_ID = track.trackId;
 
             return tfhd;
         },
 
-        createTrackFragmentDecodeTimeBox = function(track) {
+        createTrackFragmentBaseMediaDecodeTimeBox = function(track) {
 
             // Track Fragment Base Media Decode Time Box
             // The Track Fragment Base Media Decode Time Box provides the absolute decode time, measured on the
@@ -854,12 +853,12 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // The Track Fragment Base Media Decode Time Box, if present, shall be positioned after the Track Fragment
             // Header Box and before the first Track Fragment Run box.
 
-            var tfdt = new mp4lib.boxes.TrackFragmentDecodeTimeBox();
+            var tfdt = new mp4lib.boxes.TrackFragmentBaseMediaDecodeTimeBox();
 
-            tfdt.version = 0;
-            tfdt.flags = 1; // baseMediaDecodeTime on 64 bits
+            tfdt.version = 1;// baseMediaDecodeTime on 64 bits
+            tfdt.flags = 0;
 
-            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].pts : 0;
+            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].cts : 0;
 
             return tfdt;
         },
@@ -875,23 +874,35 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             // new fields to be defined.
 
             var trun = new mp4lib.boxes.TrackFragmentRunBox(),
-                i;
+                i,
+                cts_base,
+                sample_duration_present_flag;
+
+            cts_base = track.samples[0].cts;
+            sample_duration_present_flag = (track.samples[0].duration > 0) ? 0x000100 : 0x000000;
 
             trun.version = 0;
             trun.flags = 0x000001 | // data-offset-present
-                         0x000100 | // sample-duration-present
+                         sample_duration_present_flag | // sample-duration-present
                          0x000200 | // sample-size-present
-                         (track.type === 'video') ? 0x000100 : 0x000000; // sample-composition-time-offsets-present
-
+                         ((track.type === 'video') ? 0x000800 : 0x000000); // sample-composition-time-offsets-present
 
             trun.data_offset = 0; // Set to 0, will be updated once mdat is set
+            trun.samples_table = [];
+            trun.sample_count = track.samples.length;
 
             for (i = 0; i < track.samples.length; i++) {
-                track.samples_table.push({
+                var sample = {
                     sample_duration: track.samples[i].duration,
                     sample_size: track.samples[i].size,
-                    sample_composition_time_offset: track.samples[i].cts - 0
-                });
+                    sample_composition_time_offset: track.samples[i].cts - track.samples[i].dts
+                };
+
+                if (sample.sample_composition_time_offset < 0) {
+                    trun.version = 1;
+                }
+
+                trun.samples_table.push(sample);
             }
 
             return trun;
@@ -931,6 +942,8 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 moof.boxes.push(createTrackFragmentBox(tracks[i]));
             }
 
+            moof_file.boxes.push(moof);
+
             // Determine total length of output fragment file
             length = moof_file.getLength();
 
@@ -947,7 +960,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 length += tracks[i].data.length;
 
                 // Create mdat
-                moof.boxes.push(createMdatBox(tracks[i]));
+                moof_file.boxes.push(createMediaDataBox(tracks[i]));
             }
 
             data = mp4lib.serialize(moof_file);

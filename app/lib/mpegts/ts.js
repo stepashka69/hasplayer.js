@@ -1,33 +1,16 @@
-// TS trame manipulation library
-// (C) 2014 Orange
-
-var mpegts = (function() {
-    var mpegts = {
-        pes:{},
-        psi:{},
-        binary:{},
-        ts:{},
-        Pts:{},
-    };
-    
-    mpegts.parse = function (data) {
-        var i = 0;
-        while(i<=data.length)
-        {
-            var tsPacket = new mpegts.ts.TsPacket();
-            tsPacket.parse(data.subarray(i,i+mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE));
-
-            if ((tsPacket.getPusi() && tsPacket.getPid() === 305)||(tsPacket.getPusi() && tsPacket.getPid() === 289)) {
-                debugger;
-                var pesPacket = new mpegts.pes.PesPacket();
-                pesPacket.parse(data.subarray(i+tsPacket.getPayloadIndex(),i+tsPacket.getPayloadLength()));
-            }
-            i+= mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE;
-        }
-    };
-   
-    return mpegts;
-})();
+/*
+ * The copyright in this software is being made available under the BSD License, included below. This software may be subject to other third party and contributor rights, including patent rights, and no such rights are granted under this license.
+ *
+ * Copyright (c) 2014, Orange
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * •  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * •  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * •  Neither the name of the Digital Primates nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 mpegts.ts.TsPacket = function(){
     this.m_cSync = null;
@@ -39,7 +22,7 @@ mpegts.ts.TsPacket = function(){
     this.m_cAdaptationFieldCtrl = null;
     this.m_cContinuityCounter = null;
     this.m_pAdaptationField = null;
-    this.m_IdPayload = null;
+    this.m_payloadArray = null;
     this.m_cPayloadLength = null;
     this.m_bDirty = null;
     this.m_time = null;
@@ -70,12 +53,10 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
 
     byteId++;
 
-    debugger;
     // Adaptation field
     // NAN => to Validate
     if(this.m_cAdaptationFieldCtrl & 0x02)
     {
-        debugger;
         // Check adaptation field length before parsing
         var cAFLength = data[byteId];
         if ((cAFLength + byteId) >= this.TS_PACKET_SIZE)
@@ -99,7 +80,7 @@ mpegts.ts.TsPacket.prototype.parse = function(data) {
     if(this.m_cAdaptationFieldCtrl & 0x01)
     {
         this.m_cPayloadLength = this.TS_PACKET_SIZE - byteId;
-        this.m_IdPayload = byteId;
+        this.m_payloadArray = data.subarray(byteId,byteId + this.m_cPayloadLength);
     }
 };
 
@@ -107,8 +88,8 @@ mpegts.ts.TsPacket.prototype.getPid = function() {
     return this.m_nPID;
 };
 
-mpegts.ts.TsPacket.prototype.getPayloadIndex = function() {
-    return this.m_IdPayload;
+mpegts.ts.TsPacket.prototype.getPayload = function() {
+    return this.m_payloadArray;
 };
 
 mpegts.ts.TsPacket.prototype.getPayloadLength = function() {
@@ -119,8 +100,14 @@ mpegts.ts.TsPacket.prototype.getPusi = function() {
     return this.m_bPUSI;
 };
 
+mpegts.ts.TsPacket.prototype.hasAdaptationFieldOnly = function() {
+    return (this.m_cAdaptationFieldCtrl === 0x02);
+};
+
 mpegts.ts.TsPacket.prototype.SYNC_WORD = 0x47;
 mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE = 188;
+mpegts.ts.TsPacket.prototype.UNDEFINED_PID = 0xFFFF;
+mpegts.ts.TsPacket.prototype.PAT_PID = 0;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_MAP = 0xBC;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PADDING_STREAM = 0xBE;
@@ -130,14 +117,3 @@ mpegts.ts.TsPacket.prototype.STREAM_ID_EMM_STREAM = 0xF1;
 mpegts.ts.TsPacket.prototype.STREAM_ID_DSMCC_STREAM = 0xF2;
 mpegts.ts.TsPacket.prototype.STREAM_ID_H2221_TYPE_E_STREAM = 0xF8;
 mpegts.ts.TsPacket.prototype.STREAM_ID_PROGRAM_STREAM_DIRECTORY = 0xFF;
-
-
-// This module is intended to work both on node.js and inside browser.
-// Since these environments differ in a way modules are stored/accessed,
-// we need to export the module in the environment-dependant way
-
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
-    module.exports = mpegts; // node.js
-else
-    window.mpegts = mpegts;  // browser
-

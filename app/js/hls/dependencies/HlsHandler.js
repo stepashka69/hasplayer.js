@@ -125,5 +125,5 @@ Hls.dependencies.HlsHandler = function() {
 };
 
 Hls.dependencies.HlsHandler.prototype =  {
-	constructor : Hls.dependencies.MssHandler
+	constructor : Hls.dependencies.HlsHandler
 };

@@ -193,6 +193,7 @@ MediaPlayer.models.MetricsModel = function () {
             if (DEBUG) {
                 var vo = new MediaPlayer.vo.metrics.PlayList();
 
+            vo.stream = streamType;
                 vo.start = start;
                 vo.mstart = mstart;
                 vo.starttype = starttype;

@@ -1,13 +1,20 @@
-if (typeof require !== 'undefined') {
-    // node.js adaptation
-    var mpegts = require('./ts.js');
-}
-
-// ---------- PES Packet class ----------
+/*
+ * The copyright in this software is being made available under the BSD License, included below. This software may be subject to other third party and contributor rights, including patent rights, and no such rights are granted under this license.
+ *
+ * Copyright (c) 2014, Orange
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * •  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * •  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * •  Neither the name of the Digital Primates nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 mpegts.pes.PesPacket = function(){
-	this.m_cStreamID					= null;            
-	this.m_nPESPacketLength				= null;        
+	this.m_cStreamID					= null;
+	this.m_nPESPacketLength				= null;
 	this.m_cPESScramblingCtrl			= null;
 	this.m_bPESpriority					= null;
 	this.m_bDataAlignement				= null;
@@ -31,7 +38,7 @@ mpegts.pes.PesPacket = function(){
 	this.m_cNbStuffingBytes				= null;
 	this.m_pPESExtension				= null;
 	this.m_pPrivateData					= null;
-	this.m_IdPayload					= null;
+	this.m_payloadArray					= null;
 	this.m_nPayloadLength				= null;
 	this.m_bDirty						= null;
 	this.m_bValid						= false;
@@ -70,7 +77,7 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	if (!this.hasOptionalPESHeader()) {
 		//NAN => to Validate!!!!
 		// no more header field, only payload
-		this.m_IdPayload = index + mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH;
+		this.m_payloadArray = data.subarray(index + mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH);
 		this.m_nPayloadLength = this.m_nLength - mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH;
 		this.m_bValid = true;
 		return;
@@ -113,7 +120,6 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	// DTS
 	if((this.m_cPTS_DTS_flags & mpegts.pes.PesPacket.prototype.FLAG_DTS) == mpegts.pes.PesPacket.prototype.FLAG_DTS)
 	{
-		debugger;
 		this.m_pDTS = new mpegts.Pts(data.subarray(index, index+5));
 		index += 5;
 	}
@@ -167,8 +173,8 @@ mpegts.pes.PesPacket.prototype.parse = function(data) {
 	index += this.m_cNbStuffingBytes;
 
 	// Payload
-	this.m_IdPayload = uiHeaderLength;
 	this.m_nPayloadLength = this.m_nLength - uiHeaderLength;
+	this.m_payloadArray = data.subarray(uiHeaderLength,uiHeaderLength + this.m_nPayloadLength);
 
 	this.m_bValid = true;
 };
@@ -195,15 +201,21 @@ mpegts.pes.PesPacket.prototype.hasOptionalPESHeader = function() {
 };
 
 mpegts.pes.PesPacket.prototype.getHeaderLength = function() {
-    //return m_nPID;
+    return 	mpegts.pes.PesPacket.prototype.FIXED_HEADER_LENGTH +
+			mpegts.pes.PesPacket.prototype.FIXED_OPTIONAL_HEADER_LENGTH + 
+			this.m_cPES_header_data_length;
 };
 
-mpegts.pes.PesPacket.prototype.getPTS = function() {
-    //return m_nPID;
+mpegts.pes.PesPacket.prototype.getPayload = function() {
+	return this.m_payloadArray;
 };
 
-mpegts.pes.PesPacket.prototype.getDTS = function() {
-    //return m_nPID;
+mpegts.pes.PesPacket.prototype.getPts = function() {
+	return this.m_pPTS;
+};
+
+mpegts.pes.PesPacket.prototype.getDts = function() {
+	return this.m_pDTS;
 };
 
 /** The start code prefix */
