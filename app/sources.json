@@ -2,7 +2,12 @@
     "items": [
         {
             "name": "Apple HLS 1",
-            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
+            "url": "http://vimtv2.orange-labs.fr/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "name": "Apple HLS VIM2",
+            "url": "http://10.194.60.139/VIDEO/HLS/VIM1/1.m3u8",
             "browsers": "cdsbi"
         },
         {

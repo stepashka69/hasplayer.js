@@ -835,9 +835,13 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             var tfhd = new mp4lib.boxes.TrackFragmentHeaderBox();
 
             tfhd.version = 0;
-            tfhd.flags = 0x020000; // set tfhd.default-base-is-moof to true
+            tfhd.flags = 0x000008 | // default-sample-duration-present
+                         0x000010 | // default-sample-size-present
+                         0x020000 ; // default-base-is-moof
 
             tfhd.track_ID = track.trackId;
+            tfhd.default_sample_duration = 0;
+            tfhd.default_sample_size = 0;
 
             return tfhd;
         },
@@ -858,7 +862,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             tfdt.version = 1;// baseMediaDecodeTime on 64 bits
             tfdt.flags = 0;
 
-            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].cts : 0;
+            tfdt.baseMediaDecodeTime = 0;//(track.samples.length > 0) ? track.samples[0].cts : 0;
 
             return tfdt;
         },

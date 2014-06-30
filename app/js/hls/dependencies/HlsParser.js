@@ -108,7 +108,7 @@ Hls.dependencies.HlsParser = function () {
 						stream.resolution = value;
 						break;
 					case ATTR_CODECS:
-						stream.codecs = value.replace("\"","");
+						stream.codecs = value.replace(/"/g, ''); // Remove '"' characters
 						break;
 
 					// > HLD v3
