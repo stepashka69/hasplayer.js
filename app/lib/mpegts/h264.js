@@ -266,24 +266,34 @@ mpegts.h264.bytestreamToMp4 = function (data) { // data as Uint8Array
 
     var i = 0,
         length = data.length,
-        startCodeOffset = -1,
+        startCodeIndex = -1,
         naluSize = 0;
 
     while (i < length) {
-        if ((i === (length - 1)) || ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01))) {
+        if ((data[i] === 0x00) && (data[i+1] === 0x00) && (data[i+2] === 0x00) && (data[i+3] === 0x01)) {
 
-            if (startCodeOffset >= 0) {
-                naluSize = (i - startCodeOffset - 4); // 4 = start code length or NALU-size field length
-                data[startCodeOffset] = (naluSize & 0xFF000000) >> 24;
-                data[startCodeOffset+1] = (naluSize & 0x00FF0000) >> 16;
-                data[startCodeOffset+2] = (naluSize & 0x0000FF00) >> 8;
-                data[startCodeOffset+3] = (naluSize & 0x000000FF);
+            if (startCodeIndex >= 0) {
+                naluSize = (i - startCodeIndex - 4); // 4 = start code length or NALU-size field length
+                data[startCodeIndex] = (naluSize & 0xFF000000) >> 24;
+                data[startCodeIndex+1] = (naluSize & 0x00FF0000) >> 16;
+                data[startCodeIndex+2] = (naluSize & 0x0000FF00) >> 8;
+                data[startCodeIndex+3] = (naluSize & 0x000000FF);
             }
 
-            startCodeOffset = i;
+            startCodeIndex = i;
+            i += 4;
+        } else {
+            i++;
         }
-        i++;
     }
+
+    // Last NAL unit
+    naluSize = (i - startCodeIndex - 4); // 4 = start code length or NALU-size field length
+    data[startCodeIndex] = (naluSize & 0xFF000000) >> 24;
+    data[startCodeIndex+1] = (naluSize & 0x00FF0000) >> 16;
+    data[startCodeIndex+2] = (naluSize & 0x0000FF00) >> 8;
+    data[startCodeIndex+3] = (naluSize & 0x000000FF);
+
 };
 
 mpegts.h264.NALUTYPE_NONIDR = 1;

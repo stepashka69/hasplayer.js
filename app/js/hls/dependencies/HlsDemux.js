@@ -22,6 +22,7 @@ Hls.dependencies.HlsDemux = function () {
         pmt = null,
         pidToTrackId = [],
         tracks = [],
+        baseDts = -1,
 
         getTsPacket = function (data, pid, pusi) {
 
@@ -100,10 +101,10 @@ Hls.dependencies.HlsDemux = function () {
                 track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
                 track.pid = elementStream.m_elementary_PID;
                 track.trackId = trackIdCounter;
-                pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
-                tracks.push(track);
-                trackIdCounter ++;
-            }
+                    pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
+                    tracks.push(track);
+                    trackIdCounter ++;
+                }
 
             return pmt;
         },
@@ -149,8 +150,14 @@ Hls.dependencies.HlsDemux = function () {
                 sample.duration = 0;
                 sample.subSamples = [];
 
+                if (baseDts === -1) {
+                    baseDts = sample.dts;
+                }
+                sample.dts -= baseDts;
+                sample.cts -= baseDts;
+
                 // Store payload of PES packet as a subsample
-                sample.subSamples.push(pesPacket.getPayload());
+                    sample.subSamples.push(pesPacket.getPayload());
 
                 track.samples.push(sample);
             }
@@ -227,6 +234,7 @@ Hls.dependencies.HlsDemux = function () {
             pat = null;
             pmt = null;
             tracks = [];
+            baseDts = -1;
         },
 
         getTrackCodecInfo = function (data, track) {

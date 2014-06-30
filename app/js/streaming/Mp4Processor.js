@@ -862,7 +862,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             tfdt.version = 1;// baseMediaDecodeTime on 64 bits
             tfdt.flags = 0;
 
-            tfdt.baseMediaDecodeTime = 0;//(track.samples.length > 0) ? track.samples[0].cts : 0;
+            tfdt.baseMediaDecodeTime = (track.samples.length > 0) ? track.samples[0].dts : 0;
 
             return tfdt;
         },
