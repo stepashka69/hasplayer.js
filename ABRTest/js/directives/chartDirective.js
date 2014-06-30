@@ -5,12 +5,16 @@ angular.module('HASPlayer').directive('chart', function(){
 		},
 		restrict: 'E',
 		templateUrl: 'js/directives/chart-template.html',
-		controller: function($scope, $timeout, graphService) {
+		controller: function($scope, $timeout, graphService, fluxService) {
+
+			$scope.showBandwidth = true;
 
 			$scope.getChart = function() {
 				$scope.success = false;
 				$scope.exportOngoing = true;
-				graphService.getChart($scope.bandwidth).then(function() {
+				graphService.getChart($scope.bandwidth).then(function(data) {
+
+					$scope.dbId = data.id;
 					$scope.success = true;
 					$scope.exportOngoing = false;
 				}, function() {
@@ -18,9 +22,39 @@ angular.module('HASPlayer').directive('chart', function(){
 				});
 			};
 
+
+			var started = false,
+				data = {};
+
+			$scope.bandwidth.dataSequence = [];
+
+			fluxService.getSequence().then(function(sequence) {
+				data.sequence = sequence;
+			});
+
 			$scope.$watch('bandwidth', function(bandwidth) {
 
-				if(bandwidth.playSeries[0] !== undefined) {
+				if(!started && bandwidth.playSeries[0] !== undefined) {
+
+					//génération des données de la représentation de la séquence Wanem
+					var i = 0,
+					len = data.sequence.length,
+					time = bandwidth.playSeries[0][0];
+
+					for(i; i<len; i++) {
+
+						$scope.bandwidth.dataSequence.push([time, data.sequence[i].bandwidth]);
+						var datatime = time+(data.sequence[i].duration/1000);
+						console.log(datatime);
+						$scope.bandwidth.dataSequence.push([datatime - 1, data.sequence[i].bandwidth]);
+
+						time = datatime;
+					}
+
+					data.sequenceGraph = [];
+					angular.copy($scope.bandwidth.dataSequence, data.sequenceGraph);
+				
+					//config du graph
 					$scope.chartConfig = {
 						title: {
 							text: 'ABR'
@@ -30,9 +64,9 @@ angular.module('HASPlayer').directive('chart', function(){
 						},
 						series: [{
 							type: 'area',
-							name: 'Playing',
+							name: 'Scenario',
 							color: '#16a085',
-							data: $scope.bandwidth.playSeries,
+							data: data.sequenceGraph,
 							marker: {
 								enabled: false
 							},
@@ -51,8 +85,20 @@ angular.module('HASPlayer').directive('chart', function(){
 								radius: 2.5,
 								symbol: 'circle'
 							}
+						},
+						{
+							type: 'scatter',
+							name: 'Bande passante réelle',
+							color: 'red',
+							data: $scope.bandwidth.calcBandwidthSeries,
+							marker: {
+								radius: 2.5,
+								symbol: 'triangle'
+							}
 						}]
 					};
+
+					started = true;
 				} 
 			}, true);
 

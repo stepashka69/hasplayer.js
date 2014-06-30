@@ -25,7 +25,6 @@ Hls.dependencies.HlsDemux = function () {
         baseDts = -1,
 
         getTsPacket = function (data, pid, pusi) {
-
             var i = 0;
 
             while (i < data.length) {
@@ -45,7 +44,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         getPAT = function (data) {
-
             var tsPacket = getTsPacket.call(this, data, mpegts.ts.TsPacket.prototype.PAT_PID);
 
             if (tsPacket === null) {
@@ -62,7 +60,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         getPMT = function (data, pid) {
-
             var tsPacket = getTsPacket.call(this, data, pid);
 
             if (tsPacket === null) {
@@ -173,7 +170,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         postProcess = function(track) {
-
             var sample,
                 length = 0,
                 offset = 0,
@@ -238,7 +234,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         getTrackCodecInfo = function (data, track) {
-
             var tsPacket;
 
             if (track.codecs !== "") {
@@ -292,7 +287,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         doGetTracks = function (data) {
-
             // Parse PSI (PAT, PMT) if not yet received
             if (pat === null) {
                 pat = getPAT.call(this, data);
@@ -320,7 +314,6 @@ Hls.dependencies.HlsDemux = function () {
         },
 
         doDemux = function (data) {
-
             var nbPackets = data.length / mpegts.ts.TsPacket.prototype.TS_PACKET_SIZE,
                 i = 0;
 
@@ -360,7 +353,6 @@ Hls.dependencies.HlsDemux = function () {
     return {
         debug: undefined,
 
-        init: doInit,
         getTracks: doGetTracks,
         demux: doDemux
     };

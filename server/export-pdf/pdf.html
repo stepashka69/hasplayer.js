@@ -14,13 +14,13 @@
 				text: 'ABR'
 			},
 			xAxis: {
-				min: bandwidth.playSeries[0][0],
+				min: bandwidth.playSeries[0][0]
 			},
 			series: [{
 				type: 'area',
-				name: 'Playing',
+				name: 'Scenario',
 				color: '#16a085',
-				data: bandwidth.playSeries,
+				data: bandwidth.dataSequence,
 				marker: {
 					enabled: false
 				},
@@ -38,6 +38,16 @@
 				marker: {
 					radius: 2.5,
 					symbol: 'circle'
+				}
+			},
+			{
+				type: 'scatter',
+				name: 'Bande passante réelle',
+				color: 'red',
+				data: bandwidth.calcBandwidthSeries,
+				marker: {
+					radius: 2.5,
+					symbol: 'triangle'
 				}
 			}]
 		});

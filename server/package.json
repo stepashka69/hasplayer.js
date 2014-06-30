@@ -5,6 +5,7 @@
   "dependencies": {
     "body-parser": "*",
     "express": "3.x",
+    "express-csv": "*",
     "hogan-express": "*",
     "http-proxy": "*",
     "phantom": "*",

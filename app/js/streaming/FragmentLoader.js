@@ -96,7 +96,8 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                     var currentTime = new Date(),
                         bytes = req.response,
                         latency,
-                        download;
+                        download,
+                        total;
 
                     if (!request.firstByteDate) {
                         request.firstByteDate = request.requestStartDate;
@@ -105,6 +106,7 @@ MediaPlayer.dependencies.FragmentLoader = function () {
 
                     latency = (request.firstByteDate.getTime() - request.requestStartDate.getTime());
                     download = (request.requestEndDate.getTime() - request.firstByteDate.getTime());
+                    total = (request.requestEndDate.getTime() - request.requestStartDate.getTime());
 
                     self.debug.log("loaded " + request.streamType + ":" + request.type + ":" + request.startTime + " (" + req.status + ", " + latency + "ms, " + download + "ms)");
 
@@ -119,7 +121,7 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                     lastTraceTime = currentTime;
                     
                     // ORANGE: add metric for current measured bandwidth value
-                    //self.metricsModel.setBandwidthValue(request.streamType, (bytes.byteLength*8)/total);
+                    self.metricsModel.setBandwidthValue(request.streamType, (bytes.byteLength*8)/total);
 
                     request.deferred.resolve({
                         data: bytes,
