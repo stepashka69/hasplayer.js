@@ -14,108 +14,9 @@
 
 Hls.dependencies.HlsFragmentController = function () {
     "use strict";
+    var lastRequestQuality = null;
 
-    var getIndex = function (adaptation, manifest) {
-
-            var periods = manifest.Period_asArray,
-                i, j;
-
-            for (i = 0; i < periods.length; i += 1) {
-                var adaptations = periods[i].AdaptationSet_asArray;
-                for (j = 0; j < adaptations.length; j += 1) {
-                    if (adaptations[j] === adaptation) {
-                        return j;
-                    }
-                }
-            }
-
-            return -1;
-        },
-
-        processTfrf = function(tfrf, adaptation) {
-
-            var manifest = rslt.manifestModel.getValue(),
-                segmentsUpdated = false,
-                // Get adaptation's segment timeline (always a SegmentTimeline in Smooth Streaming use case)
-                segments = adaptation.SegmentTemplate.SegmentTimeline.S,
-                entries = tfrf.entry,
-                fragment_absolute_time = 0,
-                fragment_duration = 0,
-                segment = null,
-                r = 0,
-                t = 0,
-                i = 0,
-                availabilityStartTime = null;
-
-            // Go through tfrf entries
-            while (i < entries.length)
-            {
-                fragment_absolute_time = entries[i].fragment_absolute_time;
-                fragment_duration = entries[i].fragment_duration;
-
-                // Get timestamp of the last segment
-                segment = segments[segments.length-1];
-                r = (segment.r === undefined)?0:segment.r;
-                t = segment.t + (segment.d * r);
-
-                if (fragment_absolute_time > t)
-                {
-                    rslt.debug.log("[HlsFragmentController] Add new segment - t = " + (fragment_absolute_time / 10000000.0));
-                    if (fragment_duration === segment.d)
-                    {
-                        segment.r = r + 1;
-                    }
-                    else
-                    {
-                        segments.push({
-                            't': fragment_absolute_time,
-                            'd': fragment_duration
-                        });
-                    }
-                    segmentsUpdated = true;
-                }
-
-                i += 1;
-            }
-
-            // In case we have added some segments, we also check if some out of date segments
-            // may not been removed
-            if (segmentsUpdated) {
-
-                // Get timestamp of the last segment
-                segment = segments[segments.length-1];
-                r = (segment.r === undefined)?0:segment.r;
-                t = segment.t + (segment.d * r);
-
-                // Determine the segments' availability start time
-                availabilityStartTime = t - (manifest.timeShiftBufferDepth * 10000000);
-
-                // Remove segments prior to availability start time
-                segment = segments[0];
-                while (segment.t < availabilityStartTime)
-                {
-                    rslt.debug.log("[HlsFragmentController] Remove segment  - t = " + (segment.t / 10000000.0));
-                    if ((segment.r !== undefined) && (segment.r > 0))
-                    {
-                        segment.t += segment.d;
-                        segment.r -= 1;
-                    }
-                    else
-                    {
-                        segments.splice(0, 1);
-                    }
-                    segment = segments[0];
-                }
-            }
-
-            return segmentsUpdated;
-        },
-
-        generateInitSegment = function(data) {
-
-            // Initialize demux
-            //rslt.hlsDemux.init();
-
+    var generateInitSegment = function(data) {
             var manifest = rslt.manifestModel.getValue();
 
             // Process the HLS chunk to get media tracks description
@@ -130,63 +31,13 @@ Hls.dependencies.HlsFragmentController = function () {
         },
 
         generateMediaSegment = function(data) {
-            // Initialize demux
-            //rslt.hlsDemux.init();
-
             // Process the HLS chunk to get media tracks description
             //var tracks = rslt.hlsDemux.getTracks(new Uint8Array(data));
             var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
 
             // Generate media segment (moov)
             return rslt.mp4Processor.generateMediaSegment(tracks, rslt.sequenceNumber++);
-        },
-
-        getInitData = function(representation) {
-            // return data in byte format
-            // call MP4 lib to generate the init
-            
-            // Get required media information from manifest  to generate initialisation segment
-            //var representation = getRepresentationForQuality(quality, adaptation);
-            if(representation){
-                if(!representation.initData){
-                    var manifest = rslt.manifestModel.getValue();
-                    var adaptation = representation.adaptation;
-                    var realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
-                    var realRepresentation = realAdaptation.Representation_asArray[representation.index];
-                    var media = {};
-                    media.type = rslt.getType() || 'und';
-                    media.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
-                    media.timescale = representation.timescale;
-                    media.duration = representation.adaptation.period.duration;
-                    media.codecs = realRepresentation.codecs;
-                    media.codecPrivateData = realRepresentation.codecPrivateData;
-                    media.bandwidth = realRepresentation.bandwidth;
-
-                    //DRM Protected Adaptation is detected
-                    if (realAdaptation.ContentProtection !== undefined){
-                        media.contentProtection = realAdaptation.ContentProtection;
-                    }
-
-                    // Video related informations
-                    media.width = realRepresentation.width || realAdaptation.maxWidth;
-                    media.height = realRepresentation.height || realAdaptation.maxHeight;
-
-                    // Audio related informations
-                    media.language = realAdaptation.lang ? realAdaptation.lang : 'und';
-
-                    media.channels = getAudioChannels(realAdaptation, realRepresentation);
-                    media.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
-
-                    representation.initData =  rslt.mp4Processor.generateInitSegment(media);
-
-                    //console.saveBinArray(representation.initData, "init_evolution_"+media.type+"_"+media.bandwidth+".mp4");
-                }
-                return representation.initData;
-            }else{
-                return null;
-            }
         };
-
     
     var rslt = Custom.utils.copyMethods(MediaPlayer.dependencies.FragmentController);
 
@@ -199,6 +50,7 @@ Hls.dependencies.HlsFragmentController = function () {
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
+            InitSegmentData = null,
             manifest = this.manifestModel.getValue();
 
         if ((bytes === null) || (bytes === undefined) || (bytes.byteLength === 0)) {
@@ -215,39 +67,23 @@ Hls.dependencies.HlsFragmentController = function () {
             // (Note: here representations is of type Dash.vo.Representation)
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
 
-            //var res = convertFragment(result, request, adaptation);
+            if (lastRequestQuality === null || lastRequestQuality !== request.quality) {
+                lastRequestQuality = request.quality;
+                InitSegmentData = generateInitSegment(bytes);
+                request.index = undefined;
+                request.quality = 1;
+            }
+
             result = generateMediaSegment(bytes);
+
+            //new quality => append init segment + media segment in Buffer
+            if (InitSegmentData !== null) {
+                var catArray = new Uint8Array(InitSegmentData.length+result.length);
+                catArray.set(InitSegmentData,0);
+                catArray.set(result, InitSegmentData.length);
+                result = catArray;
+            }
             //console.saveBinArray(result, "moof_" + rslt.sequenceNumber + ".mp4");
-
-           /* result = res.bytes;
-            if (res.segmentsUpdated) {
-                representations = [];
-            }*/
-        }
-
-        // Note: request = 'undefined' in case of initialization segments
-        if ((request === undefined)) {
-
-            // Initialization segment => generate moov initialization segment from PSI tables
-            result = generateInitSegment(bytes);
-            //console.saveBinArray(result, "moov.mp4");
-
-
-            // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
-            /*if ((navigator.userAgent.indexOf("Chrome") >= 0) && (manifest.type === "dynamic")) {
-                var init_segment = mp4lib.deserialize(result);
-                // FIXME unused variables ?
-                var moov = init_segment.getBoxByType("moov");
-                var mvhd = moov.getBoxByType("mvhd");
-                var trak = moov.getBoxByType("trak");
-                var mdia = trak.getBoxByType("mdia");
-                var mdhd = mdia.getBoxByType("mdhd");
-
-                mvhd.timescale /= 1000;
-                mdhd.timescale /= 1000;
-
-                result = mp4lib.serialize(init_segment);
-            }*/
         }
 
         if (request !== undefined) {
