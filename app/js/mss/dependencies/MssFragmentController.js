@@ -258,8 +258,7 @@ Mss.dependencies.MssFragmentController = function () {
     rslt.process = function (bytes, request, representations) {
 
         var result = null,
-            manifest = this.manifestModel.getValue(),
-            needUpdate = false;
+            manifest = this.manifestModel.getValue();
 
         if (bytes !== null && bytes !== undefined && bytes.byteLength > 0) {
             result = new Uint8Array(bytes);
