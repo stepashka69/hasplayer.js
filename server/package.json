@@ -3,9 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "express":"3.x",
-    "request":"*",
-    "tunnel":"*",
-    "http-proxy":"*"
+    "body-parser": "*",
+    "express": "3.x",
+    "express-csv": "*",
+    "hogan-express": "*",
+    "http-proxy": "*",
+    "phantom": "*",
+    "quiche": "0.0.8",
+    "request": "*",
+    "tunnel": "*"
   }
 }

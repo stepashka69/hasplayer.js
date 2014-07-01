@@ -1,0 +1,16 @@
+<select class="flux-choice" ng-model="selectedItem.url" ng-options="stream.link as stream.name for stream in data.fluxList" ng-change="doLoad()"></select>
+
+<video controls="true" class="video-player"></video>
+<div ng-if="playing">
+    <!-- <div ng-controller="WanemController">
+
+        <ul class="wanem-actions">
+            <li ng-repeat="action in sequence" ng-class="{'sequence-action-valid': action.valid, 'sequence-action-invalid': action.valid === false, 'sequence-action-current': action.ongoing }">
+                Passage à <strong>{{ action.bandwidth }}k</strong> pendant <strong>{{ action.duration/1000 }} secondes</strong>
+            </li>
+        </ul>
+
+    </div> -->
+
+    <chart bandwidth="bandwidthData"></chart>
+</div>
