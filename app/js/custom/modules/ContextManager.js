@@ -17,7 +17,7 @@ Custom.modules.ContextManager = function (){
             } else if (ctx === "HLS") {
                 this.system.mapClass('mp4Processor', MediaPlayer.dependencies.Mp4Processor);
                 this.system.mapClass('fragmentController', Hls.dependencies.HlsFragmentController);
-                //this.system.mapClass('indexHandler', Hls.dependencies.HlsHandler);
+                this.system.mapClass('indexHandler', Hls.dependencies.HlsHandler);
             } else {
                 this.system.mapClass('fragmentController', MediaPlayer.dependencies.FragmentController);
                 this.system.mapClass('indexHandler', Dash.dependencies.DashHandler);
