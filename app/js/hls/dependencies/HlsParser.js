@@ -139,7 +139,7 @@ Hls.dependencies.HlsParser = function () {
 		var media = {},
 			mediaParams = _getTagValue(extInf[0], TAG_EXTINF).split(',');
 
-		media.duration = parseInt(mediaParams[0]);
+		media.duration = parseInt(mediaParams[0],10);
 		media.title = mediaParams[1];
 		media.uri = extInf[1];
 
