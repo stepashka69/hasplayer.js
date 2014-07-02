@@ -735,6 +735,8 @@ MediaPlayer.dependencies.BufferController = function () {
                         }
                     } else {
                         self.debug.log("No " + type + " bytes to push.");
+                        // ORANGE : For Hls Stream, init segment are pushed with media
+                        deferredInitAppend.resolve();
                     }
                 }
             );

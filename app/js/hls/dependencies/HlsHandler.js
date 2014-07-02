@@ -14,9 +14,32 @@
  
 Hls.dependencies.HlsHandler = function() {
     var getInit = function (representation) {
-        var deferred = Q.defer();
-        deferred.resolve(null);
-        return deferred.promise;
+            var period = null;
+            var self = this;
+            var presentationStartTime = null;
+            var deferred = Q.defer();
+
+            //Mss.dependencies.MssHandler.prototype.getInitRequest.call(this,quality,data).then(onGetInitRequestSuccess);
+            // get the period and startTime
+            period = representation.adaptation.period;
+            presentationStartTime = period.start;
+
+            var manifest = rslt.manifestModel.getValue();
+            var isDynamic = rslt.manifestExt.getIsDynamic(manifest);
+
+            var request = new MediaPlayer.vo.SegmentRequest();
+
+            request.streamType = rslt.getType();
+            request.type = "Initialization Segment";
+            request.url = null;
+            request.data = 1; //used to activate Loaded event in BufferControler
+            request.range =  representation.range;
+            request.availabilityStartTime = self.timelineConverter.calcAvailabilityStartTimeFromPresentationTime(presentationStartTime, representation.adaptation.period.mpd, isDynamic);
+            request.availabilityEndTime = self.timelineConverter.calcAvailabilityEndTimeFromPresentationTime(presentationStartTime + period.duration, period.mpd, isDynamic);
+
+            request.quality = representation.index;
+            deferred.resolve(request);
+            return deferred.promise;
     };
 	
 	var rslt = Custom.utils.copyMethods(Dash.dependencies.DashHandler);

@@ -48,19 +48,14 @@ Hls.dependencies.HlsFragmentController = function () {
     rslt.sequenceNumber = 1;
 
     rslt.process = function (bytes, request, representations) {
-
         var result = null,
-            InitSegmentData = null,
-            manifest = this.manifestModel.getValue();
+            InitSegmentData = null;
 
         if ((bytes === null) || (bytes === undefined) || (bytes.byteLength === 0)) {
             return Q.when(bytes);
         }
 
-        // Intialize output data
-        result = new Uint8Array(bytes);
-
-        // Media segment => genrate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
+        // Media segment => generate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
         if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
             if (lastRequestQuality === null || lastRequestQuality !== request.quality) {
                 InitSegmentData = generateInitSegment(bytes);
