@@ -352,7 +352,7 @@ Hls.dependencies.HlsDemux = function () {
 
     return {
         debug: undefined,
-
+        reset:doInit,
         getTracks: doGetTracks,
         demux: doDemux
     };

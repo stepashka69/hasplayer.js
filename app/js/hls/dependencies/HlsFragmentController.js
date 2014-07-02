@@ -58,6 +58,7 @@ Hls.dependencies.HlsFragmentController = function () {
         // Media segment => generate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
         if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
             if (lastRequestQuality === null || lastRequestQuality !== request.quality) {
+                rslt.hlsDemux.reset();
                 InitSegmentData = generateInitSegment(bytes);
                 request.index = undefined;
                 lastRequestQuality = request.quality;
