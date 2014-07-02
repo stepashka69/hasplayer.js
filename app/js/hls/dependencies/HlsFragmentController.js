@@ -62,16 +62,10 @@ Hls.dependencies.HlsFragmentController = function () {
 
         // Media segment => genrate corresponding moof data segment from demultiplexed mpeg-2 ts chunk
         if (request && (request.type === "Media Segment") && representations && (representations.length > 0)) {
-
-            // Get current adaptation containing provided representations
-            // (Note: here representations is of type Dash.vo.Representation)
-            var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
-
             if (lastRequestQuality === null || lastRequestQuality !== request.quality) {
-                lastRequestQuality = request.quality;
                 InitSegmentData = generateInitSegment(bytes);
                 request.index = undefined;
-                request.quality = 1;
+                lastRequestQuality = request.quality;
             }
 
             result = generateMediaSegment(bytes);
@@ -83,11 +77,7 @@ Hls.dependencies.HlsFragmentController = function () {
                 catArray.set(result, InitSegmentData.length);
                 result = catArray;
             }
-            //console.saveBinArray(result, "moof_" + rslt.sequenceNumber + ".mp4");
-        }
-
-        if (request !== undefined) {
-            //console.saveBinArray(result, request.streamType + "_" + request.index + "_" + request.quality + ".mp4");
+            //console.saveBinArray(result, "mp4ToTs_" + rslt.sequenceNumber + ".mp4");
         }
 
         return Q.when(result);
