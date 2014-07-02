@@ -154,8 +154,13 @@ Hls.dependencies.HlsDemux = function () {
                 sample.cts -= baseDts;
 
                 // Store payload of PES packet as a subsample
-                    sample.subSamples.push(pesPacket.getPayload());
+                var data = pesPacket.getPayload();
 
+                if (track.streamType.search('ADTS') !== -1) {
+                    data = data.subarray(7); // 7 = ADTS header size
+                }
+
+                sample.subSamples.push(data);
                 track.samples.push(sample);
             }
             else {

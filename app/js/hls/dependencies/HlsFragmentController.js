@@ -36,7 +36,7 @@ Hls.dependencies.HlsFragmentController = function () {
             var tracks = rslt.hlsDemux.demux(new Uint8Array(data));
 
             // Generate media segment (moov)
-            return rslt.mp4Processor.generateMediaSegment(tracks, rslt.sequenceNumber++);
+            return rslt.mp4Processor.generateMediaSegment(tracks, rslt.sequenceNumber);
         };
     
     var rslt = Custom.utils.copyMethods(MediaPlayer.dependencies.FragmentController);
@@ -73,7 +73,9 @@ Hls.dependencies.HlsFragmentController = function () {
                 catArray.set(result, InitSegmentData.length);
                 result = catArray;
             }
-            //console.saveBinArray(result, "mp4ToTs_" + rslt.sequenceNumber + ".mp4");
+            //console.saveBinArray(result, "moof_" + rslt.sequenceNumber + ".mp4");
+
+            rslt.sequenceNumber++;
         }
 
         return Q.when(result);
