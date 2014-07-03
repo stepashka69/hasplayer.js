@@ -235,7 +235,6 @@ Hls.dependencies.HlsDemux = function () {
             pat = null;
             pmt = null;
             tracks = [];
-            baseDts = -1;
         },
 
         getTrackCodecInfo = function (data, track) {
