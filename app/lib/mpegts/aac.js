@@ -18,16 +18,14 @@ mpegts.aac.getAudioSpecificConfig = function (data) { // data as Uint8Array
 
     // We need to parse the beginning of the adts_frame in order to get
     // object type, sampling frequency and channel configuration
-
     var profile = mpegts.binary.getValueFromByte(data[2], 0, 2);
     var sampling_frequency_index = mpegts.binary.getValueFromByte(data[2], 2, 4);
     var channel_configuration = mpegts.binary.getValueFrom2Bytes(data.subarray(2, 5), 7, 3);
 
     var audioSpecificConfig = new Uint8Array(2);
-    audioSpecificConfig[0] = audioSpecificConfig[1] = 0;
 
-    // audioObjectType = profile
-    audioSpecificConfig[0] = profile << 3;
+    // audioObjectType = profile => profile, the MPEG-4 Audio Object Type minus 1
+    audioSpecificConfig[0] = (profile+1) << 3;
 
     // samplingFrequencyIndex
     audioSpecificConfig[0] |= (sampling_frequency_index & 0x0E) >> 1;

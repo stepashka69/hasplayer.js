@@ -281,7 +281,7 @@ Hls.dependencies.HlsDemux = function () {
                 var codecPrivateData = mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload());
                 var objectType = (codecPrivateData[0] & 0xF8) >> 3;
                 track.codecPrivateData = arrayToHexString(codecPrivateData);
-                track.codecs = "mp4a.40.2";// + objectType;
+                track.codecs = "mp4a.40." + objectType;
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
