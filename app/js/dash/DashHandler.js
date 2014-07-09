@@ -155,7 +155,7 @@ Dash.dependencies.DashHandler = function () {
                 seg,
                 duration,
                 presentationStartTime,
-                presentationEndTime;                
+                presentationEndTime;
 
             duration = representation.segmentDuration;
             presentationStartTime = representation.adaptation.period.start + (index * duration);
