@@ -329,7 +329,7 @@ Hls.dependencies.HlsParser = function () {
 
         if (representation.codecs === "") {
 			self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
-			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));        	
+			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));
         } else {
         	deferred.resolve();
         }
