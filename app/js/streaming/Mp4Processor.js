@@ -930,7 +930,11 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 i,
                 length,
                 data,
-                trafs;
+                trafs,
+                mdatLength = 0,
+                trackglobal = {},
+                mdatTracksTab,
+                offset = 0;
 
             // Create file
             moof_file = new mp4lib.boxes.File();
@@ -953,25 +957,41 @@ MediaPlayer.dependencies.Mp4Processor = function () {
 
             // Add tracks data
             trafs = moof.getBoxesByType("traf");
+            
+            length += 8; // 8 = 'size' + 'type' mdat fields length
+            
+            //mdat array size = tracks.length
+            mdatTracksTab = [tracks.length];
+
             for (i = 0; i < tracks.length; i++) {
-                
-                length += 8; // 8 = 'size' + 'type' mdat fields length
 
                 // update trun.data_offset for the track
                 trafs[i].getBoxByType("trun").data_offset = length;
 
                 // Update length of output fragment file
                 length += tracks[i].data.length;
-
-                // Create mdat
-                moof_file.boxes.push(createMediaDataBox(tracks[i]));
+                //add current data in mdatTracksTab array
+                mdatTracksTab[i] = tracks[i].data;
+                //update length of global mdat
+                mdatLength += mdatTracksTab[i].length;
             }
+
+            trackglobal.data = new Uint8Array(mdatLength);
+
+            //concatenate all the tracks data in an array
+            for (i = 0; i < mdatTracksTab.length; i+=2) {
+                trackglobal.data.set(mdatTracksTab[i],offset);
+                trackglobal.data.set(mdatTracksTab[i+1], mdatTracksTab[i].length);
+                offset += mdatTracksTab[i].length + mdatTracksTab[i+1].length;
+            }
+
+            // Create mdat
+            moof_file.boxes.push(createMediaDataBox(trackglobal));
 
             data = mp4lib.serialize(moof_file);
 
             return data;
         };
-
 
     return {
 
