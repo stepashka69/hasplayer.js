@@ -1389,8 +1389,7 @@ MediaPlayer.dependencies.BufferController = function () {
             if (!from) {
                 from = dataValue;
             }
-            // ORANGE: remove stop for HLS use case but...
-            //doStop.call(self);
+            doStop.call(self);
 
             // ORANGE: if data language changed (audio or text) then cancel current requests
             if (data && (data.lang !== dataValue.lang)) {
@@ -1422,8 +1421,7 @@ MediaPlayer.dependencies.BufferController = function () {
                                 data = dataValue;
                                 self.bufferExt.updateData(data, type);
                                 self.debug.log("[BufferController]["+type+"] ========== updateData, seek = " + time);
-                                // ORANGE: remove seek for HLS use case but...
-                                //self.seek(time);
+                                self.seek(time);
 
                                 self.indexHandler.updateSegmentList(currentRepresentation).then(
                                     function() {
