@@ -767,6 +767,8 @@ MediaPlayer.dependencies.BufferController = function () {
                 availabilityRange = currentRepresentation.segmentAvailabilityRange, // all segments are supposed to be available in this interval
                 searchTimeSpan = 12 * 60 * 60; // set the time span that limits our search range to a 12 hours in seconds
 
+            self.debug.log("[BufferController]["+type+"] ### searchForLiveEdge: availabilityRange = [" + availabilityRange.start + " - " + availabilityRange.end + "]");
+
             // start position of the search, it is supposed to be a live edge - the last available segment for the current mpd
             liveEdgeInitialSearchPosition = availabilityRange.end;
             // we should search for a live edge in a time range which is limited by searchTimeSpan.
@@ -783,6 +785,9 @@ MediaPlayer.dependencies.BufferController = function () {
 
         findLiveEdge = function (searchTime, onSuccess, onError, request) {
             var self = this;
+
+            self.debug.log("[BufferController]["+type+"] ### findLiveEdge: request.url = " + (request === null) ? "" : request.url);
+
             if (request === null) {
                 // request can be null because it is out of the generated list of request. In this case we need to
                 // update the list and the segmentAvailabilityRange
@@ -1240,12 +1245,16 @@ MediaPlayer.dependencies.BufferController = function () {
                         return;
                     }
 
-                    searchForLiveEdge.call(self).then(
-                        function(liveEdgeTime) {
+                    // ORANGE: Disable live edge searching
+                    var liveEdgeTime = currentRepresentation.segmentAvailabilityRange.end;
+
+                    //searchForLiveEdge.call(self).then(
+                        //function(liveEdgeTime) {
                             self.debug.log("[BufferController]["+type+"] ### Live edge = " + liveEdgeTime);
                             // step back from a found live edge time to be able to buffer some data
                             // ORANGE: (minBufferTime * 2) in order to ensure not requiring segments that are available yet while buffering
-                            var startTime = Math.max((liveEdgeTime - (minBufferTime * 2)), currentRepresentation.segmentAvailabilityRange.start),
+                            //var startTime = Math.max((liveEdgeTime - (minBufferTime * 2)), currentRepresentation.segmentAvailabilityRange.start),
+                            var startTime = Math.max((liveEdgeTime - minBufferTime), currentRepresentation.segmentAvailabilityRange.start),
                                 segmentStart;
                             self.debug.log("[BufferController]["+type+"] ### Live start time = " + startTime);
                             // get a request for a start time
@@ -1260,8 +1269,8 @@ MediaPlayer.dependencies.BufferController = function () {
                                 startPlayback.call(self);
                                 doSeek.call(self, segmentStart);
                             });
-                        }
-                    );
+                        //}
+                    //);
 
                     // ORANGE: in live use case, search for live edge only for main video stream.
                     // Else do nothing. startPlayback will be called later once live edge of video stream
@@ -1380,7 +1389,8 @@ MediaPlayer.dependencies.BufferController = function () {
             if (!from) {
                 from = dataValue;
             }
-            doStop.call(self);
+            // ORANGE: remove stop for HLS use case but...
+            //doStop.call(self);
 
             // ORANGE: if data language changed (audio or text) then cancel current requests
             if (data && (data.lang !== dataValue.lang)) {
@@ -1412,7 +1422,8 @@ MediaPlayer.dependencies.BufferController = function () {
                                 data = dataValue;
                                 self.bufferExt.updateData(data, type);
                                 self.debug.log("[BufferController]["+type+"] ========== updateData, seek = " + time);
-                                self.seek(time);
+                                // ORANGE: remove seek for HLS use case but...
+                                //self.seek(time);
 
                                 self.indexHandler.updateSegmentList(currentRepresentation).then(
                                     function() {

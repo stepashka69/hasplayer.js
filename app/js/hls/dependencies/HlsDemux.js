@@ -23,6 +23,7 @@ Hls.dependencies.HlsDemux = function () {
         pidToTrackId = [],
         tracks = [],
         baseDts = -1,
+        dtsOffset = -1,
 
         getTsPacket = function (data, pid, pusi) {
             var i = 0;
@@ -98,10 +99,10 @@ Hls.dependencies.HlsDemux = function () {
                 track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
                 track.pid = elementStream.m_elementary_PID;
                 track.trackId = trackIdCounter;
-                    pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
-                    tracks.push(track);
-                    trackIdCounter ++;
-                }
+                pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
+                tracks.push(track);
+                trackIdCounter ++;
+            }
 
             return pmt;
         },
@@ -152,6 +153,9 @@ Hls.dependencies.HlsDemux = function () {
                 }
                 sample.dts -= baseDts;
                 sample.cts -= baseDts;
+
+                sample.dts += dtsOffset;
+                sample.cts += dtsOffset;
 
                 // Store payload of PES packet as a subsample
                 var data = pesPacket.getPayload();
@@ -231,10 +235,14 @@ Hls.dependencies.HlsDemux = function () {
             return str;
         },
 
-        doInit = function () {
+        doInit = function (startTime) {
             pat = null;
             pmt = null;
             tracks = [];
+
+            if (dtsOffset === -1) {
+                dtsOffset = startTime;
+            }
         },
 
         getTrackCodecInfo = function (data, track) {
@@ -358,8 +366,10 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // Re-assemble samples from sub-samples
+            this.debug.log("[HlsDemux] Demux: baseDts = " + baseDts + ", dtsOffset = " + dtsOffset);
             for (i = 0; i < tracks.length; i++) {
                 postProcess.call(this, tracks[i]);
+                this.debug.log("[HlsDemux] Demux: 1st PTS = " + tracks[i].samples[0].dts + " (" + (tracks[i].samples[0].dts / 90000) + ")");
             }
 
             return tracks;
