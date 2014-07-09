@@ -529,22 +529,27 @@ Dash.dependencies.DashHandler = function () {
                     endIdx = range.end;
 
                     for (i = startIdx; i < endIdx; i += 1) {
-                s = list.SegmentURL_asArray[i];
+                        s = list.SegmentURL_asArray[i];
 
-                seg = getIndexBasedSegment.call(
-                            self,
-                    representation,
-                    i);
+                        seg = getIndexBasedSegment.call(self, representation, i);
 
-                seg.replacementTime = (start + i - 1) * representation.segmentDuration;
-                seg.media = s.media;
-                seg.mediaRange = s.mediaRange;
-                seg.index = s.index;
-                seg.indexRange = s.indexRange;
+                        seg.replacementTime = (start + i - 1) * representation.segmentDuration;
+                        seg.media = s.media;
+                        seg.mediaRange = s.mediaRange;
+                        seg.index = s.index;
+                        seg.indexRange = s.indexRange;
 
-                segments.push(seg);
-                seg = null;
-            }
+                        // ORANGE: add segment time if present (HLS use case)
+                        if (s.time !== undefined) {
+                            seg.presentationStartTime = s.time;
+                            seg.mediaStartTime = s.time;
+                        }
+
+                        self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
+
+                        segments.push(seg);
+                        seg = null;
+                    }
 
                     representation.availableSegmentsNumber = len;
                     deferred.resolve(segments);

@@ -75,6 +75,10 @@ Hls.dependencies.HlsParser = function () {
 		return data.substring(tag.length + 1, data.length);
 	};
 
+	var _getTagParams = function(data) {
+		return data.substring(data.indexOf(':') + 1).split(',');
+	};
+
 	var _parseStreamInf = function(streamInfArray) {
 		var stream = {
 				programId: "",
@@ -85,7 +89,8 @@ Hls.dependencies.HlsParser = function () {
 			name = "",
 			value = "",
 			i,
-			streamParams = _getTagValue(streamInfArray[0], TAG_EXTXSTREAMINF).split(',');
+			//streamParams = _getTagValue(streamInfArray[0], TAG_EXTXSTREAMINF).split(',');
+			streamParams = _getTagParams(streamInfArray[0]);
 
 		for (i = streamParams.length - 1; i >= 0; i--) {
 
@@ -137,9 +142,10 @@ Hls.dependencies.HlsParser = function () {
 	//	<url>
 	var _parseExtInf = function(extInf) {
 		var media = {},
-			mediaParams = _getTagValue(extInf[0], TAG_EXTINF).split(',');
+			//mediaParams = _getTagValue(extInf[0], TAG_EXTINF).split(',');
+			mediaParams = _getTagParams(extInf[0]);
 
-		media.duration = parseInt(mediaParams[0],10);
+		media.duration = parseInt(mediaParams[0], 10);
 		media.title = mediaParams[1];
 		media.uri = extInf[1];
 
@@ -184,12 +190,14 @@ Hls.dependencies.HlsParser = function () {
 
 	var _parsePlaylist = function(deferred, data, representation) {
 		var segmentList,
+			segments,
 			segment,
 			version,
-			media,
 			duration = 0,
-			i,
-			self = this;
+			startNumber = 0,
+			index = 0,
+			media,
+			i;
 
 		console.log(data);
 		data = _splitLines(data);
@@ -214,8 +222,10 @@ Hls.dependencies.HlsParser = function () {
 		};
 		representation[segmentList.name] = segmentList;
 
+		segments = segmentList.SegmentURL_asArray;
+
 		// Set representation duration, by default set to  (="dynamic")
-		representation.duration = 0;
+		representation.duration = Infinity;
 
 		// Parse playlist
 		for (i = 1; i < data.length; i++) {
@@ -233,61 +243,99 @@ Hls.dependencies.HlsParser = function () {
 					isArray: true,
 					//parent: segmentList,
 					// children: [],
-					media: segmentList.BaseURL + media.uri
+					media: segmentList.BaseURL + media.uri,
+					sequenceNumber: segmentList.startNumber + index,
+					time: (segments.length === 0) ? 0 : segments[segments.length - 1].time + segments[segments.length - 1].duration,
+					duration: media.duration
 				};
-				segmentList.SegmentURL_asArray.push(segment);
+
+				segments.push(segment);
 				duration += media.duration;
+
+				index++;
+
 			} else if (_containsTag(data[i], TAG_EXTXENDLIST)) {
-				// "static" playlist => set duration
+				// "static" playlist => set representation duration
 				representation.duration = duration;
 			}
 		}
 
 		// PATCH Live = VOD
-		representation.duration = duration;
-
+		//representation.duration = duration;
 		deferred.resolve();
 	};
 
+	var mergeSegmentLists = function(_representation, representation) {
+
+		var _segmentList = _representation.SegmentList,
+			segmentList = representation.SegmentList,
+			_segments = _segmentList.SegmentURL_asArray,
+			segments = segmentList.SegmentURL_asArray,
+			_length = _segments.length,
+			length = segments.length,
+			segment,
+			_lastSegment = _segments[_length - 1],
+			i = 0;
+
+		for (i = 0; i < length; i++) {
+			segment = segments[i];
+			if (segment.sequenceNumber > _lastSegment.sequenceNumber) {
+				segment.time = _lastSegment.time + _lastSegment.duration;
+				_segments.push(segment);
+				_lastSegment = _segments[_length - 1];
+			}
+		}
+
+		representation.SegmentList = _segmentList;
+
+	};
 
 	var postProcess = function(manifest) {
 		var deferred = Q.defer(),
 			period = manifest.Period_asArray[0],
 			adaptationSet = period.AdaptationSet_asArray[0],
 			representation = adaptationSet.Representation_asArray[0],
+			startNumber = -1,
 			i,
 			initialization,
 			request = new MediaPlayer.vo.SegmentRequest(),
+			_manifest = this.manifestModel.getValue(),
 			self = this;
 
 
-		period.start = 0;
+		period.start = 0;//segmentTimes[adaptationSet.Representation_asArray[0].SegmentList.startNumber];
 
 		// Copy duration from first representation's duration
 		adaptationSet.duration = representation.duration;
 		period.duration = representation.duration;
-		manifest.mediaPresentationDuration = representation.duration;
+
+		if (representation.duration !== Infinity) {
+			manifest.mediaPresentationDuration = representation.duration;
+		}
 
 		// Set manifest type, "static" vs "dynamic"
-		manifest.type = (manifest.mediaPresentationDuration === 0) ? "dynamic": "static";
+		manifest.type = (representation.duration === Infinity) ? "dynamic": "static";
+
+		var manifestDuration = representation.SegmentList.duration * representation.SegmentList.SegmentURL_asArray.length;
 
 		// Dynamic use case
 		if (manifest.type === "dynamic") {
 			// => set manifest refresh period as the duration of 1 fragment/chunk
-			manifest.minimumUpdatePeriod = adaptationSet.Representation_asArray[0].SegmentList.duration;
+			manifest.minimumUpdatePeriod = representation.SegmentList.duration;
 
 			// => set availabilityStartTime property
 			var mpdLoadedTime = new Date();
-			var manifestDuration = representation.SegmentList.duration * representation.SegmentList.SegmentURL_asArray.length;
-			manifest.availabilityStartTime = new Date(mpdLoadedTime.getTime() - manifestDuration);
+			manifest.availabilityStartTime = new Date(mpdLoadedTime.getTime() - (manifestDuration * 1000));
+
+			// => set timeshift buffer depth
+			manifest.timeShiftBufferDepth = manifestDuration - representation.SegmentList.duration;
 		}
 
 		// Set minBufferTime            
-		manifest.minBufferTime = representation.SegmentList.duration - 1;//MediaPlayer.dependencies.BufferExtensions.DEFAULT_MIN_BUFFER_TIME
+		manifest.minBufferTime = representation.SegmentList.duration * 2;//MediaPlayer.dependencies.BufferExtensions.DEFAULT_MIN_BUFFER_TIME
 
-		// Set initialization segment for each representation
-		// And download initialization data (PSI, IDR...) to obtain codec information
-		var requestPromiseArray = [];
+		// Set initialization segment info
+		// And get highest start sequence number among all representations
 		for (i = 0; i < adaptationSet.Representation_asArray.length; i++) {
 			representation = adaptationSet.Representation_asArray[i];
 			
@@ -298,6 +346,36 @@ Hls.dependencies.HlsParser = function () {
 			};
 			representation.SegmentList.Initialization = initialization;
 
+			if (representation.SegmentList.startNumber > startNumber) {
+				startNumber = representation.SegmentList.startNumber;
+			}
+		}
+
+		if (manifest.type === "dynamic") {
+
+			if ((_manifest === undefined) || (_manifest === null)) {
+				// At first manifest download, align segment lists according to sequence number
+				for (i = 0; i < adaptationSet.Representation_asArray.length; i++) {
+					var itemsToRemove = startNumber - representation.SegmentList.SegmentURL_asArray[0].sequenceNumber;
+					if (itemsToRemove > 0) {
+						representation.SegmentList.SegmentURL_asArray.splice(0, itemsToRemove);
+					}
+				}
+			} else {
+				// Merge segments lists of all representation to get whole timeline
+				// in order to enable DashHandler generic operating
+				var _period = _manifest.Period_asArray[0],
+					_adaptationSet = _period.AdaptationSet_asArray[0],
+					_representation;
+
+				manifest.availabilityStartTime = _manifest.availabilityStartTime;
+
+				for (i = 0; i < adaptationSet.Representation_asArray.length; i++) {
+					representation = adaptationSet.Representation_asArray[i];
+					_representation = _adaptationSet.Representation_asArray[i];
+					mergeSegmentLists(_representation, representation);
+				}
+			}
 		}
 
 		// Download initialization data (PSI, IDR...) of 1st representation to obtain codec information
@@ -329,14 +407,13 @@ Hls.dependencies.HlsParser = function () {
 
         if (representation.codecs === "") {
 			self.debug.log("[HlsParser]", "Load initialization segment: " + request.url);
-			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));        	
+			self.fragmentLoader.load(request).then(onLoaded.bind(self, representation), onError.bind(self));
         } else {
-        	deferred.resolve();
+			deferred.resolve();
         }
 
         return deferred.promise;
 	};
-
 
 	var processManifest = function(data, baseUrl) {
 		var deferred = Q.defer(),
@@ -368,7 +445,6 @@ Hls.dependencies.HlsParser = function () {
 
         mpd.profiles= "urn:mpeg:dash:profile:isoff-live:2011";
         mpd.type = "static"; // Updated in postProcess()
-        mpd.mediaPresentationDuration = 0; // Updated in postProcess()
         
         // PERIOD
         period = {};
@@ -506,6 +582,7 @@ Hls.dependencies.HlsParser = function () {
 
 	return {
         debug: undefined,
+        manifestModel: undefined,
         fragmentLoader: undefined,
         hlsDemux: undefined,
 

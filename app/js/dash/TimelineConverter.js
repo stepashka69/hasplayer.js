@@ -145,7 +145,7 @@ Dash.dependencies.TimelineConverter = function () {
             // and server time as well
             period.clientServerTimeShift = actualLiveEdge - expectedLiveEdge;
             period.isClientServerTimeSyncCompleted = true;
-            clientServerTimeShift = period.clientServerTimeShift * 1000;
+            clientServerTimeShift = period.clientServerTimeShift;// * 1000; // ORANGE: clientServerTimeShift in seconds (and not milliseconds)
             isClientServerTimeSyncCompleted = true;
         },
 
