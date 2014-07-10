@@ -275,10 +275,10 @@ MediaPlayer.dependencies.BufferController = function () {
                         Q.when(deferredInitAppend.promise).then(
                             function() {
                                 self.debug.log("[BufferController]["+type+"] ### Buffer segment from url ", request.url);
-                                appendToBuffer.call(self, data, request.quality, request.index).then(
-                                    function() {
-                                        deleteInbandEvents.call(self,data).then(
-                                            function(data) {
+                                deleteInbandEvents.call(self,data).then(
+                                    function(data) {
+                                        appendToBuffer.call(self, data, request.quality, request.index).then(
+                                            function() {
                                                 // ORANGE unnecessary deferred in dynamic mode which produce a memoryleak, deferred is never resolve...
                                                 if (!isDynamic) {
                                                     deferredStreamComplete.promise.then(
@@ -735,7 +735,7 @@ MediaPlayer.dependencies.BufferController = function () {
                         }
                     } else {
                         self.debug.log("No " + type + " bytes to push.");
-                        // ORANGE : For Hls Stream, init segment are pushed with media
+                        // ORANGE : For HLS Stream, init segment are pushed with media (@see HlsFragmentController)
                         deferredInitAppend.resolve();
                     }
                 }
@@ -1165,6 +1165,12 @@ MediaPlayer.dependencies.BufferController = function () {
                             self.debug.log("[BufferController]["+type+"] ### QUALITY CHANGED => " + newQuality + " (" + currentRepresentation.id + ")");
                             if (currentRepresentation === null || currentRepresentation === undefined) {
                                 throw "Unexpected error!";
+                            }
+
+                            // ORANGE: reset current representation list of segments, to force DashHandler
+                            // updating the list of segments.
+                            if (currentRepresentation.segments) {
+                                currentRepresentation.segments = null;
                             }
 
                             // each representation can have its own @presentationTimeOffset, so we should set the offset
