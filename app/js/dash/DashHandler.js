@@ -528,7 +528,8 @@ Dash.dependencies.DashHandler = function () {
                     startIdx = range.start;
                     endIdx = range.end;
 
-                    for (i = startIdx; i < endIdx; i += 1) {
+                    // ORANGE: patch in case range is to wide
+                    for (i = startIdx; (i < endIdx) && (i < list.SegmentURL_asArray.length); i += 1) {
                         s = list.SegmentURL_asArray[i];
 
                         seg = getIndexBasedSegment.call(self, representation, i);
