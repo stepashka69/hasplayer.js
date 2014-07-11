@@ -23,6 +23,7 @@ Hls.dependencies.HlsDemux = function () {
         pidToTrackId = [],
         tracks = [],
         baseDts = -1,
+        dtsOffset = -1,
 
         getTsPacket = function (data, pid, pusi) {
             var i = 0;
@@ -98,10 +99,10 @@ Hls.dependencies.HlsDemux = function () {
                 track.timescale = mpegts.Pts.prototype.SYSTEM_CLOCK_FREQUENCY;
                 track.pid = elementStream.m_elementary_PID;
                 track.trackId = trackIdCounter;
-                    pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
-                    tracks.push(track);
-                    trackIdCounter ++;
-                }
+                pidToTrackId[elementStream.m_elementary_PID] = trackIdCounter;
+                tracks.push(track);
+                trackIdCounter ++;
+            }
 
             return pmt;
         },
@@ -152,6 +153,9 @@ Hls.dependencies.HlsDemux = function () {
                 }
                 sample.dts -= baseDts;
                 sample.cts -= baseDts;
+
+                sample.dts += dtsOffset;
+                sample.cts += dtsOffset;
 
                 // Store payload of PES packet as a subsample
                 var data = pesPacket.getPayload();
@@ -231,10 +235,14 @@ Hls.dependencies.HlsDemux = function () {
             return str;
         },
 
-        doInit = function () {
+        doInit = function (startTime) {
             pat = null;
             pmt = null;
             tracks = [];
+
+            if (dtsOffset === -1) {
+                dtsOffset = startTime;
+            }
         },
 
         getTrackCodecInfo = function (data, track) {
@@ -280,8 +288,19 @@ Hls.dependencies.HlsDemux = function () {
             if (track.streamType.search('AAC') !== -1) {
                 var codecPrivateData = mpegts.aac.getAudioSpecificConfig(pesPacket.getPayload());
                 var objectType = (codecPrivateData[0] & 0xF8) >> 3;
+                track.channels = (codecPrivateData[1] & 0x78) >> 3;
+                track.bandwidth = mpegts.aac.SAMPLING_FREQUENCY[(codecPrivateData[0] & 0x07) << 1 | (codecPrivateData[1] & 0x80) >> 7];
+                //samplingRate not useful to decode audio data on chrome and IE
+                //track.samplingRate = 24000;              
                 track.codecPrivateData = arrayToHexString(codecPrivateData);
                 track.codecs = "mp4a.40." + objectType;
+                /* code for HE AAC v2 to be tested
+                var arr16 = new Uint16Array(2);
+                arr16[0] = (codecPrivateData[0] << 8) + codecPrivateData[1];
+                arr16[1] = (codecPrivateData[2] << 8) + codecPrivateData[3];
+                //convert decimal to hex value
+                var codecPrivateDataHex = arr16[0].toString(16)+arr16[1].toString(16);
+                track.codecPrivateData = codecPrivateDataHex.toUpperCase();*/
             }
 
             this.debug.log("[HlsDemux] track codecPrivateData = " + track.codecPrivateData);
@@ -347,8 +366,10 @@ Hls.dependencies.HlsDemux = function () {
             }
 
             // Re-assemble samples from sub-samples
+            this.debug.log("[HlsDemux] Demux: baseDts = " + baseDts + ", dtsOffset = " + dtsOffset);
             for (i = 0; i < tracks.length; i++) {
                 postProcess.call(this, tracks[i]);
+                this.debug.log("[HlsDemux] Demux: 1st PTS = " + tracks[i].samples[0].dts + " (" + (tracks[i].samples[0].dts / 90000) + ")");
             }
 
             return tracks;

@@ -34,6 +34,29 @@ mpegts.aac.getAudioSpecificConfig = function (data) { // data as Uint8Array
     // channelConfiguration
     audioSpecificConfig[1] |= channel_configuration << 3;
 
+   /*  code for HE AAC v2 to be tested
+
+    var audioSpecificConfig = new Uint8Array(4);
+
+    // audioObjectType = profile => profile, the MPEG-4 Audio Object Type minus 1
+    audioSpecificConfig[0] = 29 << 3;
+
+    // samplingFrequencyIndex
+    audioSpecificConfig[0] |= (sampling_frequency_index & 0x0E) >> 1;
+    audioSpecificConfig[1] |= (sampling_frequency_index & 0x01) << 7;
+
+    // channelConfiguration
+    audioSpecificConfig[1] |= channel_configuration << 3;
+    
+    var extensionSamplingFrequencyIndex = 5;// in HE AAC Extension Sampling frequence
+
+    audioSpecificConfig[1] |= extensionSamplingFrequencyIndex >> 1;
+       
+    audioSpecificConfig[2] = (extensionSamplingFrequencyIndex << 7) | ((profile+1) << 2);// origin object type equals to 2 => AAC Main Low Complexity
+    audioSpecificConfig[3] = 0x0; //alignment bits
+
+   */
+
     return audioSpecificConfig;
 };
 

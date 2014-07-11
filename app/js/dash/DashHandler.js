@@ -155,7 +155,7 @@ Dash.dependencies.DashHandler = function () {
                 seg,
                 duration,
                 presentationStartTime,
-                presentationEndTime;                
+                presentationEndTime;
 
             duration = representation.segmentDuration;
             presentationStartTime = representation.adaptation.period.start + (index * duration);
@@ -528,23 +528,29 @@ Dash.dependencies.DashHandler = function () {
                     startIdx = range.start;
                     endIdx = range.end;
 
-                    for (i = startIdx; i < endIdx; i += 1) {
-                s = list.SegmentURL_asArray[i];
+                    // ORANGE: patch in case range is to wide
+                    for (i = startIdx; (i < endIdx) && (i < list.SegmentURL_asArray.length); i += 1) {
+                        s = list.SegmentURL_asArray[i];
 
-                seg = getIndexBasedSegment.call(
-                            self,
-                    representation,
-                    i);
+                        seg = getIndexBasedSegment.call(self, representation, i);
 
-                seg.replacementTime = (start + i - 1) * representation.segmentDuration;
-                seg.media = s.media;
-                seg.mediaRange = s.mediaRange;
-                seg.index = s.index;
-                seg.indexRange = s.indexRange;
+                        seg.replacementTime = (start + i - 1) * representation.segmentDuration;
+                        seg.media = s.media;
+                        seg.mediaRange = s.mediaRange;
+                        seg.index = s.index;
+                        seg.indexRange = s.indexRange;
 
-                segments.push(seg);
-                seg = null;
-            }
+                        // ORANGE: add segment time if present (HLS use case)
+                        if (s.time !== undefined) {
+                            seg.presentationStartTime = s.time;
+                            seg.mediaStartTime = s.time;
+                        }
+
+                        self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
+
+                        segments.push(seg);
+                        seg = null;
+                    }
 
                     representation.availableSegmentsNumber = len;
                     deferred.resolve(segments);
@@ -673,7 +679,7 @@ Dash.dependencies.DashHandler = function () {
                     frag = segments[i];
                     ft = frag.presentationStartTime;
                     fd = frag.duration;
-                    //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd);
+                    //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd + ", idx = " + frag.availabilityIdx);
                     if ((time + Dash.dependencies.DashHandler.EPSILON) >= ft &&
                         (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
                         idx = frag.availabilityIdx;
