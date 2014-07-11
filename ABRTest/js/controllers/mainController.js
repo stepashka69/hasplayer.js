@@ -1,4 +1,4 @@
-angular.module('HASPlayer').controller('MainController', function($scope, $timeout, fluxService, graphService) {
+angular.module('HASPlayer').controller('MainController', function($scope, $timeout, $routeParams, $location, $window, fluxService, graphService) {
     var player,
     video,
     context,
@@ -18,11 +18,55 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
     previousRequest = null;
 
     $scope.data = {};
+    $scope.selectedItem = {};
+
+    //UI Actions
+    var setFlux = function(list) {
+        var i = 0,
+            len = list.length;
+
+        for(i; i< len; i++) {
+            if(list[i].name === $routeParams.selectedFlux) {
+                return list[i];
+            }
+        }
+        return list[0];
+    };
 
     fluxService.getList().then(function(data) {
         $scope.data.fluxList = data;
+        $scope.selectedItem = setFlux($scope.data.fluxList);
+        $scope.doLoad();
     });
 
+    //Version Choice
+    fluxService.getVersion().then(function(data) {
+        $scope.data.versionList = data;
+
+        var i = 0,
+            len = $scope.data.versionList.length;
+
+        for(i; i<len; i++) {
+            var pattern = new RegExp($scope.data.versionList[i].id);
+            if(pattern.test($location.absUrl())) {
+                $scope.selectedVersion = $scope.data.versionList[i].id;
+            }
+        }
+    });
+
+    $scope.redirectFlux = function(selectedFlux) {
+        $location.path(selectedFlux.name);
+        $window.location.href= $location.absUrl();
+        $scope.doLoad();
+    };
+
+    $scope.redirectVersion = function(selectedVersion) {
+        $window.location.href = selectedVersion + '#' + $location.path();
+    };
+
+
+
+    //Player INIT
     function initMetrics() {
 
         $scope.videoBitrate = 0;
@@ -208,6 +252,7 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
             }
 
             if(metrics.httpRequest !== null) {
+
                 if(previousRequest !== metrics.httpRequest.url) {
                     requestSeries.push([video.currentTime, Math.round(previousDownloadedQuality/1000)])
                     if(metrics.calcBandwidth !== null && metrics.calcBandwidth.value < 10000) {
@@ -225,10 +270,12 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
 
             if(playSeries.length < 1) {
                var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
+               if(video.currentTime !== 0) {
                 playSeries.push(playPoint); 
             }
-            
-            videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
+        }
+
+        videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
 
             // if (videoSeries.length > maxGraphPoints) {
             //     videoSeries.splice(0, 1);
@@ -317,22 +364,18 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
 
     $scope.doLoad = function () {
 
+
         $scope.playing = false;
 
-        
-
         $timeout(function() {
-            initMetrics();
 
-            if($scope.chartConfig !== undefined) {
-                delete $scope.chartConfig;
-            } 
+            initMetrics();
 
             if(typeof updating !== 'undefined') {
                 clearTimeout(updating);
             }
 
-            player.attachSource($scope.selectedItem.url, $scope.selectedItem.backUrl);
+            player.attachSource($scope.selectedItem.link, $scope.selectedItem.backUrl);
             update();
 
             $scope.playing = true;
@@ -353,8 +396,8 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
     if (paramUrl !== null) {
         var startPlayback = true;
 
-        $scope.selectedItem = {};
-        $scope.selectedItem.url = paramUrl;
+        
+        $scope.selectedItem.link = paramUrl;
 
         if (vars.hasOwnProperty("autoplay")) {
             startPlayback = (vars.autoplay === 'true');
