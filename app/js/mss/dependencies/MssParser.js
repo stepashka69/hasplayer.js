@@ -622,9 +622,10 @@
         var manifest = null;
         var converter = new X2JS(matchers, '', true);
         var iron = new Custom.utils.ObjectIron(getDashMap());
- 
+
         // Process 'CodecPrivateData' attributes values so that they can be identified/processed as hexadecimal strings
         data = data.replace(/CodecPrivateData="/g, "CodecPrivateData=\"0x");
+        data = data.replace(/CodecPrivateData='/g, "CodecPrivateData=\'0x");
 
         this.debug.log("[MssParser]", "Converting from XML.");
         manifest = converter.xml_str2json(data);
