@@ -413,9 +413,9 @@
                 if (node.FourCC === "AACH") {
                     objectType = 0x05;
                 }
-              
+
                 //if codecPrivateDatafield is empty, build it :
-                if (codecPrivateDatafield === "" || codecPrivateDatafield === undefined) {
+                if (codecPrivateDatafield === "" || codecPrivateDatafield === undefined || codecPrivateDatafield === "0x") {
                     objectType = 0x02; //AAC Main Low Complexity => object Type = 2
                     var indexFreq = samplingFrequencyIndex[node.SamplingRate];
                     if (node.FourCC === "AACH") {
