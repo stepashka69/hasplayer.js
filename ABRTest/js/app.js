@@ -8,7 +8,7 @@ app.config(['$routeProvider',
 	function($routeProvider) {
 
 		$routeProvider.
-		when('/', {
+		when('/:selectedFlux?', {
 			templateUrl: 'views/main.html',
 			controller: 'MainController'
 		}).

@@ -1,6 +1,5 @@
 angular.module('HASPlayer').service('graphService', function($resource){
-	var chartService = $resource('/chart-db', {}),
-		chartService = $resource('/chart-db', {});
+	var chartService = $resource('/chart-db', {});
 
 	return {
 		getChart: function(requestData) {

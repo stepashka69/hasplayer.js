@@ -1,4 +1,7 @@
-<select class="flux-choice" ng-model="selectedItem.url" ng-options="stream.link as stream.name for stream in data.fluxList" ng-change="doLoad()"></select>
+<select class="select flux-choice" ng-model="selectedItem" ng-change="redirectFlux(selectedItem)" ng-options="stream as stream.name for stream in data.fluxList"></select>
+
+<select class="select version-choice" ng-change="redirectVersion(selectedVersion)" ng-model="selectedVersion" ng-options="version.id as version.name for version in data.versionList">
+</select>
 
 <video controls="true" class="video-player"></video>
 <div ng-if="playing">

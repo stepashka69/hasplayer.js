@@ -1,4 +1,13 @@
+
+
 [{
+    "name": "VOD 2 - Arte - test",
+    "link": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+    "audioChoice": false,
+    "live": false,
+    "type": "SMOOTH",
+    "DRM": false
+}, {
     "name": "France 2",
     "link": "http://192.168.1.1:8080/MSS/France2/Manifest.xml",
     "audioChoice": false,

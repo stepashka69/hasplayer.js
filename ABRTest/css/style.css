@@ -38,18 +38,25 @@ button:hover {
 	margin: 15px 0;
 }
 
-.flux-choice {
-	width: 100%;
-	height: 30px;
+.select {
 	font-size: 18px;
 	padding: 3px;
 	border: none;
 }
 
-.flux-choice:hover {
+.select:hover {
 	cursor: pointer;
 }
 
+.version-choice {
+	width: 29%;
+	height: 30px;
+}
+
+.flux-choice {
+	width: 70%;
+	height: 30px;
+}
 
 .wanem-actions {
 	margin: 0;

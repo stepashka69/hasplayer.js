@@ -45,7 +45,6 @@ angular.module('HASPlayer').directive('chart', function(){
 
 						$scope.bandwidth.dataSequence.push([time, data.sequence[i].bandwidth]);
 						var datatime = time+(data.sequence[i].duration/1000);
-						console.log(datatime);
 						$scope.bandwidth.dataSequence.push([datatime - 1, data.sequence[i].bandwidth]);
 
 						time = datatime;
@@ -87,7 +86,7 @@ angular.module('HASPlayer').directive('chart', function(){
 							}
 						},
 						{
-							type: 'scatter',
+							type: 'line',
 							name: 'Bande passante réelle',
 							color: 'red',
 							data: $scope.bandwidth.calcBandwidthSeries,
