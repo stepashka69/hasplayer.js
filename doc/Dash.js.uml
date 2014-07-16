@@ -8959,7 +8959,6 @@ been initilized in the NeedKey callback
 <XPD:REF name="Receiver">QpxbD1wb8kaC8yrtLlyTjgAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="5w42TCk1YE65OUWdAvRXaQAA">
 <XPD:REF name="Stimulus">yFwJEFLVlESEhTnGt+Z9dwAA</XPD:REF>
-<XPD:REF name="Operation">AI7o1XUKs0O68oi+sJo18wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">19Ey02NXBESCXDiDSb8HxAAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
@@ -14254,7 +14253,6 @@ been initilized in the NeedKey callback
 <XPD:REF name="Receiver">gxzAkD9lAkCv4wF9f2ENlwAA</XPD:REF>
 <XPD:OBJ name="Action" type="UMLCallAction" guid="27GjIQXo9EyhLYJNlj9q5AAA">
 <XPD:REF name="Stimulus">/4owl4T6kE2zAUf3bU4RJwAA</XPD:REF>
-<XPD:REF name="Operation">AI7o1XUKs0O68oi+sJo18wAA</XPD:REF>
 </XPD:OBJ>
 <XPD:REF name="InteractionInstanceSet">LzUz75dQMEeRHb6g4s5RQQAA</XPD:REF>
 <XPD:ATTR name="#Views" type="integer">4</XPD:ATTR>
@@ -15080,7 +15078,7 @@ been initilized in the NeedKey callback
 <XPD:REF name="Views[1]">n/BtkGp5uUCTJWBOSnuqfgAA</XPD:REF>
 <XPD:REF name="Views[2]">AP1OcHQEtEeXBZ0pshUhwQAA</XPD:REF>
 <XPD:REF name="Views[3]">tHYOcOfj7kWSA5Qj+psKhwAA</XPD:REF>
-<XPD:ATTR name="#Operations" type="integer">14</XPD:ATTR>
+<XPD:ATTR name="#Operations" type="integer">67</XPD:ATTR>
 <XPD:OBJ name="Operations[0]" type="UMLOperation" guid="JUw0WjIfIkm8eqJnlIqHfQAA">
 <XPD:ATTR name="Name" type="string">initialize</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
@@ -15106,11 +15104,7 @@ been initilized in the NeedKey callback
 <XPD:ATTR name="Name" type="string">setBuffer</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[5]" type="UMLOperation" guid="KlfTJ8jYtUmawyXRWAlg0QAA">
-<XPD:ATTR name="Name" type="string">getBuffer</XPD:ATTR>
-<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
-</XPD:OBJ>
-<XPD:OBJ name="Operations[6]" type="UMLOperation" guid="OZ5L5yJpqEGbav1qhU2zDwAA">
+<XPD:OBJ name="Operations[5]" type="UMLOperation" guid="OZ5L5yJpqEGbav1qhU2zDwAA">
 <XPD:ATTR name="Name" type="string">validate</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
@@ -15120,7 +15114,7 @@ been initilized in the NeedKey callback
 <XPD:REF name="CallActions[2]">3Fs/W1ZKRkifrv0PrtSOfwAA</XPD:REF>
 <XPD:REF name="CallActions[3]">36zmBDTyrkqAJ03TUaIuOgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[7]" type="UMLOperation" guid="mIzwR1MtdUGI7WAjw49ynAAA">
+<XPD:OBJ name="Operations[6]" type="UMLOperation" guid="mIzwR1MtdUGI7WAjw49ynAAA">
 <XPD:ATTR name="Name" type="string">loadInitialization</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
@@ -15129,7 +15123,7 @@ been initilized in the NeedKey callback
 <XPD:REF name="CallActions[1]">Ml+57duvWkidAnEKC1AKdwAA</XPD:REF>
 <XPD:REF name="CallActions[2]">1i0quW/tzUOwzEaDQduWywAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[8]" type="UMLOperation" guid="1G93zFx6vkObnjXx6UtJ6QAA">
+<XPD:OBJ name="Operations[7]" type="UMLOperation" guid="1G93zFx6vkObnjXx6UtJ6QAA">
 <XPD:ATTR name="Name" type="string">loadNextFragment</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
@@ -15137,39 +15131,252 @@ been initilized in the NeedKey callback
 <XPD:REF name="CallActions[0]">cOF7teVRbkaG1Tp3cL07zQAA</XPD:REF>
 <XPD:REF name="CallActions[1]">0vhNQKiaI0ODPpoUhZUykgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[9]" type="UMLOperation" guid="rDn1B0vkukezMTIMgXtYPwAA">
+<XPD:OBJ name="Operations[8]" type="UMLOperation" guid="rDn1B0vkukezMTIMgXtYPwAA">
 <XPD:ATTR name="Name" type="string">onFragmentRequest</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 <XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
 <XPD:REF name="CallActions[0]">a1aEhCkQfEeLVz8pk3HeUAAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[10]" type="UMLOperation" guid="09ZUWIFo9EyjtauStgcFzQAA">
+<XPD:OBJ name="Operations[9]" type="UMLOperation" guid="09ZUWIFo9EyjtauStgcFzQAA">
 <XPD:ATTR name="Name" type="string">onBytesLoaded</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 <XPD:ATTR name="#CallActions" type="integer">2</XPD:ATTR>
 <XPD:REF name="CallActions[0]">ldtYNy5bP0W8QsN0UI6W+QAA</XPD:REF>
 <XPD:REF name="CallActions[1]">cbZvhenh8k+M1BHDc1BHAgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[11]" type="UMLOperation" guid="CBx6TQyGFUacbUKfKcAICAAA">
+<XPD:OBJ name="Operations[10]" type="UMLOperation" guid="CBx6TQyGFUacbUKfKcAICAAA">
 <XPD:ATTR name="Name" type="string">startPlayback</XPD:ATTR>
 <XPD:ATTR name="Visibility" type="UMLVisibilityKind">vkPrivate</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 <XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
 <XPD:REF name="CallActions[0]">ZY+pUMZbJEOimbQOk7VNlgAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[12]" type="UMLOperation" guid="bG5UrZ3AMUKrKuWcsnzTigAA">
+<XPD:OBJ name="Operations[11]" type="UMLOperation" guid="bG5UrZ3AMUKrKuWcsnzTigAA">
 <XPD:ATTR name="Name" type="string">onTimer</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 <XPD:ATTR name="#CallActions" type="integer">1</XPD:ATTR>
 <XPD:REF name="CallActions[0]">arw+Zj9yh0qdIMemI0EtZQAA</XPD:REF>
 </XPD:OBJ>
-<XPD:OBJ name="Operations[13]" type="UMLOperation" guid="AI7o1XUKs0O68oi+sJo18wAA">
+<XPD:OBJ name="Operations[12]" type="UMLOperation" guid="ooOAj7fGV0O7nT+BtD4RbQAA">
+<XPD:ATTR name="Name" type="string">setState</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[13]" type="UMLOperation" guid="dM5FAqh+yUSAEnSqZ012dgAA">
+<XPD:ATTR name="Name" type="string">clearPlayListTraceMetrics</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[14]" type="UMLOperation" guid="wU1RAFy360mBNzgAhwBp2gAA">
+<XPD:ATTR name="Name" type="string">updateRepresentations</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[15]" type="UMLOperation" guid="d8CqZs/85EqOMLtLajrbQAAA">
+<XPD:ATTR name="Name" type="string">getRepresentationForQuality</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[16]" type="UMLOperation" guid="M+yBFr2NMEOwIXv/9BHm4wAA">
 <XPD:ATTR name="Name" type="string">finishValidation</XPD:ATTR>
 <XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
-<XPD:ATTR name="#CallActions" type="integer">2</XPD:ATTR>
-<XPD:REF name="CallActions[0]">5w42TCk1YE65OUWdAvRXaQAA</XPD:REF>
-<XPD:REF name="CallActions[1]">27GjIQXo9EyhLYJNlj9q5AAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[17]" type="UMLOperation" guid="AdsM8eRcO0WVdM1dcng7WwAA">
+<XPD:ATTR name="Name" type="string">onBytesLoadingStart</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[18]" type="UMLOperation" guid="IkliSC3sHkGLDVZlzGf7TgAA">
+<XPD:ATTR name="Name" type="string">onMediaLoaded</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[19]" type="UMLOperation" guid="8Fz52U2xkUK1NXp/Akpe+gAA">
+<XPD:ATTR name="Name" type="string">appendToBuffer</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[20]" type="UMLOperation" guid="UM20j5yqakWHVUyqZygMoQAA">
+<XPD:ATTR name="Name" type="string">updateBufferLevel</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[21]" type="UMLOperation" guid="pw9DaDfo9kulX092A8d7fgAA">
+<XPD:ATTR name="Name" type="string">handleInbandEvents</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[22]" type="UMLOperation" guid="1RnOJglCeUGwcRKk9kwzrwAA">
+<XPD:ATTR name="Name" type="string">deleteInbandEvents</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[23]" type="UMLOperation" guid="oJUOzHQbA062E9a9x9AlJgAA">
+<XPD:ATTR name="Name" type="string">checkGapBetweenBuffers</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[24]" type="UMLOperation" guid="PkAqwW87qU2MpxO8Tp29QAAA">
+<XPD:ATTR name="Name" type="string">hasEnoughSpaceToAppend</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[25]" type="UMLOperation" guid="1TNp28X/UE+SjetxxlFm+QAA">
+<XPD:ATTR name="Name" type="string">clearBuffer</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[26]" type="UMLOperation" guid="KVFKpB2uBk6QX3A9chVRpgAA">
+<XPD:ATTR name="Name" type="string">removeBuffer</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[27]" type="UMLOperation" guid="6CdHZBmaY0Geoi0tVifBeQAA">
+<XPD:ATTR name="Name" type="string">onInitializationLoaded</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[28]" type="UMLOperation" guid="KDEccGDmSEa1dtZ8OVXkhwAA">
+<XPD:ATTR name="Name" type="string">onBytesError</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[29]" type="UMLOperation" guid="VMSENKFUfEq1wInrm46bKQAA">
+<XPD:ATTR name="Name" type="string">searchForLiveEdge</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[30]" type="UMLOperation" guid="1CB/fz/QI0+jroJh8YeuMwAA">
+<XPD:ATTR name="Name" type="string">findLiveEdge</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[31]" type="UMLOperation" guid="JE3oJsQ1/06BZaX7dB0QLAAA">
+<XPD:ATTR name="Name" type="string">onSearchForSegmentFailed</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[32]" type="UMLOperation" guid="Cc4k9HbyJEK5KoEC3sS2pAAA">
+<XPD:ATTR name="Name" type="string">onSearchForSegmentSucceeded</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[33]" type="UMLOperation" guid="DyWV6zpNfkyRwWQstjvUrAAA">
+<XPD:ATTR name="Name" type="string">binarySearch</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[34]" type="UMLOperation" guid="O0vKBgKdwUSpLotO+YQhrAAA">
+<XPD:ATTR name="Name" type="string">signalStreamComplete</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[35]" type="UMLOperation" guid="d6/dFU0h40OXt6Aq64hhdwAA">
+<XPD:ATTR name="Name" type="string">checkIfSufficientBuffer</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[36]" type="UMLOperation" guid="IraxVjqjNUuUAVvG0y2gSwAA">
+<XPD:ATTR name="Name" type="string">isSchedulingRequired</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[37]" type="UMLOperation" guid="6MWIphiHkk266K9b6+dT5AAA">
+<XPD:ATTR name="Name" type="string">hasData</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[38]" type="UMLOperation" guid="83CK5H24hUaUY93T+EKvywAA">
+<XPD:ATTR name="Name" type="string">getTimeToEnd</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[39]" type="UMLOperation" guid="UMjsYGxeQkuhiB4k9DT1+gAA">
+<XPD:ATTR name="Name" type="string">getWorkingTime</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[40]" type="UMLOperation" guid="thDyTGPLbkOa68PtpazdwwAA">
+<XPD:ATTR name="Name" type="string">getRequiredFragmentCount</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[41]" type="UMLOperation" guid="Np+wz+TZukGR5wn0qZuanQAA">
+<XPD:ATTR name="Name" type="string">requestNewFragment</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[42]" type="UMLOperation" guid="jOaqrRbP006dlctNOewU1gAA">
+<XPD:ATTR name="Name" type="string">getType</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[43]" type="UMLOperation" guid="xu02X8L4J0iC1a8dPuFYvAAA">
+<XPD:ATTR name="Name" type="string">setType</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[44]" type="UMLOperation" guid="ktSAOvE1CEKacdHkhmS/4gAA">
+<XPD:ATTR name="Name" type="string">getPeriodInfo</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[45]" type="UMLOperation" guid="2NSoElvliE+Y4oP78BvjTgAA">
+<XPD:ATTR name="Name" type="string">getVideoModel</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[46]" type="UMLOperation" guid="z96DoBDWZ0SjJQKPBHJ3zwAA">
+<XPD:ATTR name="Name" type="string">setVideoModel</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[47]" type="UMLOperation" guid="hC4W6V1lskWO+GXHCpVHEAAA">
+<XPD:ATTR name="Name" type="string">getScheduler</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[48]" type="UMLOperation" guid="h/vM1/RqzEuYMECQI+H9jQAA">
+<XPD:ATTR name="Name" type="string">setScheduler</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[49]" type="UMLOperation" guid="/BcQU88Hv0iT7D7IFf1a7AAA">
+<XPD:ATTR name="Name" type="string">getFragmentController</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[50]" type="UMLOperation" guid="fLb2SBu9tUC9UKyO8KS0aQAA">
+<XPD:ATTR name="Name" type="string">setFragmentController</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[51]" type="UMLOperation" guid="1VeAlJ8oNkimBOBQD5rN3AAA">
+<XPD:ATTR name="Name" type="string">setEventController</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[52]" type="UMLOperation" guid="Ywg+61hgyEu9HT2Suw+JHgAA">
+<XPD:ATTR name="Name" type="string">getAutoSwitchBitrate</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[53]" type="UMLOperation" guid="qDUn15Y/3EqzX2aWD72t7AAA">
+<XPD:ATTR name="Name" type="string">setAutoSwitchBitrate</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[54]" type="UMLOperation" guid="t4nI4pdXXEOSLm1RHR6UUwAA">
+<XPD:ATTR name="Name" type="string">getData</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[55]" type="UMLOperation" guid="QE20wE3YQkWmOAqNeqlg8AAA">
+<XPD:ATTR name="Name" type="string">updateData</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[56]" type="UMLOperation" guid="cqKi/Nic/kqTo136LXgnFwAA">
+<XPD:ATTR name="Name" type="string">getCurrentRepresentation</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[57]" type="UMLOperation" guid="0PfI/iRsO02rR/hAo1jRpgAA">
+<XPD:ATTR name="Name" type="string">getBuffer</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[58]" type="UMLOperation" guid="KkVtrKJm8UiDX528IdidLwAA">
+<XPD:ATTR name="Name" type="string">getMinBufferTime</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[59]" type="UMLOperation" guid="leNxukCl6kCl477HE4YGlwAA">
+<XPD:ATTR name="Name" type="string">setMinBufferTime</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[60]" type="UMLOperation" guid="rO0RQGz/WUCf5BL9RB1z0wAA">
+<XPD:ATTR name="Name" type="string">setMediaSource</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[61]" type="UMLOperation" guid="6VZluIP5lka4XKJZ3bbmbwAA">
+<XPD:ATTR name="Name" type="string">isReady</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[62]" type="UMLOperation" guid="0qExBKXo2kKJ1LmQzh41XAAA">
+<XPD:ATTR name="Name" type="string">isBufferingCompleted</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[63]" type="UMLOperation" guid="SKiNWnMKkUyoP2HbTtTQCgAA">
+<XPD:ATTR name="Name" type="string">clearMetrics</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[64]" type="UMLOperation" guid="3vqpt9mbQEaPr0nFJgftbAAA">
+<XPD:ATTR name="Name" type="string">updateBufferState</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[65]" type="UMLOperation" guid="e9wP3RjirU28vJbJg1hepAAA">
+<XPD:ATTR name="Name" type="string">updateStalledState</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="Operations[66]" type="UMLOperation" guid="q5OyKyFRmUKdS3eWCwbelgAA">
+<XPD:ATTR name="Name" type="string">reset</XPD:ATTR>
+<XPD:REF name="Owner">T2mAklnR5Uy57SauCv82CgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:ATTR name="#Associations" type="integer">8</XPD:ATTR>
 <XPD:REF name="Associations[0]">UbFQIoFgaEe+jpPzw2y88wAA</XPD:REF>
