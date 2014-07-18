@@ -151,8 +151,9 @@ Dash.dependencies.DashHandler = function () {
         },
 
         getIndexBasedSegment = function (representation, index) {
-            var self = this,
-                seg,
+            // ORANGE unnecessary utilisation of self
+            //var self = this,
+            var seg,
                 duration,
                 presentationStartTime,
                 presentationEndTime;
@@ -268,6 +269,8 @@ Dash.dependencies.DashHandler = function () {
                     if (calculatedRange) {
                         if (availabilityIdx > endIdx) {
                             hasEnoughSegments = true;
+                            //ORANGE : SS case, for the first createSegment, isAvailableSegmentNumberCalculated = false
+                            //unuseful iteration between availabilityIdx and repeat value...
                             if (isAvailableSegmentNumberCalculated) break;
                             continue;
                         }
