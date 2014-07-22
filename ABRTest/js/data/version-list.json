@@ -1,12 +1,12 @@
 [
 	{
-		"id": "/ABRTest/1.0.0.html",
+		"id": 100,
 		"name": "Version 1.0.0",
-		"linkName": "v100"
+		"file": "player/player-100.js"
 	},
 	{
-		"id": "/ABRTest/1.1.2.html",
+		"id": 112,
 		"name": "Version 1.1.2",
-		"linkName": "v112"
+		"file": "player/player-112.js"
 	}
 ]

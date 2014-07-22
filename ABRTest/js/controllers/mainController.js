@@ -12,7 +12,7 @@ angular.module('HASPlayer').controller('MainController', function($scope, $timeo
         $scope.playing = false;
         var versionFile = document.createElement('script');
         versionFile.setAttribute('type','text/javascript');
-        versionFile.setAttribute('src', 'player.js');
+        versionFile.setAttribute('src', $scope.data.selectedVersion.file);
 
         document.head.appendChild(versionFile);
 

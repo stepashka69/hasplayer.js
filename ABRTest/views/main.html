@@ -4,7 +4,7 @@
 
 	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="updateUrl()">
 
-	<select class="select version-choice" ng-change="redirectVersion(selectedVersion)" ng-model="selectedVersion" ng-options="version.id as version.name for version in data.versionList">
+	<select class="select version-choice" ng-model="data.selectedVersion" ng-options="version as version.name for version in data.versionList">
 	</select>
 
 	<button ng-click="startFlux()" class="select start-button">Start</button>

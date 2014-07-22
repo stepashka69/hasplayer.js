@@ -16,3 +16,9 @@ app.config(['$routeProvider',
 			redirectTo: '/'
 		});
 	}]);
+
+app.run(function($rootScope) {
+	$rootScope.empty = function (data) {
+		return (data === undefined || data === '' || data === null);
+	};
+});
