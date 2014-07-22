@@ -54,8 +54,12 @@ button:hover {
 }
 
 .flux-choice {
-	width: 70%;
+	width: 19%;
 	height: 30px;
+}
+
+.flux-url {
+	width: 50%;
 }
 
 .wanem-actions {

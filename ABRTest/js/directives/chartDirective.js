@@ -23,8 +23,8 @@ angular.module('HASPlayer').directive('chart', function(){
 			};
 
 
-			var started = false,
-				data = {};
+			var data = {};
+			$scope.started = false;
 
 			$scope.bandwidth.dataSequence = [];
 
@@ -34,7 +34,7 @@ angular.module('HASPlayer').directive('chart', function(){
 
 			$scope.$watch('bandwidth', function(bandwidth) {
 
-				if(!started && bandwidth.playSeries[0] !== undefined) {
+				if(!$scope.started && bandwidth.playSeries[0] !== undefined) {
 
 					//génération des données de la représentation de la séquence Wanem
 					var i = 0,
@@ -52,7 +52,7 @@ angular.module('HASPlayer').directive('chart', function(){
 
 					data.sequenceGraph = [];
 					angular.copy($scope.bandwidth.dataSequence, data.sequenceGraph);
-				
+
 					//config du graph
 					$scope.chartConfig = {
 						title: {
@@ -97,7 +97,7 @@ angular.module('HASPlayer').directive('chart', function(){
 						}]
 					};
 
-					started = true;
+					$scope.started = true;
 				} 
 			}, true);
 

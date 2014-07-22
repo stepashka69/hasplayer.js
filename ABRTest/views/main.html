@@ -1,19 +1,36 @@
-<select class="select flux-choice" ng-model="selectedItem" ng-change="redirectFlux(selectedItem)" ng-options="stream as stream.name for stream in data.fluxList"></select>
+<div ng-controller="UIController">
 
-<select class="select version-choice" ng-change="redirectVersion(selectedVersion)" ng-model="selectedVersion" ng-options="version.id as version.name for version in data.versionList">
-</select>
+	<select class="select flux-choice" ng-model="data.selectedItem" ng-change="initFlux()" ng-options="stream as stream.name for stream in data.fluxList"></select>
 
-<video controls="true" class="video-player"></video>
-<div ng-if="playing">
-    <div ng-controller="WanemController">
+	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="initFlux()">
 
-        <ul class="wanem-actions">
-            <li ng-repeat="action in sequence" ng-class="{'sequence-action-valid': action.valid, 'sequence-action-invalid': action.valid === false, 'sequence-action-current': action.ongoing }">
-                Passage à <strong>{{ action.bandwidth }}k</strong> pendant <strong>{{ action.duration/1000 }} secondes</strong>
-            </li>
-        </ul>
+	<select class="select version-choice" ng-change="redirectVersion(selectedVersion)" ng-model="selectedVersion" ng-options="version.id as version.name for version in data.versionList">
+	</select>
 
-    </div>
-
-    <chart bandwidth="bandwidthData"></chart>
 </div>
+
+<div ng-if="playing" ng-controller="PlayerController">
+	<!-- <video controls="true" class="video-player video-js vjs-default-skin" width="900" height="370"></video> -->
+	<video controls="true" class="video-player"></video>
+</div>
+
+<div ng-if="playing">
+
+	<div ng-controller="WanemController">
+
+		<ul class="wanem-actions">
+			<li ng-repeat="action in sequence" ng-class="{'sequence-action-valid': action.valid, 'sequence-action-invalid': action.valid === false, 'sequence-action-current': action.ongoing }">
+				Passage à <strong>{{ action.bandwidth }}k</strong> pendant <strong>{{ action.duration/1000 }} secondes</strong>
+			</li>
+		</ul>
+
+	</div>
+
+	<chart bandwidth="bandwidthData"></chart>
+
+</div>
+
+
+
+
+
