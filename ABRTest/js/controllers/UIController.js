@@ -1,21 +1,7 @@
 angular.module('HASPlayer').controller('UIController', function($scope, $location, $routeParams, $window, $q, fluxService) {
 
-	var setFlux = function() {
-
-		var i = 0,
-		list = $scope.data.fluxList,
-		len = list.length;
-
-		for(i; i< len; i++) {
-			if(list[i].link === $routeParams.url) {
-				return list[i];
-			}
-		}
-
-		return list[0];
-	};
-
 	var getVersion = function() {
+		
 		var d = $q.defer(),
 			version;
 
@@ -64,12 +50,13 @@ angular.module('HASPlayer').controller('UIController', function($scope, $locatio
 
 	};
 
-	$scope.getParams = function() {
+	$scope.getUrl = function() {
+
 		if (!$scope.empty($routeParams.url)) {
 			var startPlayback = true;
 
-			$scope.data.stream = setFlux($scope.data.fluxList);
-			$scope.data.selectedItem = angular.copy($scope.data.stream);
+			$scope.data.selectedItem.link = $routeParams.url;
+			$scope.updateUrl();
 
 			if (!$scope.empty($routeParams.autoplay)) {
 				startPlayback = ($routeParams.autoplay === 'true');
@@ -79,6 +66,7 @@ angular.module('HASPlayer').controller('UIController', function($scope, $locatio
 				$scope.action.load();
 			}
 		}
+
 	};
 
 	$scope.startFlux = function() {
@@ -91,7 +79,7 @@ angular.module('HASPlayer').controller('UIController', function($scope, $locatio
 
 		getVersion().then(function(version) {
 			$scope.data.selectedVersion = version;
-			$scope.getParams();
+			$scope.getUrl();
 		});
 	});
 

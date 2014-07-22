@@ -1,12 +1,13 @@
 angular.module('HASPlayer').controller('MainController', function($scope, $timeout) {
 
     $scope.data = {};
+    $scope.data.selectedItem = {};
     $scope.action = {};
     $scope.bandwidthData = {};
 
     $scope.data.player = null;
     $scope.action.updating = null;
-   
+
     $scope.action.load = function () {
 
         $scope.playing = false;
