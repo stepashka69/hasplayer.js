@@ -49,17 +49,30 @@ button:hover {
 }
 
 .version-choice {
-	width: 29%;
+	width: 15%;
 	height: 30px;
 }
 
 .flux-choice {
-	width: 19%;
+	width: 15%;
 	height: 30px;
 }
 
 .flux-url {
-	width: 50%;
+	width: 58%;
+}
+
+.start-button {
+	height: 30px;
+	width: 9%;
+	background: #313131;
+	font-weight: normal;
+	color: #fff;
+	border-radius: 0;
+}
+
+.start-button:hover {
+	cursor: pointer;
 }
 
 .wanem-actions {

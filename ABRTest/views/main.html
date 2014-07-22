@@ -1,11 +1,13 @@
 <div ng-controller="UIController">
 
-	<select class="select flux-choice" ng-model="data.selectedItem" ng-change="initFlux()" ng-options="stream as stream.name for stream in data.fluxList"></select>
+	<select class="select flux-choice" ng-model="data.stream" ng-change="updateUrl(data.stream)" ng-options="stream as stream.name for stream in data.fluxList"></select>
 
-	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="initFlux()">
+	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="updateUrl()">
 
 	<select class="select version-choice" ng-change="redirectVersion(selectedVersion)" ng-model="selectedVersion" ng-options="version.id as version.name for version in data.versionList">
 	</select>
+
+	<button ng-click="startFlux()" class="select start-button">Start</button>
 
 </div>
 
