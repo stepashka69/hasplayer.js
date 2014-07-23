@@ -38,33 +38,70 @@ button:hover {
 	margin: 15px 0;
 }
 
-.select {
-	font-size: 18px;
-	padding: 3px;
-	border: none;
-}
+/* Stream selection */
 
-.select:hover {
-	cursor: pointer;
+.selection-bar {
+	height: 30px;
+	background: #fff;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	border-radius: 10px;
+	border: 0.15em solid #CCC;
 }
 
 .version-choice {
 	width: 15%;
-	height: 30px;
 }
 
 .flux-choice {
-	width: 15%;
-	height: 30px;
+	width: 18%;
+	background: transparent;
 }
 
 .flux-url {
-	width: 58%;
+	width: 55%;
+}
+
+.select-wrap {
+   	overflow: hidden;
+   	background: #ddd;
+   	display: inline;
+   	padding: 9px 0;
+}
+
+.select {
+	font-size: 18px;
+	padding: 0 3px;
+	border: none;
+	margin: 0;
+	height: 30px;
+}
+
+.select:focus {
+	outline: 0;
+}
+
+.select-wrap .select:hover {
+	cursor: pointer;
+}
+
+.select-wrap .select .hidden {
+	display: none;
+}
+
+.disable-option option
+{
+    color: #000;
+}
+
+.disable-option, .disable-option option:first-child
+{
+    color: #818181;
 }
 
 .start-button {
-	height: 30px;
-	width: 9%;
+	width: 10%;
 	background: #313131;
 	font-weight: normal;
 	color: #fff;
@@ -74,6 +111,14 @@ button:hover {
 .start-button:hover {
 	cursor: pointer;
 }
+
+.start-button:disabled {
+	cursor: default;
+	color: #eee;
+	background: #818181;
+}
+
+/* Wanem Actions */
 
 .wanem-actions {
 	margin: 0;

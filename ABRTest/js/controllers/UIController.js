@@ -1,7 +1,7 @@
 angular.module('HASPlayer').controller('UIController', function($scope, $location, $routeParams, $window, $q, fluxService) {
 
 	var getVersion = function() {
-		
+
 		var d = $q.defer(),
 			version;
 
@@ -82,5 +82,16 @@ angular.module('HASPlayer').controller('UIController', function($scope, $locatio
 			$scope.getUrl();
 		});
 	});
+
+
+	//UI Test
+	
+	$scope.noValidUrl = function() {
+		return ($scope.empty($scope.data.selectedItem) || $scope.empty($scope.data.selectedItem.link));
+	};
+
+	$scope.noValidStream = function() {
+		return $scope.empty($scope.data.stream);
+	};
 
 });

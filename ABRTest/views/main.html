@@ -1,14 +1,17 @@
-<div ng-controller="UIController">
+<div ng-controller="UIController" class="selection-bar">
 
-	<select class="select flux-choice" ng-model="data.stream" ng-change="updateUrl(data.stream)" ng-options="stream as stream.name for stream in data.fluxList"></select>
+	<div class="select-wrap">
+		<select ng-class="{'disable-option': noValidStream()}" class="select flux-choice" ng-model="data.stream" ng-change="updateUrl(data.stream)" ng-options="stream as stream.name for stream in data.fluxList">
+			<option value="" disabled class="hidden">Select a stream</option>
+		</select>
+	</div>
 
-	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="updateUrl()">
+	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="updateUrl()" placeholder="Type in the manifest url">
 
 	<select class="select version-choice" ng-model="data.selectedVersion" ng-options="version as version.name for version in data.versionList">
 	</select>
 
-	<button ng-click="startFlux()" class="select start-button">Start</button>
-
+	<button ng-disabled="noValidUrl()" ng-click="startFlux()" class="select start-button">Start</button>
 </div>
 
 <div ng-if="playing" ng-controller="PlayerController">
