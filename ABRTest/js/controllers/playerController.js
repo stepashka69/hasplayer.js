@@ -207,8 +207,15 @@ angular.module('HASPlayer').controller('PlayerController', function($scope) {
 
                 if(previousRequest !== metrics.httpRequest.url) {
                     requestSeries.push([video.currentTime, Math.round(previousDownloadedQuality/1000)]);
-                    if(metrics.calcBandwidth !== null && metrics.calcBandwidth.value < 10000) {
-                        calcBandwidthSeries.push([video.currentTime, metrics.calcBandwidth.value]);
+                    if(metrics.calcBandwidth !== null) {
+                        var value;
+                        //if calculated Bandwidth has a value too high for the graph, use 10000 as a limit value 
+                        if(metrics.calcBandwidth.value > 10000) {
+                            value = 10000;
+                        } else {
+                            value = metrics.calcBandwidth.value;
+                        }
+                        calcBandwidthSeries.push([video.currentTime, value]);
                     }
                 }
 
