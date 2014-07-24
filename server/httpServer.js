@@ -42,17 +42,17 @@ app.get('/export-csv', function(req, res) {
 
 	//Adding provenance for PlaySeries & Wanem & Bandwidth
 	var i = 0,
-	csvData = null;
+	csvData = null,
 	playSeriesName = 'Player',
-	playSeries = JSON.parse(JSON.stringify(database[req.query.id].requestSeries));
+	playSeries = JSON.parse(JSON.stringify(database[req.query.id].requestSeries)),
 	playSeriesLength = playSeries.length,
 	y = 0,
 	wanemSeriesName = 'Wanem',
-	wanemSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence));
+	wanemSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence)),
 	wanemSeriesLength = wanemSeries.length,
 	z = 0,
 	calcBandwidthSeriesName = 'Bandwidth',
-	calcBandwidthSeries = JSON.parse(JSON.stringify(database[req.query.id].calcBandwidthSeries));
+	calcBandwidthSeries = JSON.parse(JSON.stringify(database[req.query.id].calcBandwidthSeries)),
 	calcBandwidthSeriesLength = calcBandwidthSeries.length;
 
 	for(i; i < playSeriesLength; i++) {

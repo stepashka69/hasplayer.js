@@ -45,7 +45,7 @@ angular.module('HASPlayer').directive('chart', function(){
 
 						$scope.bandwidth.dataSequence.push([time, data.sequence[i].bandwidth]);
 						var datatime = time+(data.sequence[i].duration/1000);
-						$scope.bandwidth.dataSequence.push([datatime - 1, data.sequence[i].bandwidth]);
+						$scope.bandwidth.dataSequence.push([datatime - 0.001, data.sequence[i].bandwidth]);
 
 						time = datatime;
 					}
@@ -77,7 +77,7 @@ angular.module('HASPlayer').directive('chart', function(){
 							enableMouseTracking: false
 						}, {
 							type: 'scatter',
-							name: 'Calls',
+							name: 'Requests',
 							color: '#2c3e50',
 							data: $scope.bandwidth.requestSeries,
 							marker: {
@@ -87,7 +87,7 @@ angular.module('HASPlayer').directive('chart', function(){
 						},
 						{
 							type: 'line',
-							name: 'Bande passante réelle',
+							name: 'Calculated Bandwidth',
 							color: 'red',
 							data: $scope.bandwidth.calcBandwidthSeries,
 							marker: {
