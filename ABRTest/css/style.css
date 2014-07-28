@@ -51,7 +51,7 @@ button:hover {
 }
 
 .version-choice {
-	width: 15%;
+	width: 16%;
 }
 
 .flux-choice {
@@ -60,7 +60,11 @@ button:hover {
 }
 
 .flux-url {
-	width: 55%;
+	width: 53%;
+}
+
+.flux-url-current {
+	width: 70%;
 }
 
 .select-wrap {
@@ -72,7 +76,7 @@ button:hover {
 
 .select {
 	font-size: 18px;
-	padding: 0 3px;
+	padding: 0 5px;
 	border: none;
 	margin: 0;
 	height: 30px;
@@ -106,6 +110,7 @@ button:hover {
 	font-weight: normal;
 	color: #fff;
 	border-radius: 0;
+	float: right;
 }
 
 .start-button:hover {

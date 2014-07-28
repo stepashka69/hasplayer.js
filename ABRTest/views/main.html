@@ -6,9 +6,9 @@
 		</select>
 	</div>
 
-	<input type="text" class="select flux-url" ng-model="data.selectedItem.link" ng-change="updateUrl()" placeholder="Type in the manifest url">
+	<input type="text" class="select" ng-class="current ? 'flux-url-current' :'flux-url'" ng-model="data.selectedItem.link" ng-change="updateUrl()" placeholder="Type in the manifest url">
 
-	<select class="select version-choice" ng-model="data.selectedVersion" ng-options="version as version.name for version in data.versionList">
+	<select ng-if="!current" class="select version-choice" ng-model="data.selectedVersion" ng-options="version as version.name for version in data.versionList">
 	</select>
 
 	<button ng-disabled="noValidUrl()" ng-click="startFlux()" class="select start-button">Start</button>

@@ -70,7 +70,14 @@ angular.module('HASPlayer').controller('UIController', function($scope, $locatio
 	};
 
 	$scope.startFlux = function() {
-		$location.search({url: $scope.data.selectedItem.link, version: $scope.data.selectedVersion.id});
+		var params = {};
+
+		params.url = $scope.data.selectedItem.link;
+		
+		if($scope.empty($scope.current)){
+			params.version = $scope.data.selectedVersion.id;
+		}
+		$location.search(params);
 	};
 
 	fluxService.getList().then(function(data) {
