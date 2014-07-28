@@ -20,7 +20,7 @@ module.exports = function(grunt) {
               'rslt.debug.log'
             ],
             global_defs: {
-              DEBUG: false        /* conditionned code by DEBUG will be remove at build */
+              DEBUG: true        /* conditionned code by DEBUG will be remove at build */
             },
             drop_console : true,  /* remove console statements */
             drop_debugger: true,  /* remove debugger statements */

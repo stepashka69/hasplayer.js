@@ -314,5 +314,4 @@ angular.module('HASPlayer').controller('PlayerController', function($scope) {
     $scope.action.update();
 
     // videojs(video, { "controls": true, "autoplay": true, "preload": "auto" });
-
 });
