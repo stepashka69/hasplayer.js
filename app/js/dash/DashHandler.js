@@ -674,7 +674,6 @@ Dash.dependencies.DashHandler = function () {
                 fd,
                 i;
 
-
             this.debug.log("[DashHandler]["+type+"] getIndexForSegments for time ", time);
 
             if (segments && segments.length > 0) {
@@ -684,7 +683,9 @@ Dash.dependencies.DashHandler = function () {
                     fd = frag.duration;
                     //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd + ", idx = " + frag.availabilityIdx);
                     if ((time + Dash.dependencies.DashHandler.EPSILON) >= ft &&
-                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
+                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd) &&
+                        //ORANGE : add a test to not send twice last id in the segments list
+                        (time + Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
                         idx = frag.availabilityIdx;
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, idx =  ", idx);
                         break;
