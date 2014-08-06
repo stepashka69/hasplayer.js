@@ -692,7 +692,10 @@ Dash.dependencies.DashHandler = function () {
                     } else if (idx === -1 && (time - Dash.dependencies.DashHandler.EPSILON) > (ft + fd)) {
                         // time is past the end
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, (past the end) idx =  ", idx);
-                        idx  = isNaN(representation.segmentDuration) ? (frag.availabilityIdx + 1) : Math.floor(time / representation.segmentDuration);
+                        //ORANGE : we have past the end, don't iterate for nothing
+                        //idx = -1 not the last id, it's not the good id
+                        //idx  = isNaN(representation.segmentDuration) ? (frag.availabilityIdx + 1) : Math.floor(time / representation.segmentDuration);
+                        break;
                     }
                 }
             }
