@@ -103,10 +103,6 @@ Custom.dependencies.CustomBufferController = function () {
         doStart = function () {
             var currentTime;
 
-            if(this.requestScheduler.isScheduled(this)) {
-                return;
-            }
-
             if (seeking === false) {
                 currentTime = new Date();
                 clearPlayListTraceMetrics(currentTime, MediaPlayer.vo.metrics.PlayList.Trace.USER_REQUEST_STOP_REASON);
@@ -140,8 +136,6 @@ Custom.dependencies.CustomBufferController = function () {
             this.debug.log("[BufferController]["+type+"] ### STOP");
             //setState.call(this, isBufferingCompleted ? READY : WAITING);
             //this.requestScheduler.stopScheduling(this);
-            // cancel the requests that have already been created, but not loaded yet.
-            //this.fragmentController.cancelPendingRequestsForModel(fragmentModel);
             started = false;
             waitingForBuffer = false;
 
@@ -179,35 +173,11 @@ Custom.dependencies.CustomBufferController = function () {
                     stalled = false;
                     this.videoModel.stallStream(type, stalled);
                 }
-                //setState.call(this, READY);
             }
         },
 
         onBytesLoadingStart = function(request) {
-
             this.debug.log("[BufferController]["+type+"] ### Load request ", (request.url !== null)?request.url:request.quality);
-            /*if (this.fragmentController.isInitializationRequest(request)) {
-                setState.call(this, READY);
-            } else {
-                setState.call(this, LOADING);
-
-                //ORANGE : check if requests are sequential or not
-                if(!this.fragmentController.isSequential()){
-                    var self = this,
-                        time = self.fragmentController.getLoadingTime(self);
-                    if (timeoutId !== null) return;
-                    timeoutId =  setTimeout(function(){
-                        if (!hasData()) return;
-
-                        setState.call(self, READY);
-                        requestNewFragment.call(self);
-                        timeoutId = null;
-                    }, time);
-                }else{
-                    if(!hasData()) return;
-                    setState.call(this, READY);
-                }
-            }*/
         },
 
         onBytesLoaded = function (request, response) {
@@ -262,7 +232,6 @@ Custom.dependencies.CustomBufferController = function () {
                                                                 stalled = false;
                                                                 self.videoModel.stallStream(type, stalled);
                                                             }
-                                                                setState.call(self, READY);
                                                                 self.system.notify("bufferingCompleted");
                                                             }
                                                         }
@@ -270,8 +239,6 @@ Custom.dependencies.CustomBufferController = function () {
                                                 }
                                                 // appel du fillBuffer
                                                 scheduledwork.call(self);
-                                                //this.requestScheduler.setTriggerForWallTime(this,scheduledwork,1000);
-                                                //self.requestScheduler.startScheduling(self, scheduledwork);
                                             }
                                         );
                                     }
@@ -359,10 +326,6 @@ Custom.dependencies.CustomBufferController = function () {
                                             // change currentQuality to a quality of a new appended init segment.
                                             if (isInit) {
                                                 currentQuality = quality;
-                                            }
-
-                                            if (!self.requestScheduler.isScheduled(self) && isSchedulingRequired.call(self)) {
-                                                doStart.call(self);
                                             }
 
                                             isQuotaExceeded = false;
@@ -709,8 +672,6 @@ Custom.dependencies.CustomBufferController = function () {
                                     deferredInitAppend.resolve();
                                     // appel du fillBuffer
                                     scheduledwork.call(self);
-                                    //this.requestScheduler.setTriggerForWallTime(this,scheduledwork,1000);
-                                    //self.requestScheduler.startScheduling(self, scheduledwork);
                                 }
                             );
                         }
@@ -718,6 +679,8 @@ Custom.dependencies.CustomBufferController = function () {
                         self.debug.log("No " + type + " bytes to push.");
                         // ORANGE : For HLS Stream, init segment are pushed with media (@see HlsFragmentController)
                         deferredInitAppend.resolve();
+                        // appel du fillBuffer
+                        scheduledwork.call(self);
                     }
                 }
             );
@@ -735,10 +698,6 @@ Custom.dependencies.CustomBufferController = function () {
                 }
             }
             */
-
-            if (state === LOADING) {
-                setState.call(this, READY);
-            }
 
             this.system.notify("segmentLoadingFailed");
         },
@@ -808,7 +767,6 @@ Custom.dependencies.CustomBufferController = function () {
                 this.system.notify("segmentLoadingFailed");
             } else {
                 // continue searching for a first available segment
-                setState.call(this, READY);
                 this.indexHandler.getSegmentRequestForTime(currentRepresentation, searchTime).then(findLiveEdge.bind(this, searchTime, onSearchForSegmentSucceeded, onSearchForSegmentFailed));
             }
         },
@@ -914,8 +872,6 @@ Custom.dependencies.CustomBufferController = function () {
                                 deferredInitAppend.resolve();
                                 // appel du fillBuffer
                                 scheduledwork.call(self);
-                                //this.requestScheduler.setTriggerForWallTime(this,scheduledwork,1000);
-                                //self.requestScheduler.startScheduling(self, scheduledwork);
                             }
                         );
                     } else {
@@ -932,10 +888,15 @@ Custom.dependencies.CustomBufferController = function () {
                 self = this;
 
             self.debug.log("[BufferController]["+type+"] loadNextFragment");
-            self.indexHandler.getCurrentTime(currentRepresentation).then(
+            Q.when(seeking ? seekTarget : self.indexHandler.getCurrentTime(currentRepresentation)).then(
                 function (time) {
                     self.sourceBufferExt.getBufferRange(buffer, time).then(
                         function (range) {
+                            if (seeking) {
+                                currentRepresentation.segments = null;
+                                seeking = false;
+                            }
+
                             segmentTime = range ? range.end : time;
                             self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
                     });
@@ -1002,34 +963,14 @@ Custom.dependencies.CustomBufferController = function () {
                 //this.debug.log("Working time is video time: " + time);
 
             return time;
-        },
-
-        getRequiredFragmentCount = function() {
-            var self =this,
-                playbackRate = self.videoModel.getPlaybackRate(),
-                actualBufferedDuration = bufferLevel / Math.max(playbackRate, 1),
-                deferred = Q.defer();
-
-            self.bufferExt.getRequiredBufferLength(waitingForBuffer, self.requestScheduler.getExecuteInterval(self)/1000, isDynamic, periodInfo.duration).then(
-                function (requiredBufferLength) {
-                    self.indexHandler.getSegmentCountForDuration(currentRepresentation, requiredBufferLength, actualBufferedDuration).then(
-                        function(count) {
-                            deferred.resolve(count);
-                        }
-                    );
-                }
-            );
-
-            return deferred.promise;
-        },
+        },     
 
         scheduledwork = function () {
             var self = this,
             qualityChanged = false;
             //test to know if videomodel is stalled or not
             checkIfSufficientBuffer.call(self);
-            //on arrête le scheduler pour le relancer par la suite avec un nouveau délai calculé
-            //self.requestScheduler.stopScheduling(self);
+
             //test niveau du buffer
             if(bufferLevel> minBufferTime) {
                 self.debug.log("[BufferController]["+type+"] ### Buffer is full enough");
@@ -1037,7 +978,11 @@ Custom.dependencies.CustomBufferController = function () {
                 //rien à faire, juste demander à nouveau l'appel à scheduledwork dans n secondes
                 updateBufferLevel.call(self).then(
                     function () {
-                        setTimeout(function (){scheduledwork.call(self);},1000);
+                        if (seeking) {
+                            scheduledwork.call(self);
+                        }else{
+                            setTimeout(function (){scheduledwork.call(self);},minBufferTime/4*1000);
+                        }
                     }
                 );
             }
@@ -1065,107 +1010,6 @@ Custom.dependencies.CustomBufferController = function () {
                             loadNextFragment.call(self);
                         }
                     });
-            }
-        },
-
-        validate = function () {
-            var self = this,
-                newQuality,
-                qualityChanged = false,
-                now = new Date(),
-                currentVideoTime = self.videoModel.getCurrentTime();
-
-            checkIfSufficientBuffer.call(self);
-
-            if (!isSchedulingRequired.call(self) && !initialPlayback && !dataChanged) {
-                doStop.call(self);
-                return;
-            }
-
-            if (bufferLevel < STALL_THRESHOLD && !stalled) {
-                    self.debug.log("Stalling " + type + " Buffer: " + type);
-                    clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.REBUFFERING_REASON);
-                    stalled = true;
-                    waitingForBuffer = true;
-                    self.videoModel.stallStream(type, stalled);
-                }
-
-            if (state === READY) {
-                setState.call(self, VALIDATING);
-                var manifestMinBufferTime = self.manifestModel.getValue().minBufferTime;
-                self.bufferExt.decideBufferLength(manifestMinBufferTime, periodInfo.duration, waitingForBuffer).then(
-                    function (time) {
-                        //self.debug.log("Min Buffer time: " + time);
-                        self.setMinBufferTime(time);
-                        self.requestScheduler.adjustExecuteInterval();
-                    }
-                );
-                self.abrController.getPlaybackQuality(type, data).then(
-                    function (result) {
-                        var quality = result.quality;
-                        //self.debug.log(type + " Playback quality: " + quality);
-                        //self.debug.log("Populate " + type + " buffers.");
-
-                        if (quality !== undefined) {
-                            newQuality = quality;
-                        }
-
-                        qualityChanged = (quality !== requiredQuality);
-
-                        if (qualityChanged === true) {
-                            requiredQuality = newQuality;
-                            // The quality has beeen changed so we should abort the requests that has not been loaded yet
-                            self.fragmentController.cancelPendingRequestsForModel(fragmentModel);
-                            currentRepresentation = getRepresentationForQuality.call(self, newQuality);
-                            self.debug.log("[BufferController]["+type+"] ### QUALITY CHANGED => " + newQuality + " (" + currentRepresentation.id + ")");
-                            if (currentRepresentation === null || currentRepresentation === undefined) {
-                                throw "Unexpected error!";
-                            }
-
-                            // ORANGE: reset current representation list of segments, to force DashHandler
-                            // updating the list of segments.
-                            if (currentRepresentation.segments) {
-                                currentRepresentation.segments = null;
-                            }
-
-                            // each representation can have its own @presentationTimeOffset, so we should set the offset
-                            // if it has changed after switching the quality
-                            if (buffer.timestampOffset !== currentRepresentation.MSETimeOffset) {
-                                buffer.timestampOffset = currentRepresentation.MSETimeOffset;
-                            }
-
-                            clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.REPRESENTATION_SWITCH_STOP_REASON);
-                            self.metricsModel.addRepresentationSwitch(type, now, currentVideoTime, currentRepresentation.id);
-                        }
-
-                        //self.debug.log(qualityChanged ? (type + " Quality changed to: " + quality) : "Quality didn't change.");
-                        return getRequiredFragmentCount.call(self, quality);
-                    }
-                ).then(
-                    function (count) {
-                        fragmentsToLoad = count;
-                        loadInitialization.call(self).then(
-                            function (request) {
-                                if (request !== null) {
-                                    //self.debug.log("Loading initialization: " + request.streamType + ":" + request.startTime);
-                                    //self.debug.log(request);
-                                    self.fragmentController.prepareFragmentForLoading(self, request, null/*onBytesLoadingStart*/, onBytesLoaded, onBytesError, signalStreamComplete).then(
-                                        function() {
-                                            setState.call(self, READY);
-                                        }
-                                    );
-
-                                    dataChanged = false;
-                                }
-                            }
-                        );
-                        // We should request the media fragment w/o waiting for the next validate call
-                        // or until the initialization fragment has been loaded
-                        //requestNewFragment.call(self);
-                    }
-                );
-            } else if (state === VALIDATING) {
-                setState.call(self, READY);
             }
         };
 
