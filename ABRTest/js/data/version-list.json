@@ -5,6 +5,11 @@
 		"file": "player/player-100.js"
 	},
 	{
+		"id": 101,
+		"name": "Version 1.0.0 - Calc test",
+		"file": "player/player-100-calc.js"
+	},
+	{
 		"id": 112,
 		"name": "Version 1.1.2",
 		"file": "player/player-112.js"
