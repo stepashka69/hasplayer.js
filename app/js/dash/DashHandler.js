@@ -179,7 +179,7 @@ Dash.dependencies.DashHandler = function () {
             seg.replacementNumber = getNumberForSegment(seg, index);
             seg.availabilityIdx = index;
 
-            this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx);
+            //this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx);
 
             return seg;
         },
@@ -502,7 +502,7 @@ Dash.dependencies.DashHandler = function () {
             seg.mediaRange = range;
             seg.availabilityIdx = index;
 
-            this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
+            //this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
 
             return seg;
         },
@@ -549,7 +549,7 @@ Dash.dependencies.DashHandler = function () {
                             seg.mediaStartTime = s.time;
                         }
 
-                        self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
+                        //self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
 
                         segments.push(seg);
                         seg = null;
@@ -683,9 +683,9 @@ Dash.dependencies.DashHandler = function () {
                     fd = frag.duration;
                     //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd + ", idx = " + frag.availabilityIdx);
                     if ((time + Dash.dependencies.DashHandler.EPSILON) >= ft &&
-                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd) &&
+                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {/* &&
                         //ORANGE : add a test to not send twice last id in the segments list
-                        (time + Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
+                        (time + Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {*/
                         idx = frag.availabilityIdx;
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, idx =  ", idx);
                         break;
@@ -694,7 +694,7 @@ Dash.dependencies.DashHandler = function () {
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, (past the end) idx =  ", idx);
                         //ORANGE : we have past the end, don't iterate for nothing
                         //idx = -1 not the last id, it's not the good id
-                        //idx  = isNaN(representation.segmentDuration) ? (frag.availabilityIdx + 1) : Math.floor(time / representation.segmentDuration);
+                        idx  = isNaN(representation.segmentDuration) ? (frag.availabilityIdx + 1) : Math.floor(time / representation.segmentDuration);
                         break;
                     }
                 }
