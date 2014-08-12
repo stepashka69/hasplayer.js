@@ -211,9 +211,9 @@ Custom.dependencies.CustomBufferController = function () {
                     } else {
                         self.debug.log("No " + type + " bytes to push.");
                         // ORANGE : For HLS Stream, init segment are pushed with media (@see HlsFragmentController)
-                        //deferredInitAppend.resolve();
-                        // appel du fillBuffer
-                        //scheduledwork.call(self);
+                        if (started === true) {
+                            loadNextFragment.call(self);
+                        }
                     }
                 }
             );
@@ -696,9 +696,12 @@ Custom.dependencies.CustomBufferController = function () {
             }
             else {
                 //impossible to find a request for the loadNextFragment call
-                //the end of the createdSegment list has been reached, recall scheduledwork to update the list and get the next segment
+                //the end of the createdSegment list has been reached, recall checkIfSufficientBuffer to update the list and get the next segment
                 self.debug.log("[BufferController]["+type+"] loadNextFragment failed");
-                checkIfSufficientBuffer.call(self);
+                bufferTimeout = setTimeout(function () {
+                    checkIfSufficientBuffer.call(self);
+                    },
+                    Math.max(2000));
             }
         },
 
@@ -763,6 +766,10 @@ Custom.dependencies.CustomBufferController = function () {
         checkIfSufficientBuffer = function () {
             var self = this;
 
+            if (started === false) {
+                return;
+            }
+
             self.debug.log("[BufferController]["+type+"] checkIfSufficientBuffer");
             
             updateBufferLevel.call(self);
@@ -789,7 +796,7 @@ Custom.dependencies.CustomBufferController = function () {
                 bufferTimeout = setTimeout(function () {
                     checkIfSufficientBuffer.call(self);
                     },
-                    (delay * 1000));
+                    Math.max((delay * 1000), 2000));
             }
         },
 
@@ -954,7 +961,7 @@ Custom.dependencies.CustomBufferController = function () {
                             self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo, waitingForBuffer).then(
                                 function (time) {
                                     self.setMinBufferTime(time);
-                                    minBufferTimeAtStartup = isNaN(fragmentDuration) ? 4 : (fragmentDuration * 2);
+                                    minBufferTimeAtStartup = isNaN(fragmentDuration) ? 2 : fragmentDuration;
                                 }
                             );
 
