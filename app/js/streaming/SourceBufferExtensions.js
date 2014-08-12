@@ -69,7 +69,7 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         try {
             ranges = buffer.buffered;
         } catch(ex) {
-            return Q.when(null);
+            return null;
         }
 
         if (ranges !== null) {
@@ -82,12 +82,10 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
                         // start the range
                         firstStart = start;
                         lastEnd = end;
-                        continue;
                     } else if (gap <= toler) {
                         // start the range even though the buffer does not contain time 0
                         firstStart = start;
                         lastEnd = end;
-                        continue;
                     }
                 } else {
                     gap = start - lastEnd;
@@ -101,11 +99,11 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
             }
 
             if (firstStart !== null) {
-                return Q.when({start: firstStart, end: lastEnd});
+                return {start: firstStart, end: lastEnd};
             }
         }
 
-        return Q.when(null);
+        return null;
     },
 
     getAllRanges: function(buffer) {
@@ -113,9 +111,9 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
 
         try{
             ranges = buffer.buffered;
-            return Q.when(ranges);
+            return ranges;
         } catch (ex) {
-            return Q.when(null);
+            return null;
         }
     },
 
@@ -123,19 +121,18 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         "use strict";
 
         var self = this,
-            deferred = Q.defer();
+            range,
+            length;
 
-        self.getBufferRange(buffer, time, tolerance).then(
-            function (range) {
-                if (range === null) {
-                    deferred.resolve(0);
-                } else {
-                    deferred.resolve(range.end - time);
-                }
-            }
-        );
+        range = self.getBufferRange(buffer, time, tolerance);
 
-        return deferred.promise;
+        if (range === null) {
+            length = 0;
+        } else {
+            length = range.end - time;
+        }
+
+        return length;
     },
 
     waitForUpdateEnd: function(buffer) {
