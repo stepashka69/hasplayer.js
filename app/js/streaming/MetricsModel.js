@@ -11,14 +11,13 @@
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.models.MetricsModel = function () {
+ MediaPlayer.models.MetricsModel = function () {
     "use strict";
 
     return {
         system : undefined,
         eventBus: undefined,
         streamMetrics: {},
-
         metricsChanged: function () {
             this.eventBus.dispatchEvent({
                 type: "metricsChanged",
@@ -116,8 +115,6 @@ MediaPlayer.models.MetricsModel = function () {
             // ORANGE unnecessary metrics, when builded, DEBUG is false, saving the whole list is useless
             if (DEBUG) {
                 this.getMetricsFor(streamType).HttpList.push(vo);
-            } else {
-                this.getMetricsFor(streamType).HttpList = [vo];
             }
 
             this.metricAdded(streamType, "HttpRequest", vo);
@@ -159,7 +156,7 @@ MediaPlayer.models.MetricsModel = function () {
 
             vo.t = t;
             vo.level = level;
-            
+
             // ORANGE unnecessary metrics, when builded, DEBUG is false, saving the whole list is useless
             if (DEBUG) {
                 this.getMetricsFor(streamType).BufferLevel.push(vo);
@@ -171,9 +168,23 @@ MediaPlayer.models.MetricsModel = function () {
             return vo;
         },
 
+        addDVRInfo: function (streamType, currentTime, mpd, range)
+        {
+            var vo = new MediaPlayer.vo.metrics.DVRInfo();
+
+            vo.time = currentTime ;
+            vo.range = range;
+            vo.mpd= mpd;
+
+            this.getMetricsFor(streamType).DVRInfo.push(vo);
+            this.metricAdded(streamType, "DVRInfo", vo);
+
+            return vo;
+        },
+
         addDroppedFrames: function (streamType, quality) {
             var vo = new MediaPlayer.vo.metrics.DroppedFrames(),
-                list = this.getMetricsFor(streamType).DroppedFrames;
+            list = this.getMetricsFor(streamType).DroppedFrames;
 
             vo.time = quality.creationTime;
             vo.droppedFrames = quality.droppedVideoFrames;
@@ -193,7 +204,7 @@ MediaPlayer.models.MetricsModel = function () {
             if (DEBUG) {
                 var vo = new MediaPlayer.vo.metrics.PlayList();
 
-            vo.stream = streamType;
+                vo.stream = streamType;
                 vo.start = start;
                 vo.mstart = mstart;
                 vo.starttype = starttype;
@@ -207,7 +218,7 @@ MediaPlayer.models.MetricsModel = function () {
 
         appendPlayListTrace: function (playList, representationid, subreplevel, start, mstart, duration, playbackspeed, stopreason) {
             // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
-            if (DEBUG) {    
+            if (DEBUG) {
                 var vo = new MediaPlayer.vo.metrics.PlayList.Trace();
 
                 vo.representationid = representationid;
