@@ -276,7 +276,7 @@
     <div class="panel">
         <div class="panel-heading panel-top">
             <span class="panel-title">Video</span>
-            <div class="btn-group" style="width: 25px;"><div id="sliderBitrate"></div></div>
+            <div class="btn-group" style="width: 50px;"><div id="sliderBitrate"></div></div>
         </div>
         <div class="panel-body panel-stats">
             <p class="text-warning">{{videoBitrate}} kbps</p>
@@ -319,27 +319,41 @@
             <span class="panel-title">Charts</span>
             <div class="btn-group">
                 <button
-                type="button"
-                class="btn btn-default"
-                ng-class="{active:showCharts == false}"
-                ng-click="setCharts(false)">
-                Hide
-            </button>
-            <button
-            type="button"
-            class="btn btn-default"
-            ng-class="{active:showCharts == true}"
-            ng-click="setCharts(true)">
-            Show
-        </button>
+                    type="button"
+                    class="btn btn-default"
+                    ng-class="{active:showCharts == false}"
+                    ng-click="setCharts(false)">
+                    Hide
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    ng-class="{active: (switchCharts == false && showCharts == true)}"
+                    ng-click="setSwitchCharts(false)">
+                    Buffer Chart
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    ng-class="{active: (switchCharts == true && showCharts == true)}"
+                    ng-click="setSwitchCharts(true)">
+                    Bandwidth Chart
+                </button>
+            </div>
+        </div>
+        <div ng-switch on="showCharts">
+            <div class="panel-body panel-stats" ng-switch-when="true">
+                <div ng-switch on="switchCharts">
+                    <div ng-switch-when="false">
+                        <chart ng-model="bufferData"></chart>
+                    </div>
+                    <div ng-switch-when="true">
+                        <chart2 id="chartBandwidth" class="overlayChart" ng-model="bandwidthData"></chart2>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<div ng-switch on="showCharts">
-    <div class="panel-body panel-stats" ng-switch-when="true">
-        <chart ng-model="bufferData"></chart>
-    </div>
-</div>
-</div>
 </div>
 
 <div class="row">

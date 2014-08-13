@@ -89,8 +89,8 @@ app.directive('chart2', function() {
     return {
         restrict: 'E',
         link: function (scope, elem, attrs) {
-         var chartBandwidth =  null,
-         optionsBandwidth = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: false},lines: {steps: true,},grid: {markings: [],borderWidth: 0}};
+           var chartBandwidth =  null,
+           optionsBandwidth = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: false},lines: {steps: true,},grid: {markings: [],borderWidth: 0}};
 
 
             // If the data changes somehow, update it in the chart
@@ -223,61 +223,63 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
 
     function getCribbedMetricsFor(type) {
         var metrics = player.getMetricsFor(type),
-            metricsExt = player.getMetricsExt(),
-            repSwitch,
-            bufferLevel,
-            httpRequests,
-            droppedFramesMetrics,
-            bitrateIndexValue,
-            bandwidthValue,
-            pendingValue,
-            numBitratesValue,
-            bufferLengthValue = 0,
-            point,
-            movingLatency = {},
-            movingDownload = {},
-            movingRatio = {},
-            droppedFramesValue = 0,
-            fillmoving = function(type, Requests){
-                var requestWindow,
-                    downloadTimes,
-                    latencyTimes,
-                    durationTimes;
+        metricsExt = player.getMetricsExt(),
+        repSwitch,
+        bufferLevel,
+        httpRequests,
+        droppedFramesMetrics,
+        bitrateIndexValue,
+        bandwidthValue,
+        pendingValue,
+        numBitratesValue,
+        bitrateValues,
+        bufferLengthValue = 0,
+        point,
+        movingLatency = {},
+        movingDownload = {},
+        movingRatio = {},
+        droppedFramesValue = 0,
+        dwnldSwitch,
+        fillmoving = function(type, Requests){
+            var requestWindow,
+            downloadTimes,
+            latencyTimes,
+            durationTimes;
 
-                requestWindow = Requests
-                    .slice(-20)
-                    .filter(function(req){return req.responsecode >= 200 && req.responsecode < 300 && !!req.mediaduration && req.type === "Media Segment" && req.stream === type;})
-                    .slice(-4);
-                if (requestWindow.length > 0) {
+            requestWindow = Requests
+            .slice(-20)
+            .filter(function(req){return req.responsecode >= 200 && req.responsecode < 300 && !!req.mediaduration && req.type === "Media Segment" && req.stream === type;})
+            .slice(-4);
+            if (requestWindow.length > 0) {
 
-                    latencyTimes = requestWindow.map(function (req){ return Math.abs(req.tresponse.getTime() - req.trequest.getTime()) / 1000;});
+                latencyTimes = requestWindow.map(function (req){ return Math.abs(req.tresponse.getTime() - req.trequest.getTime()) / 1000;});
 
-                    movingLatency[type] = {
-                        average: latencyTimes.reduce(function(l, r) {return l + r;}) / latencyTimes.length, 
-                        high: latencyTimes.reduce(function(l, r) {return l < r ? r : l;}), 
-                        low: latencyTimes.reduce(function(l, r) {return l < r ? l : r;}), 
-                        count: latencyTimes.length
-                    };
+                movingLatency[type] = {
+                    average: latencyTimes.reduce(function(l, r) {return l + r;}) / latencyTimes.length, 
+                    high: latencyTimes.reduce(function(l, r) {return l < r ? r : l;}), 
+                    low: latencyTimes.reduce(function(l, r) {return l < r ? l : r;}), 
+                    count: latencyTimes.length
+                };
 
-                    downloadTimes = requestWindow.map(function (req){ return Math.abs(req.tfinish.getTime() - req.tresponse.getTime()) / 1000;});
+                downloadTimes = requestWindow.map(function (req){ return Math.abs(req.tfinish.getTime() - req.tresponse.getTime()) / 1000;});
 
-                    movingDownload[type] = {
-                        average: downloadTimes.reduce(function(l, r) {return l + r;}) / downloadTimes.length, 
-                        high: downloadTimes.reduce(function(l, r) {return l < r ? r : l;}), 
-                        low: downloadTimes.reduce(function(l, r) {return l < r ? l : r;}), 
-                        count: downloadTimes.length
-                    };
+                movingDownload[type] = {
+                    average: downloadTimes.reduce(function(l, r) {return l + r;}) / downloadTimes.length, 
+                    high: downloadTimes.reduce(function(l, r) {return l < r ? r : l;}), 
+                    low: downloadTimes.reduce(function(l, r) {return l < r ? l : r;}), 
+                    count: downloadTimes.length
+                };
 
-                    durationTimes = requestWindow.map(function (req){ return req.mediaduration;});
+                durationTimes = requestWindow.map(function (req){ return req.mediaduration;});
 
-                    movingRatio[type] = {
-                        average: (durationTimes.reduce(function(l, r) {return l + r;}) / downloadTimes.length) / movingDownload[type].average, 
-                        high: durationTimes.reduce(function(l, r) {return l < r ? r : l;}) / movingDownload[type].low, 
-                        low: durationTimes.reduce(function(l, r) {return l < r ? l : r;}) / movingDownload[type].high, 
-                        count: durationTimes.length
-                    };
-                }
-            };
+                movingRatio[type] = {
+                    average: (durationTimes.reduce(function(l, r) {return l + r;}) / downloadTimes.length) / movingDownload[type].average, 
+                    high: durationTimes.reduce(function(l, r) {return l < r ? r : l;}) / movingDownload[type].low, 
+                    low: durationTimes.reduce(function(l, r) {return l < r ? l : r;}) / movingDownload[type].high, 
+                    count: durationTimes.length
+                };
+            }
+        };
 
         if (metrics && metricsExt) {
             repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
@@ -288,6 +290,8 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
             fillmoving("video", httpRequests);
             fillmoving("audio", httpRequests);
 
+            dwnldSwitch = metricsExt.getCurrentDownloadSwitch(metrics);
+
             if (repSwitch !== null) {
                 bitrateIndexValue = metricsExt.getIndexForRepresentation(repSwitch.to);
                 bandwidthValue = metricsExt.getBandwidthForRepresentation(repSwitch.to);
@@ -296,6 +300,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
             }
 
             numBitratesValue = metricsExt.getMaxIndexForBufferType(type);
+            bitrateValues = metricsExt.getBitratesForType(type);
 
             if (bufferLevel !== null) {
                 bufferLengthValue = bufferLevel.level.toPrecision(5);
@@ -327,11 +332,13 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
                 bitrateIndexValue: bitrateIndexValue + 1,
                 pendingIndex: (pendingValue !== bitrateIndexValue) ? "(-> " + (pendingValue + 1) + ")" : "",
                 numBitratesValue: numBitratesValue,
+                bitrateValues : bitrateValues,
                 bufferLengthValue: bufferLengthValue,
                 droppedFramesValue: droppedFramesValue,
                 movingLatency: movingLatency,
                 movingDownload: movingDownload,
-                movingRatio: movingRatio
+                movingRatio: movingRatio,
+                dwnldSwitch: dwnldSwitch
             }
         }
         else {
@@ -346,13 +353,14 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
 
         if (e.data.stream == "video") {
             metrics = getCribbedMetricsFor("video");
-            if (metrics) {
+            if (metrics && metrics.dwnldSwitch) {
                 $scope.videoBitrate = metrics.bandwidthValue;
                 $scope.videoIndex = metrics.bitrateIndexValue;
                 $scope.videoPendingIndex = metrics.pendingIndex;
                 $scope.videoMaxIndex = metrics.numBitratesValue;
                 $scope.videoBufferLength = metrics.bufferLengthValue;
                 $scope.videoDroppedFrames = metrics.droppedFramesValue;
+
                 if (metrics.movingLatency["video"]) {
                     $scope.videoLatencyCount = metrics.movingLatency["video"].count;
                     $scope.videoLatency = metrics.movingLatency["video"].low.toFixed(3) + " < " + metrics.movingLatency["video"].average.toFixed(3) + " < " + metrics.movingLatency["video"].high.toFixed(3);
@@ -366,13 +374,74 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
                     $scope.videoRatio = metrics.movingRatio["video"].low.toFixed(3) + " < " + metrics.movingRatio["video"].average.toFixed(3) + " < " + metrics.movingRatio["video"].high.toFixed(3);
                 }
 
-                point = [parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))];
-                videoSeries.push(point);
+                if ($('#sliderBitrate').labeledslider( "option", "max" ) === 0) {
+                    var labels = [];
+                    console.log(metrics.bitrateValues);
+                    for (var i = 0; i < metrics.bitrateValues.length; i++) {
+                        labels.push(Math.round(metrics.bitrateValues[i] / 1000) + "k");
+                    }
 
-                if (videoSeries.length > maxGraphPoints) {
-                    videoSeries.splice(0, 1);
+                    $('#sliderBitrate').labeledslider({ max: (metrics.numBitratesValue - 1), step: 1, values: [ 0, (metrics.numBitratesValue - 1 )], tickLabels: labels});
+                    $('#sliderBitrate').labeledslider({stop: function( event, ui ) {
+                        player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
+                    }});
+                }
+
+                // case of downloaded quality change
+                if (metrics.bitrateValues[metrics.dwnldSwitch.quality] != previousDownloadedQuality) {
+                // save quality change for later when video currentTime = mediaStartTime
+                qualityChangements.push({
+                    mediaStartTime : metrics.dwnldSwitch.mediaStartTime,
+                    switchedQuality : metrics.bitrateValues[metrics.dwnldSwitch.quality],
+                    downloadStartTime : metrics.dwnldSwitch.downloadStartTime
+                });
+                previousDownloadedQuality = metrics.bitrateValues[metrics.dwnldSwitch.quality];
+            }
+            
+            for (var p in qualityChangements) {
+                var currentQualityChangement = qualityChangements[p];
+                //time of downloaded quality change
+                if (currentQualityChangement.downloadStartTime <= video.currentTime) {
+                    previousDownloadedQuality = currentQualityChangement.switchedQuality;
+                }
+
+                // time of played quality change !
+                if (currentQualityChangement.mediaStartTime <= video.currentTime) {
+                    previousPlayedQuality = currentQualityChangement.switchedQuality;
+                    qualityChangements.splice(p,1);
                 }
             }
+
+            var dlPoint = [video.currentTime, Math.round(previousDownloadedQuality/1000)];
+            dlSeries.push(dlPoint);
+            var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
+            playSeries.push(playPoint);
+            
+            videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
+
+            if (videoSeries.length > maxGraphPoints) {
+                videoSeries.splice(0, 1);
+            }
+
+            if (dlSeries.length > maxGraphPoints) {
+                dlSeries.splice(0, 1);
+                playSeries.splice(0, 1);
+            }
+
+            //initialisation of bandwidth chart
+            if (!$scope.optionsBandwidthGrid) {
+                // $scope.optionsBandwidth.xaxis.min = video.currentTime;
+                $scope.optionsBandwidthGrid = {};
+                $scope.optionsBandwidthGrid.grid = {markings:[]};
+                $scope.optionsBandwidthGrid.yaxis = {ticks: []};
+                for (var idx in metrics.bitrateValues) {
+                    $scope.optionsBandwidthGrid.grid.markings.push({yaxis: { from: metrics.bitrateValues[idx]/1000, to: metrics.bitrateValues[idx]/1000 },color:"#b0b0b0"});
+                    $scope.optionsBandwidthGrid.yaxis.ticks.push([metrics.bitrateValues[idx]/1000, ""+metrics.bitrateValues[idx]/1000+"k"]);
+                }
+                $scope.optionsBandwidthGrid.yaxis.min = Math.min.apply(null,metrics.bitrateValues)/1000;
+                $scope.optionsBandwidthGrid.yaxis.max = Math.max.apply(null,metrics.bitrateValues)/1000;
+            }
+        }
         }
 
         if (e.data.stream == "audio") {
