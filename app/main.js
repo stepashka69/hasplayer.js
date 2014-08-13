@@ -565,6 +565,15 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
     player.attachView(video);
     player.setAutoPlay(true);
 
+    $scope.videojsIsOn = false;
+    
+    $scope.activateVideoJS = function() {
+        if(!$scope.videojsIsOn) {
+            videojs(video, { "controls": true, "autoplay": true, "preload": "auto" }); 
+        }
+        $scope.videojsIsOn = true;
+    };
+
     ////////////////////////////////////////
     //
     // Player Methods

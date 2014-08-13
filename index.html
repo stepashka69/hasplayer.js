@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="app/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css">
     <link rel="stylesheet" href="app/css/main.css">
 
+    <!-- Videojs -->
+    <link href="//vjs.zencdn.net/4.6/video-js.css" rel="stylesheet">
+    <script src="//vjs.zencdn.net/4.6/video.js"></script>
     <!-- http://jquery.com/ -->
     <script src="app/lib/jquery/jquery-1.10.2.min.js"></script>
     <script src="app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.js"></script>
@@ -242,7 +245,8 @@
 
         <div class="row">
             <div class="dash-video-player col-md-9">
-                <video controls="true"></video>
+                <!-- <video controls="true"></video> -->
+                <video controls="true" class="video-player video-js vjs-default-skin" width="848" height="424"></video>
                 <div class="panel">
                     <div class="panel-heading panel-top">
                         <span class="panel-title">Charts</span>
@@ -307,6 +311,7 @@
                         </div>
                     </div>
                 </div>
+                <button ng-show="!videojsIsOn" ng-click="activateVideoJS()" class="btn btn-default btn-xs" style="border-radius: 0; width: 100%;">Use the VideoJS skin</button>
             </div>
 
             <div class="col-md-3">
