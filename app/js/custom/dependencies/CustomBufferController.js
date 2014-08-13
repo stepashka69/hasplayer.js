@@ -802,7 +802,9 @@ Custom.dependencies.CustomBufferController = function () {
 
         bufferFragment = function() {
 
-            var self = this;
+            var self = this,
+                now = new Date(),
+                currentVideoTime = self.videoModel.getCurrentTime();
 
             self.debug.log("[BufferController]["+type+"] Buffer...");
 
@@ -828,6 +830,10 @@ Custom.dependencies.CustomBufferController = function () {
                                 self.debug.log("[BufferController]["+type+"] Quality changed: " + quality);
                                 currentQuality = quality;
                                 loadInit = true;
+
+                                clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.REPRESENTATION_SWITCH_STOP_REASON);
+                                self.metricsModel.addRepresentationSwitch(type, now, currentVideoTime, currentRepresentation.id);
+
                             }
 
                             if (loadInit === true) {
