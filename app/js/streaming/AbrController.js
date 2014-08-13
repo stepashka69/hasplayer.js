@@ -109,7 +109,7 @@ MediaPlayer.dependencies.AbrController = function () {
             //self.debug.log("ABR enabled? (" + autoSwitchBitrate + ")");
 
             if (autoSwitchBitrate) {
-                //self.debug.log("Check ABR rules.");
+                self.debug.log("[ABRController] Check rules....");
 
                 self.getMetricsFor(data).then(
                     function (metrics) {
@@ -128,6 +128,7 @@ MediaPlayer.dependencies.AbrController = function () {
 
                                         for (i = 0, len = results.length; i < len; i += 1) {
                                             req = results[i];
+                                            self.debug.log("[ABRController]["+type+"] Request for quality " + req.quality + ", priority = " + req.priority);
                                             if (req.quality !== MediaPlayer.rules.SwitchRequest.prototype.NO_CHANGE) {
                                                 values[req.priority] = Math.min(values[req.priority], req.quality);
                                             }

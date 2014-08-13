@@ -26,6 +26,9 @@ Custom.di.CustomContext = function () {
             this.system.mapSingleton('abrController', Custom.dependencies.CustomAbrController);
             this.system.mapClass('bufferController', Custom.dependencies.CustomBufferController);
 
+            // overload ABR rules
+            this.system.mapClass('downloadRatioRule', Custom.rules.CustomDownloadRatioRule);
+
             // plug message handler. When the message is notify, the contextManager is called
             this.system.mapHandler('setContext', 'contextManager', 'setContext');
         }
