@@ -15,7 +15,6 @@ Dash.dependencies.TimelineConverter = function () {
     "use strict";
 
     var clientServerTimeShift = 0,
-        isClientServerTimeSyncCompleted = false,
 
         calcAvailabilityTimeFromPresentationTime = function (presentationTime, mpd, isDynamic, calculateEnd) {
             var availabilityTime = NaN;
@@ -51,14 +50,29 @@ Dash.dependencies.TimelineConverter = function () {
 
         calcPresentationStartTime = function (period) {
             var presentationStartTime,
-                isDynamic;
-
-            isDynamic = period.mpd.manifest.type === "dynamic";
+                isDynamic = period.mpd.manifest.type === "dynamic",
+                startTimeOffset = parseInt(this.uriQueryFragModel.getURIFragmentData.s);
 
             if (isDynamic) {
-                presentationStartTime = period.liveEdge;
+
+                if (!isNaN(startTimeOffset) && startTimeOffset > 1262304000) {
+
+                    presentationStartTime = startTimeOffset - (period.mpd.availabilityStartTime.getTime()/1000);
+
+                    if (presentationStartTime > period.liveEdge ||
+                        presentationStartTime < (period.liveEdge - period.mpd.timeShiftBufferDepth)) {
+
+                        presentationStartTime = null;
+                    }
+                }
+                presentationStartTime = presentationStartTime || period.liveEdge;
+
+            } else {
+                if (!isNaN(startTimeOffset) && startTimeOffset < period.duration && startTimeOffset >= 0) {
+                    presentationStartTime = startTimeOffset;
             } else {
                 presentationStartTime = period.start;
+            }
             }
 
             return presentationStartTime;
@@ -112,15 +126,15 @@ Dash.dependencies.TimelineConverter = function () {
 
         calcSegmentAvailabilityRange = function(representation, isDynamic) {
             var duration = representation.segmentDuration,
-                start = 0,
-                end = representation.adaptation.period.duration,
+                start = representation.adaptation.period.start,
+                end = start + representation.adaptation.period.duration,
                 range = {start: start, end: end},
                 checkTime,
                 now;
 
             if (!isDynamic) return range;
 
-            if ((!isClientServerTimeSyncCompleted || isNaN(duration)) && representation.segmentAvailabilityRange) {
+            if ((!representation.adaptation.period.isClientServerTimeSyncCompleted || isNaN(duration)) && representation.segmentAvailabilityRange) {
                 return representation.segmentAvailabilityRange;
             }
 
@@ -130,7 +144,7 @@ Dash.dependencies.TimelineConverter = function () {
             // MPD@timeShiftBufferDepth such that only Media Segments for which the sum of the start time of the
             // Media Segment and the Period start time falls in the interval [NOW- MPD@timeShiftBufferDepth - @duration, min(CheckTime, NOW)] are included.
             start = Math.max((now - representation.adaptation.period.mpd.timeShiftBufferDepth - duration), 0);
-            checkTime -= duration - clientServerTimeShift;
+            checkTime -= duration - (clientServerTimeShift / 1000);
             now -= duration;
             end = isNaN(checkTime) ? now : Math.min(checkTime, now);
             range = {start: start, end: end};
@@ -145,8 +159,7 @@ Dash.dependencies.TimelineConverter = function () {
             // and server time as well
             period.clientServerTimeShift = actualLiveEdge - expectedLiveEdge;
             period.isClientServerTimeSyncCompleted = true;
-            clientServerTimeShift = period.clientServerTimeShift;// * 1000; // ORANGE: clientServerTimeShift in seconds (and not milliseconds)
-            isClientServerTimeSyncCompleted = true;
+            clientServerTimeShift = period.clientServerTimeShift * 1000;
         },
 
         calcMSETimeOffset = function (representation) {
@@ -159,6 +172,7 @@ Dash.dependencies.TimelineConverter = function () {
     return {
         system: undefined,
         debug: undefined,
+        uriQueryFragModel:undefined,
 
         setup: function() {
             this.system.mapHandler("liveEdgeFound", undefined, liveEdgeFound.bind(this));

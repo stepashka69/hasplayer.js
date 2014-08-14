@@ -70,6 +70,7 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
     },
 
     createSession: function (mediaKeys, mediaCodec, initData, customData) {
+        // ORANGE: licenser custom data
         if (customData) {
             var customDataValue = customData;
 

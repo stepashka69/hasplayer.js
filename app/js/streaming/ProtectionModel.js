@@ -34,9 +34,11 @@ MediaPlayer.models.ProtectionModel = function () {
             element = this.videoModel.getElement();
         },
 
+        // ORANGE: licenser custom data
         addKeySession: function (kid, mediaCodec, initData, cdmData) {
             var session = null;
 
+            // ORANGE: licenser custom data
             session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, cdmData);
 
             this.protectionExt.listenToKeyAdded(session, keyAddedListener);
@@ -93,6 +95,7 @@ MediaPlayer.models.ProtectionModel = function () {
             return keySystem.keySystem.getInitData(keySystem.contentProtection);
         },
 
+        // ORANGE: licenser custom data
         updateFromMessage: function (kid, msg, laURL, cdmData) {
             return keySystems[kid].keySystem.getUpdate(msg, laURL, cdmData);
         },
