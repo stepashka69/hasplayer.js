@@ -18,10 +18,70 @@ Dash.dependencies.DashHandler = function () {
         requestedTime,
         isDynamic,
         type,
+        offset = null,
+
+        zeroPadToLength = function (numStr, minStrLength) {
+            while (numStr.length < minStrLength) {
+                numStr = "0" + numStr;
+            }
+
+            return numStr;
+        },
 
         replaceNumberForTemplate = function (url, value) {
-            var v = value.toString();
-            return url.split("$Number$").join(v);
+
+            var startPos,
+                endPos,
+                formatTagPos,
+                specifier,
+                width;
+
+            // check that there is a valid $Number...$ identifier
+            startPos = url.indexOf("$Number");
+            if (startPos < 0) {
+                return url;
+            }
+
+            // the next '$' must be the end of the identifer
+            endPos = url.indexOf("$", startPos + 7);
+            if (endPos < 0) {
+                return url;
+            }
+
+            // now see if there is an additional format tag suffixed to
+            // the identifier within the enclosing '$' characters
+            formatTagPos = url.indexOf("%", startPos + 7);
+            if (formatTagPos > startPos && formatTagPos < endPos) {
+
+                specifier = url.charAt(endPos - 1);
+                width = url.substring(formatTagPos + 1, endPos - 1);
+
+                // support the minimum specifiers required by IEEE 1003.1
+                // (d, i , o, u, x, and X) for completeness
+                switch (specifier) {
+                // treat all int types as uint,
+                // hence deliberate fallthrough
+                case 'd':
+                case 'i':
+                case 'u':
+                    value = zeroPadToLength(value.toString(), width);
+                    break;
+                case 'x':
+                    value = zeroPadToLength(value.toString(16), width);
+                    break;
+                case 'X':
+                    value = zeroPadToLength(value.toString(16), width).toUpperCase();
+                    break;
+                case 'o':
+                    value = zeroPadToLength(value.toString(8), width);
+                    break;
+                default:
+                    this.debug.log("Unsupported/invalid IEEE 1003.1 format identifier string in URL");
+                    return url;
+                }
+            }
+
+            return url.substring(0, startPos) + value + url.substring(endPos + 1);
         },
 
         replaceTimeForTemplate = function (url, value) {
@@ -125,6 +185,10 @@ Dash.dependencies.DashHandler = function () {
                 seg,
                 fTime;
 
+            if(offset === null || offset > representation.segments[0].availabilityIdx) {
+                offset = representation.segments[0].availabilityIdx;
+            }
+
             //this.debug.log("Checking for stream end...");
             if (isDynamic) {
                 //this.debug.log("Live never ends! (TODO)");
@@ -133,7 +197,7 @@ Dash.dependencies.DashHandler = function () {
             } else {
                 if (index < 0) {
                     isFinished = false;
-                } else if (index < representation.availableSegmentsNumber) {
+                } else if (index < representation.availableSegmentsNumber + offset) {
                     seg = getSegmentByIndex(index, representation);
 
                     if (seg) {
@@ -156,10 +220,11 @@ Dash.dependencies.DashHandler = function () {
             var seg,
                 duration,
                 presentationStartTime,
+                idx,
                 presentationEndTime;
 
             duration = representation.segmentDuration;
-            presentationStartTime = representation.adaptation.period.start + (index * duration);
+            presentationStartTime = index * duration;
             presentationEndTime = presentationStartTime + duration;
 
             seg = new Dash.vo.Segment();
@@ -176,7 +241,8 @@ Dash.dependencies.DashHandler = function () {
             // at this wall clock time, the video element currentTime should be seg.presentationStartTime
             seg.wallStartTime = this.timelineConverter.calcWallTimeForSegment(seg, isDynamic);
 
-            seg.replacementNumber = getNumberForSegment(seg, index);
+            idx = Math.max(Math.floor((presentationStartTime - representation.adaptation.period.start) / duration), 0);
+            seg.replacementNumber = getNumberForSegment(seg, idx);
             seg.availabilityIdx = index;
 
             //this.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx);
@@ -269,8 +335,6 @@ Dash.dependencies.DashHandler = function () {
                     if (calculatedRange) {
                         if (availabilityIdx > endIdx) {
                             hasEnoughSegments = true;
-                            //ORANGE : SS case, for the first createSegment, isAvailableSegmentNumberCalculated = false
-                            //unuseful iteration between availabilityIdx and repeat value...
                             if (isAvailableSegmentNumberCalculated) break;
                             continue;
                         }
@@ -371,6 +435,10 @@ Dash.dependencies.DashHandler = function () {
                 start,
                 end,
                 range;
+
+            if (!availabilityWindow) {
+                availabilityWindow = self.timelineConverter.calcSegmentAvailabilityRange(representation, isDynamic);
+            }
 
             if (isDynamic && !representation.adaptation.period.isClientServerTimeSyncCompleted) {
                 start = Math.floor(availabilityWindow.start / duration);
@@ -474,7 +542,6 @@ Dash.dependencies.DashHandler = function () {
             presentationStartTime = this.timelineConverter.calcPresentationTimeFromMediaTime(scaledTime, representation);
             // ORANGE: presentationStartTime is the media time of the segment as provided in the SegmentTimeline
             presentationStartTime = scaledTime;//self.timelineConverter.calcPresentationTimeFromMediaTime(scaledTime, representation);
-
             presentationEndTime = presentationStartTime + scaledDuration;
 
             seg = new Dash.vo.Segment();
@@ -518,24 +585,28 @@ Dash.dependencies.DashHandler = function () {
                 seg,
                 s,
                 range,
-                startIdx,
-                endIdx,
+                startIdx = 0,
+                endIdx = list.SegmentURL_asArray.length,
                 start;
 
             start = representation.startNumber;
 
             waitForAvailabilityWindow.call(self, representation).then(
-                function(availabilityWindow) {
-                    representation.segmentAvailabilityRange = availabilityWindow;
+                function(/*availabilityWindow*/) {
+                    if (!isDynamic) {
                     range = decideSegmentListRangeForTemplate.call(self, representation);
                     startIdx = range.start;
                     endIdx = range.end;
+                    }
 
                     // ORANGE: patch in case range is to wide
                     for (i = startIdx; (i < endIdx) && (i < list.SegmentURL_asArray.length); i += 1) {
                         s = list.SegmentURL_asArray[i];
 
-                        seg = getIndexBasedSegment.call(self, representation, i);
+                        seg = getIndexBasedSegment.call(
+                            self,
+                            representation,
+                            i);
 
                         seg.replacementTime = (start + i - 1) * representation.segmentDuration;
                         seg.media = s.media;
@@ -554,7 +625,7 @@ Dash.dependencies.DashHandler = function () {
                         segments.push(seg);
                         seg = null;
                     }
-
+                    representation.segmentAvailabilityRange = {start: representation.adaptation.period.start + segments[0].presentationStartTime, end: representation.adaptation.period.start + segments[segments.length-1].presentationStartTime};
                     representation.availableSegmentsNumber = len;
                     deferred.resolve(segments);
             });
@@ -683,18 +754,15 @@ Dash.dependencies.DashHandler = function () {
                     fd = frag.duration;
                     //this.debug.log("[DashHandler]["+type+"] ft = " + ft + ", fd = " + fd + ", idx = " + frag.availabilityIdx);
                     if ((time + Dash.dependencies.DashHandler.EPSILON) >= ft &&
-                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {/* &&
-                        //ORANGE : add a test to not send twice last id in the segments list
-                        (time + Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {*/
+                        (time - Dash.dependencies.DashHandler.EPSILON) <= (ft + fd)) {
                         idx = frag.availabilityIdx;
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, idx =  ", idx);
                         break;
                     } else if (idx === -1 && (time - Dash.dependencies.DashHandler.EPSILON) > (ft + fd)) {
                         // time is past the end
                         this.debug.log("[DashHandler]["+type+"] getIndexForSegments, (past the end) idx =  ", idx);
-                        //ORANGE : we have past the end, don't iterate for nothing
-                        //idx = -1 not the last id, it's not the good id
                         idx  = isNaN(representation.segmentDuration) ? (frag.availabilityIdx + 1) : Math.floor(time / representation.segmentDuration);
+                        //ORANGE : we have past the end, don't iterate for nothing
                         break;
                     }
                 }

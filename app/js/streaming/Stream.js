@@ -519,7 +519,8 @@ MediaPlayer.dependencies.Stream = function () {
             if (initialSeekTime != this.videoModel.getCurrentTime())
             {
                 this.system.notify("setCurrentTime");
-                this.videoModel.setCurrentTime(initialSeekTime);                
+                // ORANGE: +1 to get around timestamps rounding issues on chrome
+                this.videoModel.setCurrentTime(initialSeekTime + 1);                
             }
 
             load.resolve(null);
@@ -730,9 +731,9 @@ MediaPlayer.dependencies.Stream = function () {
 
         // ORANGE: 'liveEdgeFound' event raised when live edge has been found on video stream
         // => then seek every BufferController at the found live edge time
-        onLiveEdgeFound = function() {
+        onLiveEdgeFound = function(liveEdgeTime) {
 
-            /*var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
+            //var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
             this.debug.log("[O][Stream] ### LiveEdge = " + liveEdgeTime);
 
             if (videoController) {
@@ -740,7 +741,7 @@ MediaPlayer.dependencies.Stream = function () {
             }
             if (audioController) {
                 audioController.seek(liveEdgeTime);
-            }*/
+            }
         },
 
         updateData = function (updatedPeriodInfo) {

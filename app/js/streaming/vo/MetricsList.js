@@ -26,7 +26,8 @@ MediaPlayer.models.MetricsList = function () {
         BandwidthValue: null,
         BufferLevel: [],
         PlayList: [],
-        DroppedFrames: []
+        DroppedFrames: [],
+        DVRInfo: []
     };
 };
 

@@ -376,7 +376,7 @@ Custom.dependencies.CustomBufferController = function () {
                 return;
             }
 
-            ranges = this.sourceBufferExt.getAllRanges(buffer);
+            ranges = this.sourceBufferExt.getAllRangesSync(buffer);
 
             if ((ranges === null) || (ranges.length === 0)) {
                 return;
@@ -662,7 +662,7 @@ Custom.dependencies.CustomBufferController = function () {
             self.debug.log("[BufferController]["+type+"] loadNextFragment");
             Q.when(seeking ? seekTarget : self.indexHandler.getCurrentTime(currentRepresentation)).then(
                 function (time) {
-                    var range = self.sourceBufferExt.getBufferRange(buffer, time);
+                    var range = self.sourceBufferExt.getBufferRangeSync(buffer, time);
 
                     if (seeking) {
                         currentRepresentation.segments = null;
@@ -759,7 +759,7 @@ Custom.dependencies.CustomBufferController = function () {
             var self = this,
                 currentTime = getWorkingTime.call(self);
 
-            bufferLevel = self.sourceBufferExt.getBufferLength(buffer, currentTime);
+            bufferLevel = self.sourceBufferExt.getBufferLengthSync(buffer, currentTime);
             self.metricsModel.addBufferLevel(type, new Date(), bufferLevel);
         },
 
@@ -972,15 +972,18 @@ Custom.dependencies.CustomBufferController = function () {
                             );
 
                             if (isDynamic) {
-                                self.indexHandler.updateSegmentList(currentRepresentation).then(
-                                    function() {
-                                        getLiveEdgeTime.call(self).then(
-                                            function(time) {
-                                                self.seek(time);
-                                            }
-                                        );
-                                    }
-                                );
+                                if (type === "video") {
+                                    self.indexHandler.updateSegmentList(currentRepresentation).then(
+                                        function() {
+                                            getLiveEdgeTime.call(self).then(
+                                                function(time) {
+                                                    //self.seek(time);
+                                                    self.system.notify("liveEdgeFound", time);
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
                             } else {
                                 self.indexHandler.getCurrentTime(currentRepresentation).then(
                                     function(time) {
