@@ -14,13 +14,16 @@ module.exports = function(grunt) {
     //Copy the index to the build folder
     copy: {
       html: {
-        src: 'index.html', dest: '<%= path %>/index.html'
+        files: [
+        {src: 'index.html', dest: '<%= path %>/index.html'},
+        {src: 'player.html', dest: '<%= path %>/player.html'}
+        ]
       }
     },
 
     //Configuration for blocks in HTML
     useminPrepare: {
-      html: 'index.html',
+      src: ['index.html', 'player.html'],
       options: {
         dest: '<%= path %>'
       }
@@ -28,7 +31,7 @@ module.exports = function(grunt) {
 
     //The HTML to parse
     usemin: {
-      html: ['<%= path %>/index.html']
+      html: ['<%= path %>/index.html', '<%= path %>/player.html']
     },
 
     //Get CSS files into one and replace all file url with base64 inline
@@ -142,10 +145,12 @@ module.exports = function(grunt) {
       main: {
         options: {
           removeComments: true,
-          collapseWhitespace: true
+          collapseWhitespace: true,
+          minifyCSS: true
         },
         files: {
-          '<%= path %>/index.html': '<%= path %>/index.html'
+          '<%= path %>/index.html': '<%= path %>/index.html',
+          '<%= path %>/player.html': '<%= path %>/player.html'
         }
       }
     },
@@ -175,7 +180,7 @@ module.exports = function(grunt) {
           ]
         },
         files: [
-        {expand: true, flatten: true, src: ['<%= path %>/player.js', '<%= path %>/index.js'], dest: '<%= path %>'}
+        {expand: true, flatten: true, src: ['<%= path %>/dash.all.js', '<%= path %>/index.js', '<%= path %>/player.js'], dest: '<%= path %>'}
         ]
       }
     },
