@@ -972,15 +972,18 @@ Custom.dependencies.CustomBufferController = function () {
                             );
 
                             if (isDynamic) {
-                                self.indexHandler.updateSegmentList(currentRepresentation).then(
-                                    function() {
-                                        getLiveEdgeTime.call(self).then(
-                                            function(time) {
-                                                self.seek(time);
-                                            }
-                                        );
-                                    }
-                                );
+                                if (type === "video") {
+                                    self.indexHandler.updateSegmentList(currentRepresentation).then(
+                                        function() {
+                                            getLiveEdgeTime.call(self).then(
+                                                function(time) {
+                                                    //self.seek(time);
+                                                    self.system.notify("liveEdgeFound", time);
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
                             } else {
                                 self.indexHandler.getCurrentTime(currentRepresentation).then(
                                     function(time) {

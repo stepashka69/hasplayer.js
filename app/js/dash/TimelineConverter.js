@@ -175,7 +175,7 @@ Dash.dependencies.TimelineConverter = function () {
         uriQueryFragModel:undefined,
 
         setup: function() {
-            this.system.mapHandler("liveEdgeFound", undefined, liveEdgeFound.bind(this));
+            //this.system.mapHandler("liveEdgeFound", undefined, liveEdgeFound.bind(this));
         },
 
         calcAvailabilityStartTimeFromPresentationTime: calcAvailabilityStartTimeFromPresentationTime,
