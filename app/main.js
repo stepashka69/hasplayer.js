@@ -1,41 +1,42 @@
 'use strict';
 // don't disable metrics...
 var DEBUG = true;
+var angular = angular;
 
 angular.module('DashSourcesService', ['ngResource']).
-factory('Sources', function($resource){
+factory('Sources', ['$resource', function($resource){
     return $resource('app/sources.json', {}, {
         query: {method:'GET', isArray:false}
     });
-});
+}]);
 
 angular.module('DashNotesService', ['ngResource']).
-factory('Notes', function($resource){
+factory('Notes', ['$resource', function($resource){
     return $resource('app/notes.json', {}, {
         query: {method:'GET', isArray:false}
     });
-});
+}]);
 
 angular.module('DashContributorsService', ['ngResource']).
-factory('Contributors', function($resource){
+factory('Contributors', ['$resource', function($resource){
     return $resource('app/contributors.json', {}, {
         query: {method:'GET', isArray:false}
     });
-});
+}]);
 
 angular.module('DashPlayerLibrariesService', ['ngResource']).
-factory('PlayerLibraries', function($resource){
+factory('PlayerLibraries', ['$resource', function($resource){
     return $resource('app/player_libraries.json', {}, {
         query: {method:'GET', isArray:false}
     });
-});
+}]);
 
 angular.module('DashShowcaseLibrariesService', ['ngResource']).
-factory('ShowcaseLibraries', function($resource){
+factory('ShowcaseLibraries', ['$resource', function($resource){
     return $resource('app/showcase_libraries.json', {}, {
         query: {method:'GET', isArray:false}
     });
-});
+}]);
 
 var app = angular.module('DashPlayer', [
     'DashSourcesService',
@@ -89,8 +90,8 @@ app.directive('chart2', function() {
     return {
         restrict: 'E',
         link: function (scope, elem, attrs) {
-           var chartBandwidth =  null,
-           optionsBandwidth = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: false},lines: {steps: true,},grid: {markings: [],borderWidth: 0}};
+         var chartBandwidth =  null,
+         optionsBandwidth = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: false},lines: {steps: true,},grid: {markings: [],borderWidth: 0}};
 
 
             // If the data changes somehow, update it in the chart
@@ -123,7 +124,9 @@ app.directive('chart2', function() {
     };
 });
 
-app.controller('DashController', function($scope, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
+app.controller('DashController', ['$scope', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
+    function($scope, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
+
     var player,
     video,
     context,
@@ -135,8 +138,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
     previousPlayedQuality = 0,
     previousDownloadedQuality= 0,
     maxGraphPoints = 50,
-    firstAccess = true,
-    updateInterval = 333;
+    firstAccess = true;
 
     ////////////////////////////////////////
     //
@@ -234,7 +236,6 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
         numBitratesValue,
         bitrateValues,
         bufferLengthValue = 0,
-        point,
         movingLatency = {},
         movingDownload = {},
         movingRatio = {},
@@ -339,7 +340,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
                 movingDownload: movingDownload,
                 movingRatio: movingRatio,
                 dwnldSwitch: dwnldSwitch
-            }
+            };
         }
         else {
             return null;
@@ -348,8 +349,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
 
     function metricChanged(e) {
         var metrics,
-        point,
-        treeData;
+        point;
 
         if (e.data.stream == "video") {
             metrics = getCribbedMetricsFor("video");
@@ -441,49 +441,49 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
                 $scope.optionsBandwidthGrid.yaxis.max = Math.max.apply(null,metrics.bitrateValues)/1000;
             }
         }
-        }
+    }
 
-        if (e.data.stream == "audio") {
-            metrics = getCribbedMetricsFor("audio");
-            if (metrics) {
+    if (e.data.stream == "audio") {
+        metrics = getCribbedMetricsFor("audio");
+        if (metrics) {
 
-                if(firstAccess){
-                    $scope.audioTracks = player.getAudioTracks();
-                    $scope.audioData = $scope.audioTracks[0];
-                    firstAccess = false;
-                }
+            if(firstAccess){
+                $scope.audioTracks = player.getAudioTracks();
+                $scope.audioData = $scope.audioTracks[0];
+                firstAccess = false;
+            }
 
-                $scope.audioBitrate = metrics.bandwidthValue;
-                $scope.audioIndex = metrics.bitrateIndexValue;
-                $scope.audioPendingIndex = metrics.pendingIndex;
-                $scope.audioMaxIndex = metrics.numBitratesValue;
-                $scope.audioBufferLength = metrics.bufferLengthValue;
-                $scope.audioDroppedFrames = metrics.droppedFramesValue;
-                if (metrics.movingLatency["audio"]) {
-                    $scope.audioLatencyCount = metrics.movingLatency["audio"].count;
-                    $scope.audioLatency = metrics.movingLatency["audio"].low.toFixed(3) + " < " + metrics.movingLatency["audio"].average.toFixed(3) + " < " + metrics.movingLatency["audio"].high.toFixed(3);
-                }
-                if (metrics.movingDownload["audio"]) {
-                    $scope.audioDownloadCount = metrics.movingDownload["audio"].count;
-                    $scope.audioDownload = metrics.movingDownload["audio"].low.toFixed(3) + " < " + metrics.movingDownload["audio"].average.toFixed(3) + " < " + metrics.movingDownload["audio"].high.toFixed(3);
-                }
-                if (metrics.movingRatio["audio"]) {
-                    $scope.audioRatioCount = metrics.movingRatio["audio"].count;
-                    $scope.audioRatio = metrics.movingRatio["audio"].low.toFixed(3) + " < " + metrics.movingRatio["audio"].average.toFixed(3) + " < " + metrics.movingRatio["audio"].high.toFixed(3);
-                }
+            $scope.audioBitrate = metrics.bandwidthValue;
+            $scope.audioIndex = metrics.bitrateIndexValue;
+            $scope.audioPendingIndex = metrics.pendingIndex;
+            $scope.audioMaxIndex = metrics.numBitratesValue;
+            $scope.audioBufferLength = metrics.bufferLengthValue;
+            $scope.audioDroppedFrames = metrics.droppedFramesValue;
+            if (metrics.movingLatency["audio"]) {
+                $scope.audioLatencyCount = metrics.movingLatency["audio"].count;
+                $scope.audioLatency = metrics.movingLatency["audio"].low.toFixed(3) + " < " + metrics.movingLatency["audio"].average.toFixed(3) + " < " + metrics.movingLatency["audio"].high.toFixed(3);
+            }
+            if (metrics.movingDownload["audio"]) {
+                $scope.audioDownloadCount = metrics.movingDownload["audio"].count;
+                $scope.audioDownload = metrics.movingDownload["audio"].low.toFixed(3) + " < " + metrics.movingDownload["audio"].average.toFixed(3) + " < " + metrics.movingDownload["audio"].high.toFixed(3);
+            }
+            if (metrics.movingRatio["audio"]) {
+                $scope.audioRatioCount = metrics.movingRatio["audio"].count;
+                $scope.audioRatio = metrics.movingRatio["audio"].low.toFixed(3) + " < " + metrics.movingRatio["audio"].average.toFixed(3) + " < " + metrics.movingRatio["audio"].high.toFixed(3);
+            }
 
-                point = [parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))];
-                audioSeries.push(point);
+            point = [parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))];
+            audioSeries.push(point);
 
-                if (audioSeries.length > maxGraphPoints) {
-                    audioSeries.splice(0, 1);
-                }
+            if (audioSeries.length > maxGraphPoints) {
+                audioSeries.splice(0, 1);
             }
         }
-
-        $scope.invalidateDisplay(true);
-        $scope.safeApply();
     }
+
+    $scope.invalidateDisplay(true);
+    $scope.safeApply();
+}
 
     ////////////////////////////////////////
     //
@@ -665,25 +665,33 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
         }
     };
 
-    Sources.query(function (data) {
-        $scope.availableStreams = data.items;
-    });
+    if(window.jsonData === undefined) {
+        Sources.query(function (data) {
+            $scope.availableStreams = data.items;
+        });
 
-    Notes.query(function (data) {
-        $scope.releaseNotes = data.notes;
-    });
+        Notes.query(function (data) {
+            $scope.releaseNotes = data.notes;
+        });
 
-    Contributors.query(function (data) {
-        $scope.contributors = data.items;
-    });
+        Contributors.query(function (data) {
+            $scope.contributors = data.items;
+        });
 
-    PlayerLibraries.query(function (data) {
-        $scope.playerLibraries = data.items;
-    });
+        PlayerLibraries.query(function (data) {
+            $scope.playerLibraries = data.items;
+        });
 
-    ShowcaseLibraries.query(function (data) {
-        $scope.showcaseLibraries = data.items;
-    });
+        ShowcaseLibraries.query(function (data) {
+            $scope.showcaseLibraries = data.items;
+        });
+    } else {
+        $scope.availableStreams = window.jsonData.sources.items;
+        $scope.releaseNotes = window.jsonData.notes.notes;
+        $scope.contributors = window.jsonData.contributors.items;
+        $scope.playerLibraries = window.jsonData.player_libraries.items;
+        $scope.showcaseLibraries = window.jsonData.showcase_libraries.items;
+    }
 
     $scope.setStream = function (item) {
         $scope.selectedItem = item;
@@ -726,4 +734,4 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
             $scope.doLoad();
         }
     }
-});
+}]);

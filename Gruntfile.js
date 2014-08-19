@@ -1,23 +1,51 @@
 module.exports = function(grunt) {
   grunt.initConfig({
-    connect: {
-      default_options: {}
-    },
-    watch: {},
+
     jshint: {
       all: ["app/js/*/**/*.js"],
       options: {
         jshintrc: ".jshintrc"
       }
     },
-    uglify : {
-      all : {
+
+    useminPrepare: {
+      html: 'index.html',
+      options: {
+        dest: 'dist'
+      }
+    },
+
+    usemin: {
+      html: ['dist/index.html']
+    },
+
+    copy: {
+      html: {
+        src: 'index.html', dest: 'dist/index.html'
+      }
+    },
+
+    cssmin: {
+      generated: {
+        options: {
+          keepSpecialComments: 0
+        }
+      },
+      mini: {
+        files: {
+          'dist/style.css': ['dist/style.css']
+        }
+      }
+    },
+
+    uglify: {
+      generated: {
         options: {
           compress:{
             pure_funcs: [
-              'self.debug.log',   /* set this function « no side effects » so  you can remove it ! */
-              'this.debug.log',
-              'rslt.debug.log'
+            'self.debug.log',   /* set this function « no side effects » so  you can remove it ! */
+            'this.debug.log',
+            'rslt.debug.log'
             ],
             global_defs: {
               DEBUG: true        /* conditionned code by DEBUG will be remove at build */
@@ -32,108 +60,74 @@ module.exports = function(grunt) {
           //   beautify : true
           // },
           // mangle: false       /* to debug purpose : variable names are unchanged */
+        }
+      },
+      json: {
+        options: {
+          beautify : false,
+          mangle: false
         },
         files: {
-          "dash.all.js" : [
-            "./app/lib/q.js",
-            "./app/lib/xml2json.js",
-            "./app/lib/objectiron.js",
-            "./app/lib/dijon.js",
-            "./app/lib/Math.js",
-            "./app/lib/long.js",
-            "./app/lib/base64.js",
-            "./app/lib/mp4lib/mp4lib.js",
-            "./app/lib/mp4lib/mp4lib-boxes.js",
-            "./app/lib/mp4lib/mp4lib-fieldProcessors.js",
-            "./app/lib/mp4lib/mp4lib-fields.js",
-			"./app/lib/mpegts/mpegts.js",
-			"./app/lib/mpegts/pes.js",
-			"./app/lib/mpegts/psi.js",
-			"./app/lib/mpegts/aac.js",
-			"./app/lib/mpegts/adaptationField.js",
-			"./app/lib/mpegts/binary.js",
-			"./app/lib/mpegts/h264.js",
-			"./app/lib/mpegts/pat.js",
-			"./app/lib/mpegts/pmt.js",
-			"./app/lib/mpegts/pts.js",
-			"./app/lib/mpegts/ts.js",
-            "./app/js/streaming/MediaPlayer.js",
-            "./app/js/streaming/Context.js",
-            "./app/js/dash/Dash.js",
-            "./app/js/dash/DashContext.js",
-            "./app/js/mss/Mss.js",
-            "./app/js/hls/Hls.js",
-            "./app/js/custom/Custom.js",
-            "./app/js/custom/di/CustomContext.js",
-            "./app/js/*/**/*.js"]
+          'dist/json.js': ['dist/json.js']
         }
-      }
+      } 
     },
-    jasmine: {
-      tests: {
-        src: [
-            "./app/js/streaming/MediaPlayer.js",
-            "./app/js/streaming/Context.js",
-            "./app/js/dash/Dash.js",
-            "./app/js/dash/DashContext.js",
-            "./app/js/*/**/*.js"],
 
+    filerev: {
+      options: {
+        encoding: 'utf8',
+        algorithm: 'md5',
+        length: 8
+      }
+    },
+
+    uncss: {
+      dist: {
         options: {
-          host: 'http://127.0.0.1:8000/',
-          specs: [
-            './test/js/dash/DashParser_Suite.js',
-            './test/js/dash/FragmentExtensions_Suite.js',
-            './test/js/dash/DashMetricsExtensions_Suite.js',
-            './test/js/dash/DashMetricsConverter_Suite.js',
-            './test/js/dash/DashManifestExtensions_Suite.js',
-            './test/js/dash/DashManifestExtensionsNeg_Suite.js',
-            './test/js/dash/DashHandler_Suite.js',
-            './test/js/streaming/MediaPlayer_Suite.js',
-            './test/js/streaming/Stream_Suite.js',
-            './test/js/streaming/AbrController_Suite.js',
-            './test/js/streaming/BufferController_Suite.js',
-            './test/js/streaming/Capabilities_Suite.js',
-            './test/js/streaming/MetricsModel_Suite.js',
-            './test/js/streaming/FragmentController_Suite.js',
-            './test/js/streaming/VideoModel_Suite.js',
-            './test/js/streaming/ManifestLoader_Suite.js',
-            './test/js/dash/BaseURLExtensions_Suite.js',
-            './test/js/streaming/BufferExtensions_Suite.js',
-            './test/js/streaming/Context_Suite.js',
-            './test/js/streaming/DashMetricsConverter_Suite.js',
-            './test/js/streaming/DashMetricsExtensions_Suite.js',
-            './test/js/streaming/EventBus_Suite.js',
-            './test/js/streaming/FragmentModel_Suite.js',
-            './test/js/streaming/RequestScheduler_Suite.js',
-            './test/js/streaming/Scenario_Suite.js',
-            './test/js/streaming/StreamController_Suite.js',
-            './test/js/streaming/TextTrackExtensions_Suite.js',
-            './test/js/streaming/VideoModelExtensions_Suite.js'],
-          vendor: [
-            "./app/lib/jquery/js/jquery-1.8.3.min.js",
-            "./app/lib/jquery/js/jquery-ui-1.9.2.custom.min.js",
-            "./app/lib/q.min.js",
-            "./app/lib/xml2json.js",
-            "./app/lib/objectiron.js",
-            "./app/lib/Math.js",
-            "./app/lib/long.js",
-            "./test/js/utils/MPDfiles.js",
-            "./test/js/utils/Main.js",
-            "./test/js/utils/ValidateUrl.js",
-            "./app/lib/kendo/kendo.web.min.js",
-            "./app/lib/dijon.js",
-            "./app/lib/base64.js"],
-          template : require('grunt-template-jasmine-istanbul'),
-          templateOptions: {
-            coverage: 'reports/coverage.json',
-            report: 'reports/coverage'},
-          junit: {
-              path: grunt.option('jsunit-path'),
-              consolidate: true
-            }
+          ignore: [
+          /(#|\.)fancybox(\-[a-zA-Z]+)?/,
+          ".open>.dropdown-menu",
+          ".nav>li",
+          ".nav-tabs>li",
+          ".nav-tabs>li.active>a",
+          ".nav-tabs>li.active>a:hover",
+          ".nav-tabs>li.active>a:focus",
+          ".tab-content>.active",
+          ".pill-content>.active",
+          ".tab-content>.tab-pane", 
+          ".pill-content>.pill-pane",
+          ".fade",
+          ".fade.in",
+          ".collapse",
+          ".collapse.in",
+          ".navbar-collapse",
+          ".navbar-collapse.in",
+          ".collapsing",
+          ".alert-danger",
+          ".visible-xs",
+          ".noscript-warning"
+          ],
+        },
+        files: {
+          'dist/style.css': ['dist/index.html']
         }
       }
     },
+
+    htmlbuild: {
+      dist: {
+        src: 'dist/index.html',
+        dest: 'dist/',
+        options: {
+          beautify: false,
+          relative: true,
+          styles: {
+            main: ['dist/style.css']
+          }
+        }
+      }
+    },
+
     revision: {
       options: {
         property: 'meta.revision',
@@ -141,38 +135,112 @@ module.exports = function(grunt) {
         short: true
       }
     },
+
     replace: {
-      dist: {
+      all: {
         options: {
           patterns: [
-            {
-              match: 'REVISIONTOREPLACE',
-              replacement: '<%= meta.revision %>'
-            },
-            {
-              match: 'TIMESTAMPTOREPLACE',
-              replacement: '<%= (new Date().getDate())+"."+(new Date().getMonth()+1)+"."+(new Date().getFullYear())+"_"+(new Date().getHours())+":"+(new Date().getMinutes())+":"+(new Date().getSeconds()) %>'
-            }
+          {
+            match: 'REVISIONTOREPLACE',
+            replacement: '<%= meta.revision %>'
+          },
+          {
+            match: 'TIMESTAMPTOREPLACE',
+            replacement: '<%= (new Date().getDate())+"."+(new Date().getMonth()+1)+"."+(new Date().getFullYear())+"_"+(new Date().getHours())+":"+(new Date().getMinutes())+":"+(new Date().getSeconds()) %>'
+          }
           ]
         },
         files: [
-          {expand: true, flatten: true, src: ['dash.all.js'], dest: ''}
+        {expand: true, flatten: true, src: ['dist/player.js', 'dist/index.js'], dest: 'dist'}
         ]
       }
+    },
+
+    json: {
+      main: {
+        options: {
+          namespace: 'jsonData',
+          includePath: false,
+          processName: function(filename) {
+            return filename.toLowerCase();
+          }
+        },
+        src: ['app/sources.json', 'app/notes.json', 'app/contributors.json', 'app/player_libraries.json', 'app/showcase_libraries.json'],
+        dest: 'dist/json.js'
+      }
+    },
+
+    concat: {
+      jsonToIndex: {
+        src: ['dist/index.js', 'dist/json.js'],
+        dest: 'dist/index.js',
+      },
+    },
+
+    htmlmin: {
+      main: {
+        options: {
+          removeComments: true,
+          collapseWhitespace: true
+        },
+        files: {
+          'dist/index.html': 'dist/index.html'
+        }
+      }
+    },
+
+    clean: {
+      start: {
+        src: ['dist']
+      },
+      end: {
+        src: ['dist/style.css', 'dist/json.js']
+      }
     }
+
+
   });
 
   // Require needed grunt-modules
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-filerev');
+  grunt.loadNpmTasks('grunt-usemin');
+  // grunt.loadNpmTasks('grunt-uncss');
+  grunt.loadNpmTasks('grunt-html-build');
   grunt.loadNpmTasks('grunt-git-revision');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-json');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
 
+
+  grunt.registerTask('test', [
+    'jshint',
+  ]);
 
   // Define tasks
-  grunt.registerTask('default', ['jshint','connect','jasmine','uglify','revision','replace']);
-  grunt.registerTask('build', ['uglify','revision','replace']);
+  grunt.registerTask('build', [
+    'clean:start',
+    'revision',
+    'copy',
+    'useminPrepare',
+    'concat:generated',
+    'cssmin:generated',
+    'uglify:generated',
+    'filerev',
+    'usemin',
+    // 'uncss', //Causing troubles with graphics elements not loading at start
+    'cssmin:mini',
+    'htmlbuild',
+    'replace',
+    'json',
+    'uglify:json',
+    'concat:jsonToIndex',
+    'htmlmin:main',
+    'clean:end'
+    ]);
 };

@@ -23,7 +23,7 @@
 (function ( angular ) {
 	'use strict';
 
-	angular.module( 'angularTreeview', [] ).directive( 'treeModel', function( $compile ) {
+	angular.module( 'angularTreeview', [] ).directive( 'treeModel', ['$compile', function( $compile ) {
 		return {
 			restrict: 'A',
 			link: function ( scope, element, attrs ) {
@@ -86,5 +86,5 @@
 				}
 			}
 		};
-	});
+	}]);
 })( angular );
