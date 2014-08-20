@@ -292,7 +292,12 @@ MediaPlayer = function (aContext) {
 
         // ORANGE: add function to set manually representation boundaries for a media
         setQualityBoundariesFor: function (type, min, max) {
-            this.metricsModel.addRepresentationBoundaries(type, new Date(), min, max);
+            this.abrController.setQualityBoundaries(type, min, max);
+        },
+
+        // ORANGE: add function to set manually bandwith boundaries for a media
+        setBandwidthBoundariesFor: function (type, min, max) {
+            this.abrController.setBandwidthBoundaries(type, min, max);
         },
 
         // ORANGE: add function to switch audioTracks for a media
