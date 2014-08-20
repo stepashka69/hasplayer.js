@@ -557,6 +557,7 @@ app.controller('DashController', ['$scope', 'Sources', 'Notes','Contributors','P
     player = new MediaPlayer(context);
     
     $scope.version = player.getVersion();
+    $scope.versionHAS = player.getVersionHAS();
 
     player.startup();
     player.addEventListener("error", onError.bind(this));

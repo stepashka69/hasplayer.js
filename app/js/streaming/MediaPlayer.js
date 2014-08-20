@@ -42,6 +42,7 @@ MediaPlayer = function (aContext) {
  * 7) Push fragmemt bytes into SourceBuffer.
  */
     var VERSION = "1.2.0",
+        VERSION_HAS = "1.1.0",
         context = aContext,
         system,
         element,
@@ -215,6 +216,11 @@ MediaPlayer = function (aContext) {
 
         getVersion: function () {
             return VERSION;
+        },
+
+        // ORANGE: get the HAS version
+        getVersionHAS: function () {
+            return VERSION_HAS;
         },
 
         startup: function () {
