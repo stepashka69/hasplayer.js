@@ -1,3 +1,4 @@
+var DEBUG = true;
 // customizable settings
 // hideMetricsAtStart :	if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
 var hideMetricsAtStart = true;

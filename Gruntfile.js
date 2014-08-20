@@ -31,7 +31,14 @@ module.exports = function(grunt) {
 
     //The HTML to parse
     usemin: {
-      html: ['<%= path %>/index.html', '<%= path %>/player.html']
+      html: ['<%= path %>/index.html', '<%= path %>/player.html'],
+      options: {
+        blockReplacements: {
+          dash: function () {
+            return '<script src="dash.all.js"></script>';
+          }
+        }
+      }
     },
 
     //Get CSS files into one and replace all file url with base64 inline
