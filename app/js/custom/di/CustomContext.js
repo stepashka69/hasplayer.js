@@ -23,6 +23,7 @@ Custom.di.CustomContext = function () {
             this.system.mapClass('fragmentLoader', Custom.dependencies.CustomFragmentLoader);
             this.system.mapSingleton('metricsModel', Custom.models.CustomMetricsModel);
             this.system.mapSingleton('metricsExt', Custom.dependencies.CustomMetricsExtensions);
+            this.system.mapClass('metrics', Custom.models.CustomMetricsList);
             this.system.mapSingleton('abrController', Custom.dependencies.CustomAbrController);
             this.system.mapClass('bufferController', Custom.dependencies.CustomBufferController);
 

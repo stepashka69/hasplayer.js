@@ -4,13 +4,24 @@ Custom.models.CustomMetricsModel = function () {
     var rslt = Custom.utils.copyMethods(MediaPlayer.models.MetricsModel);
 
     rslt.addRepresentationBoundaries = function (streamType, t, min, max) {
-        var vo = new MediaPlayer.vo.metrics.RepresentationBoundaries();
+        var vo = new Custom.vo.metrics.RepresentationBoundaries();
 
         vo.t = t;
         vo.min = min;
         vo.max = max;
 
         this.parent.getMetricsFor(streamType).RepBoundariesList.push(vo);
+        return vo;
+    };
+
+    rslt.addBandwidthBoundaries = function (streamType, t, min, max) {
+        var vo = new Custom.vo.metrics.BandwidthBoundaries();
+
+        vo.t = t;
+        vo.min = min;
+        vo.max = max;
+
+        this.parent.getMetricsFor(streamType).BandwidthBoundariesList.push(vo);
         return vo;
     };
 

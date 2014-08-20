@@ -176,6 +176,20 @@ Custom.dependencies.CustomMetricsExtensions = function () {
         return repBoundaries[repBoundaries.length - 1];
     };
 
+    rslt.getCurrentBandwidthBoundaries = function (metrics) {
+        if (metrics === null) {
+            return null;
+        }
+
+        var bandwidthBoundaries = metrics.BandwidthBoundariesList;
+
+        if (bandwidthBoundaries === null || bandwidthBoundaries.length <= 0) {
+            return null;
+        }
+
+        return bandwidthBoundaries[bandwidthBoundaries.length - 1];
+    };
+
     rslt.getCurrentDownloadSwitch = function (metrics) {
         if (metrics === null) {
             return null;

@@ -29,11 +29,9 @@ Custom.rules.CustomDownloadRatioRule = function () {
                 deferred = Q.defer();
 
             self.manifestExt.getRepresentationFor(newIdx, data).then(
-                function(rep)
-                {
+                function(rep) {
                     self.manifestExt.getBandwidth(rep).then(
-                        function (newBandwidth)
-                        {
+                        function (newBandwidth) {
                             deferred.resolve(newBandwidth / currentBandwidth);
                         }
                     );

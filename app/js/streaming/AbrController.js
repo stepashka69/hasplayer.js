@@ -109,7 +109,7 @@ MediaPlayer.dependencies.AbrController = function () {
             //self.debug.log("ABR enabled? (" + autoSwitchBitrate + ")");
 
             if (autoSwitchBitrate) {
-                self.debug.log("[ABRController] Check rules....");
+                self.debug.log("[ABRController]["+type+"] Check rules....");
 
                 self.getMetricsFor(data).then(
                     function (metrics) {
@@ -173,6 +173,7 @@ MediaPlayer.dependencies.AbrController = function () {
                                                     confidence = MediaPlayer.rules.SwitchRequest.prototype.DEFAULT;
                                                 }
 
+                                                self.debug.log("[ABRController]["+type+"] set quality: " + quality);
                                                 setInternalQuality(type, quality);
                                                 //self.debug.log("New quality of " + quality);
 
@@ -198,6 +199,8 @@ MediaPlayer.dependencies.AbrController = function () {
 
         setPlaybackQuality: function (type, newPlaybackQuality) {
             var quality = getInternalQuality(type);
+
+            this.debug.log("[ABRController]["+type+"] set playback quality: " + newPlaybackQuality);
 
             if (newPlaybackQuality !== quality) {
                 setInternalQuality(type, newPlaybackQuality);
