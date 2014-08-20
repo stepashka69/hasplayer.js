@@ -7,62 +7,44 @@
     <link rel="icon" type="image/png" href="http://dashpg.com/w/2012/09/dashif.ico" />
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
 
+    <!-- Add new CSS files twice: in here for dev and in gruntfile(cssUrlEmbed) for build -->
+    <!-- build:style inline main -->
     <link rel="stylesheet" href="app/lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="app/lib/bootstrap/css/bootstrap-glyphicons.css">
     <link rel="stylesheet" href="app/lib/angular.treeview/css/angular.treeview.css">
+    <link rel="stylesheet" href="app/css/main.css">
+    <link rel="stylesheet" href="app/lib/video/video-4.6.min.css">
     <link rel="stylesheet" href="app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.css">
     <link rel="stylesheet" href="app/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css">
-    <link rel="stylesheet" href="app/css/main.css">
+    <!-- /build -->
 
-    <!-- Videojs -->
-    <link href="//vjs.zencdn.net/4.6/video-js.css" rel="stylesheet">
-    <script src="//vjs.zencdn.net/4.6/video.js"></script>
-    <!-- http://jquery.com/ -->
-    <script src="app/lib/jquery/jquery-1.10.2.min.js"></script>
-    <script src="app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.js"></script>
-
-    <!-- http://angularjs.org/ -->
+    <!-- build:js index.js -->
+    <script src="app/lib/video/video-4.6.min.js"></script>
+    <script src="app/lib/jquery/jquery-1.10.2.js"></script>
+    <script src="app/lib/jquery.ui/jquery-ui.js"></script>
+    <script src="app/lib/flot/jquery.flot.js"></script>
+    <script src="app/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js"></script>
+    <script src="app/lib/bootstrap/js/bootstrap.js"></script>
     <script src="app/lib/angular/angular.min.js"></script>
     <script src="app/lib/angular/angular-resource.min.js"></script>
+    <script src="app/lib/angular.treeview/angular.treeview.js"></script>
+    <script src="app/metrics.js"></script>
+    <script src="app/main.js"></script>
+    <!-- endbuild -->
 
-    <!-- http://getbootstrap.com/ -->
-    <script src="app/lib/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- https://github.com/kriskowal/q -->
+    <!-- build:js dash.all.js -->
     <script src="app/lib/q.js"></script>
-
-    <!-- https://github.com/creynders/dijon-framework -->
-    <script src="app/lib/dijon.js"></script>
-
-    <!-- http://bannister.us/weblog/2007/06/09/simple-base64-encodedecode-javascript/ -->
-    <script src="app/lib/base64.js"></script>
-
-    <!-- http://log4javascript.org/ -->
-    <script src="app/lib/log4javascript-1.4.6/log4javascript.js"></script>
-
-    <!-- Misc Libs -->
     <script src="app/lib/xml2json.js"></script>
     <script src="app/lib/objectiron.js"></script>
-    <script src="app/lib/long.js"></script>
+    <script src="app/lib/dijon.js"></script>
     <script src="app/lib/Math.js"></script>
+    <script src="app/lib/long.js"></script>
+    <script src="app/lib/base64.js"></script>
 
-    <!-- http://www.flotcharts.org/ -->
-    <script src="app/lib/flot/jquery.flot.js"></script>
-
-    <!-- https://github.com/eu81273/angular.treeview -->
-    <script src="app/lib/angular.treeview/angular.treeview.min.js"></script>
-    <!-- http://bseth99.github.io/jquery-ui-extensions/index.html -->
-    <script src="app/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js"></script>
-
-    <!-- PLAYER SOURCE -->
-    <!-- <script src="ABRTest/player/player-100.js"></script> -->
-    <!-- mp4lib -->
-    
     <script src="app/lib/mp4lib/mp4lib.js"></script>
     <script src="app/lib/mp4lib/mp4lib-boxes.js"></script>
     <script src="app/lib/mp4lib/mp4lib-fields.js"></script>
 
-    <!-- mpegts -->
     <script src="app/lib/mpegts/mpegts.js"></script>
     <script src="app/lib/mpegts/ts.js"></script>
     <script src="app/lib/mpegts/binary.js"></script>
@@ -75,7 +57,6 @@
     <script src="app/lib/mpegts/aac.js"></script>
     <script src="app/lib/mpegts/h264.js"></script>
 
-    <!-- Player -->
     <script src="app/js/streaming/MediaPlayer.js"></script>
     <script src="app/js/streaming/Context.js"></script>
     <script src="app/js/streaming/ErrorHandler.js"></script>
@@ -115,18 +96,15 @@
     <script src="app/js/streaming/URIQueryAndFragmentModel.js"></script>
     <script src="app/js/streaming/vo/URIFragmentData.js"></script>
 
-    <!--Mp4-->
     <script src="app/js/streaming/vo/Mp4Track.js"></script>
     <script src="app/js/streaming/Mp4Processor.js"></script>
 
-    <!--Captioning-->
     <script src="app/js/streaming/captioning/VTTParser.js"></script>
     <script src="app/js/streaming/captioning/TTMLParser.js"></script>
     <script src="app/js/streaming/captioning/TextTrackExtensions.js"></script>
     <script src="app/js/streaming/captioning/TextSourceBuffer.js"></script>
     <script src="app/js/streaming/captioning/TextController.js"></script>
 
-    <!-- Metrics -->
     <script src="app/js/streaming/vo/MetricsList.js"></script>
     <script src="app/js/streaming/MetricsModel.js"></script>
     <script src="app/js/streaming/vo/metrics/BufferLevel.js"></script>
@@ -137,7 +115,6 @@
     <script src="app/js/streaming/vo/metrics/TCPConnection.js"></script>
     <script src="app/js/streaming/vo/metrics/DroppedFrames.js"></script>
 
-    <!-- Dash -->
     <script src="app/js/dash/Dash.js"></script>
     <script src="app/js/dash/DashContext.js"></script>
     <script src="app/js/dash/vo/Mpd.js"></script>
@@ -155,20 +132,17 @@
     <script src="app/js/dash/DashMetricsExtensions.js"></script>
     <script src="app/js/dash/TimelineConverter.js"></script>
 
-    <!-- Mss -->
     <script src="app/js/mss/Mss.js"></script>
     <script src="app/js/mss/dependencies/MssParser.js"></script>
     <script src="app/js/mss/dependencies/MssHandler.js"></script>
     <script src="app/js/mss/dependencies/MssFragmentController.js"></script>
     
-    <!-- HLS -->
     <script src="app/js/hls/Hls.js"></script>
     <script src="app/js/hls/dependencies/HlsDemux.js"></script>
     <script src="app/js/hls/dependencies/HlsParser.js"></script>
     <script src="app/js/hls/dependencies/HlsHandler.js"></script>
     <script src="app/js/hls/dependencies/HlsFragmentController.js"></script>
     
-    <!-- Custom -->
     <script src="app/js/custom/Custom.js"></script>
     <script src="app/js/custom/dependencies/CustomParser.js"></script>
     <script src="app/js/custom/dependencies/CustomFragmentLoader.js"></script>
@@ -187,10 +161,8 @@
     <script src="app/js/custom/vo/metrics/BandwidthValue.js"></script>
     <script src="app/js/custom/vo/metrics/DownloadSwitch.js"></script>
     <script src="app/js/custom/vo/metrics/RepresentationBoundaries.js"></script>
+    <!-- endbuild -->
 
-    <!-- App -->
-    <script src="app/metrics.js"></script>
-    <script src="app/main.js"></script>
 </head>
 
 <body ng-controller="DashController">
@@ -207,13 +179,20 @@
     <div class="container">
 
         <div class="row title-header">
-            <a href="http://dashif.org/" target="_blank"><img class="image" src="app/img/if.png"/></a>
-            <span id="big-title">Reference Client</span>
-            <span>{{version}}</span>
+            <div class="col-md-12">
+                <a href="http://orange.fr" target="_blank">
+                    <img class="image" alt="" src="data:image/gif;base64,R0lGODdhMgAyAN0AAP9mAP1qAv9mBP9hAPlmAf1lCf799PiufPyNQPlnB/phAfzWuPb//vZqAv50Fvvbxvm3hv1qEfrKp//8///8+/aFOv76/v///P7+/vJ/KvSfZfzFlPzkz/9hBe9qD/3s3/////3+/fz8/Pv+//OSTe5yHv708/JkAv39/e7Swu+BOvX68O6DRP706vjNtv14Cv3hsgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAMgAyAAAG/8BIYDAAGI/IpHLJbCYGDUGgSa1akYHpdctFegjTRBYcAJvL6DNZnW6v28aAgNCtX7MdgX3PLCT1AoAAgoSDg4WIhoGKh3yOj5CRkpOUlZaXmJmam5ydnp+goaKjpKWmp6ipqqusSwoDEQR+pFloDQ2lfgKztApadKQDHgOvWqMKDWRQpgEdsB2kLxsQGxkSUwMJhgADUwJEAb7AwLBRA2BFet2zZQAd7wcIGwsmRw0RUA4IQnRDERkBCgxA4KBAuCEBKjiY0mCAgwpDDAII0ACBhwMsIDyAcCRAghIPLExgIOTACA4tHjiQYGCEgQ8VAHDAwACEAQ0AIkgQgWHFh/8LCApACGFgwUIPg7RxC7DAgIkHBh4kgECTwgINFDhA4GBAQgELFiRwYPAhwQELBg7ACIEBAVYTByYskGJQG5EMBgzErCAiQ9wFAQFkcKBhAwPAGAwEQGDggsybgtEiWEBhQ4XGDk4AUDoRgYULQwSMQACBwgExC0BIcABBroe8AycYAMBgAoksDPR+sBAPAUEAvqaEcwBiwoEAB0Q4OHDhgBEGGEgkkMDgwQAMKAYyCDFggQUOCCRQYFAhhWoBEjTwAlaAwAEDDChMgHARBEem8X9OeBCAwggACIgAWoBEGYAdAhlc0Fh1DviCixYBeKDBAg8s0M2EGigAQAkbPCCfwQEbMbVAAxlUeIIApLlAAgMXQKRChwc0uEsBBdySRQIEBCIHEuAA0B432kSQwBwROAOiBAicNUEJgwREAAEO9KNHOER8U6VSYnRThHBZDAIGAGCQQAEGITBgAQQMTanhRAIkoAsdA0wZRz/hSOFjA8X4EecQA/h1wAEQ0fENFnH46IcxX7qZhRQKgKEhQkVEoKGeSzVSVzcK4GhEAUEAADs=" />
+                </a>
+                <a href="http://dashif.org/" target="_blank">
+                    <img class="image" alt="" src="data:image/gif;base64,R0lGODlhjgAyAO4AAAAAAAJo+wBh+gBZ+goKCjg4OICAgCkpKSZ4/XFxcXOl9kBAQFFRUazH9zExMaGhoRkZGampqXl5eVCR+WlpaUhISCIiIkqQ+ZmZmREREbGxsQhq+1lZWTuE+GBgYDKB+pKSkgBR+hpw+0GJ+YmJiaLF9hFr/jyI+KC98qHA8R94+i17+T4+PiB2+kmJ+QQEBGCb+hRt/arG9pi79glj/2ZmZid2+yBu+6vI9pK69ECH+Za29XCi9nek9rLK81CP+jB/+W5ubjU1NR0dHUCH92Gd9omx+QVg/hpu+lWV9n5+fkRERHCe8XCe9ZC29Ojo6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAE8ALAAAAACOADIAAAf/gE+Cg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp+goaKjpKWmp6ipqqusra6vsLGyjAorHR8ft7q5KzyCI7m7wkA9gsK5yB0rCoMJBQvQ0RUeGI8VBdcGjA8VBxAZEA4eGoYPzwsciecVkiMhAvDxAgPwIR+CNPT08vshF4L79MWjF2LEoAIAEipcmIHCtoUWFjlYSJFBIQkKISDSsFDShQEbAggQGYDkhgEGn8QYSZJlyQADJggi+bLmBgEyBS0AQIBiwp4AHCzaCRQAOUQZePpUKHSQAaUHEinN4HFASXgtSw44IcjE1ZcjseIU5DKsyJED/glCmPBADQ8e/zhYWKgxUdKFHhBNBOrhwRMQO5XmFfS0Z0RECglUBVtTK9cnJrDS/Jp2JkuXL2MOYqE0wcWfACweIpE44WFDC7UR4sCTQN0nT9tK/SnJhVWaZkU+9vo1K8ycZX1XXgvgBYAahhJ0PESUYoRyGQ8tPFoYQFTECalGupC7JtrdmBv/tjzZ5QAXm4sDcGgIQudDQDMg7DmY0AOF2i9SSFA/NoDTqNG23W2TtZQSb+G1BFxjl41HXE/IGcKAUgsYQlpP7EQXYE+iLeLfdYZw1JNiA2aV21aCrOSbWcPh1puDTyBkHHuFKJdQAYawBYA27iX0XCE6WkeChwqBGCBP7RDY4P9V4In31VhPBNfYcE80RyMh1RkpCFAkTthTOobMpRQAGXBQzSHVZWAACWy2CQJr2S2WG4sdpChWb2iphZtZaP1wkEJXOgVVIf41hYGGhgQ2JgAQBArbUpAiGckIt/F5lQBNrqjVgt2FBeUTnPXk6KM9aTkfAJ4JchcAfh0SgaJjZtAqYYtGKiAkEwgQkpMbHKGDICLwWtIGNOQUwK42HVvsnzOiWWQhia2mFJiJSDARaACc+ehPBRTgQLfgHhBtJES8M8C56KJrD1nozqPPuQIUBFC69A4gryChrncIRj01RWtCEGDwwAMReIDoIhQwJKhsh3AUZyQzKCDxxBQr0IT/E4L0UPHGTMwgyMYV85ADs/pKqBA7g1xrK6uOgLBQq/4BCO2tszCS76g9okpIUZByOAgDGViQAQiHiNtTqh/ORuYkDeDQwNNQQy3DID5EbfXTUwuCg9NXY02Ijo4mPCIhNoJGwNk8v6YotYSImxDSz2InKSS2yWP3PHVCdrfdIQC390Do4atUEJ8p1OETe4VWTlFnKjfirIIcqhDMSslMyLiQfKTpd10Fd6KeS7KoVoxMSZBAAhwMAZrMRf1YSOIdFkUABRho8EDCSr2WtNwkZk4gY2Ed2B3wxoZ+aU6g1qqQcdZ91tNrzjM6yH0rs0xrqVL1lN8jmg+PVt4qeu9g/3mMUanyUg2FabjSABD9J6QWuP4ERgBvtJzvwOOWqfGaRclYVv2bXwUYQMACVoB2iBggA1CGCAoMsAKqGUTBvAEBCFiAAe4jhAYemKpDKPBwjuCOk0Rykl+pJEHeWdAIYVQzVVDqb/BA0RNuAsN5qKWGNmwhK2AgAgT0UAQq8CECgoiEnAABiD4MIhJ/CANBICCJQmxBEH1YBEhIQFubiIDAsKjDUSxBCYtgwKj25QgNZCABFKBGF0sBQfsQohoc6KCFjvIAArjuKK6qUCEikEFBQM4Q7sOA/B4BgxbY4IkteKIiV3CDJAhiBYZUpCRbwMgmPgEBkZQkJis5iDZywP8BElgAjp5wAA5IAAISQNyPDuMAAzggHRTIQF4W4IAEgKApC+jgqwrhgQWQ4DC0TEcBVvkEDFggAd3wAAUsEMFHvHAfdwtB3k5Sw/MApJqBe0IbGTAYjWCgKRXwzDAFERFrCWJIpBTEAc50GOhFAAJxSYcGDmOACjngTON8QkRAMEoIDOkB/uKersLDEhlG5iYuQosKOyUS5G0zlTF6QhDYE8cY/eg6HFgAja4DIg9IwBwaPIAGIvAcA3QoKgU4Sj73qcdxaiCgjviBrhqzq5ukRAQz5ZUA1BISZNnkUw8VhBCewB9BVBRERpIARwXhADw+A4u7HARgBKEBlKqUmFPAtegTXioJHYSgXu1a1xPy4a52weteYE1XCLK5gFSGU52qEgQEPMOBdGCEqDiKQDv9ItKDbO8JIG1bNQrgmQP8iAIVespfRukAv8xTEiUwAgpSgIISpKAElU3BDHaQtRxYlrKYDe1kZ+ADQUzWs5kNbQp2UAKn+MUAjYucA2oAglZxoAAYgKgzKnAUCeComQkA4fwMcQ3dEsIDuE2VcQUhxzWuwrDOjS4mClAf6Vr3utjNrna3y93ueve74A3vLAIBADs=" />
+                </a>
+                <span id="big-title">Reference Client</span>
+                <span>{{version}}</span>
+            </div>
         </div>
 
-        <div class="row">
-            <div class="input-group">
+        <div class="row nav-header">
+            <div class="input-group col-md-12">
                 <div id="desktop-streams" class="input-group-btn">
 
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -238,7 +217,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row nav-options">
             <div class="input-group col-md-7">
                 <input type="text" class="form-control" placeholder="licenser" ng-model="selectedItem.backUrl">
             </div>
@@ -298,7 +277,7 @@
                             <div id="debugTabContent" class="tab-content">
                                 <div class="tab-pane" id="video-metrics">
                                     <button type="button" class="btn btn-default" ng-click="getVideoTreeMetrics()">Video - Update</button>
-                                    <div class="tree"data-angular-treeview="true" data-tree-model="videoMetrics" data-node-label="text" data-node-children="items"></div>
+                                    <div class="tree" data-angular-treeview="true" data-tree-model="videoMetrics" data-node-label="text" data-node-children="items"></div>
                                 </div>
                                 <div class="tab-pane" id="audio-metrics">
                                     <button type="button" class="btn btn-default" ng-click="getAudioTreeMetrics()">Audio - Update</button>
