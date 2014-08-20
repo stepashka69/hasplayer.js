@@ -67,7 +67,7 @@
                             }
                             // simple objects; merge them together
                             else {
-                                if (property.mergeFunction != null) {
+                                if (property.mergeFunction !== null) {
                                     child[property.name] = property.mergeFunction(parentValue, childValue);
                                 } else {
                                     child[property.name] = parentValue + childValue;

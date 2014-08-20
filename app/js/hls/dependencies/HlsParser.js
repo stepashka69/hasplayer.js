@@ -21,7 +21,7 @@ Hls.dependencies.HlsParser = function () {
 		TAG_EXTINF = "#EXTINF",
 		TAG_EXTXVERSION	= "#EXT-X-VERSION",
 		TAG_EXTXTARGETDURATION = "#EXT-X-TARGETDURATION",
-		TAG_EXTXMEDIA = "#EXT-X-MEDIA",
+		//TAG_EXTXMEDIA = "#EXT-X-MEDIA",
 		TAG_EXTXMEDIASEQUENCE = "#EXT-X-MEDIA-SEQUENCE",
 		TAG_EXTXSTREAMINF = "#EXT-X-STREAM-INF",
 		TAG_EXTXENDLIST = "#EXT-X-ENDLIST",
@@ -30,9 +30,9 @@ Hls.dependencies.HlsParser = function () {
 		ATTR_AUDIO = "AUDIO",
 		ATTR_SUBTITLES = "SUBTITLES",
 		ATTR_RESOLUTION = "RESOLUTION",
-		ATTR_CODECS = "CODECS",
+		ATTR_CODECS = "CODECS";
 		/*ATTR_METHOD = "METHOD",
-		ATTR_IV = "IV",*/
+		ATTR_IV = "IV",
 		ATTR_URI = "URI",
 		ATTR_TYPE = "TYPE",
 		ATTR_GROUPID = "GROUP-ID",
@@ -40,10 +40,10 @@ Hls.dependencies.HlsParser = function () {
 		ATTR_DEFAULT = "DEFAULT",
 		ATTR_AUTOSELECT = "AUTOSELECT",
 		ATTR_LANGUAGE = "LANGUAGE",
-		VAL_YES = "YES";
+		VAL_YES = "YES";*/
 
 
-	var  _splitLines = function(oData) {
+	var _splitLines = function(oData) {
 		oData = oData.split('\n');
 		//remove empty lines
 		for (var i = 0; i < oData.length; i++) {
@@ -55,7 +55,7 @@ Hls.dependencies.HlsParser = function () {
 		return oData;
 	};
 
-	var _getAttrValue = function(data, attrKey) {
+	/*var _getAttrValue = function(data, attrKey) {
 		// remove attrKey + '='
 		var value = data.substring(data.indexOf(attrKey)+attrKey.length+1);
 		// remove quottes
@@ -63,7 +63,7 @@ Hls.dependencies.HlsParser = function () {
 			value = value.substring(1,value.length-1);
 		}
 		return value;
-	};
+	};*/
 
 	var _containsTag = function(data, tag) {
 		return (data.indexOf(tag) > -1);
@@ -193,7 +193,6 @@ Hls.dependencies.HlsParser = function () {
 			segment,
 			version,
 			duration = 0,
-			startNumber = 0,
 			index = 0,
 			media,
 			i;

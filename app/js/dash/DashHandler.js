@@ -424,7 +424,8 @@ Dash.dependencies.DashHandler = function () {
         },
 
         decideSegmentListRangeForTemplate = function(representation) {
-            var duration = representation.segmentDuration,
+            var self = this,
+                duration = representation.segmentDuration,
                 minBufferTime = representation.adaptation.period.mpd.manifest.minBufferTime,
                 availabilityWindow = representation.segmentAvailabilityRange,
                 originAvailabilityTime = NaN,

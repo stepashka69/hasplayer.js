@@ -184,7 +184,7 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         } catch (ex) {
             return null;
         }
-    },    
+    },
 
     getBufferLength: function (buffer, time, tolerance) {
         "use strict";

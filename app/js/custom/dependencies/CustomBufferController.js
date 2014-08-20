@@ -13,8 +13,7 @@
  */
 Custom.dependencies.CustomBufferController = function () {
     "use strict";
-    var STALL_THRESHOLD = 0.5,
-        QUOTA_EXCEEDED_ERROR_CODE = 22,
+    var QUOTA_EXCEEDED_ERROR_CODE = 22,
         READY = "READY",
         state = READY,
         ready = false,
@@ -28,15 +27,12 @@ Custom.dependencies.CustomBufferController = function () {
         dataChanged = true,
         availableRepresentations,
         currentRepresentation,
-        playingTime,
         currentQuality = -1,
         initialQuality = -1,
         stalled = false,
         isDynamic = false,
         isBufferingCompleted = false,
         deferredAppends = [],
-        previousDeferredAppended = null,
-        deferredInitAppend = null,
         deferredStreamComplete = Q.defer(),
         deferredRejectedDataAppend = null,
         deferredBuffersFlatten = null,
@@ -295,7 +291,6 @@ Custom.dependencies.CustomBufferController = function () {
 
         appendToBuffer = function(data, quality, index) {
             var self = this,
-                req,
                 deferred = Q.defer(),
                 isInit = index === undefined,
                 currentVideoTime = self.videoModel.getCurrentTime(),
@@ -487,7 +482,7 @@ Custom.dependencies.CustomBufferController = function () {
 
         },
 
-        checkGapBetweenBuffers= function() {
+        /*checkGapBetweenBuffers= function() {
             var leastLevel = this.bufferExt.getLeastBufferLevel(),
                 acceptableGap = fragmentDuration * 2,
                 actualGap = bufferLevel - leastLevel;
@@ -501,7 +496,7 @@ Custom.dependencies.CustomBufferController = function () {
                 deferredBuffersFlatten.resolve();
                 deferredBuffersFlatten = null;
             }
-        },
+        },*/
 
         hasEnoughSpaceToAppend = function() {
             var self = this,
@@ -722,7 +717,7 @@ Custom.dependencies.CustomBufferController = function () {
                 //this.debug.log("Working time is video time: " + time);
 
             return time;
-        },     
+        },
 
         getLiveEdgeTime = function() {
 
@@ -952,7 +947,7 @@ Custom.dependencies.CustomBufferController = function () {
             dataChanged = true;
 
             doUpdateData.call(this).then(
-                function (dataUpdated) {
+                function () {
                     // Retreive the representation of initial quality to enable some parameters initialization
                     // (@see getLiveEdgeTime() for example)
                     self.abrController.getPlaybackQuality(type, data).then(

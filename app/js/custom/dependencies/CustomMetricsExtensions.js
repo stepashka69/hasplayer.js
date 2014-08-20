@@ -154,7 +154,7 @@
             representationArray,
             adaptationSetArrayIndex,
             representationArrayIndex,
-            bitrateArray = new Array();
+            bitrateArray = [];
 
         for (periodArrayIndex = 0; periodArrayIndex < periodArray.length; periodArrayIndex = periodArrayIndex + 1) {
             period = periodArray[periodArrayIndex];

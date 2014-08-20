@@ -54,11 +54,9 @@ Custom.rules.CustomDownloadRatioRule = function () {
                 downloadRatio,
                 totalRatio,
                 switchRatio,
-                newIdx,
                 deferred,
                 funcs,
                 i,
-                len,
                 DOWNLOAD_RATIO_SAFETY_FACTOR = 0.75,
                 SWICH_UP_RATIO_SAFETY_FACTOR = 1.2;
 

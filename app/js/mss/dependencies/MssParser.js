@@ -225,7 +225,7 @@ Mss.dependencies.MssParser = function () {
 
     // compare quality to order the representation by quality
     var compareQuality = function(repA,repB){
-            return parseInt(repA.Bitrate) - parseInt(repB.Bitrate);
+            return parseInt(repA.Bitrate, 10) - parseInt(repB.Bitrate, 10);
     };
 
     var getBaseUrlValuesMap = function () {
@@ -238,7 +238,6 @@ Mss.dependencies.MssParser = function () {
             representation,
             segmentTemplate,
             segmentTimeline,
-            audioChannelConfiguration,
             segment,
             common;
 

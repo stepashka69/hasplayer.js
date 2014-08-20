@@ -520,7 +520,7 @@ MediaPlayer.dependencies.Stream = function () {
             {
                 this.system.notify("setCurrentTime");
                 // ORANGE: +1 to get around timestamps rounding issues on chrome
-                this.videoModel.setCurrentTime(initialSeekTime + 1);                
+                this.videoModel.setCurrentTime(initialSeekTime + 1);
             }
 
             load.resolve(null);
@@ -914,7 +914,6 @@ MediaPlayer.dependencies.Stream = function () {
         // ORANGE: add the capability to set audioTrack
         setAudioTrack:function(audioTrack){
             var deferredAudioUpdate = Q.defer(),
-                currentTime = this.videoModel.getCurrentTime(),
                 manifest = this.manifestModel.getValue(),
                 url,
                 self = this;

@@ -109,7 +109,8 @@ Hls.dependencies.HlsDemux = function () {
                 pid,
                 trackId,
                 track,
-                sample = null;
+                sample = null,
+                sampleData = null;
 
             tsPacket = new mpegts.ts.TsPacket();
             tsPacket.parse(data);
@@ -155,13 +156,13 @@ Hls.dependencies.HlsDemux = function () {
                 sample.cts += dtsOffset;
 
                 // Store payload of PES packet as a subsample
-                var data = pesPacket.getPayload();
+                sampleData = pesPacket.getPayload();
 
                 if (track.streamType.search('ADTS') !== -1) {
-                    data = data.subarray(7); // 7 = ADTS header size
+                    sampleData = sampleData.subarray(7); // 7 = ADTS header size
                 }
 
-                sample.subSamples.push(data);
+                sample.subSamples.push(sampleData);
                 track.samples.push(sample);
             }
             else {

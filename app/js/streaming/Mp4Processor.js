@@ -586,7 +586,6 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             {
             case "mp4a":
                 return createMP4AudioSampleEntry(track);
-                break;
             default:
                 break;
             }
@@ -673,11 +672,11 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             return smhd;
         },
 
-        createNullMediaHeaderBox = function () {
+        /*createNullMediaHeaderBox = function () {
             //NAN non défini dans mp4lib, à définir
             //var nmhd = new NullMediaHeaderBox();
             //return nmhd;
-        },
+        },*/
 
         createFileTypeBox = function () {
 

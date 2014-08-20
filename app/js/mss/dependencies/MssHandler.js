@@ -14,7 +14,8 @@
 Mss.dependencies.MssHandler = function() {
 
 	var isDynamic=false,
-		getIndex = function (adaptation, manifest) {
+
+		/*getIndex = function (adaptation, manifest) {
 
 			var periods = manifest.Period_asArray,
 				i, j;
@@ -31,7 +32,7 @@ Mss.dependencies.MssHandler = function() {
 			return -1;
 		},
 		
-		getType = function (adaptation) {
+		/*getType = function (adaptation) {
 
 			var type = (adaptation.mimeType !== undefined) ? adaptation.mimeType : adaptation.contentType;
 
@@ -95,7 +96,7 @@ Mss.dependencies.MssHandler = function() {
 			}
 
 			return duration;
-		},
+		},*/
 
 		getAudioChannels = function (adaptation, representation) {
 			var channels = 1;

@@ -127,6 +127,7 @@ Mss.dependencies.MssFragmentController = function () {
             var traf = moof.getBoxByType("traf");
             var trun = traf.getBoxByType("trun");
             var tfhd = traf.getBoxByType("tfhd");
+            var saio;
             
             //if protected content
             var sepiff = traf.getBoxByType("sepiff");
@@ -134,7 +135,7 @@ Mss.dependencies.MssFragmentController = function () {
                 sepiff.boxtype = "senc";
                 sepiff.extended_type = undefined;
                 // Create Sample Auxiliary Information Offsets Box box (saio) 
-                var saio = new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
+                saio = new mp4lib.boxes.SampleAuxiliaryInformationOffsetsBox();
                 saio.version = 0;
                 saio.flags = 0;
                 saio.entry_count = 1;
@@ -292,9 +293,9 @@ Mss.dependencies.MssFragmentController = function () {
             result = mp4lib.serialize(init_segment);
         }
 
-        if (request !== undefined) {
-            //console.saveBinArray(result, request.streamType + "_" + request.index + "_" + request.quality + ".mp4");
-        }
+        //if (request !== undefined) {
+        //    console.saveBinArray(result, request.streamType + "_" + request.index + "_" + request.quality + ".mp4");
+        //}
 
         return Q.when(result);
     };

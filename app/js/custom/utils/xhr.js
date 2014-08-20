@@ -38,7 +38,7 @@ Custom.utils.doRequestWithPromise = function (url, callback, argumentsToForward)
 	var xhr = Custom.utils.getXMLHttpRequest();
 	
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+		if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {
 			callback(deferred,xhr.response,argumentsToForward);
 		}
 	};

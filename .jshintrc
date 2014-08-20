@@ -21,11 +21,6 @@
         "utils",
         "MediaPlayer",
         "Dash",
-        "Mss",
-        "Hls",
-        "mp4lib",
-        "mpegts",
-        "Custom",
         "WebKitMediaSource",
         "MediaSource",
         "WebKitMediaKeys",
@@ -33,5 +28,14 @@
         "MediaKeys",
         "Caster",
         "TextTrackCue",
-        "HTMLMediaElement"]
+        "HTMLMediaElement",
+        // ORANGE
+        "Mss",
+        "Hls",
+        "log4javascript",
+        "mp4lib",
+        "mpegts",
+        "Custom",
+        "ActiveXObject",
+        "DEBUG"]
 }
