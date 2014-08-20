@@ -1,3 +1,3 @@
 cd $PATH;
 npm install
-grunt build
+grunt --config Gruntfile.js --force
