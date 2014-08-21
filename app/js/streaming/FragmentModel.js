@@ -100,8 +100,6 @@ MediaPlayer.dependencies.FragmentModel = function () {
         },
 
         isFragmentLoadedOrPending: function(request) {
-            // ORANGE unnecessary utilisation of self
-            // var self = this,
             var isLoaded = false,
                 ln = executedRequests.length,
                 req;
@@ -110,13 +108,13 @@ MediaPlayer.dependencies.FragmentModel = function () {
             for (var i = 0; i < ln; i++) {
                 req = executedRequests[i];
                 if (request.startTime === req.startTime || ((req.action === "complete") && request.action === req.action)) {
+                    //self.debug.log(request.streamType + " Fragment already loaded for time: " + request.startTime);
                     if (request.url === req.url) {
-                        this.debug.log("[FragmentModel]["+request.streamType+"] Fragment url already loaded: " + req.url);
+                        //self.debug.log(request.streamType + " Fragment url already loaded: " + request.url);
                         isLoaded = true;
                         break;
                     } else {
                         // remove overlapping segement of a different quality
-                        this.debug.log("[FragmentModel]["+request.streamType+"] ### Remove executed request: " + req.url);
                         removeExecutedRequest(request);
                     }
                 }
@@ -272,37 +270,7 @@ MediaPlayer.dependencies.FragmentModel = function () {
                         errorLoadingCallback.call(context, currentRequest);
                     }
             }
-        },
-
-        // ORANGE
-        waitForLoadingRequestsToBeExecuted: function() {
-            var self = this,
-                defer = Q.defer(),
-                CHECK_INTERVAL = 50,
-                checkIsExecuted = function() {
-                    if (loadingRequests.length === 0) {
-                        self.debug.log("[FragmentModel] ### waitForLoadingRequestsToBeExecuted => true");
-                        defer.resolve(true);
-                    } else {
-                        self.debug.log("[FragmentModel] ### waitForLoadingRequestsToBeExecuted => false");
-                        setTimeout(checkIsExecuted, CHECK_INTERVAL);
-                    }
-                };
-
-            checkIsExecuted();
-
-            return defer.promise;
-        },
-
-        // ORANGE : force requests to be executed one by one if sequential = true
-        setSequentialRequest: function(sequential){
-            if(sequential){
-                LOADING_REQUEST_THRESHOLD = 1;
-            }else{
-                LOADING_REQUEST_THRESHOLD = 2;
-            }
         }
-
     };
 };
 
