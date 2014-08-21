@@ -57,6 +57,8 @@ Custom.dependencies.CustomBufferController = function () {
         playListTraceMetrics = null,
         playListTraceMetricsClosed = true,
 
+        inbandEventFound = false,
+
         sendRequest = function() {
             if (fragmentModel !== null) {
                 this.fragmentController.onBufferControllerStateChange();
@@ -393,6 +395,7 @@ Custom.dependencies.CustomBufferController = function () {
                 eventStreams = [],
                 inbandEvents;
 
+            inbandEventFound = false;
             /* Extract the possible schemeIdUri : If a DASH client detects an event message box with a scheme that is not defined in MPD, the client is expected to ignore it */
             inbandEvents = adaptionSetInbandEvents.concat(representationInbandEvents);
             for(var loop = 0; loop < inbandEvents.length; loop++) {
@@ -404,6 +407,7 @@ Custom.dependencies.CustomBufferController = function () {
                 if( identifier == "moov" || identifier == "moof") {
                     break;
                 } else if(identifier == "emsg") {
+                    inbandEventFound = true;
                     var eventBox = ["","",0,0,0,0,""],
                         arrIndex = 0,
                         j = i+12; //fullbox header is 12 bytes, thats why we start at 12
@@ -451,6 +455,10 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         deleteInbandEvents = function(data) {
+
+            if(!inbandEventFound) {
+                return Q.when(data);
+            }
 
             var length = data.length,
                 i = 0,
