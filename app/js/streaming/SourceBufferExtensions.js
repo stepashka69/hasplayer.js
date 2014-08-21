@@ -108,62 +108,6 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         return Q.when(null);
     },
 
-    getBufferRangeSync: function (buffer, time, tolerance) {
-        "use strict";
-
-        var ranges = null,
-            start = 0,
-            end = 0,
-            firstStart = null,
-            lastEnd = null,
-            gap = 0,
-            toler = (tolerance || 0.15),
-            len,
-            i;
-
-        try {
-            ranges = buffer.buffered;
-        } catch(ex) {
-            return null;
-        }
-
-        if (ranges !== null) {
-            for (i = 0, len = ranges.length; i < len; i += 1) {
-                start = ranges.start(i);
-                end = ranges.end(i);
-                if (firstStart === null) {
-                    gap = Math.abs(start - time);
-                    if (time >= start && time < end) {
-                        // start the range
-                        firstStart = start;
-                        lastEnd = end;
-                        continue;
-                    } else if (gap <= toler) {
-                        // start the range even though the buffer does not contain time 0
-                        firstStart = start;
-                        lastEnd = end;
-                        continue;
-                    }
-                } else {
-                    gap = start - lastEnd;
-                    if (gap <= toler) {
-                        // the discontinuity is smaller than the tolerance, combine the ranges
-                        lastEnd = end;
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            if (firstStart !== null) {
-                return {start: firstStart, end: lastEnd};
-            }
-        }
-
-        return null;
-    },
-
-
     getAllRanges: function(buffer) {
         var ranges = null;
 
@@ -172,17 +116,6 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
             return Q.when(ranges);
         } catch (ex) {
             return Q.when(null);
-        }
-    },
-
-    getAllRangesSync: function(buffer) {
-        var ranges = null;
-
-        try{
-            ranges = buffer.buffered;
-            return ranges;
-        } catch (ex) {
-            return null;
         }
     },
 
@@ -203,24 +136,6 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         );
 
         return deferred.promise;
-    },
-
-    getBufferLengthSync: function (buffer, time, tolerance) {
-        "use strict";
-
-        var self = this,
-            range,
-            length;
-
-        range = self.getBufferRangeSync(buffer, time, tolerance);
-
-        if (range === null) {
-            length = 0;
-        } else {
-            length = range.end - time;
-        }
-
-        return length;
     },
 
     waitForUpdateEnd: function(buffer) {

@@ -371,7 +371,7 @@ Custom.dependencies.CustomBufferController = function () {
                 return;
             }
 
-            ranges = this.sourceBufferExt.getAllRangesSync(buffer);
+            ranges = this.sourceBufferExt.getAllRanges(buffer);
 
             if ((ranges === null) || (ranges.length === 0)) {
                 return;
@@ -657,7 +657,7 @@ Custom.dependencies.CustomBufferController = function () {
             self.debug.log("[BufferController]["+type+"] loadNextFragment");
             Q.when(seeking ? seekTarget : self.indexHandler.getCurrentTime(currentRepresentation)).then(
                 function (time) {
-                    var range = self.sourceBufferExt.getBufferRangeSync(buffer, time);
+                    var range = self.sourceBufferExt.getBufferRange(buffer, time);
 
                     if (seeking) {
                         currentRepresentation.segments = null;
@@ -754,7 +754,7 @@ Custom.dependencies.CustomBufferController = function () {
             var self = this,
                 currentTime = getWorkingTime.call(self);
 
-            bufferLevel = self.sourceBufferExt.getBufferLengthSync(buffer, currentTime);
+            bufferLevel = self.sourceBufferExt.getBufferLength(buffer, currentTime);
             self.metricsModel.addBufferLevel(type, new Date(), bufferLevel);
         },
 
