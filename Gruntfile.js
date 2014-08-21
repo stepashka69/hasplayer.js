@@ -2,6 +2,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
 
     path: 'build',
+    orangeApps: 'orangeApps',
+    appDemoPlayer: 'orangeApps/DemoPlayer',
+    app4Ever: 'orangeApps/4Ever',
+    appDashif: 'orangeApps/Dash-IF',
+    appABRTest: 'orangeApps/ABRTest/',
 
     //Check for syntax errors
     jshint: {
@@ -15,15 +20,15 @@ module.exports = function(grunt) {
     copy: {
       html: {
         files: [
-        {src: 'index.html', dest: '<%= path %>/index.html'},
-        {src: 'player.html', dest: '<%= path %>/player.html'}
+        {src: '<%= appDashif %>/index.html', dest: '<%= path %>/index.html'},
+        {src: '<%= appDemoPlayer %>/index.html', dest: '<%= path %>/player.html'}
         ]
       }
     },
 
     //Configuration for blocks in HTML
     useminPrepare: {
-      src: ['index.html', 'player.html'],
+      src: ['<%= appDashif %>/index.html', '<%= appDemoPlayer %>/index.html', '<%= path %>/source/playerSrc.html'],
       options: {
         dest: '<%= path %>'
       }
@@ -31,14 +36,7 @@ module.exports = function(grunt) {
 
     //The HTML to parse
     usemin: {
-      html: ['<%= path %>/index.html', '<%= path %>/player.html'],
-      options: {
-        blockReplacements: {
-          dash: function () {
-            return '<script src="dash.all.js"></script>';
-          }
-        }
-      }
+      html: ['<%= path %>/index.html', '<%= path %>/player.html', '<%= path %>/source/playerSrc.html']
     },
 
     //Get CSS files into one and replace all file url with base64 inline
@@ -134,7 +132,13 @@ module.exports = function(grunt) {
             return filename.toLowerCase();
           }
         },
-        src: ['app/sources.json', 'app/notes.json', 'app/contributors.json', 'app/player_libraries.json', 'app/showcase_libraries.json'],
+        src: [
+          '<%= appDashif %>/json/sources.json',
+          '<%= appDashif %>/json/notes.json',
+          '<%= appDashif %>/json/contributors.json',
+          '<%= appDashif %>/json/player_libraries.json',
+          '<%= appDashif %>/json/showcase_libraries.json'
+        ],
         dest: '<%= path %>/json.js'
       }
     },
@@ -189,6 +193,53 @@ module.exports = function(grunt) {
         files: [
         {expand: true, flatten: true, src: ['<%= path %>/dash.all.js', '<%= path %>/index.js', '<%= path %>/player.js'], dest: '<%= path %>'}
         ]
+      },
+      source: {
+        options: {
+          patterns: [
+          {
+            match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
+            replacement: '<%= grunt.file.read("orangeApps/playerSrc.html") %>'
+          }
+          ]
+        },
+        files: [
+          {expand: true, flatten: true, src: ['<%= appDemoPlayer %>/index.html'], dest: '<%= appDemoPlayer %>'},
+          {expand: true, flatten: true, src: ['<%= app4Ever %>/index.html'], dest: '<%= app4Ever %>'},
+          {expand: true, flatten: true, src: ['<%= appDashif %>/index.html'], dest: '<%= appDashif %>'},
+          {expand: true, flatten: true, src: ['<%= appABRTest %>/current.html'], dest: '<%= appABRTest %>'}
+        ]
+      },
+      sourceForBuild: {
+        options: {
+          patterns: [
+          {
+            match: /<!-- source -->/,
+            replacement: '<!-- build:js dash.all.js-->'
+          },
+          {
+            match: /<!-- \/source -->/,
+            replacement: '<!-- endbuild -->'
+          }
+          ]
+        },
+        files: [
+          {expand: true, flatten: true, src: ['<%= orangeApps %>/playerSrc.html'], dest: '<%= path %>/source'}
+        ]
+      },
+      sourceByBuild: {
+        options: {
+          patterns: [
+          {
+            match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
+            replacement: '<script src="dash.all.js"></script>'
+          }
+          ]
+        },
+        files: [
+          {expand: true, flatten: true, src: ['<%= path %>/player.html'], dest: '<%= path %>'},
+          {expand: true, flatten: true, src: ['<%= path %>/index.html'], dest: '<%= path %>'}
+        ]
       }
     },
 
@@ -198,7 +249,7 @@ module.exports = function(grunt) {
         src: ['<%= path %>']
       },
       end: {
-        src: ['<%= path %>/style.css', '<%= path %>/json.js']
+        src: ['<%= path %>/style.css', '<%= path %>/json.js', '<%= path %>/source']
       }
     }
 
@@ -224,9 +275,15 @@ module.exports = function(grunt) {
     'jshint'
     ]);
 
+  grunt.registerTask('source', [
+    'replace:source'
+    ]);
+
   grunt.registerTask('build', [
     'clean:start',        //empty folder
     'copy',               //copy HTML file
+    'replace:sourceByBuild', //replace source by call for dash.all.js
+    'replace:sourceForBuild', //prepare source file for dash.all.js
     'revision',           //get git info
     'useminPrepare',      //get files in blocks tags
     'concat:generated',   //merge all the files in one for each blocks
@@ -238,7 +295,7 @@ module.exports = function(grunt) {
     'uglify:json',        //minify the json.js file
     'concat:jsonToIndex', //merge the json.js file with index.js
     'usemin',             //replace the tags blocks by the result
-    'htmlbuild',          //inline the CSS
+    'htmlbuild:dist',     //inline the CSS
     'htmlmin:main',       //Minify the HTML
     'replace',            //Add the git info in files
     'clean:end'           //Clean temp files

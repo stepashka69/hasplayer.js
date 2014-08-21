@@ -13,9 +13,9 @@ angular.module('HAS').controller('homeCtrl', ['$scope', '$location', function($s
 		var pageLink = '';
 		
 		if($scope.option.debug) {
-			pageLink = '../index.html?url=';
+			pageLink = '../Dash-IF/index.html?url=';
 		} else {
-			pageLink = '../player.html?file=';
+			pageLink = '../DemoPlayer/index.html?file=';
 		}
 
 		return pageLink + link;

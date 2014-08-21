@@ -1,3 +1,4 @@
+var DEBUG = true;
 
 // /!\ if you modify thi title don't forget to modify the css rule ".reflected:before"
 var pageTitle = "<b>UHDTV</b> in an <b>HTML5</b> browser with <b>DASH-HEVC</b> content adaptation";
@@ -16,7 +17,7 @@ var videoStreams = [
     {
         "name": "DASH-HEVC HD/UHD 30Hz",
         "url": "http://localhost/dash/demoDashNab2014_30Hz/demoDashNab2014_30Hz.mpd",
-        "image": "app/img/4Ever/dashevc-live-2s.jpg",
+        "image": "img/dashevc-live-2s.jpg",
         "representations": [
             "3840x2160@14.5M",
             "3840x2160@11.5M",
@@ -29,7 +30,7 @@ var videoStreams = [
     {
         "name": "DASH-HEVC UHD 60Hz",
         "url": "http://localhost/dash/UHD/dashevc-live-2s/dashevc-live-2s-4k.mpd",
-        "image": "app/img/4Ever/dashevc-live-2s.jpg",
+        "image": "img/dashevc-live-2s.jpg",
         "representations": [
             "3840x2160@18.4M",
             "3840x2160@13.5M",
@@ -39,7 +40,7 @@ var videoStreams = [
     {
         "name": "DASH-HEVC HD 60Hz",
         "url": "http://localhost/dash/UHD/dashevc-live-2s/dashevc-live-2s-p60.mpd",
-        "image": "app/img/4Ever/dashevc-live-2s.jpg",
+        "image": "img/dashevc-live-2s.jpg",
         "representations": [
             "1920x1080@7.5M",
             "1920x1080@5.5M",
@@ -50,7 +51,7 @@ var videoStreams = [
     {
         "name": "DASH-HEVC UHD/HD 60Hz",
         "url": "http://localhost/dash/UHD/dashevc-live-2s/dashevc-live-2s.mpd",
-        "image": "app/img/4Ever/dashevc-live-2s.jpg",
+        "image": "img/dashevc-live-2s.jpg",
         "representations": [
             "3840x2160@18.4M",
             "3840x2160@13.5M",
