@@ -11,28 +11,36 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.utils.Debug = function () {
+Custom.utils.CustomDebug = function () {
     "use strict";
 
-    var logToBrowserConsole = true;
+    var rslt = Custom.utils.copyMethods(MediaPlayer.utils.Debug);
 
-    return {
-        eventBus: undefined,
-        setLogToBrowserConsole: function(value) {
-            logToBrowserConsole = value;
-        },
-        getLogToBrowserConsole: function() {
-            return logToBrowserConsole;
-        },
-        log: function (message) {
-            if (logToBrowserConsole){
-                console.log(message);
+    rslt.log = function () {
+        if (rslt.getLogToBrowserConsole()){
+            var _logger = ('undefined' !== typeof(log4javascript)) ? log4javascript.getLogger() : null;
+            if(_logger){
+                if(!_logger.initialized){
+                    var appender = new log4javascript.PopUpAppender();
+                    var layout = new log4javascript.PatternLayout("%d{HH:mm:ss.SSS} %-5p - %m%n");
+                    appender.setLayout(layout);
+                    _logger.addAppender(appender);
+                    _logger.setLevel(log4javascript.Level.ALL);
+                    _logger.initialized = true;
+                }
+                
+                _logger.info.apply(_logger,arguments);
+                
+            }else{
+                console.log.apply(console,arguments);
             }
-
-            this.eventBus.dispatchEvent({
-                type: "log",
-                message: message
-            });
         }
+        this.eventBus.dispatchEvent({
+            type: "log",
+            message: arguments[0]
+        });
     };
+
+    return rslt;
 };
+

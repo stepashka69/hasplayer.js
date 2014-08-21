@@ -40,6 +40,7 @@
             this.system.mapSingleton('abrController', Custom.dependencies.CustomAbrController);
             this.system.mapClass('bufferController', Custom.dependencies.CustomBufferController);
             this.system.mapSingleton('sourceBufferExt', Custom.dependencies.CustomSourceBufferExtensions);
+            this.system.mapSingleton('debug', Custom.utils.CustomDebug);
 
             // overload ABR rules
             this.system.mapClass('downloadRatioRule', Custom.rules.CustomDownloadRatioRule);
