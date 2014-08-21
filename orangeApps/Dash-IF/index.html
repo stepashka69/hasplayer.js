@@ -213,7 +213,10 @@
                 </div>
                 <input type="text" class="form-control" placeholder="manifest" ng-model="selectedItem.url">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" ng-click="doLoad()">Load</button>
+                    <button class="btn btn-primary" type="button" ng-click="doLoad()" style="border-radius: 0;">Load</button>
+                </span>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" ng-click="loadInPlayer(selectedItem.url)">Load in Player</button>
                 </span>
             </div>
         </div>
