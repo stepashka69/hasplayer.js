@@ -12,7 +12,8 @@ module.exports = function(grunt) {
     jshint: {
       all: ["app/js/*/**/*.js"],
       options: {
-        jshintrc: ".jshintrc"
+        jshintrc: ".jshintrc",
+        reporter: require('jshint-stylish')
       }
     },
 
@@ -44,13 +45,13 @@ module.exports = function(grunt) {
       encodeDirectly: {
         files: {
           '<%= path %>/style.css': [
-          'app/lib/bootstrap/css/bootstrap.min.css',
-          'app/lib/bootstrap/css/bootstrap-glyphicons.css',
-          'app/lib/angular.treeview/css/angular.treeview.css',
-          'app/css/main.css',
-          'app/lib/video/video-4.6.min.css',
-          'app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.css',
-          'app/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css'
+          '<%= appDashif %>/lib/bootstrap/css/bootstrap.min.css',
+          '<%= appDashif %>/lib/bootstrap/css/bootstrap-glyphicons.css',
+          '<%= appDashif %>/lib/angular.treeview/css/angular.treeview.css',
+          '<%= appDashif %>/css/main.css',
+          '<%= appDashif %>/lib/video/video-4.6.min.css',
+          '<%= appDashif %>/lib/jquery.ui/jquery-ui-1.10.3.custom.min.css',
+          '<%= appDashif %>/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css'
           ]
         },
         options: {
@@ -256,19 +257,7 @@ module.exports = function(grunt) {
   });
 
   // Require needed grunt-modules
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-git-revision');
-  grunt.loadNpmTasks('grunt-usemin');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-css-url-embed');
-  grunt.loadNpmTasks('grunt-json');
-  grunt.loadNpmTasks('grunt-html-build');
-  grunt.loadNpmTasks('grunt-contrib-htmlmin');
-  grunt.loadNpmTasks('grunt-replace');
+  require('load-grunt-tasks')(grunt);
 
 
   grunt.registerTask('test', [
