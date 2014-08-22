@@ -705,7 +705,15 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     };
 
     $scope.loadInPlayer = function(url) {
-        $window.open("../DemoPlayer/index.html?url="+url);
+        var demoPlayer;
+        
+        if(window.jsonData === undefined) {
+            demoPlayer = '../DemoPlayer/index.html?url=';
+        } else {
+            demoPlayer = 'player.html?url=';
+        }
+
+        $window.open(demoPlayer+url);
     };
 
     $scope.hasLogo = function (item) {
