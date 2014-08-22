@@ -23,6 +23,8 @@ Custom.models.CustomMetricsModel = function () {
         vo.max = max;
 
         this.parent.getMetricsFor(streamType).RepBoundariesList.push(vo);
+
+        this.parent.metricAdded(streamType, "RepresentationBoundaries", vo);
         return vo;
     };
 
@@ -34,28 +36,54 @@ Custom.models.CustomMetricsModel = function () {
         vo.max = max;
 
         this.parent.getMetricsFor(streamType).BandwidthBoundariesList.push(vo);
+
+        this.parent.metricAdded(streamType, "BandwidthBoundaries", vo);
         return vo;
     };
 
-    rslt.addDownloadSwitch = function (streamType, startTime, downloadTime, quality) {
-        var ds = new Custom.vo.metrics.DownloadSwitch();
-
-        ds.type = streamType;
-        ds.mediaStartTime = startTime;
-        ds.downloadStartTime = downloadTime;
-        ds.quality = quality;
-
-        this.parent.getMetricsFor(streamType).DwnldSwitchList = [ds];
-        return ds;
+    rslt.addHttpRequest = function (streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration, startTime, quality) {
+        if (DEBUG) {
+            return this.parent.addHttpRequest(streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration, startTime, quality);
+        }
+        return null;
     };
 
-    rslt.setBandwidthValue = function (streamType, value) {
-        var bwv = new Custom.vo.metrics.BandwidthValue();
+    rslt.appendHttpTrace = function (httpRequest, s, d, b) {
+        if (DEBUG) {
+            return this.parent.appendHttpTrace(httpRequest, s, d, b);
+        }
+        return null;
+    };
 
-        bwv.value = value;
-        
-        this.parent.getMetricsFor(streamType).BandwidthValue = bwv;
-        return bwv;
+    rslt.addBufferLevel = function (streamType, t, level) {
+        var vo = new MediaPlayer.vo.metrics.BufferLevel();
+
+        vo.t = t;
+        vo.level = level;
+
+        // ORANGE unnecessary metrics, when builded, DEBUG is false, saving the whole list is useless
+        if (DEBUG) {
+            this.parent.getMetricsFor(streamType).BufferLevel.push(vo);
+        } else {
+            this.parent.getMetricsFor(streamType).BufferLevel = [vo];
+        }
+
+        this.parent.metricAdded(streamType, "BufferLevel", vo);
+        return vo;
+    };
+
+    rslt.addPlayList = function (streamType, start, mstart, starttype) {
+        if (DEBUG) {
+            return this.parent.addPlayList(streamType, start, mstart, starttype);
+        }
+        return null;
+    };
+
+    rslt.appendPlayListTrace = function (playList, representationid, subreplevel, start, mstart, duration, playbackspeed, stopreason) {
+        if (DEBUG) {
+            return this.parent.appendPlayListTrace(playList, representationid, subreplevel, start, mstart, duration, playbackspeed, stopreason);
+        }
+        return null;
     };
 
     return rslt;

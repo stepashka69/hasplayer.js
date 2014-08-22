@@ -18,8 +18,6 @@ Custom.models.CustomMetricsList = function () {
 
     rslt.RepBoundariesList = [];
     rslt.BandwidthBoundariesList = [];
-    rslt.DwnldSwitchList = [];
-    rslt.BandwidthValue = null;
 
     return rslt;
 };

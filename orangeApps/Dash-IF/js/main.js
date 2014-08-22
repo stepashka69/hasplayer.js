@@ -240,7 +240,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         movingDownload = {},
         movingRatio = {},
         droppedFramesValue = 0,
-        dwnldSwitch,
+        httpRequest,
         fillmoving = function(type, Requests){
             var requestWindow,
             downloadTimes,
@@ -291,7 +291,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             fillmoving("video", httpRequests);
             fillmoving("audio", httpRequests);
 
-            dwnldSwitch = metricsExt.getCurrentDownloadSwitch(metrics);
+            httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
 
             if (repSwitch !== null) {
                 bitrateIndexValue = metricsExt.getIndexForRepresentation(repSwitch.to);
@@ -339,7 +339,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 movingLatency: movingLatency,
                 movingDownload: movingDownload,
                 movingRatio: movingRatio,
-                dwnldSwitch: dwnldSwitch
+                httpRequest: httpRequest
             };
         }
         else {
@@ -353,7 +353,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
         if (e.data.stream == "video") {
             metrics = getCribbedMetricsFor("video");
-            if (metrics && metrics.dwnldSwitch) {
+            if (metrics) {
                 $scope.videoBitrate = metrics.bandwidthValue;
                 $scope.videoIndex = metrics.bitrateIndexValue;
                 $scope.videoPendingIndex = metrics.pendingIndex;
@@ -387,14 +387,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 }
 
                 // case of downloaded quality change
-                if (metrics.bitrateValues[metrics.dwnldSwitch.quality] != previousDownloadedQuality) {
+                if ((metrics.httpRequest !== null)  && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality)) {
                 // save quality change for later when video currentTime = mediaStartTime
                 qualityChangements.push({
-                    mediaStartTime : metrics.dwnldSwitch.mediaStartTime,
-                    switchedQuality : metrics.bitrateValues[metrics.dwnldSwitch.quality],
-                    downloadStartTime : metrics.dwnldSwitch.downloadStartTime
+                    mediaStartTime : metrics.httpRequest.startTime,
+                    switchedQuality : metrics.bitrateValues[metrics.httpRequest.quality],
+                    downloadStartTime : metrics.httpRequest.trequest
                 });
-                previousDownloadedQuality = metrics.bitrateValues[metrics.dwnldSwitch.quality];
+                previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
             }
             
             for (var p in qualityChangements) {

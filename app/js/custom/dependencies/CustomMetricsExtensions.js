@@ -203,27 +203,6 @@
         return bandwidthBoundaries[bandwidthBoundaries.length - 1];
     };
 
-    rslt.getCurrentDownloadSwitch = function (metrics) {
-        if (metrics === null) {
-            return null;
-        }
-
-        var dwnldSwitch = metrics.DwnldSwitchList;
-
-        if (dwnldSwitch === null || dwnldSwitch.length <= 0) {
-            return null;
-        }
-        return dwnldSwitch[dwnldSwitch.length-1];
-    };
-
-    rslt.getCurrentBandwidth = function(metrics) {
-        if (metrics === null) {
-            return null;
-        }
-
-        return metrics.BandwidthValue;
-    };
-
     return rslt;
 };
 

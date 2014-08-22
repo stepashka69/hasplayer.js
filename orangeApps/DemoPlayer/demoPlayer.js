@@ -5,19 +5,17 @@ var hideMetricsAtStart = true;
 // idsToToggle : ids of the metrics to toggle, metrics are hided (or shown) in the array order
 var idsToToggle = ["#chartToToggle", "#sliderToToggle", "#infosToToggle"];
 // updateInterval : the intervals on how often the metrics are updated in milliseconds
-var updateInterval = 333;
+var updateInterval = 100;
 // chartXaxisWindow : the display window on the x-axis in seconds
 var chartXaxisWindow = 10;
 
-var previousPlayedQuality = 0,
-    previousDownloadedQuality= 0,
-    previousPlayedVideoHeight,
-    previousPlayedVideoWidth,
-    previousPlayedCodecs,
+var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
+    playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
+    bufferLevel,
+    qualitySwitches = [],
     chartBandwidth,
     dlSeries = [],
     playSeries = [],
-    qualityChangements = [],
     chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
     video,
     player,
@@ -27,176 +25,192 @@ var previousPlayedQuality = 0,
     seekBarIsPresent = false,
     audioTracksSelectIsPresent = false;
 
-function update() {
-    var repSwitch,
-        bufferLevel,
-        bufferLengthValue,
-        bitrateValues,
-        metricsVideo = player.getMetricsFor("video"),
-        metricsExt = player.getMetricsExt(),
-        videoWidthValue,
-        videoHeightValue,
-        codecsValue,
-        dwnldSwitch;
-        
-    repSwitch = metricsExt.getCurrentRepresentationSwitch(metricsVideo);
-    dwnldSwitch = metricsExt.getCurrentDownloadSwitch(metricsVideo);
 
-    if (repSwitch && dwnldSwitch) {
-        
-        bufferLevel = metricsExt.getCurrentBufferLevel(metricsVideo);
-        bufferLengthValue = bufferLevel ? bufferLevel.level.toPrecision(5) : 0;
-        bitrateValues = metricsExt.getBitratesForType("video");
-        videoWidthValue = metricsExt.getVideoWidthForRepresentation(repSwitch.to);
-        videoHeightValue = metricsExt.getVideoHeightForRepresentation(repSwitch.to);
-        codecsValue = metricsExt.getCodecsForRepresentation(repSwitch.to);
+function initChartAndSlider() {
+    var metricsExt = player.getMetricsExt(),
+        bdw,
+        bdwM,
+        bdwK,
+        bitrateValues = null;
 
+    bitrateValues = metricsExt.getBitratesForType("video");
 
-        // case of downloaded quality changmement
-        if (bitrateValues[dwnldSwitch.quality] != previousDownloadedQuality) {
-            // save quality changement for later when video currentTime = mediaStartTime
-            qualityChangements.push({
-                'mediaStartTime':dwnldSwitch.mediaStartTime,
-                'switchedQuality': bitrateValues[dwnldSwitch.quality],
-                'downloadStartTime': dwnldSwitch.downloadStartTime,
-                'videoWidth': videoWidthValue,
-                'videoHeight': videoHeightValue,
-                'codecsValue': codecsValue
-            });
-            previousDownloadedQuality = bitrateValues[dwnldSwitch.quality];
-        }
-
-
-
-        // test if it's time of changement
-        for (var p in qualityChangements) {
-            var currentQualityChangement = qualityChangements[p];
-            //time of downloaded quality changement !
-            if (currentQualityChangement.downloadStartTime <= video.currentTime) {
-                previousDownloadedQuality = currentQualityChangement.switchedQuality;
-            }
-
-            // time of played quality changement !
-            if (currentQualityChangement.mediaStartTime <= video.currentTime) {
-                previousPlayedQuality = currentQualityChangement.switchedQuality;
-                previousPlayedVideoWidth = currentQualityChangement.videoWidth;
-                previousPlayedVideoHeight = currentQualityChangement.videoHeight;
-                previousPlayedCodecs = currentQualityChangement.codecsValue;
-                // remove it when it's played 
-                qualityChangements.splice(p,1);
-            }
-        }
-
-        dlSeries.push([video.currentTime, Math.round(previousDownloadedQuality/1000)]);
-        playSeries.push([video.currentTime, Math.round(previousPlayedQuality / 1000)]);
-
-
-        // remove older points for the x-axis move
-        if (dlSeries.length > (chartXaxisWindow*1000)/updateInterval) {
-            dlSeries.splice(0, 1);
-            playSeries.splice(0, 1);
-        }
-
-        var bandwidthData = [{
-            data: dlSeries,
-            label: "download",
-            color: "#2980B9"
-        }, {
-            data: playSeries,
-            label: "playing",
-            color: "#E74C3C"
-        }];
-
-        //initialisation of bandwidth chart , sliders
-        if (!chartBandwidth) {
-
-            var bdw, bdwM, bdwK;
-            for (var idx in bitrateValues) {
-                bdwM = bitrateValues[idx]/1000000;
-                bdwK = bitrateValues[idx]/1000;
-                bdw = bdwM < 10 ? Math.round(bdwK) + "k" : Math.round(bitrateValues[idx]/100000)/10 + "M";
-                chartOptions.grid.markings.push({yaxis: { from: idx, to: idx},color:"#b0b0b0"});
-                chartOptions.yaxis.ticks.push([idx, bdw]);
-            }
-
-            chartOptions.yaxis.min = 0;
-            chartOptions.yaxis.max = bitrateValues.length-1;
-
-            chartBandwidth = $.plot($("#chartBandwidth"), bandwidthData , chartOptions);
-
-            var labels = [];
-            for (var i = 0; i < bitrateValues.length; i++) {
-                labels.push(Math.round(bitrateValues[i] / 1000) + "k");
-            }
-
-            $('#sliderBitrate').labeledslider({
-                max: (bitrateValues.length - 1),
-                orientation:'vertical',
-                range:true,
-                step: 1,
-                values: [ 0, (bitrateValues.length - 1 )],
-                //tickLabels: labels,
-                stop: function( event, ui ) {
-                    player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
-                }
-            });
-
-            var audioDatas = player.getAudioTracks();
-            if (audioDatas.length>1) {
-                var selectOptions = "";
-                for (var j = 0 ; j < audioDatas.length; j++) {
-                    selectOptions += '<option value="'+audioDatas[j].id+'">'+audioDatas[j].lang + ' - ' + audioDatas[j].id+'</option>';
-                }
-                $("#audioTracksSelect").html(selectOptions);
-                audioTracksSelectIsPresent = true;
-
-                
-                $("#audioTracksSelect").change(function(track) {
-                    var currentTrackId = $("select option:selected")[0].value;
-                    for (var j = 0 ; j < audioDatas.length; j++) {
-                        if (audioDatas[j].id == currentTrackId) {
-                            player.setAudioTrack(audioDatas[j]);
-                        }
-                    }
-                });
-            }
-            
-        } else {
-            chartBandwidth.setData(bandwidthData);
-            chartBandwidth.setupGrid();
-            chartBandwidth.draw();
-        }
-
-        // control bar initialisation
-        if(firstAccess && video.duration >0) {
-            firstAccess = false;
-            // in dynamic mode, don't diplay seekbar and pause button
-            if(!player.metricsExt.manifestExt.getIsDynamic(player.metricsExt.manifestModel.getValue())) {
-                seekBarIsPresent = true;
-                videoDuration = video.duration;
-                $("#seekBar").attr('max', video.duration);
-                $("#videoPlayer").on('timeupdate', updateSeekBar);
-            }
-
-            if(audioTracksSelectIsPresent && seekBarIsPresent) {
-                $("#controlBar").addClass("controlBarWithAudioTrackSelectAndSeek");
-            } else if(audioTracksSelectIsPresent) {
-                $("#controlBar").addClass("controlBarWithAudioTrackSelect");
-            } else if (seekBarIsPresent) {
-                $("#controlBar").addClass("controlBarWithSeek");
-            }
-        }
-        
-        previousPlayedVideoWidth = previousPlayedVideoWidth ? previousPlayedVideoWidth : "0";
-        previousPlayedVideoHeight = previousPlayedVideoHeight ? previousPlayedVideoHeight : "0";
-        previousPlayedCodecs = previousPlayedCodecs ? previousPlayedCodecs : "-";
-        bufferLengthValue = bufferLengthValue ? bufferLengthValue : 0;
-
-        $("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(previousPlayedQuality/1000) + " kbps<br>"+ previousPlayedVideoWidth +"x"+previousPlayedVideoHeight + "<br>"+ previousPlayedCodecs + "<br>"+ bufferLengthValue + "s");
-        $("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(previousDownloadedQuality/1000) + " kbps<br>"+ videoWidthValue +"x"+videoHeightValue + "<br>"+ codecsValue + "<br>"+ bufferLengthValue + "s");
+    for (var idx in bitrateValues) {
+        bdwM = bitrateValues[idx]/1000000;
+        bdwK = bitrateValues[idx]/1000;
+        bdw = bdwM < 10 ? Math.round(bdwK) + "k" : Math.round(bitrateValues[idx]/100000)/10 + "M";
+        chartOptions.grid.markings.push({yaxis: { from: idx, to: idx},color:"#b0b0b0"});
+        chartOptions.yaxis.ticks.push([idx, bdw]);
     }
 
-   
+    chartOptions.yaxis.min = 0;
+    chartOptions.yaxis.max = bitrateValues.length-1;
+
+    var bandwidthData = [{
+        data: dlSeries,
+        label: "download",
+        color: "#2980B9"
+    }, {
+        data: playSeries,
+        label: "playing",
+        color: "#E74C3C"
+    }];
+
+    chartBandwidth = $.plot($("#chartBandwidth"), bandwidthData , chartOptions);
+
+    var labels = [];
+    for (var i = 0; i < bitrateValues.length; i++) {
+        labels.push(Math.round(bitrateValues[i] / 1000) + "k");
+    }
+
+    $('#sliderBitrate').labeledslider({
+        max: (bitrateValues.length - 1),
+        orientation:'vertical',
+        range:true,
+        step: 1,
+        values: [ 0, (bitrateValues.length - 1 )],
+        //tickLabels: labels,
+        stop: function( event, ui ) {
+            player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
+        }
+    });
+
+    var audioDatas = player.getAudioTracks();
+    if (audioDatas.length > 1) {
+        var selectOptions = "";
+        for (var j = 0 ; j < audioDatas.length; j++) {
+            selectOptions += '<option value="'+audioDatas[j].id+'">'+audioDatas[j].lang + ' - ' + audioDatas[j].id+'</option>';
+        }
+        $("#audioTracksSelect").html(selectOptions);
+        audioTracksSelectIsPresent = true;
+
+        
+        $("#audioTracksSelect").change(function(track) {
+            var currentTrackId = $("select option:selected")[0].value;
+            for (var j = 0 ; j < audioDatas.length; j++) {
+                if (audioDatas[j].id == currentTrackId) {
+                    player.setAudioTrack(audioDatas[j]);
+                }
+            }
+        });
+    }
+}
+
+function update() {
+    var httpRequests,
+        httpRequest,
+        repSwitch,
+        metricsVideo = player.getMetricsFor("video"),
+        metricsExt = player.getMetricsExt(),
+        currentTime = video.currentTime,
+        i,
+        currentSwitch;
+
+
+    if (!chartBandwidth) {
+        initChartAndSlider();
+    }
+
+    // Get current buffer level
+    bufferLevel = metricsExt.getCurrentBufferLevel(metricsVideo);
+    bufferLevel = bufferLevel ? bufferLevel.level.toPrecision(3) : 0;
+
+    repSwitch = metricsExt.getCurrentRepresentationSwitch(metricsVideo);
+    httpRequests = metricsExt.getHttpRequests(metricsVideo);
+    httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
+
+    // Check for download quality change
+    if (repSwitch && httpRequest && (httpRequest.quality != downloadRepInfos.quality)) {
+
+        // CHECK !!
+        if (metricsExt.getIndexForRepresentation(repSwitch.to) !== httpRequest.quality) {
+            console.log("!!!!!! demoPlayer ERROR");
+        }
+
+        // Store current downloading representation infos
+        downloadRepInfos.quality = metricsExt.getIndexForRepresentation(repSwitch.to);
+        downloadRepInfos.bandwidth = metricsExt.getBandwidthForRepresentation(repSwitch.to);
+        downloadRepInfos.width = metricsExt.getVideoWidthForRepresentation(repSwitch.to);
+        downloadRepInfos.height = metricsExt.getVideoHeightForRepresentation(repSwitch.to);
+        downloadRepInfos.codecs = metricsExt.getCodecsForRepresentation(repSwitch.to);
+
+        // Save download quality change for later when video currentTime = mediaStartTime
+        qualitySwitches.push({
+            'downloadStartTime': httpRequest.trequest,
+            'mediaStartTime':httpRequest.startTime,
+            'quality': downloadRepInfos.quality,
+            'bandwidth': downloadRepInfos.bandwidth,
+            'width': downloadRepInfos.width,
+            'height': downloadRepInfos.height,
+            'codecs': downloadRepInfos.codecs
+        });
+    }
+
+    // Check for playing quality change
+    for (i = 0; i < qualitySwitches.length; i += 1) {
+        currentSwitch = qualitySwitches[i];
+        if (currentTime > currentSwitch.mediaStartTime) {
+            // Store current playing representation infos
+            playRepInfos.quality = currentSwitch.quality;
+            playRepInfos.bandwidth = currentSwitch.bandwidth;
+            playRepInfos.width = currentSwitch.width;
+            playRepInfos.height = currentSwitch.height;
+            playRepInfos.codecs = currentSwitch.codecs;
+            
+            // And remove when it's played
+            qualitySwitches.splice(0, 1);
+            break;
+        }
+    }
+
+    // Add chart points
+    //dlSeries.push([currentTime, Math.round(downloadRepInfos.bandwidth / 1000)]);
+    //playSeries.push([currentTime, Math.round(playRepInfos.bandwidth / 1000)]);
+    dlSeries.push([currentTime, Math.round(downloadRepInfos.quality)]);
+    playSeries.push([currentTime, Math.round(playRepInfos.quality)]);
+
+    // remove older points for the x-axis move
+    if (dlSeries.length > (chartXaxisWindow*1000)/updateInterval) {
+        dlSeries.splice(0, 1);
+        playSeries.splice(0, 1);
+    }
+
+    // Set char data
+    var bandwidthData = [{
+        data: dlSeries,
+        label: "download",
+        color: "#2980B9"
+    }, {
+        data: playSeries,
+        label: "playing",
+        color: "#E74C3C"
+    }];
+    chartBandwidth.setData(bandwidthData);
+    chartBandwidth.setupGrid();
+    chartBandwidth.draw();
+
+    // control bar initialisation
+    if(firstAccess && video.duration >0) {
+        firstAccess = false;
+        // in dynamic mode, don't diplay seekbar and pause button
+        if(!player.metricsExt.manifestExt.getIsDynamic(player.metricsExt.manifestModel.getValue())) {
+            seekBarIsPresent = true;
+            videoDuration = video.duration;
+            $("#seekBar").attr('max', video.duration);
+            $("#videoPlayer").on('timeupdate', updateSeekBar);
+        }
+
+        if(audioTracksSelectIsPresent && seekBarIsPresent) {
+            $("#controlBar").addClass("controlBarWithAudioTrackSelectAndSeek");
+        } else if(audioTracksSelectIsPresent) {
+            $("#controlBar").addClass("controlBarWithAudioTrackSelect");
+        } else if (seekBarIsPresent) {
+            $("#controlBar").addClass("controlBarWithSeek");
+        }
+    }
+
+    $("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(downloadRepInfos.bandwidth/1000) + " kbps<br>"+ downloadRepInfos.width +"x"+downloadRepInfos.height + "<br>"+ downloadRepInfos.codecs + "<br>"+ bufferLevel + "s");
+    $("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(playRepInfos.bandwidth/1000) + " kbps<br>"+ playRepInfos.width +"x"+playRepInfos.height + "<br>"+ playRepInfos.codecs + "<br>"+ bufferLevel + "s");
 }
 
 
