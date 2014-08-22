@@ -5,6 +5,11 @@
 		html, body {
 			margin: 100px 0;
 			padding: 0;
+			/* Webkit (Chrome 11+) */ 
+background-image: -webkit-linear-gradient(top left, #FFFFFF 0%, #EEEEEE 100%);
+
+/* W3C Markup, IE10 Release Preview */ 
+background-image: linear-gradient(to bottom right, #FFFFFF 0%, #EEEEEE 100%);
 		}
 
 		h1 {
@@ -12,6 +17,8 @@
 			letter-spacing: 2px;
 			font-family:  Arial;
 			text-align: center;
+			color: #616161;
+			text-shadow: 2px 2px 8px #AAA;
 		}
 
 		.menu {
@@ -23,11 +30,11 @@
 		}
 
 		.menu li a {
-			background: #FFF;
+			background: transparent;
 			font-size: 18px;
 			font-family: Tahoma, Verdana;
 			text-transform: uppercase;
-			color: #313131;
+			color: #7f8c8d;
 			letter-spacing: 1px;
 			display: inline-block;
 			width: 100%;
@@ -45,7 +52,7 @@
 		.footer {
 			position: absolute;
 			text-align: center;
-			bottom: 30px;
+			bottom: 18px;
 			left: 50%;
 			margin-left: -97.5;
 		}
