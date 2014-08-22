@@ -7,27 +7,28 @@
     <link rel="icon" type="image/png" href="http://dashpg.com/w/2012/09/dashif.ico" />
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
 
-    <!-- Add new CSS files twice: in here for dev and in gruntfile(cssUrlEmbed) for build -->
     <!-- build:style inline main -->
-    <link rel="stylesheet" href="../../app/lib/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../app/lib/bootstrap/css/bootstrap-glyphicons.css">
-    <link rel="stylesheet" href="../../app/lib/angular.treeview/css/angular.treeview.css">
-    <link rel="stylesheet" href="../../app/css/main.css">
-    <link rel="stylesheet" href="../../app/lib/video/video-4.6.min.css">
-    <link rel="stylesheet" href="../../app/lib/jquery.ui/jquery-ui-1.10.3.custom.min.css">
-    <link rel="stylesheet" href="../../app/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css">
+    <!-- build:css style.css -->
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-glyphicons.inlineimg.css">
+    <link rel="stylesheet" href="lib/angular.treeview/css/angular.treeview.inlineimg.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="lib/video/video-4.6.min.css">
+    <link rel="stylesheet" href="lib/jquery.ui/jquery-ui-1.10.3.custom.min.inlineimg.css">
+    <link rel="stylesheet" href="lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css">
+    <!-- endbuild -->
     <!-- /build -->
 
     <!-- build:js index.js -->
-    <script src="../../app/lib/video/video-4.6.min.js"></script>
-    <script src="../../app/lib/jquery/jquery-1.10.2.js"></script>
-    <script src="../../app/lib/jquery.ui/jquery-ui.js"></script>
-    <script src="../../app/lib/flot/jquery.flot.js"></script>
-    <script src="../../app/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js"></script>
-    <script src="../../app/lib/bootstrap/js/bootstrap.js"></script>
-    <script src="../../app/lib/angular/angular.min.js"></script>
-    <script src="../../app/lib/angular/angular-resource.min.js"></script>
-    <script src="../../app/lib/angular.treeview/angular.treeview.js"></script>
+    <script src="lib/video/video-4.6.min.js"></script>
+    <script src="lib/jquery/jquery-1.10.2.js"></script>
+    <script src="lib/jquery.ui/jquery-ui.js"></script>
+    <script src="lib/flot/jquery.flot.js"></script>
+    <script src="lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/angular/angular-resource.min.js"></script>
+    <script src="lib/angular.treeview/angular.treeview.js"></script>
     <script src="js/metrics.js"></script>
     <script src="js/main.js"></script>
     <!-- endbuild -->
@@ -211,7 +212,10 @@
                 </div>
                 <input type="text" class="form-control" placeholder="manifest" ng-model="selectedItem.url">
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" ng-click="doLoad()">Load</button>
+                    <button class="btn btn-primary" ng-disabled="!selectedItem.url" type="button" ng-click="doLoad()" style="border-radius: 0;">Load</button>
+                </span>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" ng-disabled="!selectedItem.url" type="button" ng-click="loadInPlayer(selectedItem.url)">Load in Player</button>
                 </span>
             </div>
         </div>

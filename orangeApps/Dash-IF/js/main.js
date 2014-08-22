@@ -124,8 +124,8 @@ app.directive('chart2', function() {
     };
 });
 
-app.controller('DashController', ['$scope', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
-    function($scope, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
+app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
+    function($scope, $window, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
 
     var player,
     video,
@@ -702,8 +702,18 @@ app.controller('DashController', ['$scope', 'Sources', 'Notes','Contributors','P
         firstAccess = true;
         // ORANGE: add licenser backUrl parameter and customData
         player.attachSource($scope.selectedItem.url, $scope.selectedItem.backUrl, $scope.selectedItem.customData);
+    };
+
+    $scope.loadInPlayer = function(url) {
+        var demoPlayer;
         
-        
+        if(window.jsonData === undefined) {
+            demoPlayer = '../DemoPlayer/index.html?url=';
+        } else {
+            demoPlayer = 'player.html?url=';
+        }
+
+        $window.open(demoPlayer+url);
     };
 
     $scope.hasLogo = function (item) {
