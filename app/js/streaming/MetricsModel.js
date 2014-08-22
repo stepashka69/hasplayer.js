@@ -96,7 +96,8 @@
             return vo;
         },
 
-        addHttpRequest: function (streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration) {
+        // ORANGE: add request quality
+        addHttpRequest: function (streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration, startTime, quality) {
             var vo = new MediaPlayer.vo.metrics.HTTPRequest();
 
             vo.stream = streamType;
@@ -111,30 +112,27 @@
             vo.responsecode = responsecode;
             vo.interval = interval;
             vo.mediaduration = mediaduration;
+            // ORANGE: add request media start time and quality
+            vo.startTime = startTime;
+            vo.quality = quality;
 
-            // ORANGE unnecessary metrics, when builded, DEBUG is false, saving the whole list is useless
-            if (DEBUG) {
-                this.getMetricsFor(streamType).HttpList.push(vo);
-            }
+            this.getMetricsFor(streamType).HttpList.push(vo);
 
             this.metricAdded(streamType, "HttpRequest", vo);
             return vo;
         },
 
         appendHttpTrace: function (httpRequest, s, d, b) {
-            // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
-            if (DEBUG) {
-                var vo = new MediaPlayer.vo.metrics.HTTPRequest.Trace();
+            var vo = new MediaPlayer.vo.metrics.HTTPRequest.Trace();
 
-                vo.s = s;
-                vo.d = d;
-                vo.b = b;
+            vo.s = s;
+            vo.d = d;
+            vo.b = b;
 
-                httpRequest.trace.push(vo);
+            httpRequest.trace.push(vo);
 
-                this.metricUpdated(httpRequest.stream, "HttpRequestTrace", httpRequest);
-                return vo;
-            }
+            this.metricUpdated(httpRequest.stream, "HttpRequestTrace", httpRequest);
+            return vo;
         },
 
         addRepresentationSwitch: function (streamType, t, mt, to, lto) {
@@ -157,16 +155,12 @@
             vo.t = t;
             vo.level = level;
 
-            // ORANGE unnecessary metrics, when builded, DEBUG is false, saving the whole list is useless
-            if (DEBUG) {
-                this.getMetricsFor(streamType).BufferLevel.push(vo);
-            } else {
-                this.getMetricsFor(streamType).BufferLevel = [vo];
-            }
+            this.getMetricsFor(streamType).BufferLevel.push(vo);
 
             this.metricAdded(streamType, "BufferLevel", vo);
             return vo;
         },
+
 
         addDVRInfo: function (streamType, currentTime, mpd, range)
         {
@@ -200,40 +194,34 @@
         },
 
         addPlayList: function (streamType, start, mstart, starttype) {
-            // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
-            if (DEBUG) {
-                var vo = new MediaPlayer.vo.metrics.PlayList();
+            var vo = new MediaPlayer.vo.metrics.PlayList();
 
-                vo.stream = streamType;
-                vo.start = start;
-                vo.mstart = mstart;
-                vo.starttype = starttype;
+            vo.stream = streamType;
+            vo.start = start;
+            vo.mstart = mstart;
+            vo.starttype = starttype;
 
-                this.getMetricsFor(streamType).PlayList.push(vo);
+            this.getMetricsFor(streamType).PlayList.push(vo);
 
-                this.metricAdded(streamType, "PlayList", vo);
-                return vo;
-            }
+            this.metricAdded(streamType, "PlayList", vo);
+            return vo;
         },
 
         appendPlayListTrace: function (playList, representationid, subreplevel, start, mstart, duration, playbackspeed, stopreason) {
-            // ORANGE unnecessary metrics, when builded, DEBUG is false, the code is never called
-            if (DEBUG) {
-                var vo = new MediaPlayer.vo.metrics.PlayList.Trace();
+            var vo = new MediaPlayer.vo.metrics.PlayList.Trace();
 
-                vo.representationid = representationid;
-                vo.subreplevel = subreplevel;
-                vo.start = start;
-                vo.mstart = mstart;
-                vo.duration = duration;
-                vo.playbackspeed = playbackspeed;
-                vo.stopreason = stopreason;
+            vo.representationid = representationid;
+            vo.subreplevel = subreplevel;
+            vo.start = start;
+            vo.mstart = mstart;
+            vo.duration = duration;
+            vo.playbackspeed = playbackspeed;
+            vo.stopreason = stopreason;
 
-                playList.trace.push(vo);
+            playList.trace.push(vo);
 
-                this.metricUpdated(playList.stream, "PlayListTrace", playList);
-                return vo;
-            }
+            this.metricUpdated(playList.stream, "PlayListTrace", playList);
+            return vo;
         }
     };
 };

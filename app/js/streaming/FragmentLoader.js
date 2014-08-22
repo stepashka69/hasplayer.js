@@ -15,9 +15,8 @@ MediaPlayer.dependencies.FragmentLoader = function () {
     "use strict";
 
     var RETRY_ATTEMPTS = 3,
-        RETRY_INTERVAL = 2000,
+        RETRY_INTERVAL = 500,
         xhrs = [],
-        currentQuality =null,
 
         doLoad = function (request, remainingAttempts) {
             var req = new XMLHttpRequest(),
@@ -26,9 +25,6 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                 needFailureReport = true,
                 lastTraceTime = null,
                 self = this;
-
-                req.url = request.url;
-                req.streamType = request.streamType;
 
                 xhrs.push(req);
                 request.requestStartDate = new Date();
@@ -44,19 +40,16 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                                                                       null,
                                                                       null,
                                                                       null,
-                                                                      request.duration);
+                                                                      request.duration,
+                                                                      // ORANGE: add request media start time and quality
+                                                                      request.startTime,
+                                                                      request.quality);
 
                 self.metricsModel.appendHttpTrace(httpRequestMetrics,
                                                   request.requestStartDate,
                                                   request.requestStartDate.getTime() - request.requestStartDate.getTime(),
                                                   [0]);
                 lastTraceTime = request.requestStartDate;
-
-                // ORANGE: add download switch metric
-                if (currentQuality != request.quality) {
-                    currentQuality = request.quality;
-                    this.metricsModel.addDownloadSwitch(request.streamType, request.startTime, request.requestStartDate, request.quality);
-                }
 
                 req.open("GET", self.tokenAuthentication.addTokenAsQueryArg(request.url), true);
                 req.responseType = "arraybuffer";
@@ -96,8 +89,7 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                     var currentTime = new Date(),
                         bytes = req.response,
                         latency,
-                        download,
-                        total;
+                        download;
 
                     if (!request.firstByteDate) {
                         request.firstByteDate = request.requestStartDate;
@@ -106,7 +98,6 @@ MediaPlayer.dependencies.FragmentLoader = function () {
 
                     latency = (request.firstByteDate.getTime() - request.requestStartDate.getTime());
                     download = (request.requestEndDate.getTime() - request.firstByteDate.getTime());
-                    total = (request.requestEndDate.getTime() - request.requestStartDate.getTime());
 
                     self.debug.log("[FragmentLoader]["+request.streamType+"] Loaded: " + request.url +" (" + req.status + ", " + latency + "ms, " + download + "ms)");
 
@@ -120,9 +111,6 @@ MediaPlayer.dependencies.FragmentLoader = function () {
                                                       [bytes ? bytes.byteLength : 0]);
                     lastTraceTime = currentTime;
                     
-                    // ORANGE: add metric for current measured bandwidth value
-                    self.metricsModel.setBandwidthValue(request.streamType, (bytes.byteLength*8)/total);
-
                     request.deferred.resolve({
                         data: bytes,
                         request: request
