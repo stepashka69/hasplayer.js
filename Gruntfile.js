@@ -40,39 +40,11 @@ module.exports = function(grunt) {
       html: ['<%= path %>/index.html', '<%= path %>/player.html', '<%= path %>/source/playerSrc.html']
     },
 
-    //Get CSS files into one and replace all file url with base64 inline
-    cssUrlEmbed: {
-      encodeDirectly: {
-        files: {
-          '<%= path %>/style.css': [
-          '<%= appDashif %>/lib/bootstrap/css/bootstrap.min.css',
-          '<%= appDashif %>/lib/bootstrap/css/bootstrap-glyphicons.css',
-          '<%= appDashif %>/lib/angular.treeview/css/angular.treeview.css',
-          '<%= appDashif %>/css/main.css',
-          '<%= appDashif %>/lib/video/video-4.6.min.css',
-          '<%= appDashif %>/lib/jquery.ui/jquery-ui-1.10.3.custom.min.css',
-          '<%= appDashif %>/lib/jquery.ui.labeledSlider/jquery.ui.labeledslider.css'
-          ]
-        },
-        options: {
-          failOnMissingUrl: false
-        }
-      }
-    },
-
     //Options for minify CSS
     cssmin: {
       generated: {
         options: {
           keepSpecialComments: 0
-        }
-      },
-      style: {
-        options: {
-          keepSpecialComments: 0
-        },
-        files: {
-          '<%= path %>/style.css': ['<%= path %>/style.css']
         }
       }
     },
@@ -259,6 +231,9 @@ module.exports = function(grunt) {
   // Require needed grunt-modules
   require('load-grunt-tasks')(grunt);
 
+  grunt.registerTask('cssimg', [
+    'cssUrlEmbed'
+    ]);
 
   grunt.registerTask('test', [
     'jshint'
@@ -269,24 +244,22 @@ module.exports = function(grunt) {
     ]);
 
   grunt.registerTask('build', [
-    'clean:start',        //empty folder
-    'copy',               //copy HTML file
-    'replace:sourceByBuild', //replace source by call for dash.all.js
+    'clean:start',            //empty folder
+    'copy',                   //copy HTML files
+    'replace:sourceByBuild',  //replace source by call for dash.all.js
     'replace:sourceForBuild', //prepare source file for dash.all.js
-    'revision',           //get git info
-    'useminPrepare',      //get files in blocks tags
-    'concat:generated',   //merge all the files in one for each blocks
-    'cssUrlEmbed',        //get the CSS files and merge into one
-    'cssmin:style',       //minify the generated CSS file
-    'cssmin:generated',   //minify the CSS in blocks (none)
-    'uglify:generated',   //minify the JS in blocks
-    'json',               //get the json files into a json.js
-    'uglify:json',        //minify the json.js file
-    'concat:jsonToIndex', //merge the json.js file with index.js
-    'usemin',             //replace the tags blocks by the result
-    'htmlbuild:dist',     //inline the CSS
-    'htmlmin:main',       //Minify the HTML
-    'replace',            //Add the git info in files
-    'clean:end'           //Clean temp files
+    'revision',               //get git info
+    'useminPrepare',          //get files in blocks tags
+    'concat:generated',       //merge all the files in one for each blocks
+    'cssmin:generated',       //minify the CSS in blocks (none)
+    'uglify:generated',       //minify the JS in blocks
+    'json',                   //get the json files into a json.js
+    'uglify:json',            //minify the json.js file
+    'concat:jsonToIndex',     //merge the json.js file with index.js
+    'usemin',                 //replace the tags blocks by the result
+    'htmlbuild:dist',         //inline the CSS
+    'htmlmin:main',           //Minify the HTML
+    'replace',                //Add the git info in files
+    'clean:end'               //Clean temp files
     ]);
 };
