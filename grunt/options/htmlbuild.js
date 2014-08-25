@@ -1,6 +1,6 @@
 module.exports = {
 	dist: {
-		src: '<%= path %>/index.html',
+		src: '<%= path %>/dashif.html',
 		dest: '<%= path %>',
 		options: {
 			beautify: false,

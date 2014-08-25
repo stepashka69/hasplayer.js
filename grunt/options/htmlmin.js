@@ -8,6 +8,7 @@ module.exports = {
     },
     files: {
       '<%= path %>/index.html': '<%= path %>/index.html',
+      '<%= path %>/dashif.html': '<%= path %>/dashif.html',
       '<%= path %>/player.html': '<%= path %>/player.html'
     }
   }

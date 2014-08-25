@@ -13,7 +13,7 @@ module.exports = {
 			]
 		},
 		files: [
-		{expand: true, flatten: true, src: ['<%= path %>/dash.all.js', '<%= path %>/index.js', '<%= path %>/player.js'], dest: '<%= path %>'}
+		{expand: true, flatten: true, src: ['<%= path %>/dash.all.js', '<%= path %>/dashif.js', '<%= path %>/player.js'], dest: '<%= path %>'}
 		]
 	},
 	source: {
@@ -60,7 +60,7 @@ module.exports = {
 		},
 		files: [
 		{expand: true, flatten: true, src: ['<%= path %>/player.html'], dest: '<%= path %>'},
-		{expand: true, flatten: true, src: ['<%= path %>/index.html'], dest: '<%= path %>'}
+		{expand: true, flatten: true, src: ['<%= path %>/dashif.html'], dest: '<%= path %>'}
 		]
 	}
-}
+};

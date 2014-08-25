@@ -10,6 +10,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', [
     'clean:start',            //empty folder
     'copy',                   //copy HTML files
+    'targethtml',             //Take the list element only for the build in index.html
     'replace:sourceByBuild',  //replace source by call for dash.all.js
     'replace:sourceForBuild', //prepare source file for dash.all.js
     'revision',               //get git info
