@@ -1,13 +1,17 @@
 var DEBUG = true;
 // customizable settings
 // hideMetricsAtStart :	if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
-var hideMetricsAtStart = true;
+var hideMetricsAtStart = false;
 // idsToToggle : ids of the metrics to toggle, metrics are hided (or shown) in the array order
 var idsToToggle = ["#chartToToggle", "#sliderToToggle", "#infosToToggle"];
-// updateInterval : the intervals on how often the metrics are updated in milliseconds
-var updateInterval = 100;
+// the update timeout variable
+var updateTimeout;
+// updateIntervalLength : the intervals on how often the metrics are updated in milliseconds
+var updateIntervalLength = 100;
 // chartXaxisWindow : the display window on the x-axis in seconds
-var chartXaxisWindow = 10;
+var chartXaxisWindow = 20;
+// the number of plots
+var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
 var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
     playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
@@ -16,7 +20,8 @@ var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
     chartBandwidth = null,
     dlSeries = [],
     playSeries = [],
-    chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
+    plotIndex = 0,
+    chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true, tickFormatter:function(){return "";}},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
     video,
     player,
     currentIdToToggle = 0,
@@ -31,7 +36,8 @@ function initChartAndSlider() {
         bdw,
         bdwM,
         bdwK,
-        bitrateValues = null;
+        bitrateValues = null,
+        i;
 
     bitrateValues = metricsExt.getBitratesForType("video");
 
@@ -51,6 +57,12 @@ function initChartAndSlider() {
     chartOptions.yaxis.min = 0;
     chartOptions.yaxis.max = bitrateValues.length-1;
 
+    for (i = 0; i < plotCount; i++) {
+        dlSeries.push([i, -1]);
+        playSeries.push([i, -1]);
+    }
+    plotIndex = 0;
+
     var bandwidthData = [{
         data: dlSeries,
         label: "download",
@@ -64,7 +76,7 @@ function initChartAndSlider() {
     chartBandwidth = $.plot($("#chartBandwidth"), bandwidthData , chartOptions);
 
     var labels = [];
-    for (var i = 0; i < bitrateValues.length; i++) {
+    for (i = 0; i < bitrateValues.length; i++) {
         labels.push(Math.round(bitrateValues[i] / 1000) + "k");
     }
 
@@ -83,8 +95,8 @@ function initChartAndSlider() {
     var audioDatas = player.getAudioTracks();
     if (audioDatas.length > 1) {
         var selectOptions = "";
-        for (var j = 0 ; j < audioDatas.length; j++) {
-            selectOptions += '<option value="'+audioDatas[j].id+'">'+audioDatas[j].lang + ' - ' + audioDatas[j].id+'</option>';
+        for (i = 0 ; i < audioDatas.length; i++) {
+            selectOptions += '<option value="' + audioDatas[i].id + '">' + audioDatas[i].lang + ' - ' + audioDatas[i].id+'</option>';
         }
         $("#audioTracksSelect").html(selectOptions);
         audioTracksSelectIsPresent = true;
@@ -92,9 +104,9 @@ function initChartAndSlider() {
         
         $("#audioTracksSelect").change(function(track) {
             var currentTrackId = $("select option:selected")[0].value;
-            for (var j = 0 ; j < audioDatas.length; j++) {
-                if (audioDatas[j].id == currentTrackId) {
-                    player.setAudioTrack(audioDatas[j]);
+            for (i = 0 ; i < audioDatas.length; i++) {
+                if (audioDatas[i].id == currentTrackId) {
+                    player.setAudioTrack(audioDatas[i]);
                 }
             }
         });
@@ -110,7 +122,6 @@ function update() {
         currentTime = video.currentTime,
         i,
         currentSwitch;
-
 
     if (!chartBandwidth) {
         initChartAndSlider();
@@ -144,22 +155,34 @@ function update() {
         downloadRepInfos.height = metricsExt.getVideoHeightForRepresentation(repSwitch.to);
         downloadRepInfos.codecs = metricsExt.getCodecsForRepresentation(repSwitch.to);
 
+        console.log("[DemoPlayer] new switch: " + downloadRepInfos.quality + " - " + httpRequest.startTime);
+
         // Save download quality change for later when video currentTime = mediaStartTime
         qualitySwitches.push({
             'downloadStartTime': httpRequest.trequest,
-            'mediaStartTime':httpRequest.startTime,
+            'mediaStartTime': httpRequest.startTime,
             'quality': downloadRepInfos.quality,
             'bandwidth': downloadRepInfos.bandwidth,
             'width': downloadRepInfos.width,
             'height': downloadRepInfos.height,
             'codecs': downloadRepInfos.codecs
         });
+
+        if (playRepInfos.quality === -1) {
+            playRepInfos.quality = downloadRepInfos.quality;
+            playRepInfos.bandwidth = downloadRepInfos.bandwidth;
+            playRepInfos.width = downloadRepInfos.width;
+            playRepInfos.height = downloadRepInfos.height;
+            playRepInfos.codecs = downloadRepInfos.codecs;            
+        }
+
     }
 
     // Check for playing quality change
     for (i = 0; i < qualitySwitches.length; i += 1) {
         currentSwitch = qualitySwitches[i];
-        if (currentTime > currentSwitch.mediaStartTime) {
+        console.log("[DemoPlayer] " + currentTime + " - " + currentSwitch.mediaStartTime);
+        if (currentTime >= currentSwitch.mediaStartTime) {
             // Store current playing representation infos
             playRepInfos.quality = currentSwitch.quality;
             playRepInfos.bandwidth = currentSwitch.bandwidth;
@@ -174,16 +197,24 @@ function update() {
     }
 
     // Add chart points
-    //dlSeries.push([currentTime, Math.round(downloadRepInfos.bandwidth / 1000)]);
-    //playSeries.push([currentTime, Math.round(playRepInfos.bandwidth / 1000)]);
-    dlSeries.push([currentTime, Math.round(downloadRepInfos.quality)]);
-    playSeries.push([currentTime, Math.round(playRepInfos.quality)]);
+    //dlSeries.push([currentTime, Math.round(downloadRepInfos.quality)]);
+    //playSeries.push([currentTime, Math.round(playRepInfos.quality)]);
+    if (plotIndex === plotCount) {
+        for (i = 0; i < (plotCount - 1); i += 1) {
+            dlSeries[i] = [i, dlSeries[i+1][1]];
+            playSeries[i] = [i, playSeries[i+1][1]];
+        }
+        plotIndex -= 1;
+    }
+    dlSeries[plotIndex] = [plotIndex, Math.round(downloadRepInfos.quality)];
+    playSeries[plotIndex] = [plotIndex, Math.round(playRepInfos.quality)];
+    plotIndex += 1;
 
     // remove older points for the x-axis move
-    if (dlSeries.length > (chartXaxisWindow*1000)/updateInterval) {
+    /*if (dlSeries.length > (chartXaxisWindow*1000)/updateIntervalLength) {
         dlSeries.splice(0, 1);
         playSeries.splice(0, 1);
-    }
+    }*/
 
     // Set char data
     var bandwidthData = [{
@@ -200,7 +231,7 @@ function update() {
     chartBandwidth.draw();
 
     // control bar initialisation
-    if(firstAccess && video.duration >0) {
+    if(firstAccess && (video.duration > 0)) {
         firstAccess = false;
         // in dynamic mode, don't diplay seekbar and pause button
         if(!player.metricsExt.manifestExt.getIsDynamic(player.metricsExt.manifestModel.getValue())) {
@@ -221,6 +252,8 @@ function update() {
 
     $("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(downloadRepInfos.bandwidth/1000) + " kbps<br>"+ downloadRepInfos.width +"x"+downloadRepInfos.height + "<br>"+ downloadRepInfos.codecs + "<br>"+ bufferLevel + "s");
     $("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(playRepInfos.bandwidth/1000) + " kbps<br>"+ playRepInfos.width +"x"+playRepInfos.height + "<br>"+ playRepInfos.codecs + "<br>"+ bufferLevel + "s");
+
+    updateTimeout = setTimeout(update, updateIntervalLength);
 }
 
 
@@ -250,8 +283,13 @@ function toggleFullScreen() {
 }
 
 function hideMetrics() {
+
+    $("#infosToToggle").toggle();
+    $("#chartToToggle").toggle();
+    $("#sliderToToggle").toggle();
+
     // hide or show chart 
-    if (currentIdToToggle < idsToToggle.length) {
+    /*if (currentIdToToggle < idsToToggle.length) {
         // Toggle current id (toggle switch between display: none and display: block)
         $(idsToToggle[currentIdToToggle]).toggle();
         currentIdToToggle++;
@@ -261,16 +299,14 @@ function hideMetrics() {
             $(idsToToggle[i]).toggle();
         }
         currentIdToToggle = 0;
-    }
+    }*/
 }
-
 
 function updateSeekBar() {
     $("#seekBar").attr('value',video.currentTime);
 }
 
 function initControlBar () {
-    console.log(video);
     $("#playPauseButton").click(function() {
         isPlaying ? video.pause() : video.play();
     });
@@ -295,6 +331,7 @@ function initControlBar () {
     $("#videoPlayer").on("pause", function() {
         isPlaying = false;
         $("#playPauseButton").removeClass("playing");
+        clearTimeout(updateTimeout);
     });
 
     $("#videoPlayer").on("play", function() {
@@ -303,6 +340,7 @@ function initControlBar () {
         if (video.muted) {
             $("#volumeButton").addClass("muted");
         }
+        update();
     });
 
     $("#videoPlayer").on("volumechange", function() {
@@ -352,6 +390,7 @@ function onLoaded () {
     player.startup();
     player.attachView(video);
     player.setAutoPlay(true);
+    //player.addEventListener("metricAdded", update, false);
 
     // get url
     var query = window.location.search;
@@ -359,7 +398,8 @@ function onLoaded () {
         query = query.substring(query.indexOf("?file=")+6);
         if (query) {
             player.attachSource(query);
-            setInterval(update, updateInterval);
+            //updateInterval = setInterval(update, updateIntervalLength);
+            update();
         }
     }
 
@@ -375,7 +415,7 @@ function onLoaded () {
 
     // force hide of all metrics  
     if (hideMetricsAtStart) {
-		currentIdToToggle = idsToToggle.length;
+		//currentIdToToggle = idsToToggle.length;
 		hideMetrics();
     }
 }
