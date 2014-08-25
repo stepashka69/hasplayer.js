@@ -145,7 +145,7 @@
     rslt.getBitratesForType = function (type) {
         var self = this,
             manifest = self.manifestModel.getValue(),
-            periodArray = manifest.Period_asArray,
+            periodArray,
             period,
             periodArrayIndex,
             adaptationSet,
@@ -155,6 +155,12 @@
             adaptationSetArrayIndex,
             representationArrayIndex,
             bitrateArray = [];
+
+        if ((manifest === null) || (manifest === undefined)) {
+            return null
+        }
+
+        periodArray = manifest.Period_asArray;
 
         for (periodArrayIndex = 0; periodArrayIndex < periodArray.length; periodArrayIndex = periodArrayIndex + 1) {
             period = periodArray[periodArrayIndex];

@@ -13,7 +13,7 @@ var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
     playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
     bufferLevel,
     qualitySwitches = [],
-    chartBandwidth,
+    chartBandwidth = null,
     dlSeries = [],
     playSeries = [],
     chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
@@ -34,6 +34,11 @@ function initChartAndSlider() {
         bitrateValues = null;
 
     bitrateValues = metricsExt.getBitratesForType("video");
+
+    if (bitrateValues === null) {
+        // Manifest has not been received yet
+        return;
+    }
 
     for (var idx in bitrateValues) {
         bdwM = bitrateValues[idx]/1000000;
@@ -109,6 +114,11 @@ function update() {
 
     if (!chartBandwidth) {
         initChartAndSlider();
+    }
+
+    // Check if chart is initialized, i.e. if manifest has been received
+    if (chartBandwidth === null) {
+        return;
     }
 
     // Get current buffer level
