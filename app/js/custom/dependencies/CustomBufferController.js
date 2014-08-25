@@ -518,7 +518,18 @@ Custom.dependencies.CustomBufferController = function () {
             }
 
             startClearing = function() {
-                clearBuffer.call(self).then(
+                var self = this,
+                    currentTime = self.videoModel.getCurrentTime(),
+                    removeStart = 0,
+                    removeEnd,
+                    req;
+
+                // we need to remove data that is more than one segment before the video currentTime
+                req = self.fragmentController.getExecutedRequestForTime(fragmentModel, currentTime);
+                removeEnd = (req && !isNaN(req.startTime)) ? req.startTime : Math.floor(currentTime);
+                fragmentDuration = (req && !isNaN(req.duration)) ? req.duration : 1;
+
+                removeBuffer.call(self, removeStart, removeEnd).then(
                     function(removedTimeValue) {
                         removedTime += removedTimeValue;
                         if (removedTime >= fragmentDuration) {
@@ -531,39 +542,6 @@ Custom.dependencies.CustomBufferController = function () {
             };
 
             startClearing.call(self);
-
-            return deferred.promise;
-        },
-
-        clearBuffer = function() {
-            var self = this,
-                deferred = Q.defer(),
-                currentTime = self.videoModel.getCurrentTime(),
-                removeStart = 0,
-                removeEnd,
-                req;
-
-            // we need to remove data that is more than one segment before the video currentTime
-            req = self.fragmentController.getExecutedRequestForTime(fragmentModel, currentTime);
-            removeEnd = (req && !isNaN(req.startTime)) ? req.startTime : Math.floor(currentTime);
-            fragmentDuration = (req && !isNaN(req.duration)) ? req.duration : 1;
-
-            self.sourceBufferExt.getBufferRange(buffer, currentTime).then(
-                function(range) {
-                    if ((range === null) && (seekTarget === currentTime) && (buffer.buffered.length > 0)) {
-                        removeEnd = buffer.buffered.end(buffer.buffered.length -1 );
-                    }
-                    removeStart = buffer.buffered.start(0);
-                    self.sourceBufferExt.remove(buffer, removeStart, removeEnd, periodInfo.duration, mediaSource).then(
-                        function() {
-                            // after the data has been removed from the buffer we should remove the requests from the list of
-                            // the executed requests for which playback time is inside the time interval that has been removed from the buffer
-                            self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, removeEnd);
-                            deferred.resolve(removeEnd - removeStart);
-                        }
-                    );
-                }
-            );
 
             return deferred.promise;
         },
