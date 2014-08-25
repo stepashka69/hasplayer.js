@@ -58,8 +58,8 @@ function initChartAndSlider() {
     chartOptions.yaxis.max = bitrateValues.length-1;
 
     for (i = 0; i < plotCount; i++) {
-        dlSeries.push([i, -1]);
-        playSeries.push([i, -1]);
+        dlSeries.push([i, null]);
+        playSeries.push([i, null]);
     }
     plotIndex = 0;
 
@@ -85,6 +85,7 @@ function initChartAndSlider() {
         orientation:'vertical',
         range:true,
         step: 1,
+        tweenLabels: false,
         values: [ 0, (bitrateValues.length - 1 )],
         //tickLabels: labels,
         stop: function( event, ui ) {
@@ -155,7 +156,7 @@ function update() {
         downloadRepInfos.height = metricsExt.getVideoHeightForRepresentation(repSwitch.to);
         downloadRepInfos.codecs = metricsExt.getCodecsForRepresentation(repSwitch.to);
 
-        console.log("[DemoPlayer] new switch: " + downloadRepInfos.quality + " - " + httpRequest.startTime);
+        // console.log("[DemoPlayer] new switch: " + downloadRepInfos.quality + " - " + httpRequest.startTime);
 
         // Save download quality change for later when video currentTime = mediaStartTime
         qualitySwitches.push({
@@ -181,7 +182,7 @@ function update() {
     // Check for playing quality change
     for (i = 0; i < qualitySwitches.length; i += 1) {
         currentSwitch = qualitySwitches[i];
-        console.log("[DemoPlayer] " + currentTime + " - " + currentSwitch.mediaStartTime);
+        // console.log("[DemoPlayer] " + currentTime + " - " + currentSwitch.mediaStartTime);
         if (currentTime >= currentSwitch.mediaStartTime) {
             // Store current playing representation infos
             playRepInfos.quality = currentSwitch.quality;
