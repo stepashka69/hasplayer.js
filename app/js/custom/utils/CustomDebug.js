@@ -17,7 +17,7 @@ Custom.utils.CustomDebug = function () {
     var rslt = Custom.utils.copyMethods(MediaPlayer.utils.Debug);
 
     rslt.log = function () {
-        if (rslt.getLogToBrowserConsole()){
+        if (rslt.getLogToBrowserConsole() && DEBUG){
             var _logger = ('undefined' !== typeof(log4javascript)) ? log4javascript.getLogger() : null;
             if(_logger){
                 if(!_logger.initialized){
