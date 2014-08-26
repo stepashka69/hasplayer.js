@@ -536,9 +536,9 @@ MediaPlayer.dependencies.Stream = function () {
                         load.resolve(null);                       
                     }
                 );
+            } else {
+                load.resolve(null);
             }
-
-            //load.resolve(null);
         },
 
         // ORANGE: see onLoad()
