@@ -42,10 +42,11 @@ Custom.models.CustomMetricsModel = function () {
     };
 
     rslt.addHttpRequest = function (streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration, startTime, quality) {
-        if (DEBUG) {
+        // Returned metric used by FragmentLoader
+        //if (DEBUG) {
             return this.parent.addHttpRequest(streamType, tcpid, type, url, actualurl, range, trequest, tresponse, tfinish, responsecode, interval, mediaduration, startTime, quality);
-        }
-        return null;
+        //}
+        //return null;
     };
 
     rslt.appendHttpTrace = function (httpRequest, s, d, b) {
