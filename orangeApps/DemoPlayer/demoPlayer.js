@@ -9,7 +9,7 @@ var updateTimeout;
 // updateIntervalLength : the intervals on how often the metrics are updated in milliseconds
 var updateIntervalLength = 100;
 // chartXaxisWindow : the display window on the x-axis in seconds
-var chartXaxisWindow = 20;
+var chartXaxisWindow = 30;
 // the number of plots
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
