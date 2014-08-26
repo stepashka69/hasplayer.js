@@ -45,8 +45,8 @@
         
         .ui-slider .ui-slider-handle {
             position: absolute;
-            z-index: 2;
-            cursor: default;
+            z-index: 3;
+            cursor: pointer;
             width: 11px;
             height: 4px;
             left: -4px;
@@ -69,16 +69,20 @@
             border-top-right-radius:0;
             background-position: 0 0;
         }
-        .ui-slider-vertical {width: 5px;height: 100px;}
+        .ui-slider-vertical {width: 5px;height: 112px; }
         .ui-slider-vertical .ui-slider-range {left: 0;width: 100%;}
-        .ui-slider-wrapper { position: relative; }
-        .ui-slider-labels { position: absolute; border: 1px solid transparent; }
+        .ui-slider-wrapper { position: relative; vertical-align: top; padding-top: 4px; margin-left: -10px;}
+        .ui-slider-labels { position: absolute;}
         .ui-slider-label-ticks { border: 1px solid transparent; position: absolute; white-space: nowrap; }
         .ui-slider-label-ticks span { font-size: 0.9em; min-width: 1.2em; }
-        .ui-slider-wrapper.vertical { width: 56px; }
-        .vertical .ui-slider-labels { top: 1px; bottom: 0; left: 0.7em; }
-        .vertical .ui-slider-label-ticks { height: 1.2em; width: 5px; border-bottom: 1px solid #999; }
+        .ui-slider-wrapper.vertical { display: inline-block;}
+        .vertical .ui-slider-labels { top: 1px; bottom: -3px; left: -1; z-index: 2;}
+        .vertical .ui-slider-label-ticks { height: 1.2em; width: 4px; border-bottom: 2px solid #fff; }
         .vertical .ui-slider-label-ticks span { position: relative; display: inline-block; margin-left: 8px; top: .6em; }
+
+        .ui-slider-labels .ui-slider-label-ticks:first-child, .ui-slider-labels .ui-slider-label-ticks:last-child {
+            display: none;
+        }
 
 
         /* ********************************************************* */
@@ -89,18 +93,19 @@
             -webkit-border-radius: 5px;
             border-radius: 5px;
             position: absolute;
+            padding: 12px;
         }
 
         .chartContainer {
             left: 10px;
-            top: 10px;
+            bottom: 130px;
             z-index: 2;
         }
 
         .overlayChart {
+            display: inline-block;
             width: 500px;
             height: 120px;
-            margin: 10px;
         }
 
         .sliderContainer {
@@ -111,15 +116,9 @@
             height: 100px;
         }
 
-        .infosContainer {
-            top: 160px;
-            left: 10px;
-            z-index: 2;
-        }
-
         .infos {
             float: left;
-            padding: 10px;
+            width: 110px;
         }
 
         .playingTitle {
@@ -445,15 +444,15 @@
 </head>
 <div id="videoContainer" class="videoContainer">
     <div id="chartToToggle" class="chartContainer container"> 
+        <div id="playingInfos" class="infos"></div>
         <div id="chartBandwidth" class="overlayChart" ng-model="bandwidthData"></div>
-    </div>
-    <div id="sliderToToggle" class="sliderContainer container">
         <div id="sliderBitrate"></div>
     </div>
-    <div id="infosToToggle" class="infosContainer container">
-        <!--div id="downloadingInfos" class="infos"></div-->
-        <div id="playingInfos" class="infos"></div>
-    </div>
+    
+    <!-- <div id="infosToToggle" class="infosContainer container">
+        div id="downloadingInfos" class="infos"></div
+        
+    </div> -->
 
     <video id="videoPlayer" loop></video>
     <div id="controlBar" class="controlBar">
