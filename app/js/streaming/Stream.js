@@ -509,6 +509,8 @@ MediaPlayer.dependencies.Stream = function () {
         },
 
         onLoad = function () {
+            var self = this;
+
             this.debug.log("Got loadmetadata event.");
 
             var initialSeekTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
@@ -518,12 +520,47 @@ MediaPlayer.dependencies.Stream = function () {
             // from current time (live use case)
             if (initialSeekTime != this.videoModel.getCurrentTime())
             {
-                this.system.notify("setCurrentTime");
-                // ORANGE: +1 to get around timestamps rounding issues on chrome
-                this.videoModel.setCurrentTime(initialSeekTime + 1);
+                //this.system.notify("setCurrentTime");
+                //this.videoModel.setCurrentTime(initialSeekTime);
+
+                // ORANGE: PATCH for chrome for which there is an issue for starting live streams,
+                // due to a difference (rounding?) between manifest segments times and real samples times
+                // returned by the buffer.
+                // => we start the <video> element at the real start time got from the video buffer
+                // once the first fragment has been appended
+                waitForStartTime.call(this, initialSeekTime, 2).then(
+                    function (time) {
+                        self.debug.log("Starting playback at offset: " + time);
+                        self.system.notify("setCurrentTime");
+                        self.videoModel.setCurrentTime(time);
+                        load.resolve(null);                       
+                    }
+                );
             }
 
-            load.resolve(null);
+            //load.resolve(null);
+        },
+
+        // ORANGE: see onLoad()
+        waitForStartTime = function (time, tolerance) {
+            var self = this,
+                defer = Q.defer(),
+                intervalId,
+                buffer = videoController.getBuffer(),
+                CHECK_INTERVAL = 50,
+                range,
+                checkStartTime = function() {
+                    range = self.sourceBufferExt.getBufferRange(buffer, time, tolerance);
+                    if (range === null) {
+                        return;
+                    }
+                    // updating is completed, now we can stop checking and resolve the promise
+                    clearInterval(intervalId);
+                    defer.resolve(range.start);
+                };
+
+            intervalId = setInterval(checkStartTime, CHECK_INTERVAL);
+            return defer.promise;
         },
 
         onPlay = function () {
