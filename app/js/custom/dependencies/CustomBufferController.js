@@ -786,7 +786,8 @@ Custom.dependencies.CustomBufferController = function () {
 
             var self = this,
                 now = new Date(),
-                currentVideoTime = self.videoModel.getCurrentTime();
+                currentVideoTime = self.videoModel.getCurrentTime(),
+                quality;
 
             self.debug.log("[BufferController]["+type+"] Buffer...");
 
@@ -800,7 +801,10 @@ Custom.dependencies.CustomBufferController = function () {
                     self.abrController.getPlaybackQuality(type, data).then(
                         function (result) {
 
-                            var quality = result.quality;
+                            // Re-activate ABR in case it would have been disabled at seek
+                            self.abrController.setAutoSwitchBitrate(true);
+
+                            quality = result.quality;
 
                             // Get corresponding representation
                             currentRepresentation = getRepresentationForQuality.call(self, quality);
@@ -831,9 +835,6 @@ Custom.dependencies.CustomBufferController = function () {
                                         }
                                 });
                             } else {
-                                // re-activate ABR in case it would have been disabled at seek
-                                self.abrController.setAutoSwitchBitrate(true);
-
                                 // Load next fragment
                                 // Notes: 1 - Next fragment is download in // with initialization segment
                                 //        2 - Buffer level is checked once next fragment data has been pushed into buffer (@see checkIfSufficientBuffer())
