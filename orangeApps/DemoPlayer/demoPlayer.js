@@ -1,4 +1,4 @@
-var DEBUG = true;
+var DEBUG = false;
 // customizable settings
 // hideMetricsAtStart :	if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
 var hideMetricsAtStart = false;
@@ -14,30 +14,31 @@ var chartXaxisWindow = 30;
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
 var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
-    playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
-    bufferLevel,
-    qualitySwitches = [],
-    chartBandwidth = null,
-    dlSeries = [],
-    playSeries = [],
-    plotIndex = 0,
-    chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true, tickFormatter:function(){return "";}},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
-    video,
-    player,
-    currentIdToToggle = 0,
-    isPlaying = false,
-    firstAccess = true,
-    seekBarIsPresent = false,
-    audioTracksSelectIsPresent = false;
+playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
+bufferLevel,
+qualitySwitches = [],
+chartBandwidth = null,
+dlSeries = [],
+playSeries = [],
+plotIndex = 0,
+chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true, tickFormatter:function(){return "";}},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
+video,
+player,
+currentIdToToggle = 0,
+isPlaying = false,
+isMetricsOn = !hideMetricsAtStart,
+firstAccess = true,
+seekBarIsPresent = false,
+audioTracksSelectIsPresent = false;
 
 
 function initChartAndSlider() {
     var metricsExt = player.getMetricsExt(),
-        bdw,
-        bdwM,
-        bdwK,
-        bitrateValues = null,
-        i;
+    bdw,
+    bdwM,
+    bdwK,
+    bitrateValues = null,
+    i;
 
     bitrateValues = metricsExt.getBitratesForType("video");
 
@@ -99,11 +100,11 @@ function initChartAndSlider() {
         for (i = 0 ; i < audioDatas.length; i++) {
             selectOptions += '<option value="' + audioDatas[i].id + '">' + audioDatas[i].lang + ' - ' + audioDatas[i].id+'</option>';
         }
-        $("#audioTracksSelect").html(selectOptions);
+        $(".audio-tracks").html(selectOptions);
         audioTracksSelectIsPresent = true;
 
         
-        $("#audioTracksSelect").change(function(track) {
+        $(".audio-tracks").change(function(track) {
             var currentTrackId = $("select option:selected")[0].value;
             for (i = 0 ; i < audioDatas.length; i++) {
                 if (audioDatas[i].id == currentTrackId) {
@@ -111,18 +112,33 @@ function initChartAndSlider() {
                 }
             }
         });
+    } else {
+        $(".audio-tracks").hide();
     }
+}
+
+function setTimeWithSeconds(sec) {
+    var sec_num = parseInt(sec, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
 }
 
 function update() {
     var httpRequests,
-        httpRequest,
-        repSwitch,
-        metricsVideo = player.getMetricsFor("video"),
-        metricsExt = player.getMetricsExt(),
-        currentTime = video.currentTime,
-        i,
-        currentSwitch;
+    httpRequest,
+    repSwitch,
+    metricsVideo = player.getMetricsFor("video"),
+    metricsExt = player.getMetricsExt(),
+    currentTime = video.currentTime,
+    i,
+    currentSwitch;
 
     if (!chartBandwidth) {
         initChartAndSlider();
@@ -239,6 +255,7 @@ function update() {
             seekBarIsPresent = true;
             videoDuration = video.duration;
             $("#seekBar").attr('max', video.duration);
+            $(".duration").text(setTimeWithSeconds(video.duration));
             $("#videoPlayer").on('timeupdate', updateSeekBar);
         }
 
@@ -263,25 +280,55 @@ function toggleFullScreen() {
       !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
     if (document.getElementById("videoContainer").requestFullscreen) {
       document.getElementById("videoContainer").requestFullscreen();
-    } else if (document.getElementById("videoContainer").msRequestFullscreen) {
+  } else if (document.getElementById("videoContainer").msRequestFullscreen) {
       document.getElementById("videoContainer").msRequestFullscreen();
-    } else if (document.getElementById("videoContainer").mozRequestFullScreen) {
+  } else if (document.getElementById("videoContainer").mozRequestFullScreen) {
       document.getElementById("videoContainer").mozRequestFullScreen();
-    } else if (document.getElementById("videoContainer").webkitRequestFullscreen) {
+  } else if (document.getElementById("videoContainer").webkitRequestFullscreen) {
       document.getElementById("videoContainer").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
-  } else {
+  }
+} else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
-    } else if (document.msExitFullscreen) {
+  } else if (document.msExitFullscreen) {
       document.msExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
+  } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
+  } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
-    }
   }
 }
+}
+
+var setVolumeOff = function(value) {
+    if(value) {
+        $(".button-volume").removeClass("fa-volume-up");
+        $(".button-volume").addClass("fa-volume-off");
+    } else {
+        $(".button-volume").removeClass("fa-volume-off");
+        $(".button-volume").addClass("fa-volume-up");
+    }
+};
+
+var setPlaying = function(value) {
+    if(value) {
+        $(".button-playpause").removeClass("fa-play");
+        $(".button-playpause").addClass("fa-pause");
+    } else {
+        $(".button-playpause").removeClass("fa-pause");
+        $(".button-playpause").addClass("fa-play");
+    }
+};
+
+var setShowInfo = function(value) {
+    if(value) {
+        $(".button-informations").removeClass("fa-info");
+        $(".button-informations").addClass("fa-info-circle");
+    } else {
+        $(".button-informations").removeClass("fa-info-circle");
+        $(".button-informations").addClass("fa-info");
+    }
+};
 
 function hideMetrics() {
 
@@ -289,34 +336,45 @@ function hideMetrics() {
     $("#chartToToggle").toggle();
     $("#sliderToToggle").toggle();
 
-    // hide or show chart 
-    /*if (currentIdToToggle < idsToToggle.length) {
-        // Toggle current id (toggle switch between display: none and display: block)
-        $(idsToToggle[currentIdToToggle]).toggle();
-        currentIdToToggle++;
-    } else {
-        // toggle all ids
-        for (var i = 0; i < idsToToggle.length ; i++) {
-            $(idsToToggle[i]).toggle();
-        }
-        currentIdToToggle = 0;
-    }*/
+    isMetricsOn = $('#chartToToggle').is(':visible');
+    setShowInfo(isMetricsOn);
 }
 
 function updateSeekBar() {
     $("#seekBar").attr('value',video.currentTime);
+    $(".current-time").text(setTimeWithSeconds(video.currentTime));
 }
 
 function initControlBar () {
-    $("#playPauseButton").click(function() {
+
+    var controlBar = $('#controlBar');
+    controlBar.hide();
+    var i = null;
+    $('html').mousemove(function() {
+        clearTimeout(i);
+        controlBar.show();
+        $('body').css({cursor: 'auto'});
+        i = setTimeout(function() {
+            controlBar.fadeOut(500, function() {
+                $('body').css({cursor: 'none'});
+            });
+        }, 1500);
+    });
+
+    setShowInfo(isMetricsOn);
+    $(".button-informations").click(function() {
+        hideMetrics();
+    });
+
+    $(".button-playpause").click(function() {
         isPlaying ? video.pause() : video.play();
     });
 
-    $("#volumeButton").click(function() {
+    $(".button-volume").click(function() {
         video.muted = !video.muted;
     });
 
-    $("#fullscreenButton").click(function(){
+    $(".button-fullscreen").click(function(){
         toggleFullScreen();
     });
 
@@ -324,62 +382,36 @@ function initControlBar () {
         toggleFullScreen();
     });
 
-    // init value is unknown
     if (video.muted) {
-        $("#volumeButton").addClass("muted");
+        setVolumeOff(true);
     }
 
     $("#videoPlayer").on("pause", function() {
         isPlaying = false;
-        $("#playPauseButton").removeClass("playing");
+        setPlaying(false);
         clearTimeout(updateTimeout);
     });
 
     $("#videoPlayer").on("play", function() {
         isPlaying = true;
-        $("#playPauseButton").addClass("playing");
+        setPlaying(true);
         if (video.muted) {
-            $("#volumeButton").addClass("muted");
+            setVolumeOff(true);
         }
         update();
     });
 
     $("#videoPlayer").on("volumechange", function() {
         if (video.muted) {
-            $("#volumeButton").addClass("muted");
+            setVolumeOff(true);
         } else {
-            $("#volumeButton").removeClass("muted");
+            setVolumeOff(false);
         }
     });
 
-    /*$("#seekBar").slider({
-        orientation: "horizontal",
-        range: "min",
-        value: 0,
-        step: 0.01,
-        max: video.duration,
-        change: doSeek,
-        slide: function(){
-            isSeeking = true;
-        }
-    });*/
     $("#seekBar").click(function(event) {
         video.currentTime = event.offsetX * video.duration / $("#seekBar").width();
         updateSeekBar();
-    });
-
-    video.subtitleChoice = false;
-
-    $(".subtitle").click(function() {
-        video.subtitleChoice = !video.subtitleChoice;
-    });
-
-    $(".subtitle").click(function() {
-        if(video.subtitleChoice) {
-            $(".subtitle-select").addClass("show");
-        } else {
-            $(".subtitle-select").removeClass("show");
-        }
     });
 }
 

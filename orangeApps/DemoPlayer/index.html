@@ -4,10 +4,17 @@
     <meta charset="utf-8"/>
     <title>Orange Dash JavaScript Player</title>
     <meta name="description" content="" />
+    <link rel="stylesheet" href="lib/font-awesome-4.1.0/css/font-awesome.css">
     <style type="text/css">
         html {
             height: 100%;
             width: 100%;
+        }
+
+        * { 
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box; 
         }
 
         body {
@@ -97,8 +104,8 @@
         }
 
         .chartContainer {
-            left: 10px;
-            bottom: 130px;
+            left: 22px;
+            bottom: 50px;
             z-index: 2;
         }
 
@@ -137,295 +144,70 @@
         /* ************  CONTROL BAR AND BUTTONS ****************** */
         /* ******************************************************** */
 
-        .controlBarWithAudioTrackSelectAndSeek.controlBar {
-            width: auto;
-            margin: 0 -310px;
-        }
-        
-        .controlBarWithAudioTrackSelectAndSeek.controlBar .audioTracksSelect,
-        .controlBarWithAudioTrackSelectAndSeek.controlBar .seekBar,
-        .controlBarWithAudioTrackSelectAndSeek.controlBar .playPauseButton {
-            display: inline-block;
-        }
-
-        .controlBarWithSeek.controlBar {
-            width: auto;
-            margin: 0 -232px;
-        }
-        
-        .controlBarWithSeek.controlBar .seekBar,
-        .controlBarWithSeek.controlBar .playPauseButton {
-            display: inline-block;
-        }
-
-
-        .controlBarWithAudioTrackSelect.controlBar {
-            width: auto;
-            margin: 0 -150px;
-        }
-
-        .controlBarWithAudioTrackSelect.controlBar .audioTracksSelect {
-            display: inline-block;
-        }
-
-        .controlBar .audioTracksSelect,
-        .controlBar .seekBar,
-        .controlBar .playPauseButton{
-            display: none;
-        }
-
         .controlBar {
-            display: block;
-            background-color: rgba(0,0,0,0.8);
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            margin: 0 -65px;
+            opacity: 0.9;
             text-align: center;
-            padding: 7px 12px 0 12px;
-            /*overflow: hidden;*/
-        }
-
-        .playPauseButton {
-            display: inline-block;
-            height: 0;
-            width: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 18px solid #FFF;
-            margin: 8px 11px;
-        }
-        .playPauseButton.playing {
-            width:24px;
-            height:24px;
-            margin: 8px;
-            position:relative;
-            border: none;
-        }
-
-        .playPauseButton.playing::before,
-        .playPauseButton.playing::after {
-            position: absolute;
-            background: #FFF;
-            content: "";
-            top: 0;
-            width: 6px;
-            height: 100%;
-        }
-        .playPauseButton.playing::before {
-            left: 3px;
-        }
-        .playPauseButton.playing::after {
-            right: 3px;
-        }
-
-        .audioTracksSelect {
-            height: 24px;
-            margin: 0 8px;
-            position: relative;
-            top: -15px;
-        }
-
-        .volumeButton{
-            display: inline-block;
-            width:15px;
-            height:15px;
-            margin: 8px 16px 8px 0;
-            border: solid 0.25em transparent;
-        }
-
-        .speaker{
-            width: 7px;
-            height: 7px;
-            background: #FFF;
-            position:relative;
-            top:3px;
-            
-        }
-        
-        .muted .speaker::before {
-            content: ' ';
-            font-size: 10px;
-            width: 0.4em;
-            height: 3em;
-            background: #FFF;
-            -moz-transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
-            -o-transform: rotate(45deg);
-            transform: rotate(45deg);
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            color: rgba(0,0,0,0.8);
-            border: 1px solid;
-            z-index: 2;
-        }
-
-        .speaker::before{
-            content: '';
-            position: absolute;
-            width: 0.313em;
-            height: 0.313em;
-            border-style: double;
-            border-color: #FFF;
-            border-width: 0.500em 0.500em 0 0;
-            -webkit-border-radius: 0 3.125em 0 0;
-            -moz-border-radius: 0 3.125em 0 0;
-            border-radius: 0 3.125em 0 0;
-            -webkit-transform: rotate(45deg);
-            -moz-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            -o-transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
-            left: 1em;
-            top: -0.1em;
-        }
-
-        .speaker::after{
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-color: transparent #FFF transparent transparent;
-            border-width: 0.750em 1em 0.750em 0.938em;
-            left: -0.9em;
-            margin-top: -0.5em;
-        }
-
-        #subtitle {
-            display: inline-block;
-            position: relative;
-        }
-
-        .subtitle-select {
-            position: absolute;
-            bottom: 100%;
-            left: -110px;
-            width: 250px;
-            margin: 0;
-            padding: 5px;
-            background-color: rgba(0,0,0,0.8);
-            display: none;
-        }
-
-        .subtitle-select h3 {
-            padding: 0;
-            margin: 0;
-            font-size: 16px;
-        }
-
-        .subtitle-select-list {
-            padding: 0px;
-            margin: 5px;
-            list-style-type: none;
-        }
-
-        .subtitle-select-list li {
-            color: #fff;
-            font-size: 12px;
-            text-align: center;
-            background: #111;
-            padding: 3px;
-            border-bottom: 1px solid #000;
-        }
-
-        .subtitle-select-list li:hover {
+            width: 100%;
+            height: 33px;
             background: #fff;
-            color: #111;
-            cursor: pointer;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 5px;
+            background-image: -webkit-linear-gradient(top, #354241 0%, #081110 100%);
+            background-image: linear-gradient(to bottom, #354241 0%, #081110 100%);
+            background-image: -ms-linear-gradient(top, #354241 0%, #081110 100%);
         }
 
-        .subtitle-select.show{
+        .seekbar-container {
+            overflow:hidden;
             display: block;
-        }
-
-        .subtitle { 
-            position: relative; 
-            font-size: 10px;
-            width: 3.3em; 
-            height: 3.3em; 
-            background: transparent; 
-            border-radius: 0.3em;
-        }
-
-        .subtitle:hover {
-            cursor: pointer;
-        }
-
-        .subtitle:before { 
-            content: ""; 
-            position: absolute; 
-            width: 1.2em; 
-            height: 1em; 
-            margin: auto; 
-            border-bottom: 0.3em solid #efefef;
-            top: 1em; 
-            left: 1.1em;
-            border-radius:0.1em;
-        }
-
-        .subtitle:after { 
-            display: block; 
-            content: ""; 
-            position: absolute; 
-            top: 1.6em; 
-            width: 1.9em; 
-            height: 0.3em; 
-            background: #efefef; 
-            left: 0.7em; 
-            border-radius:0.1em;
+            border: 1px solid #283332;
+            width: auto;
+            position: relative;
+            padding: 8px 110px 8px 4px;
+            height: 21px;
+            background-image: -ms-linear-gradient(top, #060C0C 70%, #152524 100%);
+            background-image: -moz-linear-gradient(top, #060C0C 70%, #152524 100%);
+            background-image: -o-linear-gradient(top, #060C0C 70%, #152524 100%);
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.7, #060C0C), color-stop(1, #152524));
+            background-image: -webkit-linear-gradient(top, #060C0C 70%, #152524 100%);
+            background-image: linear-gradient(to bottom, #060C0C 70%, #152524 100%);
         }
 
         .seekBar {
-            clear: left;
-            width: 300px;
-            margin: 0 12px;
-            position: relative;
-            top: -17px;
-            height: 8px;
+            display: block;
+            height: 6px;
+            width: 100%;
         }
 
         progress{
-            flex:1;
-            display: block;
-            border-radius: 10px;
-            background-color: #BBB;
+            display: inline-block;
+            background-image: -ms-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -moz-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -o-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #020303), color-stop(0.1, #3C4948), color-stop(0.9, #3C4948), color-stop(0.1, #3C4948), color-stop(1, #020303));
+            background-image: -webkit-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: linear-gradient(to right, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
             color:#FFF;
         }
 
         progress::-webkit-progress-bar{
             border-radius: 10px;
+            background-image: -ms-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -moz-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -o-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #020303), color-stop(0.1, #3C4948), color-stop(0.9, #3C4948), color-stop(0.1, #3C4948), color-stop(1, #020303));
+            background-image: -webkit-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
+            background-image: linear-gradient(to right, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
         }
 
         progress::-webkit-progress-value{
-            background: #FFF !important;
+            background: #818181 !important;
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
             border-right: 1px solid #000;
             /*border-radius:10px;*/
-        }
-
-
-        .fullscreenButton{
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin: 8px;
-            border: 3px #FFF dashed;
-            position: relative;
-        }
-
-        .fullscreenButton:before{
-            content: '';
-            position:absolute;
-            background: #FFF;
-            top: 5px;
-            left: 5px;
-            width: 8px;
-            height: 8px;
         }
 
         .videoContainer:-webkit-full-screen{
@@ -438,43 +220,98 @@
             left:0px;
             top:0px;
             width: 100%;
-            height: 100%;        
+            height: 100%;
+        }
+
+        .time {
+            position: absolute;
+            top: 0;
+            right: 4px;
+        }
+
+        .current-time, .duration {
+            font: 10px Arial;
+            display: inline-block;
+            padding: 0 0 0 5px;
+        }
+
+        .duration {
+            border-left: 1px solid;
+            color: #656762;
+        }
+
+        .select {
+            display: inline-block;
+            border: 1px solid #283332;
+            height: 21px;
+            vertical-align: top;
+            color: #fff;
+            font: 11px Arial;
+            padding: 0 4px;
+            background: #060C0C;
+            outline: none;
+        }
+
+        .select option {
+            display: block;
+            background: #313131;
+            color: #fff;
+            outline: none;
+            padding: 5px;
+        }
+        
+        .button {
+            border-width: 0 1px 0 0;
+            border-style: dotted;
+            border-color: #3E4743;
+            width: 40px;
+            text-align: center;
+            margin-right: 5px;
+            font-size: 21px;
+            vertical-align: top;
+            background: -webkit-linear-gradient(#43777E, #A2DAE1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .button:hover {
+            cursor: pointer;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .right {
+            float: right;
         }
     </style>
 </head>
 <div id="videoContainer" class="videoContainer">
+
     <div id="chartToToggle" class="chartContainer container"> 
         <div id="playingInfos" class="infos"></div>
         <div id="chartBandwidth" class="overlayChart" ng-model="bandwidthData"></div>
         <div id="sliderBitrate"></div>
     </div>
-    
-    <!-- <div id="infosToToggle" class="infosContainer container">
-        div id="downloadingInfos" class="infos"></div
-        
-    </div> -->
 
     <video id="videoPlayer" loop></video>
     <div id="controlBar" class="controlBar">
-        <div id="playPauseButton" class="playPauseButton"></div>
-        <div id="volumeButton" class="volumeButton">
-            <div class="speaker"></div>
-        </div>
-        <div id="subtitle">
-            <div class="subtitle-select">
-                <h3>Sous-titre</h3>
-                <ul class="subtitle-select-list">
-                    <li>FRA - Piste 1 [francais]</li>
-                    <li>ENG - Piste 2 [english]</li>
-                    <li>DEU - Piste 3 [deutsch]</li>
-                </ul>
+
+        <i class="fa fa-pause button button-playpause left"></i>
+        <i class="fa fa-volume-up button button-volume left"></i>
+
+        <select class="select audio-tracks right"></select>
+        <i class="fa fa-expand button button-fullscreen right"></i>
+        <i class="fa fa-info button button-informations right"></i>
+
+        <div class="seekbar-container">
+            <progress id="seekBar" min="0" class="seekBar"></progress>
+            <div class="time">
+                <div class="current-time"></div>
+                <div class="duration"></div>
             </div>
-            <div class="subtitle"></div>
         </div>
-        <!-- <div id="seekBar" class="seekBar"></div> -->
-        <progress id="seekBar" min="0" class="seekBar"></progress>
-        <div id="fullscreenButton" class="fullscreenButton"></div>
-        <select id="audioTracksSelect" class="audioTracksSelect"></select>
     </div>
 </div>
 </body>
