@@ -13,7 +13,7 @@ module.exports = {
 			]
 		},
 		files: [
-		{expand: true, flatten: true, src: ['<%= path %>/dash.all.js', '<%= path %>/dashif.js', '<%= path %>/player.js'], dest: '<%= path %>'}
+		{expand: true, flatten: true, src: ['<%= path %>/hasplayer.js', '<%= path %>/dashif.js', '<%= path %>/player.js'], dest: '<%= path %>'}
 		]
 	},
 	source: {
@@ -37,7 +37,7 @@ module.exports = {
 			patterns: [
 			{
 				match: /<!-- source -->/,
-				replacement: '<!-- build:js dash.all.js-->'
+				replacement: '<!-- build:js hasplayer.js-->'
 			},
 			{
 				match: /<!-- \/source -->/,
@@ -54,7 +54,7 @@ module.exports = {
 			patterns: [
 			{
 				match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
-				replacement: '<script src="dash.all.js"></script>'
+				replacement: '<script src="hasplayer.js"></script>'
 			}
 			]
 		},

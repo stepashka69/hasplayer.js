@@ -10,8 +10,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', [
     'clean:start',            //empty folder
     'copy',                   //copy HTML files
-    'replace:sourceByBuild',  //replace source by call for dash.all.js
-    'replace:sourceForBuild', //prepare source file for dash.all.js
+    'replace:sourceByBuild',  //replace source by call for hasplayer.js
+    'replace:sourceForBuild', //prepare source file for hasplayer.js
     'targethtml',             //Take the list element only for the build in index.html
     'revision',               //get git info
     'useminPrepare',          //get files in blocks tags
