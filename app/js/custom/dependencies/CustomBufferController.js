@@ -136,6 +136,7 @@ Custom.dependencies.CustomBufferController = function () {
 
             // Reset ABR controller
             this.debug.log("[BufferController]["+type+"] ### Reset quality: " + initialQuality);
+            this.abrController.setAutoSwitchBitrate(false);
             this.abrController.setPlaybackQuality(type, initialQuality);
 
             // Restart
@@ -785,7 +786,8 @@ Custom.dependencies.CustomBufferController = function () {
 
             var self = this,
                 now = new Date(),
-                currentVideoTime = self.videoModel.getCurrentTime();
+                currentVideoTime = self.videoModel.getCurrentTime(),
+                quality;
 
             self.debug.log("[BufferController]["+type+"] Buffer...");
 
@@ -798,7 +800,11 @@ Custom.dependencies.CustomBufferController = function () {
                     // Get current quality
                     self.abrController.getPlaybackQuality(type, data).then(
                         function (result) {
-                            var quality = result.quality;
+
+                            // Re-activate ABR in case it would have been disabled at seek
+                            self.abrController.setAutoSwitchBitrate(true);
+
+                            quality = result.quality;
 
                             // Get corresponding representation
                             currentRepresentation = getRepresentationForQuality.call(self, quality);
