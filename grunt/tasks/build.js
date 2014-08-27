@@ -10,9 +10,9 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', [
     'clean:start',            //empty folder
     'copy',                   //copy HTML files
-    'targethtml',             //Take the list element only for the build in index.html
     'replace:sourceByBuild',  //replace source by call for dash.all.js
     'replace:sourceForBuild', //prepare source file for dash.all.js
+    'targethtml',             //Take the list element only for the build in index.html
     'revision',               //get git info
     'useminPrepare',          //get files in blocks tags
     'concat:generated',       //merge all the files in one for each blocks
