@@ -212,6 +212,10 @@
             /*border-radius:10px;*/
         }
 
+        progress:hover {
+            cursor: pointer;
+        }
+
         .videoContainer:-webkit-full-screen{
             width:100%;
             height:100%;
@@ -231,10 +235,15 @@
             right: 4px;
         }
 
+        .time div:hover {
+            cursor: default;
+        }
+
         .current-time, .duration {
             font: 10px Arial;
             display: inline-block;
             padding: 0 0 0 5px;
+            margin-right: 5px;
         }
 
         .duration {
@@ -310,8 +319,7 @@
         <div class="seekbar-container">
             <progress id="seekBar" min="0" class="seekBar"></progress>
             <div class="time">
-                <div class="current-time"></div>
-                <div class="duration"></div>
+                <div class="current-time"></div><div class="duration"></div>
             </div>
         </div>
     </div>
@@ -452,9 +460,18 @@
 <script src="../../app/js/custom/vo/metrics/RepresentationBoundaries.js"></script>
 <!-- /source -->
 
+
+
+
 <!-- build:js player.js-->
+<script src="../../metricsAgent/MetricsAgent.js"></script>
+<script src="../../metricsAgent/MetricsDatabase.js"></script>
+<script src="../../metricsAgent/MetricsSender.js"></script>
+<script src="../../metricsAgent/collectors/HasPlayerCollector.js"></script>
+<script src="../../metricsAgent/formatters/CSQoEFormatter.js"></script>
 <script src="demoPlayer.js"></script>
 <!-- endbuild -->
+
 
 
 

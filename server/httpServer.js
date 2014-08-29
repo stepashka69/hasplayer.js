@@ -121,3 +121,17 @@ app.post('/chart-db', function(req, res){
 
 	res.json({"id": id});
 });
+
+
+
+//Testing MetricsAgent
+app.get('/config', function(req, res){
+	console.log(req.query);
+	res.json({"active": true});
+});
+
+app.post('/metrics', function(req, res){
+	console.log(req.body);
+
+	res.send(204);
+});
