@@ -180,6 +180,15 @@
 
     </div>
 
+    <div class="modal fade" id="streamTypeModal">
+        <div class="modal-dialog">
+            <div class="list-group modal-list">
+                <a ng-repeat="item in streamTypes" href="#" class="list-group-item" ng-click="setStreamType(item)" data-dismiss="modal" ng-show="true">{{item}}</a>
+            </div>
+        </div>
+
+    </div>
+
     <div class="container">
 
         <div class="row title-header">
@@ -199,7 +208,22 @@
         <div class="row nav-header">
             <div class="input-group col-md-12">
                 <div id="desktop-streams" class="input-group-btn">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        {{streamType}} <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in streamTypes" ng-click="setStreamType(item)" ng-show="true">
+                            <a>{{item}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="mobile-streams" class="input-group-btn">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" href="#streamTypeModal">
+                        {{streamType}} <span class="caret"></span>
+                    </button>
+                </div>
 
+                <div id="desktop-streams" class="input-group-btn">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                         Stream <span class="caret"></span>
                     </button>
@@ -208,7 +232,6 @@
                             <a>{{item.name}}</a>
                         </li>
                     </ul>
-
                 </div>
                 <div id="mobile-streams" class="input-group-btn">
                     <button type="button" class="btn btn-primary" data-toggle="modal" href="#streamModal">

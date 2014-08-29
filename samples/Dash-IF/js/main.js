@@ -166,6 +166,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.optionsBandwidthGrid = null;
 
+    $scope.streamTypes = ["HLS", "MSS", "DASH"];
+    $scope.streamType = "MSS";
+
     $('#sliderBitrate').labeledslider({
         max: 0,
         step: 1,
@@ -663,12 +666,13 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
         else {
             return (str.indexOf(filterValue) != -1);
-        }
+        }            
     };
 
     if(window.jsonData === undefined) {
         Sources.query(function (data) {
-            $scope.availableStreams = data.items;
+            $scope.streams = data.items;
+            $scope.selectStreams();
         });
 
         Notes.query(function (data) {
@@ -687,12 +691,26 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             $scope.showcaseLibraries = data.items;
         });
     } else {
-        $scope.availableStreams = window.jsonData.sources.items;
+        $scope.streams = window.jsonData.sources.items;
         $scope.releaseNotes = window.jsonData.notes.notes;
         $scope.contributors = window.jsonData.contributors.items;
         $scope.playerLibraries = window.jsonData.player_libraries.items;
         $scope.showcaseLibraries = window.jsonData.showcase_libraries.items;
+        $scope.selectStreams();
     }
+
+    $scope.selectStreams = function () {
+        $scope.availableStreams = $scope.streams.filter(function(item) {
+            return (item.type === $scope.streamType);
+        });
+    };
+
+    $scope.setStreamType = function (item) {
+        $scope.streamType = item;
+        $scope.availableStreams = $scope.streams.filter(function(item) {
+            return (item.type === $scope.streamType);
+        });
+    };
 
     $scope.setStream = function (item) {
         $scope.selectedItem = item;

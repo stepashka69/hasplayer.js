@@ -1,36 +1,31 @@
 {
     "items": [
         {
-            "name": "Apple HLS 1",
+            "type": "HLS",
+            "name": "VIM 1",
             "url": "http://vimtv2.orange-labs.fr/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
-            "name": "Apple HLS VIM2",
-            "url": "http://10.194.60.139/VIDEO/HLS/VIM1/1.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "name": "Apple HLS Envivo",
+            "type": "HLS",
+            "name": "Envivo",
             "url": "http://10.194.60.139/VIDEO/HLS/Envivio/index.m3u8",
             "browsers": "cdsbi"
         },
         {
-            "name": "DASH + PlayReady DRM",
-            "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
-            "browsers": "cdsbi"
-        },
-        {
+            "type": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
+            "type": "MSS",
             "name": "Smooth + PlayReady DRM 2",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
+            "type": "MSS",
             "name": "Smooth + PlayReady DRM + CustomData",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
             "backUrl" : "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
@@ -38,121 +33,151 @@
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - SynchroAV 2 stream audio AAC+AACH",
+            "type": "MSS",
+            "name": "VOD - SynchroAV 2 stream audio AAC+AACH",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3511/ATEME3511_clr_MSS_SynchroAV/Synchro_AV.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Audio stream AAC HE implicit mode",
+            "type": "MSS",
+            "name": "VOD - Audio stream AAC HE implicit mode",
             "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_Implicit.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Audio stream AAC HE explicit backward mode",
+            "type": "MSS",
+            "name": "VOD - Audio stream AAC HE explicit backward mode",
             "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_ExplicitBwd.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Big Buck Bunny",
+            "type": "MSS",
+            "name": "VOD - Big Buck Bunny",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - SuperSpeedway",
+            "type": "MSS",
+            "name": "VOD - SuperSpeedway",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Elephants Dream (multi-audio/text)",
+            "type": "MSS",
+            "name": "VOD - Elephants Dream (multi-audio/text)",
             "url": "http://streams.smooth.vertigo.com/elephantsdream/Elephants_Dream_1024-h264-st-aac.ism/manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Big Buck Bunny (gzipped - AAC-HE)",
+            "type": "MSS",
+            "name": "VOD - Big Buck Bunny (gzipped - AAC-HE)",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/gzip/bbb.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Volver",
+            "type": "MSS",
+            "name": "VOD - Volver",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Arte",
+            "type": "MSS",
+            "name": "VOD - Arte",
             "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - VIF Steph Richard",
+            "type": "MSS",
+            "name": "VOD - VIF Steph Richard",
             "url": "http://161.105.176.12/VIF/srichard2.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Anevia - Red Bull",
+            "type": "MSS",
+            "name": "VOD - Anevia - Red Bull",
             "url": "http://demo.anevia.com:3128/vod/disk1/content1/ss-ss/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - Anevia - Sintel",
+            "type": "MSS",
+            "name": "VOD - Anevia - Sintel",
             "url": "http://demo.anevia.com:3128/vod/disk1/content2/ss-ss/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/LIVE - TF1 Halo/IIS 7.13",
+            "type": "MSS",
+            "name": "LIVE - TF1 Halo/IIS 7.13",
             "url": "http://161.105.176.13/Halo/ch1.isml/manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/LIVE - France 2",
+            "type": "MSS",
+            "name": "LIVE - France 2",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/LIVE - France 24",
+            "type": "MSS",
+            "name": "LIVE - France 24",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/LIVE - Arte multi-audio",
+            "type": "MSS",
+            "name": "LIVE - Arte multi-audio",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/VOD - SynchroAV",
+            "type": "MSS",
+            "name": "VOD - SynchroAV",
             "url": "http://2is7server2.rd.francetelecom.com/VOD/Synchro/C4-52_S1.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "MSS/LIVE - SynchroAV",
+            "type": "MSS",
+            "name": "LIVE - SynchroAV",
             "url": "http://2is7server2.rd.francetelecom.com/C4/C4-52_S1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
+            "type": "DASH",
             "name": "DASH/VOD - PrinceOfPersia (2 audios)",
             "url": "http://10.194.60.110/VIDEO/DASH/VOD/PrinceOfPersia/manifest.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "DASH",
+            "name": "DASH + PlayReady DRM",
+            "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "DASH",
             "name": "DASH/LIVE - TF1",
             "url": "http://apache1.rd.francetelecom.com/DASH/ch1/manifest.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "DASH",
             "name": "Caption Test",
             "url": "http://dash.edgesuite.net/akamai/test/caption_test/ElephantsDream/elephants_dream_480p_heaac5_1.mpd",
             "browsers": ""
         },
         {
+            "type": "DASH",
             "name": "4K",
             "url": "http://dash.edgesuite.net/akamai/test/tears1/tearsofsteel_4096x1714_14Mbps.mpd",
             "browsers": "cd"
         },
         {
+            "type": "DASH",
             "name": "Fraunhofer - HEACC 2.0 - Dream",
             "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_2_0_with_video/ElephantsDream/elephants_dream_480p_heaac2_0.mpd",
             "browsers": "cdb"
         },
         {
+            "type": "DASH",
             "name": "Fraunhofer - HEACC 2.0 - Sintel",
             "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_2_0_with_video/Sintel/sintel_480p_heaac2_0.mpd",
             "browsers": "cdb"
