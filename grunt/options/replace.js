@@ -21,7 +21,7 @@ module.exports = {
 			patterns: [
 			{
 				match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
-				replacement: '<%= grunt.file.read("orangeApps/playerSrc.html") %>'
+				replacement: '<%= grunt.file.read("samples/playerSrc.html") %>'
 			}
 			]
 		},
