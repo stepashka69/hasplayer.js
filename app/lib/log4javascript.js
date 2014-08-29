@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
+/**
+ * log4javascript
+ *
+ * log4javascript is a logging framework for JavaScript based on log4j
+ * for Java. This file contains all core log4javascript code and is the only
+ * file required to use log4javascript, unless you require support for
+ * document.domain, in which case you will also need console.html, which must be
+ * stored in the same directory as the main log4javascript.js file.
+ *
+ * Author: Tim Down <tim@log4javascript.org>
+ * Version: 1.4.6
+ * Edition: log4javascript
+ * Build date: 19 March 2013
+ * Website: http://log4javascript.org
+ */
 
 if(!Array.prototype.push){Array.prototype.push=function(){for(var i=0,len=arguments.length;i<len;i++){this[this.length]=arguments[i];}
 return this.length;};}
