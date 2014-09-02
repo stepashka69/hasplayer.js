@@ -718,8 +718,17 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.doLoad = function () {
         firstAccess = true;
+        
+        function DRMParams() {
+            this.backUrl = null;
+            this.customData = null;
+        }
+
         // ORANGE: add licenser backUrl parameter and customData
-        player.attachSource($scope.selectedItem.url, $scope.selectedItem.backUrl, $scope.selectedItem.customData);
+        var params = new DRMParams();
+        params.backUrl = $scope.selectedItem.backUrl;
+        params.customData = $scope.selectedItem.customData;
+        player.attachSource($scope.selectedItem.url, params);
     };
 
     $scope.loadInPlayer = function(url) {

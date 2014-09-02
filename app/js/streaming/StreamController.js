@@ -409,22 +409,22 @@
         },
         
         // ORANGE: add licenser backUrl parameter
-        load: function (url, backUrl, customData) {
+        load: function (url, drmParams) {
             var self = this;
+
             // ORANGE: add licenser backUrl parameter and customData
-            self.backUrl = backUrl;
-            self.customData = customData;
+            self.drmParams = drmParams;
 
             self.debug.log("[StreamController]", "load url: " + url);
 
             self.manifestLoader.load(url).then(
                 function(manifest) {
                     // ORANGE: add licenser backUrl parameter
-                    if (self.backUrl) {
-                        manifest.backUrl = self.backUrl;
+                    if (self.drmParams.backUrl) {
+                        manifest.backUrl = self.drmParams.backUrl;
                     }
-                    if (self.customData) {
-                        manifest.customData = self.customData;
+                    if (self.drmParams.customData) {
+                        manifest.customData = self.drmParams.customData;
                     }
                     self.manifestModel.setValue(manifest);
                     self.debug.log("Manifest has loaded.");
