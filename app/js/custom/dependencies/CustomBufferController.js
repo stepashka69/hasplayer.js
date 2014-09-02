@@ -21,6 +21,7 @@ Custom.dependencies.CustomBufferController = function () {
         waitingForBuffer = false,
         initialPlayback = true,
         initializationData = [],
+        currentSegmentTime = 0,
         seeking = false,
         //mseSetTime = false,
         seekTarget = -1,
@@ -267,13 +268,6 @@ Custom.dependencies.CustomBufferController = function () {
                                                             }
                                                         }
                                                     );
-                                                }
-                                                // appel du fillBuffer
-                                                //scheduledwork.call(self);
-
-                                                // ORANGE: update representations (MSS live use case, @see MssFragmentcontroller)
-                                                if (availableRepresentations.length === 0) {
-                                                    self.updateData(self.getData(), self.getPeriodInfo());
                                                 }
 
                                                 if (started === true) {
@@ -638,23 +632,19 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         loadNextFragment = function () {
-            var segmentTime,
-                self = this;
+            var self = this;
 
-            self.debug.log("[BufferController]["+type+"] loadNextFragment");
-            Q.when(seeking ? seekTarget : self.indexHandler.getCurrentTime(currentRepresentation)).then(
-                function (time) {
-                    var range = self.sourceBufferExt.getBufferRange(buffer, time);
+            // Get next segment time and check if already in buffer
+            var time = seeking ? seekTarget : currentSegmentTime;
+            var range = self.sourceBufferExt.getBufferRange(buffer, time);
 
-                    if (seeking) {
-                        currentRepresentation.segments = null;
-                        seeking = false;
-                    }
+            var segmentTime = range ? range.end : time;
 
-                    segmentTime = range ? range.end : time;
-                    self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
-                }
-            );
+            // Reset seeking state
+            seeking = false;
+
+            self.debug.log("[BufferController]["+type+"] loadNextFragment for time: " + segmentTime);
+            self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
         },
 
         onFragmentRequest = function (request) {
@@ -670,6 +660,10 @@ Custom.dependencies.CustomBufferController = function () {
                         doStop.call(self);
                     }
                 } else {
+                    // Store current segment time for next segment request
+                    currentSegmentTime = request.startTime;
+
+                    // Download the segment
                     self.fragmentController.prepareFragmentForLoading(self, request, onBytesLoadingStart, onBytesLoaded, onBytesError, signalStreamComplete).then(
                         function() {
                             sendRequest.call(self);
@@ -809,14 +803,14 @@ Custom.dependencies.CustomBufferController = function () {
                             // Get corresponding representation
                             currentRepresentation = getRepresentationForQuality.call(self, quality);
 
-                            // If data changed, reset segment list
-                            currentRepresentation.segments = null;
-
                             // If quality changed, then load initialization segment
                             if (quality !== currentQuality) {
                                 self.debug.log("[BufferController]["+type+"] Quality changed: " + quality);
                                 currentQuality = quality;
                                 loadInit = true;
+
+                                // If quality changed, reset segment list
+                                currentRepresentation.segments = null;
 
                                 clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.REPRESENTATION_SWITCH_STOP_REASON);
                                 self.metricsModel.addRepresentationSwitch(type, now, currentVideoTime, currentRepresentation.id);
