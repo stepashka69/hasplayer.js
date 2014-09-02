@@ -612,11 +612,19 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setQualityFor(type, newQuality);
     };
 
+
+
     ////////////////////////////////////////
     //
     // Page Setup
     //
     ////////////////////////////////////////
+
+    $scope.selectStreams = function () {
+        $scope.availableStreams = $scope.streams.filter(function(item) {
+            return (item.type === $scope.streamType);
+        });
+    };
 
     function getUrlVars() {
         var vars = {};
@@ -699,11 +707,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.selectStreams();
     }
 
-    $scope.selectStreams = function () {
-        $scope.availableStreams = $scope.streams.filter(function(item) {
-            return (item.type === $scope.streamType);
-        });
-    };
 
     $scope.setStreamType = function (item) {
         $scope.streamType = item;
