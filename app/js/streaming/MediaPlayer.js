@@ -47,9 +47,8 @@ MediaPlayer = function (aContext) {
         system,
         element,
         source,
-        // ORANGE: licenser backUrl and customData
-        sourceBackUrl,
-        customData,
+        // ORANGE: drm datas
+        drmParams,
         streamController,
         videoModel,
         initialized = false,
@@ -82,7 +81,7 @@ MediaPlayer = function (aContext) {
             streamController.setVideoModel(videoModel);
             streamController.setAutoPlay(autoPlay);
             // ORANGE: add licenser backUrl and customData parameter
-            streamController.load(source, sourceBackUrl, customData);
+            streamController.load(source, drmParams);
             system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
             system.mapOutlet("scheduleWhilePaused", "stream");
             system.mapOutlet("scheduleWhilePaused", "bufferController");
@@ -337,15 +336,15 @@ MediaPlayer = function (aContext) {
         },
         
         // ORANGE: modify attachSource function to add licenser backUrl and customData parameter
-        attachSource: function (url, backUrl, cdmData) {
+        attachSource: function (url, DRMParams) {
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
 
             source = this.uriQueryFragModel.parseURI(url);
-            // ORANGE: modify attachSource function to add licenser backUrl parameter
-            sourceBackUrl = backUrl;
-            customData = cdmData;
+            // ORANGE: set DRM data informations
+            drmParams = DRMParams;
+
             this.setQualityFor('video', 0);
             this.setQualityFor('audio', 0);
 

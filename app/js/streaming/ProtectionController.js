@@ -65,8 +65,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
             }
 
             if (!!initData) {
-                // ORANGE: licenser custom data
-                session = self.protectionModel.addKeySession(kid, codec, initData, self.customData);
+                session = self.protectionModel.addKeySession(kid, codec, initData);
                 self.debug.log("DRM: Added Key Session [" + session.sessionId + "] for KID: " + kid + " type: " + codec + " initData length: " + initData.length);
             }
             else {
@@ -74,14 +73,10 @@ MediaPlayer.dependencies.ProtectionController = function () {
             }
         },
 
-        // ORANGE: licenser custom data
-        setCustomData = function (cdmData) {
-            this.customData = cdmData;
-        },
-
         updateFromMessage = function (kid, session, msg, laURL) {
             var self = this,
                 result;
+
             result = self.protectionModel.updateFromMessage(kid, msg, laURL);
             result.then(
                 function (data) {
@@ -103,8 +98,6 @@ MediaPlayer.dependencies.ProtectionController = function () {
         videoModel : undefined,
         protectionModel : undefined,
         protectionExt : undefined,
-        // ORANGE: licenser custom data
-        customData : undefined,
 
         setup : function () {
             keySystems = this.protectionExt.getKeySystems();
@@ -120,8 +113,6 @@ MediaPlayer.dependencies.ProtectionController = function () {
         ensureKeySession : ensureKeySession,
         updateFromMessage : updateFromMessage,
         teardownKeySystem : teardownKeySystem,
-        // ORANGE: licenser custom data
-        setCustomData : setCustomData
     };
 };
 
