@@ -106,13 +106,11 @@ Mss.dependencies.MssFragmentController = function () {
                     segment = segments[0];
                 }
             }
-
-            return segmentsUpdated;
         },
 
         convertFragment = function (data, request, adaptation) {
 
-            var segmentsUpdated = false, i = 0;
+            var i = 0;
 
             // Get track id corresponding to adaptation set
             var manifest = rslt.manifestModel.getValue();
@@ -200,7 +198,7 @@ Mss.dependencies.MssFragmentController = function () {
             var tfrf = traf.getBoxesByType("tfrf");
             if (tfrf.length !== 0) {
                 for (i = 0; i < tfrf.length; i++) {
-                    segmentsUpdated = processTfrf(tfrf[i], adaptation);
+                    processTfrf(tfrf[i], adaptation);
                     traf.removeBoxByType("tfrf");
                 }
             }
@@ -244,10 +242,7 @@ Mss.dependencies.MssFragmentController = function () {
 
             //console.saveBinArray(new_data, adaptation.type+"_evolution.mp4");
 
-            return {
-                bytes: new_data,
-                segmentsUpdated: segmentsUpdated
-            };
+            return new_data;
         };
     
     var rslt = Custom.utils.copyMethods(MediaPlayer.dependencies.FragmentController);
@@ -268,12 +263,7 @@ Mss.dependencies.MssFragmentController = function () {
             // Get adaptation containing provided representations
             // (Note: here representations is of type Dash.vo.Representation)
             var adaptation = manifest.Period_asArray[representations[0].adaptation.period.index].AdaptationSet_asArray[representations[0].adaptation.index];
-            var res = convertFragment(result, request, adaptation);
-            result = res.bytes;
-            //needUpdate = res.segmentsUpdated;
-            if (res.segmentsUpdated) {
-                representations = [];
-            }
+            result = convertFragment(result, request, adaptation);
         }
 
         // PATCH timescale value in mvhd and mdhd boxes in case of live streams within chrome
