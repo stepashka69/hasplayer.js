@@ -28,7 +28,6 @@ currentIdToToggle = 0,
 isPlaying = false,
 isMetricsOn = !hideMetricsAtStart,
 firstAccess = true,
-seekBarIsPresent = false,
 audioTracksSelectIsPresent = false;
 
 
@@ -247,26 +246,20 @@ function update() {
     chartBandwidth.setupGrid();
     chartBandwidth.draw();
 
-    // control bar initialisation
     if(firstAccess && (video.duration > 0)) {
+
         firstAccess = false;
-        // in dynamic mode, don't diplay seekbar and pause button
+        $(".controlBar").show();
+
         if(!player.metricsExt.manifestExt.getIsDynamic(player.metricsExt.manifestModel.getValue())) {
-            seekBarIsPresent = true;
-            videoDuration = video.duration;
+            $(".seekbar-container").show();
             $("#seekBar").attr('max', video.duration);
             $(".duration").text(setTimeWithSeconds(video.duration));
             $("#videoPlayer").on('timeupdate', updateSeekBar);
+        } else {
+            $(".live").show();
         }
-
-        if(audioTracksSelectIsPresent && seekBarIsPresent) {
-            $("#controlBar").addClass("controlBarWithAudioTrackSelectAndSeek");
-        } else if(audioTracksSelectIsPresent) {
-            $("#controlBar").addClass("controlBarWithAudioTrackSelect");
-        } else if (seekBarIsPresent) {
-            $("#controlBar").addClass("controlBarWithSeek");
-        }
-    }
+    } 
 
     $("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(downloadRepInfos.bandwidth/1000) + " kbps<br>"+ downloadRepInfos.width +"x"+downloadRepInfos.height + "<br>"+ downloadRepInfos.codecs + "<br>"+ bufferLevel + "s");
     $("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(playRepInfos.bandwidth/1000) + " kbps<br>"+ playRepInfos.width +"x"+playRepInfos.height + "<br>"+ playRepInfos.codecs + "<br>"+ bufferLevel + "s");

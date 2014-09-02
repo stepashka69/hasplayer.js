@@ -147,6 +147,7 @@
         /* ******************************************************** */
 
         .controlBar {
+            display: none;
             opacity: 0.9;
             text-align: center;
             width: 100%;
@@ -163,7 +164,7 @@
 
         .seekbar-container {
             overflow:hidden;
-            display: block;
+            display: none;
             border: 1px solid #283332;
             width: auto;
             position: relative;
@@ -296,6 +297,14 @@
         .right {
             float: right;
         }
+
+        .live {
+            display: none;
+            float: left;
+            font: 13px Arial;
+            color: #eee;
+            padding: 3px;
+        }
     </style>
 </head>
 <div id="videoContainer" class="videoContainer">
@@ -322,6 +331,7 @@
                 <div class="current-time"></div><div class="duration"></div>
             </div>
         </div>
+        <div class="live">LIVE</div>
     </div>
 </div>
 </body>
