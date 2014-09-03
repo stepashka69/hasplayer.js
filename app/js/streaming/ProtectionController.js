@@ -76,16 +76,10 @@ MediaPlayer.dependencies.ProtectionController = function () {
         updateFromMessage = function (kid, session, msg, laURL) {
             var self = this,
                 result;
-
             result = self.protectionModel.updateFromMessage(kid, msg, laURL);
             result.then(
                 function (data) {
-                    try{
                         session.update(data);
-                    }catch(err)
-                    {
-                        console.log(err);
-                    }
             });
             return result;
         };
@@ -112,7 +106,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         selectKeySystem : selectKeySystem,
         ensureKeySession : ensureKeySession,
         updateFromMessage : updateFromMessage,
-        teardownKeySystem : teardownKeySystem,
+        teardownKeySystem : teardownKeySystem
     };
 };
 

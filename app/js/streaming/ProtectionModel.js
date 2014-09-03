@@ -37,16 +37,11 @@ MediaPlayer.models.ProtectionModel = function () {
         },
 
         addKeySession: function (kid, mediaCodec, initData) {
-            var session = null;
+            var session = null,
+                manifest = this.manifestModel.getValue();
 
-            var manifest = this.manifestModel.getValue();
-            var cdmData;
-            if(manifest.customData) {
-                cdmData = manifest.customData;
-            }
-
-            // ORANGE: licenser custom data
-            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, cdmData);
+            // ORANGE: add licenser custom data
+            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, manifest.customData);
 
             this.protectionExt.listenToKeyAdded(session, keyAddedListener);
             this.protectionExt.listenToKeyError(session, keyErrorListener);
@@ -102,14 +97,10 @@ MediaPlayer.models.ProtectionModel = function () {
             return keySystem.keySystem.getInitData(keySystem.contentProtection);
         },
 
-        // ORANGE: licenser custom data
         updateFromMessage: function (kid, msg, laURL) {
             var manifest = this.manifestModel.getValue();
-            var cdmData;
-            if(manifest.customData) {
-                cdmData = manifest.customData;
-            }
-            return keySystems[kid].keySystem.getUpdate(msg, laURL, cdmData);
+            // ORANGE: add licenser custom data
+            return keySystems[kid].keySystem.getUpdate(msg, laURL, manifest.customData);
         },
 /*
         addKey: function (type, key, data, id) {
