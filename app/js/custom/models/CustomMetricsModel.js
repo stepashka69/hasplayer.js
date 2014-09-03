@@ -11,7 +11,7 @@
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-Custom.models.CustomMetricsModel = function () {
+ Custom.models.CustomMetricsModel = function () {
     "use strict";
     var rslt = Custom.utils.copyMethods(MediaPlayer.models.MetricsModel);
 
@@ -85,6 +85,19 @@ Custom.models.CustomMetricsModel = function () {
             return this.parent.appendPlayListTrace(playList, representationid, subreplevel, start, mstart, duration, playbackspeed, stopreason);
         }
         return null;
+    };
+
+    rslt.clearAllCurrentMetrics = function () {
+        var self = this,
+            streamMetrics = this.parent.streamMetrics;
+
+        for (var prop in streamMetrics) { 
+            if (streamMetrics.hasOwnProperty(prop)) { 
+                delete streamMetrics[prop]; 
+            } 
+        }
+        
+        this.metricsChanged.call(self);
     };
 
     return rslt;
