@@ -1,10 +1,9 @@
 [
-	,
 	{
 		"id": 120,
 		"name": "Version 1.2.0",
 		"file": "player/hasplayer-120.js"
-	}{
+	},{
 		"id": 100,
 		"name": "Version 1.0.0",
 		"file": "player/player-100.js"
