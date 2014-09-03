@@ -415,11 +415,13 @@
             self.manifestLoader.load(url).then(
                 function(manifest) {
                     // ORANGE: get licenser backUrl and customData parameters
-                    if (params.backUrl) {
-                        manifest.backUrl = params.backUrl;
-                    }
-                    if (params.customData) {
-                        manifest.customData = params.customData;
+                    if (params !== undefined) {
+                        if (params.backUrl) {
+                            manifest.backUrl = params.backUrl;
+                        }
+                        if (params.customData) {
+                            manifest.customData = params.customData;
+                        }
                     }
                     self.manifestModel.setValue(manifest);
                     self.debug.log("Manifest has loaded.");
