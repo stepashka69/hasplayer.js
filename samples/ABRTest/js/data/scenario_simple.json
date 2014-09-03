@@ -1,0 +1,10 @@
+[
+	{
+		"bandwidth": 10000,
+		"duration": 20000
+	},
+	{
+		"bandwidth": 3000,
+		"duration": 120000
+	}
+]
