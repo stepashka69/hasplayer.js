@@ -815,13 +815,12 @@ MediaPlayer.dependencies.Stream = function () {
             if (audioController) {
                 audioData = audioController.getData();
                 
-                // ORANGE: refer the audio track index to get new audio data (switch audio use case)
-                /*if (!!audioData && audioData.hasOwnProperty("id")) {
-                    deferredAudioData = self.manifestExt.getDataForId(audioData.id, manifest, periodInfo.index);
-                } else {
+                // ORANGE: refer only the audio track index to get new audio data (switch audio use case)
+                //if (!!audioData && audioData.hasOwnProperty("id")) {
+                //    deferredAudioData = self.manifestExt.getDataForId(audioData.id, manifest, periodInfo.index);
+                //} else {
                     deferredAudioData = self.manifestExt.getDataForIndex(audioTrackIndex, manifest, periodInfo.index);
-                }*/
-                deferredAudioData = self.manifestExt.getDataForIndex(audioTrackIndex, manifest, periodInfo.index);
+                //}
 
                 deferredAudioData.then(
                         function (data) {
@@ -940,7 +939,7 @@ MediaPlayer.dependencies.Stream = function () {
         },
 
         // ORANGE: add the capability to set audioTrack
-        setAudioTrack:function(audioTrack){
+        setAudioTrack: function(audioTrack) {
             var deferredAudioUpdate = Q.defer(),
                 manifest = this.manifestModel.getValue(),
                 url,
