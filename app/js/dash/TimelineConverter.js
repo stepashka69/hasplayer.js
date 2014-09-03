@@ -114,7 +114,7 @@ Dash.dependencies.TimelineConverter = function () {
                 availabilityWindow = self.calcSegmentAvailabilityRange(representation, isDynamic),
                 actualTime;
 
-            // ORANGE: confusion to resoleve between ilabilityWindow.start and periodStart.
+            // ORANGE: confusion to resolve between availabilityWindow.start and periodStart.
             // (in MSS case, periodStart is set to availabilityWindow.start)
             //if ((currentTime >= (availabilityWindow.start + periodStart)) && (currentTime <= (availabilityWindow.end + periodStart))) {
             if ((currentTime >= (availabilityWindow.start)) && (currentTime <= (availabilityWindow.end))) {

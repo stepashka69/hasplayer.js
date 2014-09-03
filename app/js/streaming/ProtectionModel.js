@@ -23,6 +23,8 @@ MediaPlayer.models.ProtectionModel = function () {
         system : undefined,
         videoModel : undefined,
         protectionExt : undefined,
+        // ORANGE: licenser custom data and back url add a reference on manifestModel
+        manifestModel: undefined,
 
         setup : function () {
             //this.system.mapHandler("setCurrentTime", undefined, handleSetCurrentTimeNotification.bind(this));
@@ -34,12 +36,12 @@ MediaPlayer.models.ProtectionModel = function () {
             element = this.videoModel.getElement();
         },
 
-        // ORANGE: licenser custom data
-        addKeySession: function (kid, mediaCodec, initData, cdmData) {
-            var session = null;
+        addKeySession: function (kid, mediaCodec, initData) {
+            var session = null,
+                manifest = this.manifestModel.getValue();
 
-            // ORANGE: licenser custom data
-            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, cdmData);
+            // ORANGE: add licenser custom data
+            session = this.protectionExt.createSession(keySystems[kid].keys, mediaCodec, initData, manifest.customData);
 
             this.protectionExt.listenToKeyAdded(session, keyAddedListener);
             this.protectionExt.listenToKeyError(session, keyErrorListener);
@@ -95,9 +97,10 @@ MediaPlayer.models.ProtectionModel = function () {
             return keySystem.keySystem.getInitData(keySystem.contentProtection);
         },
 
-        // ORANGE: licenser custom data
-        updateFromMessage: function (kid, msg, laURL, cdmData) {
-            return keySystems[kid].keySystem.getUpdate(msg, laURL, cdmData);
+        updateFromMessage: function (kid, msg, laURL) {
+            var manifest = this.manifestModel.getValue();
+            // ORANGE: add licenser custom data
+            return keySystems[kid].keySystem.getUpdate(msg, laURL, manifest.customData);
         },
 /*
         addKey: function (type, key, data, id) {

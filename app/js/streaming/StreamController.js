@@ -31,6 +31,7 @@
         progressListener,
         pauseListener,
         playListener,
+        // ORANGE: audio language management
         audioTracks,
 
         play = function () {
@@ -363,9 +364,6 @@
         metricsExt: undefined,
         videoExt: undefined,
         errHandler: undefined,
-        // ORANGE: licenser backUrl and customData
-        backUrl : undefined,
-        customData : undefined,
 
         setup: function() {
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
@@ -408,23 +406,20 @@
             }
         },
         
-        // ORANGE: add licenser backUrl parameter
-        load: function (url, backUrl, customData) {
+        // ORANGE: add source stream parameters
+        load: function (url, params) {
             var self = this;
-            // ORANGE: add licenser backUrl parameter and customData
-            self.backUrl = backUrl;
-            self.customData = customData;
 
             self.debug.log("[StreamController]", "load url: " + url);
 
             self.manifestLoader.load(url).then(
                 function(manifest) {
-                    // ORANGE: add licenser backUrl parameter
-                    if (self.backUrl) {
-                        manifest.backUrl = self.backUrl;
+                    // ORANGE: get licenser backUrl and customData parameters
+                    if (params.backUrl) {
+                        manifest.backUrl = params.backUrl;
                     }
-                    if (self.customData) {
-                        manifest.customData = self.customData;
+                    if (params.customData) {
+                        manifest.customData = params.customData;
                     }
                     self.manifestModel.setValue(manifest);
                     self.debug.log("Manifest has loaded.");

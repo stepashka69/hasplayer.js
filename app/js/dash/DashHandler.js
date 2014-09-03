@@ -605,8 +605,7 @@ Dash.dependencies.DashHandler = function () {
                     endIdx = range.end;
                     }
 
-                    // ORANGE: patch in case range is to wide
-                    for (i = startIdx; (i < endIdx) && (i < list.SegmentURL_asArray.length); i += 1) {
+                    for (i = startIdx; i < endIdx; i += 1) {
                         s = list.SegmentURL_asArray[i];
 
                         seg = getIndexBasedSegment.call(
@@ -619,12 +618,6 @@ Dash.dependencies.DashHandler = function () {
                         seg.mediaRange = s.mediaRange;
                         seg.index = s.index;
                         seg.indexRange = s.indexRange;
-
-                        // ORANGE: add segment time if present (HLS use case)
-                        if (s.time !== undefined) {
-                            seg.presentationStartTime = s.time;
-                            seg.mediaStartTime = s.time;
-                        }
 
                         //self.debug.log("[DashHandler]["+type+"] createSegment: time = " + seg.mediaStartTime + ", availabilityIdx = " + seg.availabilityIdx + ", url = " + seg.media);
 
@@ -834,14 +827,18 @@ Dash.dependencies.DashHandler = function () {
             var updateRequired = false,
                 segments = representation.segments,
                 upperIdx,
-                lowerIdx;
+                lowerIdx,
+                upperTime;
+
 
             if (!segments) {
                 updateRequired = true;
             } else {
                 lowerIdx = segments[0].availabilityIdx;
                 upperIdx = segments[segments.length -1].availabilityIdx;
-                updateRequired = (index < lowerIdx) || (index > upperIdx);
+                // ORANGE: check also regarding requested time (@see getForTime()) 
+                upperTime = segments[segments.length -1].presentationStartTime;
+                updateRequired = (index < lowerIdx) || (index > upperIdx) || (requestedTime > upperTime);
             }
 
             return updateRequired;
