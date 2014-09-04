@@ -67,6 +67,7 @@ mp4lib.boxes.File.prototype.read = function(data) {
         var box = mp4lib.createBox( boxtype,size, uuid);
          if (boxtype === "uuid") {
             pos = box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
+            uuid = null;
         }else {
             pos = box.read(data,pos+8,pos+size);
         }
@@ -319,6 +320,7 @@ mp4lib.boxes.ContainerBox.prototype.read = function (data,pos,end) {
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
             pos = box.read(data,pos+mp4lib.fields.FIELD_INT8.getLength()*16+8,pos+size);
+            uuid = null;
         }else {
             pos = box.read(data,pos+8,pos+size);
         }
@@ -421,6 +423,7 @@ mp4lib.boxes.ContainerFullBox.prototype.read = function (data,pos,end,isEntryCou
         var box = mp4lib.createBox( boxtype, size, uuid);
         if (boxtype === "uuid") {
             this.localPos = box.read(data,this.localPos+mp4lib.fields.FIELD_INT8.getLength()*16+8,this.localPos+size);
+            uuid = null;
         }else {
             this.localPos = box.read(data,this.localPos+8,this.localPos+size);
         }
