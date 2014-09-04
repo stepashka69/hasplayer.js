@@ -1,15 +1,22 @@
 function MetricsDatabase() {
-	this.database = [];
 }
 
 MetricsDatabase.prototype.setMetric = function(metric) {
-	this.database.push(metric);
+	var date = new Date();
+	localStorage.setItem(date.getTime(), JSON.stringify(metric));
 };
 
 MetricsDatabase.prototype.getMetrics = function() {
-	return this.database;
+	var datas = [];
+
+	for(var i in localStorage){
+		var val = localStorage.getItem(i);
+		datas.push(JSON.parse(val));
+	}
+	
+	return datas;
 };
 
 MetricsDatabase.prototype.clear = function() {
-	this.database = [];
+	localStorage.clear();
 };
