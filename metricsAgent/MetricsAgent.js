@@ -30,7 +30,7 @@ MetricsAgent.prototype.init = function() {
 		if(activation.active) {
 			this.database = new MetricsDatabase();
 			this.collector = new window[this.parameters.collector](this.player, this.database);
-			this.formatter = new window[this.parameters.formatter](this.database);
+			this.formatter = new window[this.parameters.formatter]();
 
 			this.collector.listen();
 			this.schedule();
@@ -58,7 +58,7 @@ MetricsAgent.prototype.getActivation = function(callback) {
 		return str.join("&");
 	};
 
-	this.sender.http('GET', this.parameters.activationUrl + '?' + serialize(informations), JSON.stringify(informations), callback);
+	this.sender.http('GET', this.parameters.activationUrl + '?' + serialize(informations), null, callback);
 
 };
 

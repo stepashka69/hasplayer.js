@@ -16,8 +16,11 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 			}
 		}
 	};
-
-	http.send(data);
+	if(type === 'GET') {
+		http.send();
+	} else {
+		http.send(data);
+	}
 
 };
 
