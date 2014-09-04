@@ -1,5 +1,4 @@
-function CSQoE (database) {
-	this.database = database;
+function CSQoE () {
 }
 
 CSQoE.prototype.process = function(metrics) {
