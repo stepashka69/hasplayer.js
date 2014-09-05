@@ -91,10 +91,10 @@
         var self = this,
             streamMetrics = this.parent.streamMetrics;
 
-        for (var prop in streamMetrics) { 
-            if (streamMetrics.hasOwnProperty(prop)) { 
-                delete streamMetrics[prop]; 
-            } 
+        for (var prop in streamMetrics) {
+            if (streamMetrics.hasOwnProperty(prop)) {
+                delete streamMetrics[prop];
+            }
         }
         
         this.metricsChanged.call(self);
