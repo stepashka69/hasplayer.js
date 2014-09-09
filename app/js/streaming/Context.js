@@ -26,6 +26,7 @@ MediaPlayer.di.Context = function () {
             this.system.mapSingleton('textTrackExtensions', MediaPlayer.utils.TextTrackExtensions);
             this.system.mapSingleton('vttParser', MediaPlayer.utils.VTTParser);
             this.system.mapSingleton('ttmlParser', MediaPlayer.utils.TTMLParser);
+            this.system.mapSingleton('config', MediaPlayer.utils.Config);
 
             this.system.mapClass('videoModel', MediaPlayer.models.VideoModel);
             this.system.mapSingleton('manifestModel', MediaPlayer.models.ManifestModel);

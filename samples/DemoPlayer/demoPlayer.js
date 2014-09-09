@@ -89,12 +89,17 @@ function initChartAndSlider() {
         values: [ 0, (bitrateValues.length - 1 )],
         //tickLabels: labels,
         stop: function( event, ui ) {
-            player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
+            player.setConfig({
+                "video": {
+                    "ABR.minQuality": ui.values[0],
+                    "ABR.maxQuality": ui.values[1]
+                }
+            });
         }
     });
 
     var audioDatas = player.getAudioTracks();
-    if (audioDatas.length > 1) {
+    if (audioDatas && audioDatas.length > 1) {
         var selectOptions = "";
         for (i = 0 ; i < audioDatas.length; i++) {
             selectOptions += '<option value="' + audioDatas[i].id + '">' + audioDatas[i].lang + ' - ' + audioDatas[i].id+'</option>';

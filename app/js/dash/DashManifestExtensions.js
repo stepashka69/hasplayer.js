@@ -296,7 +296,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
     getAudioDatas: function (manifest, periodIndex) {
         "use strict";
-        //return Q.when(null);
+        return Q.when(null);
         //------------------------------------
         var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,

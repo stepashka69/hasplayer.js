@@ -204,6 +204,8 @@ MediaPlayer = function (aContext) {
         errHandler: undefined,
         tokenAuthentication:undefined,
         uriQueryFragModel:undefined,
+        // ORANGE: add config manager
+        config: undefined,
 
         addEventListener: function (type, listener, useCapture) {
             this.eventBus.addEventListener(type, listener, useCapture);
@@ -289,14 +291,9 @@ MediaPlayer = function (aContext) {
             this.abrController.setAutoSwitchBitrate(value);
         },
 
-        // ORANGE: add function to set manually representation boundaries for a media
-        setQualityBoundariesFor: function (type, min, max) {
-            this.abrController.setQualityBoundaries(type, min, max);
-        },
-
-        // ORANGE: add function to set manually bandwith boundaries for a media
-        setBandwidthBoundariesFor: function (type, min, max) {
-            this.abrController.setBandwidthBoundaries(type, min, max);
+        // ORANGE: add function to set some player configuration parameters
+        setConfig: function (params) {
+            this.config.setParams(params);
         },
 
         // ORANGE: add function to switch audioTracks for a media

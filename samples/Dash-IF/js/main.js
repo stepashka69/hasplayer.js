@@ -177,7 +177,12 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         orientation: 'vertical',
         range: true,
         stop: function(evt, ui) {
-            player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
+            player.setConfig( {
+                "video": {
+                    "ABR.minQuality": ui.values[0],
+                    "ABR.maxQuality": ui.values[1]
+                }
+            });
         }
     });
     $('#sliderAudio').labeledslider({
@@ -385,7 +390,12 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
                     $('#sliderBitrate').labeledslider({ max: (metrics.numBitratesValue - 1), step: 1, values: [ 0, (metrics.numBitratesValue - 1 )], tickLabels: labels});
                     $('#sliderBitrate').labeledslider({stop: function( event, ui ) {
-                        player.setQualityBoundariesFor("video", ui.values[0], ui.values[1]);
+                        player.setConfig( {
+                            "video": {
+                                "ABR.minQuality": ui.values[0],
+                                "ABR.maxQuality": ui.values[1]
+                            }
+                        });
                     }});
                 }
 
