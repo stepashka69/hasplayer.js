@@ -118,7 +118,7 @@ MediaPlayer.utils.Config = function () {
 
         setup: function () {
             // Download default configuration file
-            downloadConfigFile(DEFAULT_CONFIG_FILE);
+          //  downloadConfigFile(DEFAULT_CONFIG_FILE);
         },
 
         setParams: function (newParams) {
