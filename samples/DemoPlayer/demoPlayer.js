@@ -1,6 +1,9 @@
-var DEBUG = true;
+// variable to now if we are on chromecast
+var isCrKey = (cast && cast.receiver && navigator.userAgent.lastIndexOf("CrKey") != -1);
+
+var DEBUG = isCrKey ? false:true;
 // customizable settings
-// hideMetricsAtStart :	if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
+// hideMetricsAtStart : if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
 var hideMetricsAtStart = false;
 // idsToToggle : ids of the metrics to toggle, metrics are hided (or shown) in the array order
 var idsToToggle = ["#chartToToggle", "#sliderToToggle", "#infosToToggle"];
@@ -12,6 +15,7 @@ var updateIntervalLength = 100;
 var chartXaxisWindow = 30;
 // the number of plots
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
+
 
 var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
 playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
@@ -255,16 +259,17 @@ function update() {
 
         firstAccess = false;
         $(".controlBar").show();
-
         if(!player.metricsExt.manifestExt.getIsDynamic(player.metricsExt.manifestModel.getValue())) {
+            $(".live").hide();
             $(".seekbar-container").show();
             $("#seekBar").attr('max', video.duration);
             $(".duration").text(setTimeWithSeconds(video.duration));
             $("#videoPlayer").on('timeupdate', updateSeekBar);
         } else {
+            $(".seekbar-container").hide();
             $(".live").show();
         }
-    } 
+    }
 
     $("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(downloadRepInfos.bandwidth/1000) + " kbps<br>"+ downloadRepInfos.width +"x"+downloadRepInfos.height + "<br>"+ downloadRepInfos.codecs + "<br>"+ bufferLevel + "s");
     $("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(playRepInfos.bandwidth/1000) + " kbps<br>"+ playRepInfos.width +"x"+playRepInfos.height + "<br>"+ playRepInfos.codecs + "<br>"+ bufferLevel + "s");
@@ -423,14 +428,21 @@ function onLoaded () {
     player.setAutoPlay(true);
     //player.addEventListener("metricAdded", update, false);
 
+    // Initialize receiver only if cast.receiver is available
+    if(isCrKey){
+        var ccastReceiver = new HasCastReceiver(player);
+    }else{
+        var metricsAgent = new MetricsAgent(player, {
+            activationUrl: 'http://localhost:8080/config/',
+            serverUrl: 'http://localhost:8080/metrics/',
+            collector: 'HasPlayerCollector',
+            formatter: 'CSQoE',
+            sendingTime: 5000
+        });
+    }
 
-    var metricsAgent = new MetricsAgent(player, {
-        activationUrl: 'http://localhost:8080/config/',
-        serverUrl: 'http://localhost:8080/metrics/',
-        collector: 'HasPlayerCollector',
-        formatter: 'CSQoE',
-        sendingTime: 5000
-    });
+
+
 
     // get url
     var query = window.location.search;
