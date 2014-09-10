@@ -140,6 +140,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     maxGraphPoints = 50,
     firstAccess = true;
 
+
+    $scope.chromecast = {};
+
     ////////////////////////////////////////
     //
     // Metrics
@@ -575,10 +578,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     player.startup();
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
-
     player.attachView(video);
     player.setAutoPlay(true);
-
+    $scope.player = player;
     $scope.videojsIsOn = false;
     
     $scope.activateVideoJS = function() {
@@ -730,6 +732,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     };
 
     $scope.doLoad = function () {
+        if($scope.chromecast.playing){
+            $scope.stopInChromecast();
+        }
+
         firstAccess = true;
         
         function DRMParams() {
