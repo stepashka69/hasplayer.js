@@ -13,6 +13,12 @@
             "browsers": "cdsbi"
         },
         {
+            "type":"HLS",
+            "name":"LIVE - HLS Arte",
+            "url":"http://apache1.rd.francetelecom.com/C4-52/index.m3u8",
+            "browsers":"cdsbi"
+        },
+        {
             "type": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
