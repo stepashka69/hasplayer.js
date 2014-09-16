@@ -429,20 +429,9 @@ function onLoaded () {
     //player.addEventListener("metricAdded", update, false);
 
     // Initialize receiver only if cast.receiver is available
-    if(isCrKey){
+    if (isCrKey) {
         var ccastReceiver = new HasCastReceiver(player);
-    }else{
-        var metricsAgent = new MetricsAgent(player, {
-            activationUrl: 'http://localhost:8080/config/',
-            serverUrl: 'http://localhost:8080/metrics/',
-            collector: 'HasPlayerCollector',
-            formatter: 'CSQoE',
-            sendingTime: 5000
-        });
     }
-
-
-
 
     // get url
     var query = window.location.search;
