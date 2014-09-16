@@ -142,6 +142,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
 
     $scope.chromecast = {};
+    $scope.chromecast.apiOk = false;
 
     ////////////////////////////////////////
     //
@@ -792,3 +793,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 }]);
+
+
+
