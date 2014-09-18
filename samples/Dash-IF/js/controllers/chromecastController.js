@@ -4,8 +4,9 @@ angular.module("DashPlayer").controller("ChromecastController", ["$scope", "$win
 
         // information about protocol and app ID and sender version
         var PROTOCOL =  "urn:x-cast:com.google.cast.video.hasplayer";
-        // var APP_ID = "7E99FD26";
-        var APP_ID = "9ECD1B68";
+        // ChromeCastAPP_ID
+        var APP_ID = "7E99FD26";
+        // End ChromeCastAPP_ID
         var CAST_SENDER_API="//www.gstatic.com/cv/js/sender/v1/cast_sender.js";
 
         var currentSession = null;

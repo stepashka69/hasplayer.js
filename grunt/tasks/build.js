@@ -25,6 +25,7 @@ module.exports = function(grunt) {
     'htmlbuild:dist',         //inline the CSS
     'htmlmin:main',           //Minify the HTML
     'replace',                //Add the git info in files
+    'replace:chromecastId',   //Change to Online APP_ID for chromecast
     'clean:end'               //Clean temp files
     ]);
 
