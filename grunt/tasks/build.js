@@ -7,6 +7,8 @@ module.exports = function(grunt) {
 	grunt.config.set('appDashif', 'samples/Dash-IF');
 	grunt.config.set('appABRTest', 'samples/ABRTest/');
 	
+    
+
 	grunt.registerTask('build', [
     'clean:start',            //empty folder
     'copy',                   //copy HTML files
@@ -24,7 +26,9 @@ module.exports = function(grunt) {
     'usemin',                 //replace the tags blocks by the result
     'htmlbuild:dist',         //inline the CSS
     'htmlmin:main',           //Minify the HTML
-    'replace',                //Add the git info in files
+    'replace:infos',          //Add the git info in files
+    'replace:copyright',      //Add the copyright
+    'replace:noCopyright',    //Remove tag from files where no copyright is needed
     'clean:end'               //Clean temp files
     ]);
 
