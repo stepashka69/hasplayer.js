@@ -88,5 +88,18 @@ module.exports = {
 		files: [
 		{expand: true, flatten: true, src: ['<%= path %>/dashif.js', '<%= path %>/player.js'], dest: '<%= path %>'}
 		]
+	},
+	chromecastId:{
+		options:{
+			patterns: [
+				{
+					match: /7E99FD26/g,
+					replacement: '9ECD1B68'
+				}
+			]
+		},
+		files:[
+		{expand: true, flattend:true, src:['<%= path %>/dashif.js']}
+		]
 	}
 };
