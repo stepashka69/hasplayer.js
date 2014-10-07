@@ -17,19 +17,251 @@
     "use strict";
     var rslt = Custom.utils.copyMethods(MediaPlayer.dependencies.FragmentLoader);
 
-    rslt.load = function(req){
-         var deferred = Q.defer();
-        // we already have the data so no need to do request
-        if(req.type == "Initialization Segment" && req.data){
-            deferred.resolve(req,{data:req.data});
-        }else{
-            deferred.promise = this.parent.load.call(this,req);
+    var RETRY_ATTEMPTS = 3,
+    RETRY_INTERVAL = 500,
+    BYTESLENGTH = true,
+    xhrs = [];
+
+    rslt.doLoad = function (request, remainingAttempts, bytesRange) {
+        var d = Q.defer();
+        var req = new XMLHttpRequest(),
+        httpRequestMetrics = null,
+        firstProgress = true,
+        needFailureReport = true,
+        lastTraceTime = null,
+        self = this;
+
+        xhrs.push(req);
+        request.requestStartDate = new Date();
+
+        httpRequestMetrics = self.metricsModel.addHttpRequest(request.streamType,
+          null,
+          request.type,
+          request.url,
+          null,
+          request.range,
+          request.requestStartDate,
+          null,
+          null,
+          null,
+          null,
+          request.duration,
+
+          request.startTime,
+          request.quality);
+
+        self.metricsModel.appendHttpTrace(httpRequestMetrics,
+          request.requestStartDate,
+          request.requestStartDate.getTime() - request.requestStartDate.getTime(),
+          [0]);
+        lastTraceTime = request.requestStartDate;
+
+        req.open("GET", self.tokenAuthentication.addTokenAsQueryArg(request.url), true);
+        req.responseType = "arraybuffer";
+        req = self.tokenAuthentication.setTokenInRequestHeader(req);
+
+        if (bytesRange) {
+            req.setRequestHeader("Range", bytesRange);
         }
 
-        return deferred.promise;
+        req.onprogress = function (event) {
+            var currentTime = new Date();
+            if (firstProgress) {
+                firstProgress = false;
+                if (!event.lengthComputable || (event.lengthComputable && event.total != event.loaded)) {
+                    request.firstByteDate = currentTime;
+                    httpRequestMetrics.tresponse = currentTime;
+                }
+            }
+            self.metricsModel.appendHttpTrace(httpRequestMetrics,
+              currentTime,
+              currentTime.getTime() - lastTraceTime.getTime(),
+              [req.response ? req.response.byteLength : 0]);
+            lastTraceTime = currentTime;
+        };
+
+        req.onload = function () {
+            if (req.status < 200 || req.status > 299)
+            {
+              return;
+          }
+          needFailureReport = false;
+
+          var currentTime = new Date(),
+          bytes = req.response,
+          latency,
+          download;
+
+          if (!request.firstByteDate) {
+            request.firstByteDate = request.requestStartDate;
+        }
+        request.requestEndDate = currentTime;
+
+        latency = (request.firstByteDate.getTime() - request.requestStartDate.getTime());
+        download = (request.requestEndDate.getTime() - request.firstByteDate.getTime());
+
+        self.debug.log("[FragmentLoader]["+request.streamType+"] Loaded: " + request.url +" (" + req.status + ", " + latency + "ms, " + download + "ms)");
+
+        httpRequestMetrics.tresponse = request.firstByteDate;
+        httpRequestMetrics.tfinish = request.requestEndDate;
+        httpRequestMetrics.responsecode = req.status;
+
+        httpRequestMetrics.bytesLength = bytes ? bytes.byteLength : 0;
+
+        self.metricsModel.appendHttpTrace(httpRequestMetrics,
+          currentTime,
+          currentTime.getTime() - lastTraceTime.getTime(),
+          [bytes ? bytes.byteLength : 0]);
+        lastTraceTime = currentTime;
+
+        d.resolve({
+            data: bytes,
+            request: request
+        });
     };
 
-    return rslt;
+    req.onloadend = req.onerror = function () {
+        if (xhrs.indexOf(req) === -1) {
+            return;
+        } else {
+            xhrs.splice(xhrs.indexOf(req), 1);
+        }
+
+        if (!needFailureReport)
+        {
+          return;
+      }
+      needFailureReport = false;
+
+      var currentTime = new Date(),
+      bytes = req.response,
+      latency,
+      download;
+
+      if (!request.firstByteDate) {
+        request.firstByteDate = request.requestStartDate;
+    }
+    request.requestEndDate = currentTime;
+
+    latency = (request.firstByteDate.getTime() - request.requestStartDate.getTime());
+    download = (request.requestEndDate.getTime() - request.firstByteDate.getTime());
+
+    httpRequestMetrics.tresponse = request.firstByteDate;
+    httpRequestMetrics.tfinish = request.requestEndDate;
+    httpRequestMetrics.responsecode = req.status;
+
+    self.metricsModel.appendHttpTrace(httpRequestMetrics,
+      currentTime,
+      currentTime.getTime() - lastTraceTime.getTime(),
+      [bytes ? bytes.byteLength : 0]);
+    lastTraceTime = currentTime;
+
+
+    if (remainingAttempts > 0) {
+        self.debug.log("[FragmentLoader]["+request.streamType+"] Failed loading: " + request.type + ":" + request.startTime + ", retry in " + RETRY_INTERVAL + "ms" + " attempts: " + remainingAttempts);
+        remainingAttempts--;
+        setTimeout(function() {
+            self.doLoad(request, remainingAttempts);
+        }, RETRY_INTERVAL);
+    } else {
+        self.debug.log("[FragmentLoader]["+request.streamType+"] Failed loading: " + request.type + ":" + request.startTime + " no retry attempts left");
+        self.errHandler.downloadError("content", request.url, req);
+        request.deferred.reject(req);
+    }
+};
+
+self.debug.log("[FragmentLoader]["+request.streamType+"] Load: " + request.url);
+
+req.send();
+return d.promise;
+};
+
+rslt.getBytesLength = function(request) {
+    var d = Q.defer();
+    var http = new XMLHttpRequest();
+
+    http.open('HEAD', request.url);
+
+    http.onreadystatechange = function () {
+        if (http.status < 200 || http.status > 299) {
+            d.reject();
+        } else {
+            if(http.getResponseHeader('Content-Length')) {
+                d.resolve(http.getResponseHeader('Content-Length')); 
+            } else {
+                d.reject();
+            }
+        }
+    };
+    http.send();
+    return d.promise;
+};
+
+rslt.planRequests = function (req) {
+
+    if (!req) {
+        return Q.when(null);
+    }
+
+    var that = this;
+    var d = Q.defer();
+
+    if(BYTESLENGTH) {
+        this.getBytesLength(req).then(function(bytesLength) {
+
+            BYTESLENGTH = true;
+
+            that.loadRequests(bytesLength, req).then(function(datas) {
+                var buffer1 = datas[0].data,
+                buffer2 = datas[1].data,
+                tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+
+                tmp.set(new Uint8Array(buffer1), 0);
+                tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+
+                d.resolve({
+                    data: tmp.buffer,
+                    request: req
+                });
+            })
+
+        }, function() {
+            BYTESLENGTH = false;
+            d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
+        })
+    } else {
+        d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
+    }
+
+    return d.promise;
+};
+
+rslt.loadRequests = function(bytesLength, req) {
+
+    var halfBytes = Math.floor(bytesLength/2),
+    bytesFirstHalf = 'bytes=0-' + (halfBytes-1),
+    bytesSecondHalf = 'bytes=' + halfBytes + '-' + bytesLength;
+
+    return Q.all([
+        this.doLoad(req, RETRY_ATTEMPTS, bytesFirstHalf),
+        this.doLoad(req, RETRY_ATTEMPTS, bytesSecondHalf)
+        ]);
+};
+
+rslt.load = function(req){
+
+    var deferred = Q.defer();
+
+    if(req.type == "Initialization Segment" && req.data){
+        deferred.resolve(req,{data:req.data});
+    } else{
+        deferred.promise = this.planRequests(req);
+    }
+
+    return deferred.promise;
+};
+
+return rslt;
 };
 
 Custom.dependencies.CustomFragmentLoader.prototype = {
