@@ -11,28 +11,73 @@
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.dependencies.VideoModelExtensions = function () {
-    "use strict";
+var MetricsVo = {};
 
-    return {
-        getPlaybackQuality: function (videoElement) {
-            var hasWebKit = ("webkitDroppedFrameCount" in videoElement),
-                hasQuality = ("getVideoPlaybackQuality" in videoElement),
-                result = null;
+MetricsVo.Encoding = function (){
+	"use strict";
 
-            if (hasQuality) {
-                result = videoElement.getVideoPlaybackQuality();
-            }
-            // ORANGE : add totalVideoFrames
-            else if (hasWebKit) {
-                result = {droppedVideoFrames: videoElement.webkitDroppedFrameCount, creationTime: new Date(), totalVideoFrames: videoElement.webkitDecodedFrameCount};
-            }
-
-            return result;
-        }
-    };
+    this.contentType = null;
+    this.id = null;
+    this.codec = null;
+    this.index = null;
+    this.bitrate = null;
+    this.fps = null;
 };
 
-MediaPlayer.dependencies.VideoModelExtensions.prototype = {
-    constructor: MediaPlayer.dependencies.VideoModelExtensions
+MetricsVo.Session = function (){
+		this.id = null;
+		this.playerid = null;
+		this.playerType = null;
+		this.browserid = null;
+		this.userAgent = null;
+		this.uri = null;
+		this.provider = null;
+		this.loopMode = null;
+		this.loopCount = null;
+		this.startTime = null;
+		this.startBufferingTime = null;
+		this.startPlayingTime = null;
+		this.endTime = null;
+		this.minBitrate = null;
+		this.maxBitrate = null;
+};
+
+
+MetricsVo.MetaData = function (){
+		this.id = null;
+		this.contentType = null;
+		this.codec = null;
+		this.format = null;
+		this.duration = -1;
+		this.bitrates = [];
+};
+
+MetricsVo.State = function (){
+		this.current = null;
+		this.position = null;
+		this.previousState = null;
+		this.previousTime = null;
+		this.duration = null;
+		this.reason = null;
+};
+
+
+MetricsVo.Action = function (){
+		this.type = null;
+		this.parameter = null;
+		this.position = null;
+};
+
+
+MetricsVo.Condition = function () {
+		this.windowSize = null;
+		this.fullScreen = null;
+		this.bandwidth = null;
+		this.fps = null;
+		this.droppedFrames = null;
+};
+
+MetricsVo.Error = function () {
+		this.code = null;
+		this.message = null;
 };

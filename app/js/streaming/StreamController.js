@@ -31,6 +31,10 @@
         progressListener,
         pauseListener,
         playListener,
+        // ORANGE: add playing listener
+        playingListener,
+        // ORANGE: add stalled listener
+        stalledListener,
         // ORANGE: audio language management
         audioTracks,
 
@@ -80,6 +84,10 @@
                 videoModel.listen("timeupdate", timeupdateListener);
             videoModel.listen("pause", pauseListener);
             videoModel.listen("play", playListener);
+            // ORANGE: add playing listener
+            videoModel.listen("playing", playingListener);
+            // ORANGE: add satlled listener
+            videoModel.listen("stalled", stalledListener);
         },
 
         detachVideoEvents = function (videoModel) {
@@ -88,6 +96,10 @@
             videoModel.unlisten("timeupdate", timeupdateListener);
             videoModel.unlisten("pause", pauseListener);
             videoModel.unlisten("play", playListener);
+            // ORANGE: add playing listener
+            videoModel.unlisten("playing", playingListener);
+            // ORANGE: add satlled listener
+            videoModel.unlisten("stalled", stalledListener);
         },
 
         copyVideoProperties = function (fromVideoElement, toVideoElement) {
@@ -128,9 +140,17 @@
         onTimeupdate = function() {
             var streamEndTime  = activeStream.getStartTime() + activeStream.getDuration(),
                 currentTime = activeStream.getVideoModel().getCurrentTime(),
-                self = this;
+                self = this,
+                //ORANGE : calculate fps
+                videoElement = activeStream.getVideoModel().getElement(),
+                playBackQuality = self.videoExt.getPlaybackQuality(videoElement),
+                elapsedTime = (new Date().getTime()- self.startPlayingTime)/1000;
 
-            self.metricsModel.addDroppedFrames("video", self.videoExt.getPlaybackQuality(activeStream.getVideoModel().getElement()));
+            self.debug.log("[StreamController]", "FPS = " + playBackQuality.totalVideoFrames/elapsedTime);
+
+            //ORANGE : replace addDroppedFrames metric by addConditionMetric
+            //self.metricsModel.addDroppedFrames("video", playBackQuality);
+            self.metricsModel.addCondition(null, null, videoElement.videoWidth, videoElement.videoHeight,playBackQuality.droppedVideoFrames,playBackQuality.totalVideoFrames/elapsedTime);
 
             if (!getNextStream()) return;
 
@@ -152,6 +172,9 @@
             var seekingTime = activeStream.getVideoModel().getCurrentTime(),
                 seekingStream = getStreamForTime(seekingTime);
 
+            // ORANGE : add metric
+            this.metricsModel.addState(null, "seeking", activeStream.getVideoModel().getCurrentTime());
+
             if (seekingStream && seekingStream !== activeStream) {
                 switchStream.call(this, activeStream, seekingStream, seekingTime);
             }
@@ -159,10 +182,31 @@
 
         onPause = function() {
             this.manifestUpdater.stop();
+            // ORANGE : add metric
+            this.metricsModel.addState(null, "paused", activeStream.getVideoModel().getCurrentTime());
         },
 
         onPlay = function() {
             this.manifestUpdater.start();
+
+            //ORANGE : if first startPlayingTime not defined, set it
+            if (this.startPlayingTime === undefined) {
+                this.startPlayingTime = new Date().getTime();
+            }
+
+            var videoElement = activeStream.getVideoModel().getElement();
+            this.metricsModel.addCondition(null, 0, videoElement.videoWidth, videoElement.videoHeight);
+        },
+
+        onPlaying = function() {
+            // ORANGE : add metric
+            this.startTime = activeStream.getVideoModel().getCurrentTime();
+            this.metricsModel.addState(null, "playing", this.startTime);
+        },
+
+        onStalled = function () {
+            // ORANGE : add metric
+            this.metricsModel.addState("video", "buffering", this.videoModel.getCurrentTime());
         },
 
         /*
@@ -250,6 +294,9 @@
                 sIdx,
                 period,
                 stream;
+
+            //ORANGE : reset startPlayingTime
+            self.startPlayingTime = undefined;
 
             if (!manifest) {
                 return Q.when(false);
@@ -364,6 +411,9 @@
         metricsExt: undefined,
         videoExt: undefined,
         errHandler: undefined,
+        // ORANGE: set updateTime date
+        startTime : undefined,
+        startPlayingTime : undefined,
 
         setup: function() {
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
@@ -372,6 +422,10 @@
             seekingListener = onSeeking.bind(this);
             pauseListener = onPause.bind(this);
             playListener = onPlay.bind(this);
+            // ORANGE: add playing listener
+            playingListener = onPlaying.bind(this);
+            // ORANGE: add stalled listener
+            stalledListener = onStalled.bind(this);
         },
 
         getManifestExt: function () {
@@ -424,6 +478,8 @@
                         }
                     }
                     self.manifestModel.setValue(manifest);
+                    //ORANGE : add Metadata metric
+                    self.metricsModel.addMetaData();
                     self.debug.log("Manifest has loaded.");
                     //self.debug.log(self.manifestModel.getValue());
                     self.manifestUpdater.start();

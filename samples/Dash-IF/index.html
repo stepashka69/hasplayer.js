@@ -32,6 +32,12 @@
     <script src="js/metrics.js"></script>
     <script src="js/main.js"></script>
     <script src="js/controllers/chromecastController.js"></script>
+    <script src="../../metricsAgent/MetricsAgent.js"></script>
+    <script src="../../metricsAgent/MetricsDatabase.js"></script>
+    <script src="../../metricsAgent/MetricsSender.js"></script>
+    <script src="../../metricsAgent/collectors/HasPlayerCollector.js"></script>
+    <script src="../../metricsAgent/formatters/CSQoEFormatter.js"></script>
+    <script src="../../metricsAgent/MetricsVo.js"></script>
     <!-- endbuild -->
 
     <!-- source -->
@@ -167,6 +173,10 @@
 <script src="../../app/js/custom/dependencies/CustomMetricsExtensions.js"></script>
 <script src="../../app/js/custom/vo/metrics/BandwidthBoundaries.js"></script>
 <script src="../../app/js/custom/vo/metrics/RepresentationBoundaries.js"></script>
+<script src="../../app/js/custom/vo/metrics/Error.js"></script>
+<script src="../../app/js/custom/vo/metrics/State.js"></script>
+<script src="../../app/js/custom/vo/metrics/Session.js"></script>
+<script src="../../app/js/custom/vo/metrics/Condition.js"></script>
 <!-- /source -->
 
 </head>
@@ -275,7 +285,6 @@
 
                     <div class="panel-heading panel-top">
                         <span class="panel-title"><b>Chromecast Options</b></span>
-                    </div>
                     <div class="panel-body">
                         <div class="col-md-5">
                             <div>
@@ -313,6 +322,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
                 <div class="panel">
                     <div class="panel-heading panel-top">
                         <span class="panel-title">Charts</span>
@@ -383,6 +393,17 @@
             <div class="col-md-3">
                 <div class="panel">
                     <div class="panel-heading panel-top">
+                    <span class="panel-title">Agent</span>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" ng-class="{active:activateMetricsAgent == false}" ng-click="setMetricsAgent(false)">
+                            <span>Off</span>
+                        </button>
+                        <button type="button" class="btn btn-default" ng-class="{active:activateMetricsAgent == true}" ng-click="setMetricsAgent(true)">
+                            <span>On</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-heading panel-top">
                         <span class="panel-title">ABR</span>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default" ng-class="{active:abrEnabled == false}" ng-click="setAbrEnabled(false)">
@@ -433,6 +454,7 @@
                 </div>
             </div>
         </div>
+
 
     </div>
 </body>

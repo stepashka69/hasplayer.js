@@ -92,6 +92,10 @@ Custom.dependencies.CustomBufferController = function () {
             self.debug.log("[BufferController]["+type+"] stalled = ", value);
             stalled = value;
             self.videoModel.stallStream(type, stalled);
+            //ORANGE : add a buffering state metric
+            if (self.getType() === "video" && value === true) {
+                this.metricsModel.addState("video", "buffering", this.getVideoModel().getCurrentTime());
+            }
         },
 
         startPlayback = function () {
@@ -272,8 +276,7 @@ Custom.dependencies.CustomBufferController = function () {
                                                             if ((lastRequest.index - 1) === request.index && !isBufferingCompleted) {
                                                                 isBufferingCompleted = true;
                                                             if (stalled) {
-                                                                stalled = false;
-                                                                self.videoModel.stallStream(type, stalled);
+                                                                setStalled.call(self, false);
                                                             }
                                                                 self.system.notify("bufferingCompleted");
                                                             }
@@ -347,6 +350,9 @@ Custom.dependencies.CustomBufferController = function () {
                                     }
                                 },
                                 function(result) {
+                                    // ORANGE : add metric
+                                    self.metricsModel.addError(type,result.err.code,result.err.message);
+
                                     self.debug.log("[BufferController]["+type+"] Buffer failed");
                                     // if the append has failed because the buffer is full we should store the data
                                     // that has not been appended and stop request scheduling. We also need to store
@@ -766,8 +772,7 @@ Custom.dependencies.CustomBufferController = function () {
             if (stalled) {
                 if (bufferLevel > minBufferTimeAtStartup) {
                     self.debug.log("[BufferController]["+type+"] stalled = false");
-                    stalled = false;
-                    self.videoModel.stallStream(type, stalled);
+                    setStalled.call(self, false);
                 }
             }
 

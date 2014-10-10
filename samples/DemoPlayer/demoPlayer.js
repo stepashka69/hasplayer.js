@@ -440,6 +440,19 @@ function initControlBar () {
     });
 }
 
+//init player by attaching source stream
+function initPlayer() {
+    var query = window.location.search;
+    if (query) {
+        query = query.substring(query.indexOf("?file=")+6);
+        if (query) {
+            player.attachSource(query)
+            update();
+        }
+    }
+}
+
+
 
 function onLoaded () {
     player = new MediaPlayer(new Custom.di.CustomContext());
@@ -455,15 +468,21 @@ function onLoaded () {
         var ccastReceiver = new HasCastReceiver(player);
     }
 
-    // get url
-    var query = window.location.search;
-    if (query) {
-        query = query.substring(query.indexOf("?file=")+6);
-        if (query) {
-            player.attachSource(query);
-            //updateInterval = setInterval(update, updateIntervalLength);
-            update();
-        }
+    
+
+    //check for metrics Agent that will init player after activation
+    if(typeof MetricsAgent == 'function') {
+        var MetricsAgentInstance = new MetricsAgent(player, {
+            activationUrl: 'http://10.192.224.13/config',
+            serverUrl: 'http://10.192.224.13',
+            collector: 'HasPlayerCollector',
+            formatter: 'CSQoE',
+            sendingTime: 10000
+        });
+
+        MetricsAgentInstance.init(initPlayer);
+    } else {
+        initPlayer();
     }
 
 	// catch ctrl+i key stoke    

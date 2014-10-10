@@ -625,7 +625,44 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setQualityFor(type, newQuality);
     };
 
+    ////////////////////////////////////////
+    //
+    // Metrics Agent Setup
+    //
+    ////////////////////////////////////////
 
+    $scope.activateMetricsAgent = false;
+
+    if (typeof MetricsAgent == 'function') {
+        var MetricsAgentInstance = new MetricsAgent(player, {
+            activationUrl: 'http://10.192.224.13/config',
+            serverUrl: 'http://10.192.224.13',
+            // activationUrl: 'http://localhost:8080/config',
+            // serverUrl: 'http://localhost:8080/metrics',
+            dbServerUrl: 'http://localhost:8080/metricsDB',
+            collector: 'HasPlayerCollector',
+            formatter: 'CSQoE',
+            sendingTime: 10000
+        });
+    }
+
+    $scope.setMetricsAgent = function(value) {
+        $scope.activateMetricsAgent = value;
+
+        if (typeof MetricsAgent == 'function') {
+            if ($scope.activateMetricsAgent) {
+                MetricsAgentInstance.init(function (activated) {
+                    $scope.activateMetricsAgent = activated;
+                    console.log("Metrics agent state: ", activated);
+                    if (activated === false) {
+                        alert("Metrics agent not available!");
+                    }
+                });
+            } else {
+                MetricsAgentInstance.stop();
+            }
+        }
+    };
 
     ////////////////////////////////////////
     //
@@ -732,11 +769,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.selectedItem = item;
     };
 
-    $scope.doLoad = function () {
-        if($scope.chromecast.playing){
-            $scope.stopInChromecast();
-        }
 
+    function initPlayer() {
         firstAccess = true;
         
         function DRMParams() {
@@ -749,6 +783,18 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         params.backUrl = $scope.selectedItem.backUrl;
         params.customData = $scope.selectedItem.customData;
         player.attachSource($scope.selectedItem.url, params);
+    }
+
+    $scope.doLoad = function () {
+        if ($scope.chromecast.playing){
+            $scope.stopInChromecast();
+        }
+
+        if ((typeof MetricsAgent == 'function') && ($scope.activateMetricsAgent)) {
+            MetricsAgentInstance.createSession();
+        }
+
+        initPlayer();
     };
 
     $scope.loadInPlayer = function(url) {

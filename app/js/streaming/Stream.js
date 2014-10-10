@@ -31,7 +31,10 @@ MediaPlayer.dependencies.Stream = function () {
         errored = false,
         kid = null,
         initData = [],
-
+        // ORANGE : add FullScreen Listener
+        fullScreenListener,
+        // ORANGE : add Ended Event listener
+        endedListener,
         loadedListener,
         playListener,
         pauseListener,
@@ -563,6 +566,24 @@ MediaPlayer.dependencies.Stream = function () {
             updateCurrentTime.call(this);
         },
 
+        // ORANGE : fullscreen event
+        onFullScreenChange = function() {
+            var videoElement = this.videoModel.getElement(), isFullScreen = 0;
+
+            if(document.webkitIsFullScreen || document.msFullscreenElement
+                || document.mozFullScreen) {
+                // browser is fullscreen
+                isFullScreen = 1;
+            }
+            this.metricsModel.addCondition(null, isFullScreen, videoElement.videoWidth, videoElement.videoHeight);
+        },
+        
+        // ORANGE : ended event
+        onEnded = function() {
+            //add stopped state metric with reason = 1 : end of stream
+            this.metricsModel.addState("video", "stopped", this.videoModel.getCurrentTime(), 1);
+        },
+
         onPause = function () {
             //this.debug.log("Got pause event.");
             suspend.call(this);
@@ -907,6 +928,8 @@ MediaPlayer.dependencies.Stream = function () {
         timelineConverter: undefined,
         requestScheduler: undefined,
         scheduleWhilePaused: undefined,
+        // ORANGE : add metricsModel
+        metricsModel: undefined,
 
         setup: function () {
             this.system.mapHandler("setCurrentTime", undefined, currentTimeChanged.bind(this));
@@ -927,6 +950,10 @@ MediaPlayer.dependencies.Stream = function () {
             ratechangeListener = onRatechange.bind(this);
             timeupdateListener = onTimeupdate.bind(this);
             loadedListener = onLoad.bind(this);
+            // ORANGE : add FullScreen Event listener
+            fullScreenListener = onFullScreenChange.bind(this);
+            // ORANGE : add Ended Event listener
+            endedListener = onEnded.bind(this);
         },
 
         load: function(manifest, periodInfoValue) {
@@ -944,6 +971,13 @@ MediaPlayer.dependencies.Stream = function () {
             this.videoModel.listen("progress", progressListener);
             this.videoModel.listen("ratechange", ratechangeListener);
             this.videoModel.listen("loadedmetadata", loadedListener);
+            // ORANGE : add FullScreen Event listener
+            this.videoModel.listen("webkitfullscreenchange", fullScreenListener);
+            this.videoModel.listen("fullscreenchange", fullScreenListener);
+            this.videoModel.listenOnParent("fullscreenchange", fullScreenListener);
+            this.videoModel.listenOnParent("webkitfullscreenchange", fullScreenListener);
+            // ORANGE : add Ended Event listener
+            this.videoModel.listen("ended", endedListener);
 
             this.requestScheduler.videoModel = value;
         },
