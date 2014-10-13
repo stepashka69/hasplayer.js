@@ -2,6 +2,7 @@ var express = require('express');
 var phantom = require('phantom');
 var bodyParser = require('body-parser');
 var csv = require('express-csv');
+var fs = require('fs');
 
 var app = express();
 
@@ -126,12 +127,36 @@ app.post('/chart-db', function(req, res){
 
 //Testing MetricsAgent
 app.get('/config', function(req, res){
-	console.log(req.query);
+	//console.log(req.query);
 	res.json({"active": true});
+
+	// Create a file for new session
+	fs.writeFileSync("metrics.json", "### " + new Date().toString() + "\n");
+
+	// Create a file for new session
+	fs.writeFileSync("metricsDB.json", "### " + new Date().toString() + "\n");
 });
 
 app.post('/metrics', function(req, res){
-	console.log(req.body);
+	//console.log(req.body);
 
 	res.send(204);
+
+	// Append message to file
+	var fd = fs.openSync("metrics.json", 'a+');
+	fs.writeSync(fd, "### " + new Date().toString() + "\n");
+	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
+	fs.closeSync(fd);
+});
+
+app.post('/metricsDB', function(req, res){
+	//console.log(req.body);
+
+	res.send(204);
+
+	// Append message to file
+	var fd = fs.openSync("metricsDB.json", 'a+');
+	fs.writeSync(fd, "### " + new Date().toString() + "\n");
+	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
+	fs.closeSync(fd);
 });
