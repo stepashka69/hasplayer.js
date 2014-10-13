@@ -223,12 +223,12 @@ rslt.planRequests = function (req) {
                     data: tmp.buffer,
                     request: req
                 });
-            })
+            });
 
         }, function() {
             BYTESLENGTH = false;
             d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
-        })
+        });
     } else {
         d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
     }

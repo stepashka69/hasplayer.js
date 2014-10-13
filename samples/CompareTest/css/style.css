@@ -1,0 +1,218 @@
+html, body {
+	background: #eee;
+	font-family: Tahoma;
+	font-size: 12px;
+}
+
+h1 {
+	font-family: Tahoma;
+	font-size: 22px;
+	color: #313131;
+	font-weight: normal;
+	text-transform: uppercase;
+}
+
+button {
+	margin: 4px;
+	padding: 3px 15px;
+	background: #ecf0f1;
+	color: #313131;
+	font-weight: bold;
+	border-radius: 7px;
+	border: 2px solid #313131;
+}
+
+button:hover {
+	cursor: pointer;
+	background: #7f8c8d;
+	color: #fff;
+}
+
+.success {
+	color: #16a085;
+	float: right;
+	font-weight: bold;
+	margin: 4px;
+}
+
+.main {
+	width: 900px;
+	margin: auto;
+}
+
+.player {
+	width: 49%;
+	background: #313131;
+	margin: 15px 0;
+}
+
+/* Stream selection */
+
+.selection-bar {
+	height: 30px;
+	background: #fff;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	border-radius: 10px;
+	border: 0.15em solid #CCC;
+}
+
+.flux-choice {
+	width: 18%;
+	background: transparent;
+}
+
+.flux-url {
+	width: 69%;
+}
+
+.flux-url-current {
+	width: 70%;
+}
+
+.select-wrap {
+   	overflow: hidden;
+   	background: #ddd;
+   	display: inline;
+   	padding: 9px 0;
+}
+
+.select {
+	font-size: 18px;
+	padding: 0 5px;
+	border: none;
+	margin: 0;
+	height: 30px;
+}
+
+.select:focus {
+	outline: 0;
+}
+
+.select-wrap .select:hover {
+	cursor: pointer;
+}
+
+.select-wrap .select .hidden {
+	display: none;
+}
+
+.disable-option option
+{
+    color: #000;
+}
+
+.disable-option, .disable-option option:first-child
+{
+    color: #818181;
+}
+
+.start-button {
+	width: 10%;
+	background: #313131;
+	font-weight: normal;
+	color: #fff;
+	border-radius: 0;
+	float: right;
+}
+
+.start-button:hover {
+	cursor: pointer;
+}
+
+.start-button:disabled {
+	cursor: default;
+	color: #eee;
+	background: #818181;
+}
+
+/* Wanem Actions */
+
+.wanem-actions {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+.wanem-actions li {
+	background: #fff;
+	border-bottom: 1px solid #ddd;
+	padding: 3px 3px 3px 22px;
+}
+
+.wanem-actions li.sequence-action-valid {
+	color: green;
+}
+
+.wanem-actions li.sequence-action-invalid {
+	color: red;
+}
+
+.wanem-actions li.sequence-action-current {
+	background: #313131;
+	color: #fff;
+	padding: 3px 3px 3px 3px;
+}
+
+.wanem-actions li.sequence-action-current:before {
+    content: "\25ba\00a0";
+    font-family: "Times New Roman";
+}
+
+
+
+/* spinner */
+
+.spinner {
+  float: right;
+  width: 50px;
+  height: 30px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.spinner > div {
+  background-color: #333;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+  
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes stretchdelay {
+  0%, 40%, 100% { 
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% { 
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
