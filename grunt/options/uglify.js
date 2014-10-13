@@ -33,6 +33,16 @@ module.exports = function(grunt) {
 			files: {
 				'<%= path %>/json.js': ['<%= path %>/json.js']
 			}
+		},
+		agent: {
+			options: {
+				beautify : false,
+				mangle: false,
+				banner: '@@COPYRIGHTTOREPLACE/* Last build : @@TIMESTAMPTOREPLACE / git revision : @@REVISIONTOREPLACE */\n'
+			},
+			files: {
+				'<%= path %>/metricsAgent.js': ['<%= path %>/metricsAgent.js']
+			}
 		}
 	};
 
