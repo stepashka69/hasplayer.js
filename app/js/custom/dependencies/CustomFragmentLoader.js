@@ -19,7 +19,7 @@
 
     var RETRY_ATTEMPTS = 3,
     RETRY_INTERVAL = 500,
-    BYTESLENGTH = true,
+    BYTESLENGTH = false,
     xhrs = [];
 
     rslt.doLoad = function (request, remainingAttempts, bytesRange) {

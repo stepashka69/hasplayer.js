@@ -6,6 +6,7 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 
 	http.open(type, url, true);
 	http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	http.timeout = 2000;
 
 	http.onreadystatechange = function() {
 		
@@ -24,6 +25,8 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 	if(type === 'GET') {
 		http.send();
 	} else {
+		console.log("MetricsAgent [" + url + "] - Message:");
+		console.log(JSON.stringify(data));
 		http.send(data);
 	}
 

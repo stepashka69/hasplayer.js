@@ -33,6 +33,9 @@ MetricsAgent.prototype.init = function(callback) {
 
 	this.getActivation(function(activation) {
 		if (callback) {
+			if (activation.active) {
+				console.log("MetricsAgent [" + this.parameters.activationUrl + "] - Activation: " + activation.active);
+			}
 			callback(activation.active);
 		}
 	}.bind(this));	
@@ -49,7 +52,7 @@ MetricsAgent.prototype.stop = function() {
 
 MetricsAgent.prototype.createSession = function() {
 
-	console.log('%c START OF SESSION ', 'color: #2980b9');
+	//console.log('%c START OF SESSION ', 'color: #2980b9');
 	this.sessionId = new Date().getTime()+"."+String(Math.random()).substring(2);
 
 	this.database.init(this.sessionId);
@@ -66,7 +69,7 @@ MetricsAgent.prototype.getActivation = function(callback) {
 
 MetricsAgent.prototype.sendPeriodicMessage = function() {
 
-	console.log('%c SEND PERIODIC MESSAGE ', 'color: #2980b9');
+	//console.log('%c SEND PERIODIC MESSAGE ', 'color: #2980b9');
 	this.database.updateCurrentState();
 	this.sendMetrics(this.formatter.MESSAGE_PERIODIC);
 };
@@ -85,11 +88,11 @@ MetricsAgent.prototype.metricAdded = function(event) {
 		// If "stopped" state then stop periodic message
 		// Else (re)start periodic messages
 		if (metric.state.current === 'stopped') {
-			console.log('%c STOP PERIODIC MESSAGES', 'color: #2980b9');
+			//console.log('%c STOP PERIODIC MESSAGES', 'color: #2980b9');
 			clearInterval(messageInterval);
 			messageInterval = null;
 		} else if (!messageInterval) {
-			console.log('%c START PERIODIC MESSAGES', 'color: #2980b9');
+			//console.log('%c START PERIODIC MESSAGES', 'color: #2980b9');
 			messageInterval = setInterval(function () {this.sendPeriodicMessage();}.bind(this), this.parameters.sendingTime);
 		}
 	}
@@ -98,7 +101,7 @@ MetricsAgent.prototype.metricAdded = function(event) {
 	messageType = this.formatter.getMessageType(metric);
 
 	if (messageType !== -1) {
-		console.log('%c SEND MESSAGE %s', 'color: #2980b9', messageType);
+		//console.log('%c SEND MESSAGE %s', 'color: #2980b9', messageType);
 		this.sendMetrics(messageType);
 	}
 };
