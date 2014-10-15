@@ -634,7 +634,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.activateMetricsAgent = false;
 
     if (typeof MetricsAgent == 'function') {
-        var MetricsAgentInstance = new MetricsAgent(player, {
+        var MetricsAgentInstance = new MetricsAgent(player, video, {
             activationUrl: 'http://10.192.224.13/config',
             serverUrl: 'http://10.192.224.13',
             // activationUrl: 'http://localhost:8080/config',

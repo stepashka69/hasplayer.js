@@ -11,9 +11,9 @@ sendingTime: timerToSendMetricsInMs
 
 var messageInterval = null;
 
-function MetricsAgent(player, parameters) {
+function MetricsAgent(player, video, parameters) {
 	this.player = player;
-	this.video = player.getVideoModel();
+	this.video = video;
 	this.parameters = parameters;
 	this.timerActivated = false;
 
@@ -26,7 +26,7 @@ function MetricsAgent(player, parameters) {
 
 	//activate metrics listener
 	this.collector.listen();
-	this.video.getElement().addEventListener("newMetricStored", this.metricAdded.bind(this), false);
+	this.video.addEventListener("newMetricStored", this.metricAdded.bind(this), false);
 }
 
 MetricsAgent.prototype.init = function(callback) {
