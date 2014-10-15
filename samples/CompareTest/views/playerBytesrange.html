@@ -65,7 +65,7 @@
     player.setAutoPlay(true);
 
 	player.addEventListener("error", onError.bind(this));
-    player.attachSource('http://10.194.60.192/VIDEO/MSS/France2/Manifest');
+    player.attachSource('http://apache1.rd.francetelecom.com/C4-52/index.m3u8');
 
     player.addEventListener("metricUpdated", function(evt) {
         update(evt, player, video, datas);

@@ -176,7 +176,7 @@ function update() {
         }
     }
 
-    if (httpRequest.tfinish !== null) {
+    if (httpRequest && httpRequest.tfinish !== null) {
         bitrate = (httpRequest.bytesLength * 8000) / (httpRequest.tfinish - httpRequest.trequest);
         //console.log(bitrate + "(" +httpRequests.length + ")");
     }
