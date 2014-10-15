@@ -11,22 +11,28 @@ sendingTime: timerToSendMetricsInMs
 
 var messageInterval = null;
 
-function MetricsAgent(player, parameters) {
+function MetricsAgent(player, video, parameters, debug) {
 	this.player = player;
-	this.video = player.getVideoModel();
+	this.video = video;
 	this.parameters = parameters;
+	this.debug = debug;
 	this.timerActivated = false;
+
+	if ((this.debug === undefined) || (this.debug === null)) {
+		this.debug = console;
+	}
 
 	this.sessionId = null;
 	this.database = new MetricsDatabase(this.video);
 	this.collector = new window[this.parameters.collector](this.player, this.database);
 	this.formatter = new window[this.parameters.formatter](this.database);
-	this.sender = new MetricsSender();
+	this.sender = new MetricsSender(this.debug);
 	this.isSending = false;
+
 
 	//activate metrics listener
 	this.collector.listen();
-	this.video.getElement().addEventListener("newMetricStored", this.metricAdded.bind(this), false);
+	this.video.addEventListener("newMetricStored", this.metricAdded.bind(this), false);
 }
 
 MetricsAgent.prototype.init = function(callback) {
@@ -34,7 +40,7 @@ MetricsAgent.prototype.init = function(callback) {
 	this.getActivation(function(activation) {
 		if (callback) {
 			if (activation.active) {
-				console.log("MetricsAgent [" + this.parameters.activationUrl + "] - Activation: " + activation.active);
+				this.debug.log("[MetricsAgent][" + this.parameters.activationUrl + "] - Activation: " + activation.active);
 			}
 			callback(activation.active);
 		}

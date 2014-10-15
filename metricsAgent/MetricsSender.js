@@ -1,4 +1,6 @@
-function MetricsSender () {}
+function MetricsSender (debug) {
+	this.debug = debug;
+}
 
 MetricsSender.prototype.http = function(type, url, data, callback) {
 
@@ -22,11 +24,11 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 			callback(result);
 		}
 	};
+
 	if(type === 'GET') {
 		http.send();
 	} else {
-		console.log("MetricsAgent [" + url + "] - Message:");
-		console.log(JSON.stringify(data));
+		this.debug.log("[MetricsAgent][" + url + "] - Send message: " + JSON.stringify(data));
 		http.send(data);
 	}
 

@@ -636,16 +636,18 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.activateMetricsAgent = false;
 
     if (typeof MetricsAgent == 'function') {
-        var MetricsAgentInstance = new MetricsAgent(player, {
-            activationUrl: 'http://10.192.224.13/config',
-            serverUrl: 'http://10.192.224.13',
+        var MetricsAgentInstance = new MetricsAgent(player, video, {
+            activationUrl: 'http://p-collector.orange-labs.fr/config',
+            serverUrl: 'http://p-collector.orange-labs.fr',
+            //activationUrl: 'http://10.192.224.13/config',
+            //serverUrl: 'http://10.192.224.13',
             // activationUrl: 'http://localhost:8080/config',
             // serverUrl: 'http://localhost:8080/metrics',
-            dbServerUrl: 'http://localhost:8080/metricsDB',
+            //dbServerUrl: 'http://localhost:8080/metricsDB',
             collector: 'HasPlayerCollector',
             formatter: 'CSQoE',
             sendingTime: 10000
-        });
+        }, player.getDebug());
     }
 
     $scope.setMetricsAgent = function(value) {

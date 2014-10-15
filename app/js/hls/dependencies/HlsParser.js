@@ -199,7 +199,6 @@ Hls.dependencies.HlsParser = function () {
 			media,
 			i;
 
-		console.log(data);
 		data = _splitLines(data);
 
 		// Check playlist header
@@ -576,7 +575,6 @@ Hls.dependencies.HlsParser = function () {
 
 	var internalParse = function(data, baseUrl) {
 		this.debug.log("[HlsParser]", "Doing parse.");
-		console.log(data);
 		return processManifest.call(this, _splitLines(data),baseUrl);
 	};
 

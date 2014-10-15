@@ -128,7 +128,7 @@ MetricsDatabase.prototype.processMetric = function(metric) {
 		// Event to inform in case of instant message needed
 		var evt = document.createEvent("CustomEvent");
 		evt.initCustomEvent('newMetricStored', false, false, { metric: metric });
-		this.video.getElement().dispatchEvent(evt);
+		this.video.dispatchEvent(evt);
 	}
 };
 
@@ -189,7 +189,7 @@ MetricsDatabase.prototype.updateCurrentState = function(date) {
 
 	if (stateMetric) {
 		stateMetric.state.duration = currentDate - stateMetric.date;
-		stateMetric.state.position = this.video.getCurrentTime();
+		stateMetric.state.position = this.video.currentTime;
 	}
 };
 
