@@ -591,20 +591,11 @@ Custom.dependencies.CustomBufferController = function () {
             return deferred.promise;
         },
 
-        onBytesError = function () {
-            // remove the failed request from the list
-            /*
-            for (var i = fragmentRequests.length - 1; i >= 0 ; --i) {
-                if (fragmentRequests[i].startTime === request.startTime) {
-                    if (fragmentRequests[i].url === request.url) {
-                        fragmentRequests.splice(i, 1);
-                    }
-                    break;
-                }
-            }
-            */
-
-            this.system.notify("segmentLoadingFailed");
+        onBytesError = function (e) {
+            this.debug.log(type + ": Failed to load a request.");
+            //NA : work in progress, stream doesn't started after the seek.... :-(
+            this.indexHandler.getNextSegmentRequest(currentRepresentation).then(onFragmentRequest.bind(this));
+            doSeek(e.startTime+3);
         },
 
         signalStreamComplete = function (request) {
