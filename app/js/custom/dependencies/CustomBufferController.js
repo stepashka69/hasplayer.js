@@ -64,6 +64,7 @@ Custom.dependencies.CustomBufferController = function () {
 
         //ORANGE
         htmlVideoState = -1,
+        stallTime = null,
 
         sendRequest = function() {
             if (fragmentModel !== null) {
@@ -282,7 +283,7 @@ Custom.dependencies.CustomBufferController = function () {
                                                         }
                                                     );
                                                 }
-
+                                              
                                                 if (started === true) {
                                                     checkIfSufficientBuffer.call(self);
                                                 }
@@ -591,20 +592,10 @@ Custom.dependencies.CustomBufferController = function () {
             return deferred.promise;
         },
 
-        onBytesError = function () {
-            // remove the failed request from the list
-            /*
-            for (var i = fragmentRequests.length - 1; i >= 0 ; --i) {
-                if (fragmentRequests[i].startTime === request.startTime) {
-                    if (fragmentRequests[i].url === request.url) {
-                        fragmentRequests.splice(i, 1);
-                    }
-                    break;
-                }
-            }
-            */
+        onBytesError = function (e) {
+            this.debug.log(type + ": Failed to load a request at startTime = "+e.startTime);
 
-            this.system.notify("segmentLoadingFailed");
+            this.stallTime = e.startTime;
         },
 
         signalStreamComplete = function (request) {
@@ -1143,6 +1134,15 @@ Custom.dependencies.CustomBufferController = function () {
                 htmlVideoState = this.BUFFERING;
                 this.debug.log("[BufferController]["+this.getType()+"] ******************** BUFFERING at "+this.videoModel.getCurrentTime());
                 this.metricsModel.addState(this.getType(), "buffering", this.videoModel.getCurrentTime());
+                if (this.stallTime != null) {
+                    //the stall state comes from a chunk download failure
+                    //seek to the next fragment
+                    doStop.call(this);
+                    var seekValue = this.stallTime+currentRepresentation.segments[currentRepresentation.segments.length-1].duration;
+                    doSeek.call(this, seekValue);
+                    this.videoModel.setCurrentTime(seekValue);
+                    this.stallTime = null;
+                }
             }
             else  if(bufferLevel > 0 && htmlVideoState !== this.PLAYING){
                 htmlVideoState = this.PLAYING;

@@ -20,9 +20,10 @@
     var RETRY_ATTEMPTS = 3,
     RETRY_INTERVAL = 500,
     BYTESLENGTH = false,
+    retryCount = 0,
     xhrs = [];
 
-    rslt.doLoad = function (request, remainingAttempts, bytesRange) {
+    rslt.doLoad = function (request, bytesRange) {
         var d = Q.defer();
         var req = new XMLHttpRequest(),
         httpRequestMetrics = null,
@@ -156,18 +157,7 @@
       [bytes ? bytes.byteLength : 0]);
     lastTraceTime = currentTime;
 
-
-    if (remainingAttempts > 0) {
-        self.debug.log("[FragmentLoader]["+request.streamType+"] Failed loading: " + request.type + ":" + request.startTime + ", retry in " + RETRY_INTERVAL + "ms" + " attempts: " + remainingAttempts);
-        remainingAttempts--;
-        setTimeout(function() {
-            self.doLoad(request, remainingAttempts);
-        }, RETRY_INTERVAL);
-    } else {
-        self.debug.log("[FragmentLoader]["+request.streamType+"] Failed loading: " + request.type + ":" + request.startTime + " no retry attempts left");
-        self.errHandler.downloadError("content", request.url, req);
-        request.deferred.reject(req);
-    }
+    d.reject(req);
 };
 
 self.debug.log("[FragmentLoader]["+request.streamType+"] Load: " + request.url);
@@ -187,7 +177,7 @@ rslt.getBytesLength = function(request) {
             d.reject();
         } else {
             if(http.getResponseHeader('Content-Length')) {
-                d.resolve(http.getResponseHeader('Content-Length')); 
+                d.resolve(http.getResponseHeader('Content-Length'));
             } else {
                 d.reject();
             }
@@ -230,10 +220,31 @@ rslt.planRequests = function (req) {
             d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
         });
     } else {
-        d.resolve(that.doLoad(req, RETRY_ATTEMPTS));
-    }
-
+        that.doLoad(req).then(function (result){
+          d.resolve(result);
+        },function (reqerror){
+          that.retry(reqerror,d,that);
+    });
+  }
     return d.promise;
+};
+
+rslt.retry = function (request, d, that) {
+  setTimeout(function(){
+    that.doLoad(request).then(function (result){
+      retryCount = 0;
+      d.resolve(result);
+    }, function (error) {
+      retryCount++;
+      if (retryCount < RETRY_ATTEMPTS) {
+        that.retry(error,d,that);
+      }
+      else {
+        retryCount = 0;
+        d.reject(error);
+      }
+    });
+  },RETRY_INTERVAL);
 };
 
 rslt.loadRequests = function(bytesLength, req) {
@@ -255,7 +266,11 @@ rslt.load = function(req){
     if(req.type == "Initialization Segment" && req.data){
         deferred.resolve(req,{data:req.data});
     } else{
-        deferred.promise = this.planRequests(req);
+        this.planRequests(req).then(function(result) {
+          deferred.resolve(result);
+        },function (error) {
+          deferred.reject(error);
+        });
     }
 
     return deferred.promise;
