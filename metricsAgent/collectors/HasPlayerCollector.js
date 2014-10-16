@@ -87,12 +87,16 @@ HasPlayerCollector.prototype.metricUpdatedListener = function(metric) {
 };
 
 HasPlayerCollector.prototype.listen = function() {
+
     this.customMetricsExtension = this.player.getMetricsExt();
 
     this.player.addEventListener('metricAdded', this.metricAddedListener.bind(this));
     this.player.addEventListener('metricUpdated', this.metricUpdatedListener.bind(this));
 
     window.addEventListener("beforeunload", function (){
+    	if(this.sessionId === null) {
+			return;
+		}
 		//on window close event, add a stop state with reason = 0
 		this.addState("stopped", 0);
 		}.bind(this),false);
