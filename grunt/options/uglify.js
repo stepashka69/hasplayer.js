@@ -3,7 +3,7 @@
 module.exports = function(grunt) {
 
 	var log = grunt.option('log') || false;
-	var lopOtion = ['self.debug.log','this.debug.log','rslt.debug.log'];
+	var logOption = ['self.debug.log','this.debug.log','rslt.debug.log'];
 	var dropConsole = true;
 
 	if(log) {
