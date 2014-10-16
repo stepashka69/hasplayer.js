@@ -672,10 +672,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.isMetricsAgentAvailable = function (str) {
         if (typeof MetricsAgent == 'function') {
-            console.log("Metrics agent available");
             return true;
         }
-        console.log("Metrics agent not available");
         return false;
     };
 
