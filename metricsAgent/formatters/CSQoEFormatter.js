@@ -218,7 +218,7 @@ CSQoE.prototype.formatSessionObject = function(excludedList) {
 	if(session.hasOwnProperty('uri') && !this.isExcluded('uri', this.excludedList)) {
 		var parser = document.createElement('a');
         parser.href = session.uri;
-		this.data.uri = (parser.pathname.charAt(0) == "/") ? parser.pathname : "/" + parser.pathname;;
+		this.data.uri = (parser.pathname.charAt(0) == "/") ? parser.pathname : "/" + parser.pathname;
 		this.data.dhost = parser.hostname;
 	}
 

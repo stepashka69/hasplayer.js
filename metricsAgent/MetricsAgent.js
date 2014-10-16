@@ -12,6 +12,7 @@ sendingTime: timerToSendMetricsInMs
 var messageInterval = null;
 
 function MetricsAgent(player, video, parameters, debug) {
+	this.version = '1.0.0';
 	this.player = player;
 	this.video = video;
 	this.parameters = parameters;
@@ -34,6 +35,10 @@ function MetricsAgent(player, video, parameters, debug) {
 	this.collector.listen();
 	this.video.addEventListener("newMetricStored", this.metricAdded.bind(this), false);
 }
+
+MetricsAgent.prototype.getVersion = function() {
+	return this.version;
+};
 
 MetricsAgent.prototype.init = function(callback) {
 

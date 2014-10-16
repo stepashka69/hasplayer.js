@@ -648,6 +648,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             formatter: 'CSQoE',
             sendingTime: 10000
         }, player.getDebug());
+
+        $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
     }
 
     $scope.setMetricsAgent = function(value) {
