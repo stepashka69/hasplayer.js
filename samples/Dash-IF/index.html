@@ -32,6 +32,8 @@
     <script src="js/metrics.js"></script>
     <script src="js/main.js"></script>
     <script src="js/controllers/chromecastController.js"></script>
+    <!-- endbuild -->
+     <!-- build:js metricsAgent.js -->
     <script src="../../metricsAgent/MetricsAgent.js"></script>
     <script src="../../metricsAgent/MetricsDatabase.js"></script>
     <script src="../../metricsAgent/MetricsSender.js"></script>
@@ -229,7 +231,7 @@
                                 <br>
                                 <strong>Date</strong><br>{{ buildDate }}
                                 <br>
-                                <strong>Metrics Agent Version</strong><br>{{metricsAgentVersion}}
+                                <strong ng-show="isMetricsAgentAvailable()">Metrics Agent Version</strong><br>{{metricsAgentVersion}}
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -415,7 +417,7 @@
             </div>
 
             <div class="col-md-3">
-                <div class="panel">
+                <div class="panel" ng-show="isMetricsAgentAvailable()">
                     <div class="panel-heading panel-top">
                     <span class="panel-title">Agent</span>
                     <div class="btn-group">
