@@ -62,6 +62,9 @@ Custom.dependencies.CustomBufferController = function () {
 
         inbandEventFound = false,
 
+        //ORANGE
+        htmlVideoState = -1,
+
         sendRequest = function() {
             if (fragmentModel !== null) {
                 this.fragmentController.onBufferControllerStateChange();
@@ -92,10 +95,6 @@ Custom.dependencies.CustomBufferController = function () {
             self.debug.log("[BufferController]["+type+"] stalled = ", value);
             stalled = value;
             self.videoModel.stallStream(type, stalled);
-            //ORANGE : add a buffering state metric
-            if (self.getType() === "video" && value === true) {
-                this.metricsModel.addState("video", "buffering", this.getVideoModel().getCurrentTime());
-            }
         },
 
         startPlayback = function () {
@@ -783,7 +782,7 @@ Custom.dependencies.CustomBufferController = function () {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
             } else {
-                // Determine the timout delay before checking again the buffer
+                // Determine the timeout delay before checking again the buffer
                 var delay = bufferLevel - minBufferTime;
                 bufferTimeout = setTimeout(function () {
                     checkIfSufficientBuffer.call(self);
@@ -928,6 +927,8 @@ Custom.dependencies.CustomBufferController = function () {
         errHandler: undefined,
         scheduleWhilePaused: undefined,
         eventController : undefined,
+        BUFFERING : 0,
+        PLAYING : 1,
 
         initialize: function (type, newPeriodInfo, newData, buffer, videoModel, scheduler, fragmentController, source, eventController) {
             var self = this,
@@ -1138,6 +1139,17 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         updateBufferState: function() {
+            if (bufferLevel <= 0 && htmlVideoState !== this.BUFFERING) {
+                htmlVideoState = this.BUFFERING;
+                this.debug.log("[BufferController]["+this.getType()+"] ******************** BUFFERING at "+this.videoModel.getCurrentTime());
+                this.metricsModel.addState(this.getType(), "buffering", this.videoModel.getCurrentTime());
+            }
+            else  if(bufferLevel > 0 && htmlVideoState !== this.PLAYING){
+                htmlVideoState = this.PLAYING;
+                this.debug.log("[BufferController]["+this.getType()+"] ******************** PLAYING at "+this.videoModel.getCurrentTime());
+                this.metricsModel.addState(this.getType(), "playing", this.videoModel.getCurrentTime());
+            }
+
             // if the buffer controller is stopped and the buffer is full we should try to clear the buffer
             // before that we should make sure that we will have enough space to append the data, so we wait
             // until the video time moves forward for a value greater than rejected data duration since the last reject event or since the last seek.

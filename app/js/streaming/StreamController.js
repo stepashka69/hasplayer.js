@@ -31,10 +31,6 @@
         progressListener,
         pauseListener,
         playListener,
-        // ORANGE: add playing listener
-        playingListener,
-        // ORANGE: add stalled listener
-        stalledListener,
         // ORANGE: audio language management
         audioTracks,
 
@@ -84,10 +80,6 @@
                 videoModel.listen("timeupdate", timeupdateListener);
             videoModel.listen("pause", pauseListener);
             videoModel.listen("play", playListener);
-            // ORANGE: add playing listener
-            videoModel.listen("playing", playingListener);
-            // ORANGE: add satlled listener
-            videoModel.listen("stalled", stalledListener);
         },
 
         detachVideoEvents = function (videoModel) {
@@ -96,10 +88,6 @@
             videoModel.unlisten("timeupdate", timeupdateListener);
             videoModel.unlisten("pause", pauseListener);
             videoModel.unlisten("play", playListener);
-            // ORANGE: add playing listener
-            videoModel.unlisten("playing", playingListener);
-            // ORANGE: add satlled listener
-            videoModel.unlisten("stalled", stalledListener);
         },
 
         copyVideoProperties = function (fromVideoElement, toVideoElement) {
@@ -196,17 +184,6 @@
 
             var videoElement = activeStream.getVideoModel().getElement();
             this.metricsModel.addCondition(null, 0, videoElement.videoWidth, videoElement.videoHeight);
-        },
-
-        onPlaying = function() {
-            // ORANGE : add metric
-            this.startTime = activeStream.getVideoModel().getCurrentTime();
-            this.metricsModel.addState(null, "playing", this.startTime);
-        },
-
-        onStalled = function () {
-            // ORANGE : add metric
-            this.metricsModel.addState("video", "buffering", this.videoModel.getCurrentTime());
         },
 
         /*
@@ -422,10 +399,6 @@
             seekingListener = onSeeking.bind(this);
             pauseListener = onPause.bind(this);
             playListener = onPlay.bind(this);
-            // ORANGE: add playing listener
-            playingListener = onPlaying.bind(this);
-            // ORANGE: add stalled listener
-            stalledListener = onStalled.bind(this);
         },
 
         getManifestExt: function () {
