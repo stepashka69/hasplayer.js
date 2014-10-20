@@ -594,7 +594,6 @@ Custom.dependencies.CustomBufferController = function () {
 
         onBytesError = function (e) {
             this.debug.log(type + ": Failed to load a request at startTime = "+e.startTime);
-
             this.stallTime = e.startTime;
         },
 
