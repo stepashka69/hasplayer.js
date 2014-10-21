@@ -686,8 +686,7 @@ Custom.dependencies.CustomBufferController = function () {
                 self.debug.log("[BufferController]["+type+"] loadNextFragment failed");
                 bufferTimeout = setTimeout(function () {
                     checkIfSufficientBuffer.call(self);
-                    },
-                    Math.max(2000));
+                    }, 2000);
             }
         },
 
@@ -771,13 +770,15 @@ Custom.dependencies.CustomBufferController = function () {
 
             var timeToEnd = getTimeToEnd.call(self);
 
+            var delay = Math.abs(bufferLevel - minBufferTime);
+
             if ((bufferLevel < minBufferTime) &&
-                ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted))) {
+                ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)) &&
+                delay > 1) {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
             } else {
-                // Determine the timeout delay before checking again the buffer
-                var delay = bufferLevel - minBufferTime;
+                // Determine the timeout delay before checking again the buffer                
                 bufferTimeout = setTimeout(function () {
                     checkIfSufficientBuffer.call(self);
                     },
