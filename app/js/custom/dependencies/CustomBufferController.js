@@ -64,6 +64,7 @@ Custom.dependencies.CustomBufferController = function () {
 
         //ORANGE
         htmlVideoState = -1,
+        lastBufferLevel = -1,
 
         sendRequest = function() {
             if (fragmentModel !== null) {
@@ -770,15 +771,15 @@ Custom.dependencies.CustomBufferController = function () {
 
             var timeToEnd = getTimeToEnd.call(self);
 
-            var delay = Math.abs(bufferLevel - minBufferTime);
-
             if ((bufferLevel < minBufferTime) &&
                 ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)) &&
-                delay > 1) {
+                lastBufferLevel !== bufferLevel) {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
+                lastBufferLevel = bufferLevel;
             } else {
-                // Determine the timeout delay before checking again the buffer                
+                // Determine the timeout delay before checking again the buffer
+                var delay = bufferLevel - minBufferTime;
                 bufferTimeout = setTimeout(function () {
                     checkIfSufficientBuffer.call(self);
                     },
