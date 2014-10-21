@@ -241,6 +241,10 @@ Custom.dependencies.CustomBufferController = function () {
 
             self.debug.log("[BufferController]["+type+"] ### Media loaded ", request.url);
 
+            if (self.nbJumpChunkMissing !== 0) {
+                self.nbJumpChunkMissing = 0;
+            };
+
             if (!fragmentDuration && !isNaN(request.duration)) {
                 fragmentDuration = request.duration;
             }
@@ -282,7 +286,7 @@ Custom.dependencies.CustomBufferController = function () {
                                                         }
                                                     );
                                                 }
-
+                                              
                                                 if (started === true) {
                                                     checkIfSufficientBuffer.call(self);
                                                 }
@@ -592,10 +596,9 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         onBytesError = function (e) {
-            this.debug.log(type + ": Failed to load a request.");
-            //NA : work in progress, stream doesn't started after the seek.... :-(
-            this.indexHandler.getNextSegmentRequest(currentRepresentation).then(onFragmentRequest.bind(this));
-            doSeek(e.startTime+3);
+            this.debug.log(type + ": Failed to load a request at startTime = "+e.startTime);
+            this.stallTime = e.startTime;
+            this.nbJumpChunkMissing += 1;
         },
 
         signalStreamComplete = function (request) {
@@ -920,6 +923,9 @@ Custom.dependencies.CustomBufferController = function () {
         eventController : undefined,
         BUFFERING : 0,
         PLAYING : 1,
+        stallTime : null,
+        nbJumpChunkMissing : 0,
+        MAX_JUMP_CHUNK_MISSING : 3,
 
         initialize: function (type, newPeriodInfo, newData, buffer, videoModel, scheduler, fragmentController, source, eventController) {
             var self = this,
@@ -1134,6 +1140,15 @@ Custom.dependencies.CustomBufferController = function () {
                 htmlVideoState = this.BUFFERING;
                 this.debug.log("[BufferController]["+this.getType()+"] ******************** BUFFERING at "+this.videoModel.getCurrentTime());
                 this.metricsModel.addState(this.getType(), "buffering", this.videoModel.getCurrentTime());
+                if (this.stallTime != null && this.nbJumpChunkMissing<=this.MAX_JUMP_CHUNK_MISSING) {
+                    //the stall state comes from a chunk download failure
+                    //seek to the next fragment
+                    doStop.call(this);
+                    var seekValue = this.stallTime+currentRepresentation.segments[currentRepresentation.segments.length-1].duration;
+                    doSeek.call(this, seekValue);
+                    this.videoModel.setCurrentTime(seekValue);
+                    this.stallTime = null;
+                }
             }
             else  if(bufferLevel > 0 && htmlVideoState !== this.PLAYING){
                 htmlVideoState = this.PLAYING;
