@@ -243,7 +243,7 @@ Custom.dependencies.CustomBufferController = function () {
 
             if (self.nbJumpChunkMissing !== 0) {
                 self.nbJumpChunkMissing = 0;
-            };
+            }
 
             if (!fragmentDuration && !isNaN(request.duration)) {
                 fragmentDuration = request.duration;
