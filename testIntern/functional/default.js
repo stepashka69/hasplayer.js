@@ -1,4 +1,10 @@
-//java -jar selenium-server-standalone-2.43.1.jar -Dwebdriver.ie.driver=D:\FTRD\selenium\IEDriverServer_x64_2.43.0\IEDriverServer.exe -Dwebdriver.chrome.driver=D:\FTRD\selenium\chromedriver_win32\chromedriver.exe
+/*
+	http://selenium-release.storage.googleapis.com/2.43/selenium-server-standalone-2.43.0.jar
+	http://chromedriver.storage.googleapis.com/2.9/chromedriver_win32.zip
+	http://selenium-release.storage.googleapis.com/2.43/IEDriverServer_x64_2.43.0.zip
+	*/
+
+//java -jar selenium-server-standalone-2.43.0.jar -Dwebdriver.ie.driver=D:\selenium\IEDriverServer.exe -Dwebdriver.chrome.driver=D:\selenium\chromedriver.exe
 
 // D:\FTRD\workspace\dash-js>node node_modules/intern/runner.js config=testIntern/intern
 
@@ -19,14 +25,15 @@ define([
 
 			body.appendChild(div);
 
-			var onContentPlay = function(evt){
+			var onContentPlay = function(){
 				document.getElementById("functionalTestStatus").innerHTML = "playing";
 			};
 
 			videoNode.addEventListener("play", onContentPlay);
+			videoNode.loop = true;
 
 
-		}
+		};
 
 		var command = null;
 
@@ -34,6 +41,7 @@ define([
 			name: 'Dash-IF (functional)',
 
 			'initTest': function() {
+				console.log('INIT');
 				command = this.remote.get(require.toUrl(url));
 
 				return command.execute(playDetection).findById("functionalTestStatus").getVisibleText(function(text){
@@ -42,37 +50,84 @@ define([
 				
 			},
 
-			'contenPlaying': function(){
-					return command.sleep(20000)
-								.then(
-									pollUntil(function(){
-										var div = document.getElementById("functionalTestStatus");
-										return div.innerHTML;
-										},null,60000))
-								.then(function(isOk){
-										return assert.equal(isOk, "playing");
-								});
+			'contentPlaying': function(){
+				console.log('PLAYING');
+				return command.sleep(20000)
+				.then(
+					pollUntil(function(){
+						var div = document.getElementById("functionalTestStatus");
+						return div.innerHTML;
+					},null,60000))
+				.then(function(isOk){
+					return assert.equal(isOk, "playing");
+				});
 			},
 
 			'currentTimeDifferent':function(){
-					this.timeout = 1200000;
-				return command.sleep(60000)
-							// .findByTagName("video").getAttribute("currentTime").then(function(time){
-							// 	assert.equal(time,50000);
-							// 	return assert.ok(time>=60000,"the content is read since 1 minute");
-							// });
-							.then(
-								pollUntil(function(){
-									return document.querySelector("video").currentTime;
-								},null,100000))
-							.then(function(time){
-								return assert.ok(time>60,"the content is read since 1 minute");
-							})
+				console.log('STILL PLAYING');
+				return command.sleep(10000)
+				.then(
+					pollUntil(function(){
+						return document.querySelector("video").currentTime;
+					},null,100000))
+				.then(function(time){
+					return assert.ok(time>=10,"the content is still playing after 10 seconds");
+				});
+			},
+
+			'contentSeek': function() {
+				console.log('SEEKING');
+				return command.sleep(10000)
+				.then(
+					pollUntil(function() {
+						document.querySelector("video").currentTime = 5;
+						return document.querySelector("video").currentTime;
+					}, null, 20000))
+				.then(function(time) {
+					return assert.ok(time<7 && time>=5,"The seek to second 5 was successful");
+				});
+			},
+
+			'contentStillPlayingAfterSeek':function(){
+				console.log('STILL PLAYING');
+				return command.sleep(10000)
+				.then(
+					pollUntil(function(){
+						return document.querySelector("video").currentTime;
+					},null,100000))
+				.then(function(time){
+					return assert.ok(time>10 && time<25,"the content is still playing after the seek");
+				});
+			},
+
+			'contentSeekForLoop':function(){
+				console.log('SEEK 15s BEFORE THE END');
+				return command.sleep(10000)
+				.then(
+					pollUntil(function(){
+						var video = document.querySelector("video");
+						video.currentTime = video.duration - 15;
+						return video.currentTime;
+					},null,100000))
+				.then(function() {
+					return assert.ok(true, 'seek before the end for loop testing');
+				});
+			},
+
+			'contentStillPlayingAfterLoop':function(){
+				console.log('STILL PLAYING AFTER LOOP');
+				return command.sleep(25000)
+				.then(
+					pollUntil(function(){
+						return document.querySelector("video").currentTime;
+					},null,100000))
+				.then(function(time){
+					console.log(time);
+					return assert.ok(time>0 && time<25,"the content is still playing with the loop param");
+				});
 			}
 
-			
 
-
-	});
+		});
 
 });
