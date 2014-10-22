@@ -38,7 +38,7 @@ define([
 		var command = null;
 
 		registerSuite({
-			name: 'Dash-IF (functional)',
+			name: 'Sequence of play, seek and loop',
 
 			'initTest': function() {
 				console.log('INIT');

@@ -453,6 +453,8 @@ function initPlayer() {
                 query += params;
             }
 
+            console.log(query);
+
             player.attachSource(query);
             update();
         }
