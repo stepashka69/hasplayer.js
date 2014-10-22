@@ -964,7 +964,6 @@ MediaPlayer.dependencies.Stream = function () {
             // ORANGE: add event handler "liveEdgeFound"
             this.system.mapHandler("liveEdgeFound", undefined, onLiveEdgeFound.bind(this));
 
-
             load = Q.defer();
 
             playListener = onPlay.bind(this);

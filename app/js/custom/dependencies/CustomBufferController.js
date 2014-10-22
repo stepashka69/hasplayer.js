@@ -65,6 +65,8 @@ Custom.dependencies.CustomBufferController = function () {
         //ORANGE
         htmlVideoState = -1,
         lastBufferLevel = -1,
+        //ORANGE : used to test Live chunk download failure
+        //testTimeLostChunk = 0,
 
         sendRequest = function() {
             if (fragmentModel !== null) {
@@ -655,7 +657,17 @@ Custom.dependencies.CustomBufferController = function () {
             seeking = false;
 
             self.debug.log("[BufferController]["+type+"] loadNextFragment for time: " + segmentTime);
-            self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
+            //ORANGE : used to test Live chunk download failure
+            /*if ((testTimeLostChunk-2)<=segmentTime &&
+                (testTimeLostChunk+2)>=segmentTime)
+            {
+                var e = {};
+                e.startTime = segmentTime;
+                onBytesError.call(self,e);
+            }
+            else{*/
+                self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
+            //}
         },
 
         onFragmentRequest = function (request) {
@@ -976,6 +988,8 @@ Custom.dependencies.CustomBufferController = function () {
                                                 function(time) {
                                                     //self.seek(time);
                                                     self.system.notify("liveEdgeFound", time);
+                                                    //ORANGE : used to test Live chunk download failure
+                                                    //testTimeLostChunk = time+20;
                                                 }
                                             );
                                         }
@@ -1137,19 +1151,29 @@ Custom.dependencies.CustomBufferController = function () {
             this.metricsModel.clearCurrentMetricsForType(type);
         },
 
+        updateManifest: function (){
+            this.system.notify("reloadManifest");
+        },
+
         updateBufferState: function() {
             if (bufferLevel <= 0 && htmlVideoState !== this.BUFFERING) {
                 htmlVideoState = this.BUFFERING;
                 this.debug.log("[BufferController]["+this.getType()+"] ******************** BUFFERING at "+this.videoModel.getCurrentTime());
                 this.metricsModel.addState(this.getType(), "buffering", this.videoModel.getCurrentTime());
                 if (this.stallTime != null && this.nbJumpChunkMissing<=this.MAX_JUMP_CHUNK_MISSING) {
-                    //the stall state comes from a chunk download failure
-                    //seek to the next fragment
-                    doStop.call(this);
-                    var seekValue = this.stallTime+currentRepresentation.segments[currentRepresentation.segments.length-1].duration;
-                    doSeek.call(this, seekValue);
-                    this.videoModel.setCurrentTime(seekValue);
-                    this.stallTime = null;
+                    if (isDynamic) {
+                        this.stallTime = null;
+                        setTimeout(this.updateManifest.bind(this),currentRepresentation.segments[currentRepresentation.segments.length-1].duration*1000);                            
+                    }
+                    else {
+                        //the stall state comes from a chunk download failure
+                        //seek to the next fragment
+                        doStop.call(this);
+                        var seekValue = this.stallTime+currentRepresentation.segments[currentRepresentation.segments.length-1].duration;
+                        doSeek.call(this, seekValue);
+                        this.videoModel.setCurrentTime(seekValue);
+                        this.stallTime = null;
+                    }
                 }
             }
             else  if(bufferLevel > 0 && htmlVideoState !== this.PLAYING){
