@@ -442,11 +442,20 @@ function initControlBar () {
 
 //init player by attaching source stream
 function initPlayer() {
-    var query = window.location.search;
+    var query = window.location.search,
+        params = window.location.hash;
+
     if (query) {
         query = query.substring(query.indexOf("?file=")+6);
         if (query) {
-            player.attachSource(query)
+
+            if(params) {
+                query += params;
+            }
+
+            console.log(query);
+
+            player.attachSource(query);
             update();
         }
     }
