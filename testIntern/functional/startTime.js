@@ -4,7 +4,7 @@ define([
 	'intern/dojo/node!leadfoot/helpers/pollUntil',
 	"require"], function(registerSuite, assert,pollUntil, require){
 
-		var url = "../../samples/DemoPlayer/index.html?url=http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest#s=50";
+		var url = "../../samples/DemoPlayer/index.html?url=http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest#s=50";
 
 		var playDetection = function(){
 			var videoNode = document.querySelector("video");
@@ -63,7 +63,7 @@ define([
 				.then(function(time){
 					return assert.ok(time>=60,"the content is still playing after the seek at start at 50 seconds and playing for 20 seconds");
 				});
-			},
+			}
 
 
 		});

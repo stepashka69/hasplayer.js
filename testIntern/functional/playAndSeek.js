@@ -101,12 +101,12 @@ define([
 			},
 
 			'contentSeekForLoop':function(){
-				console.log('SEEK 15s BEFORE THE END');
+				console.log('SEEK 5s BEFORE THE END');
 				return command.sleep(10000)
 				.then(
 					pollUntil(function(){
 						var video = document.querySelector("video");
-						video.currentTime = video.duration - 15;
+						video.currentTime = video.duration - 5;
 						return video.currentTime;
 					},null,100000))
 				.then(function() {
@@ -123,7 +123,7 @@ define([
 					},null,100000))
 				.then(function(time){
 					console.log(time);
-					return assert.ok(time>0 && time<25,"the content is still playing with the loop param");
+					return assert.ok(time<25,"the content is still playing with the loop param");
 				});
 			}
 
