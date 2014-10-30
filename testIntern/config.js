@@ -1,4 +1,9 @@
 define({
+	//Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
+	live: [
+		'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest',
+		'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'
+	],
 	//Test Playing, Seek and Loop
 	seek: [
 		'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest',

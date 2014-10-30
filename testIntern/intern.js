@@ -35,6 +35,7 @@ define({
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
 	functionalSuites: [ 
+	'testIntern/functional/live',
 	'testIntern/functional/seek',
 	'testIntern/functional/startTime', 
 	'testIntern/functional/multiAudio' 
