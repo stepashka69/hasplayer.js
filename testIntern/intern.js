@@ -23,8 +23,8 @@ define({
 	// capabilities options specified for an environment will be copied as-is
 	environments: [
 		
-		{ browserName: 'internet explorer', version: '11', platform: 'WIN8' },
-		{ browserName: 'chrome', platform: 'WIN8' }
+		{ browserName: 'chrome', platform: 'WIN8' },
+		{ browserName: 'internet explorer', version: '11', platform: 'WIN8' }
 		
 	],
 
@@ -35,7 +35,7 @@ define({
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
 	functionalSuites: [ 
-	'testIntern/functional/playAndSeek',
+	'testIntern/functional/seek',
 	'testIntern/functional/startTime', 
 	'testIntern/functional/multiAudio' 
 	],
