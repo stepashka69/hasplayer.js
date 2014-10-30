@@ -9,8 +9,9 @@ define({
 	startTime: [
 		'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest#s=50'
 	],
-	//Test Multiaudio change from french to german (for specific videos only)
+	//Test Multiaudio change from first track to the second one (for multiaudio videos only)
+	//Params correspond to first and second audio tracks (regex that match the audio fragments url for)
 	multiAudio: [
-		'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest'
+		['http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest', 'audio101_fra', 'audio102_deu']
 	]
 });
