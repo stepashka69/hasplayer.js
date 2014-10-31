@@ -88,11 +88,25 @@ MediaPlayer.dependencies.Stream = function () {
 
         // Encrypted Media Extensions
 
+        multiBytetoUnicode = function (data) {
+            var length = (data.length / 2),
+                new_data = new Uint8Array(length),
+                i;
+
+            for (i = 0; i < length; i++) {
+                new_data[i] = data[i * 2];
+            }
+
+            return new_data;
+        },
+
         onMediaSourceNeedsKey = function (event) {
             var self = this,
                 type;
 
-            type = (event.type !== "msneedkey") ? event.type : videoCodec;
+            // ORANGE: set videoCodec as type
+            //type = (event.type !== "msneedkey") ? event.type : videoCodec;
+            type = videoCodec;
             initData.push({type: type, initData: event.initData});
 
             this.debug.log("DRM: Key required for - " + type);
@@ -126,7 +140,11 @@ MediaPlayer.dependencies.Stream = function () {
             this.debug.log("DRM: Got a key message...");
 
             session = event.target;
-            bytes = new Uint16Array(event.message.buffer);
+
+            // ORANGE: conversion from multi-byte to unicode
+            //bytes = new Uint16Array(event.message.buffer);
+            bytes = multiBytetoUnicode(event.message);
+
             msg = String.fromCharCode.apply(null, bytes);
             laURL = event.destinationURL;
             
