@@ -599,6 +599,18 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         onBytesError = function (e) {
+
+            //if it's the first download error, try to load the same segment for a different quality...
+            if(this.nbJumpChunkMissing === 0)
+            {
+                currentRepresentation = getRepresentationForQuality.call(this, e.quality-1);
+                if (currentRepresentation === undefined || currentRepresentation === null) {
+                    currentRepresentation = getRepresentationForQuality.call(this, e.quality+1);
+                }
+
+                loadNextFragment.call(this);
+            }
+
             this.debug.log(type + ": Failed to load a request at startTime = "+e.startTime);
             this.stallTime = e.startTime;
             this.nbJumpChunkMissing += 1;
