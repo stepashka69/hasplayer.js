@@ -34,7 +34,7 @@ MediaPlayer.utils.Config = function () {
             "ABR.switchUpRatioSafetyFactor": -1,
             "ABR.latencyInBandwidth": true,
             "ABR.switchDownBufferTime": -1,
-            "ABR.switchDownBufferPercentage": -1,
+            "ABR.switchDownBufferRatio": -1,
             // Video parameters
             "video": {
             },
@@ -77,7 +77,7 @@ MediaPlayer.utils.Config = function () {
         getParam = function (params, name, type, def) {
             var value = params[name];
 
-            if (value === undefined) {
+            if ((value === undefined) || (value === -1)) {
                 return def;
             }
 
