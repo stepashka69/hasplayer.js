@@ -1,0 +1,18 @@
+{
+    "BufferController.minBufferTimeForPlaying": -1,
+    "BufferController.minBufferTime": -1,
+    "ABR.minBandwidth": -1,
+    "ABR.maxBandwidth": -1,
+    "ABR.minQuality": -1,
+    "ABR.maxQuality": -1,
+    "ABR.switchIncremental": false,
+    "ABR.switchUpRatioSafetyFactor": 1.2,
+    "ABR.latencyInBandwidth": true,
+    "ABR.switchDownBufferTime": -1,
+    "ABR.switchDownBufferRatio": -1,
+    "video": {
+    },
+    "audio": {
+    }
+}
+
