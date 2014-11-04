@@ -22,26 +22,24 @@ MediaPlayer.utils.Config = function () {
 
         // Default configuration, provides list of possible parameters
         params = {
-            "ABR.switchIncremental": false,
+            // BufferController parameters
+            "BufferController.minBufferTimeForPlaying": -1,
+            "BufferController.minBufferTime": -1,
+            // ABR parameters
             "ABR.minBandwidth": -1,
             "ABR.maxBandwidth": -1,
             "ABR.minQuality": -1,
             "ABR.maxQuality": -1,
+            "ABR.switchIncremental": false,
+            "ABR.switchUpRatioSafetyFactor": -1,
+            "ABR.latencyInBandwidth": true,
+            "ABR.switchDownBufferTime": -1,
+            "ABR.switchDownBufferPercentage": -1,
             // Video parameters
             "video": {
-                "ABR.switchIncremental": false,
-                "ABR.minBandwidth": -1,
-                "ABR.maxBandwidth": -1,
-                "ABR.minQuality": -1,
-                "ABR.maxQuality": -1
             },
             // Audio parameters
             "audio": {
-                "ABR.switchIncremental": false,
-                "ABR.minBandwidth": -1,
-                "ABR.maxBandwidth": -1,
-                "ABR.minQuality": -1,
-                "ABR.maxQuality": -1
             },
         },
 
@@ -108,11 +106,11 @@ MediaPlayer.utils.Config = function () {
         doGetParamFor = function (key, name, type, def) {
             var typeParams = params[key];
 
-            if (typeParams === undefined) {
-                return getParam(params, name, type, def);
+            if ((typeParams !== undefined) && (typeParams[name])) {
+                return getParam(typeParams, name, type, def);
             }
 
-            return getParam(typeParams, name, type, def);
+            return getParam(params, name, type, def);
         };
 
     return {

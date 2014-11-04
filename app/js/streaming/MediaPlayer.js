@@ -317,7 +317,7 @@ MediaPlayer = function (aContext) {
         // ORANGE: add function to set some player configuration parameters
         setConfig: function (params) {
             if (this.config) {
-                this.config.setParams(params);                
+                this.config.setParams(params);
             }
         },
 
@@ -381,11 +381,6 @@ MediaPlayer = function (aContext) {
             source = this.uriQueryFragModel.parseURI(url);
             // ORANGE: store source stream params
             sourceParams = params;
-
-            this.setQualityFor('video', 0);
-            this.setQualityFor('audio', 0);
-
-            // TODO : update
 
             if (playing && streamController) {
                 streamController.reset();
