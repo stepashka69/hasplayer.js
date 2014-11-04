@@ -977,7 +977,7 @@ Custom.dependencies.CustomBufferController = function () {
                             fragmentDuration = currentRepresentation.segmentDuration;
                             
                             self.indexHandler.setIsDynamic(isDynamic);
-                            self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo, waitingForBuffer).then(
+                            self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer).then(
                                 function (time) {
                                     minBufferTime = (minBufferTime === -1) ? time : minBufferTime;
                                 }
