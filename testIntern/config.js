@@ -4,6 +4,10 @@ define({
 		'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest',
 		'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'
 	],
+	//Test DRM stream play (on IE only)
+	DRM: [
+		'http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest'
+	],
 	//Test Playing, Seek and Loop
 	seek: [
 		'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest',
