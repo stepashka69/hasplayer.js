@@ -3,10 +3,16 @@
 // packages, suites, excludeInstrumentation, and (if you want functional tests) functionalSuites.
 define({
 	// The port on which the instrumenting proxy will listen
-	proxyPort: 9000,
+	proxyPort: 3555,
 
 	// A fully qualified URL to the Intern proxy
-	proxyUrl: 'http://localhost:9000/',
+	proxyUrl: 'http://0.0.0.0:3555',
+	tunnel: 'NullTunnel',
+	tunnelOptions: {
+        hostname: '10.194.60.62',
+        port: '4444',
+        verbose: true
+    },
 
 	// Default desired capabilities for all environments. Individual capabilities can be overridden by any of the
 	// specified browser environments in the `environments` array below as well. See
@@ -15,7 +21,7 @@ define({
 	// Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
 	// automatically
 	capabilities: {
-		'selenium-version': '2.43.0'
+		'selenium-version': '2.44.0'
 	},
 
 	// Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
@@ -23,8 +29,8 @@ define({
 	// capabilities options specified for an environment will be copied as-is
 	environments: [
 		
-		{ browserName: 'chrome', platform: 'WIN8' },
-		{ browserName: 'internet explorer', version: '11', platform: 'WIN8' }
+		{ browserName: 'chrome', version: '2.11', platform: 'WIN8_1' },
+		{ browserName: 'internet explorer', version: '11', platform: 'WIN8_1' }
 		
 	],
 
@@ -36,6 +42,7 @@ define({
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
 	functionalSuites: [ 
 	'testIntern/functional/live',
+	// 'testIntern/functional/DRM',
 	'testIntern/functional/seek',
 	'testIntern/functional/startTime', 
 	'testIntern/functional/multiAudio' 
