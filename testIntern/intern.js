@@ -3,10 +3,10 @@
 // packages, suites, excludeInstrumentation, and (if you want functional tests) functionalSuites.
 define({
 	// The port on which the instrumenting proxy will listen
-	proxyPort: 9000,
+	proxyPort: 3555,
 
 	// A fully qualified URL to the Intern proxy
-	proxyUrl: 'http://10.194.60.33:9000',
+	proxyUrl: 'http://0.0.0.0:3555',
 	tunnel: 'NullTunnel',
 	tunnelOptions: {
         hostname: '10.194.60.62',
