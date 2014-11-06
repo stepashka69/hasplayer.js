@@ -599,6 +599,18 @@ Custom.dependencies.CustomBufferController = function () {
         },
 
         onBytesError = function (e) {
+
+            //if it's the first download error, try to load the same segment for a different quality...
+            if(this.nbJumpChunkMissing === 0)
+            {
+                currentRepresentation = getRepresentationForQuality.call(this, e.quality-1);
+                if (currentRepresentation === undefined || currentRepresentation === null) {
+                    currentRepresentation = getRepresentationForQuality.call(this, e.quality+1);
+                }
+
+                loadNextFragment.call(this);
+            }
+
             this.debug.log(type + ": Failed to load a request at startTime = "+e.startTime);
             this.stallTime = e.startTime;
             this.nbJumpChunkMissing += 1;
@@ -935,6 +947,7 @@ Custom.dependencies.CustomBufferController = function () {
         errHandler: undefined,
         scheduleWhilePaused: undefined,
         eventController : undefined,
+        config: undefined,
         BUFFERING : 0,
         PLAYING : 1,
         stallTime : null,
@@ -956,6 +969,9 @@ Custom.dependencies.CustomBufferController = function () {
             self.setFragmentController(fragmentController);
             self.setEventController(eventController);
 
+            minBufferTime = self.config.getParamFor(type, "BufferController.minBufferTime", "number", -1);
+            minBufferTimeAtStartup = self.config.getParamFor(type, "BufferController.minBufferTimeForPlaying", "number", 2);
+
             data = newData;
             periodInfo = newPeriodInfo;
             dataChanged = true;
@@ -973,10 +989,9 @@ Custom.dependencies.CustomBufferController = function () {
                             fragmentDuration = currentRepresentation.segmentDuration;
                             
                             self.indexHandler.setIsDynamic(isDynamic);
-                            self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo, waitingForBuffer).then(
+                            self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer).then(
                                 function (time) {
-                                    self.setMinBufferTime(time);
-                                    minBufferTimeAtStartup = isNaN(fragmentDuration) ? 2 : fragmentDuration;
+                                    minBufferTime = (minBufferTime === -1) ? time : minBufferTime;
                                 }
                             );
 

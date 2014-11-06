@@ -39,13 +39,20 @@
 		    supportsMediaKeys: function () {
 		        "use strict";
 
-		        this.mediaKeys = (window.WebKitMediaKeys) || (window.MSMediaKeys) || (window.MediaKeys);
+		        var hasWebKitMediaKeys = ("WebKitMediaKeys" in window),
+		            hasMsMediaKeys = ("MSMediaKeys" in window),
+		            hasMediaKeys = ("MediaKeys" in window);
 
-		        var hasMediaKeys = this.mediaKeys !== null;
+		        if (hasWebKitMediaKeys) {
+		            this.mediaKeys = window.WebKitMediaKeys;
+		        } else if (hasMsMediaKeys) {
+		            this.mediaKeys = window.MSMediaKeys
+		        } else if (hasMediaKeys) {
+		            this.mediaKeys = window.MediaKeys;
+		        }
 
-		        return hasMediaKeys;
+		        return (hasWebKitMediaKeys || hasMsMediaKeys || hasMediaKeys);
 		    },
-
 		    
 		    supportsCodec: function (codec) {
 		        "use strict";
@@ -58,7 +65,6 @@
 
 		    supportsFlavor: function(codec, flavor){
 		    	this.supportsMediaKeys();
-	    		//console.info(this.mediaKeys, this.mediaKeys.isTypeSupported);
 	    		
 		    	if(this.mediaKeys && this.mediaKeys.isTypeSupported){
 		    		return this.mediaKeys.isTypeSupported(flavor,codec);

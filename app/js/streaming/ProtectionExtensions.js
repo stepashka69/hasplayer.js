@@ -54,14 +54,14 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
     },
 
     setMediaKey: function (element, mediaKeys) {
-        var hasWebKit = ("WebKitSetMediaKeys" in element),
+        var hasWebKit = ("webkitSetMediaKeys" in element),
             hasMs = ("msSetMediaKeys" in element),
-            hasStd = ("SetMediaKeys" in element);
+            hasStd = ("setMediaKeys" in element);
 
         if (hasStd) {
-            return element.SetMediaKeys(mediaKeys);
+            return element.setMediaKeys(mediaKeys);
         } else if (hasWebKit) {
-            return element.WebKitSetMediaKeys(mediaKeys);
+            return element.webkitSetMediaKeys(mediaKeys);
         } else if (hasMs) {
             return element.msSetMediaKeys(mediaKeys);
         } else {
@@ -283,7 +283,7 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
     listenToNeedKey: function(videoModel, listener) {
         videoModel.listen("webkitneedkey", listener);
         videoModel.listen("msneedkey", listener);
-        videoModel.listen("needKey", listener);
+        videoModel.listen("needkey", listener);
     },
 
     listenToKeyError: function(source, listener) {
