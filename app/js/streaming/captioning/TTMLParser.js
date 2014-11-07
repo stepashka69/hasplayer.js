@@ -51,24 +51,26 @@ MediaPlayer.utils.TTMLParser = function () {
 
             if (timingRegexClockTime.test(timingStr)) {
 
-            timeParts = timingStr.split(":");
+                timeParts = timingStr.split(":");
 
-            parsedTime = (parseFloat(timeParts[0]) * SECONDS_IN_HOUR +
-                parseFloat(timeParts[1]) * SECONDS_IN_MIN +
-                parseFloat(timeParts[2]));
+                parsedTime = (parseFloat(timeParts[0]) * SECONDS_IN_HOUR +
+                    parseFloat(timeParts[1]) * SECONDS_IN_MIN +
+                    parseFloat(timeParts[2]));
 
-            // R0031 -For time expressions that use the hh:mm:ss:ff format, the following constraints apply:
-            //  - A ttp:frameRate attribute must be present on the tt element.
-            //  - A ttp:frameRateMultiplier attribute may be present on the tt element.
-            if (timeParts[3]) {
-                frameRate = ttml.tt.frameRate;
+                // R0031 -For time expressions that use the hh:mm:ss:ff format, the following constraints apply:
+                //  - A ttp:frameRate attribute must be present on the tt element.
+                //  - A ttp:frameRateMultiplier attribute may be present on the tt element.
 
-                if (frameRate && !isNaN(frameRate)) {
-                    parsedTime += parseFloat(timeParts[3]) / frameRate;
-                } else {
-                    return NaN;
+                // ORANGE: removed the restrictions above. 
+                //         now if no frameRate is defined in tt, the :ff information is ignored.
+
+                if (timeParts[3]) {
+                    frameRate = ttml.tt.frameRate;
+
+                    if (frameRate && !isNaN(frameRate)) {
+                        parsedTime += parseFloat(timeParts[3]) / frameRate;
+                    }
                 }
-            }
                 return parsedTime;
             }
 
@@ -89,7 +91,7 @@ MediaPlayer.utils.TTMLParser = function () {
                     case 'm':
                         parsedTime = parsedTime*60;
                         break;
-                    case 's':                        
+                    case 's':
                         break;
                     case 'ms':
                         parsedTime = parsedTime*0.01;
@@ -117,9 +119,7 @@ MediaPlayer.utils.TTMLParser = function () {
                 hasHead = hasTt ? ttml.tt.hasOwnProperty("head") : false,
                 hasLayout = hasHead ? ttml.tt.head.hasOwnProperty("layout") : false,
                 hasStyling = hasHead ? ttml.tt.head.hasOwnProperty("styling") : false,
-                hasBody = hasTt ? ttml.tt.hasOwnProperty("body") : false,
-                hasProfile = hasHead ? ttml.tt.head.hasOwnProperty("profile") : false
-
+                hasBody = hasTt ? ttml.tt.hasOwnProperty("body") : false;
 
             // R001 - A document must contain a tt element.
             // R002 - A document must contain both a head and body element.
@@ -134,6 +134,10 @@ MediaPlayer.utils.TTMLParser = function () {
             return passed;
         },
 
+        // ORANGE: now prefix is returned ending with ':' (if not empty), or empty string if not found.
+        //         So it can be directly added to attribute name with no need to check if the 
+        //         namespace exists or not
+
         getNamespacePrefix = function(json, ns) {
             var r = Object.keys(json)
                 .filter(function(k){
@@ -142,9 +146,9 @@ MediaPlayer.utils.TTMLParser = function () {
                     return k.split(":")[1];
                 });
             if (r.length != 1) {
-                return null;
+                return "";
             }
-            return r[0];
+            return r[0]+':';
         },
 
         internalParse = function(data) {
@@ -156,6 +160,7 @@ MediaPlayer.utils.TTMLParser = function () {
                 startTime,
                 endTime,
                 nsttp,
+                nscue,
                 i;
 
             try {
@@ -168,8 +173,8 @@ MediaPlayer.utils.TTMLParser = function () {
 
                 nsttp = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#parameter");
 
-                if (ttml.tt.hasOwnProperty(nsttp + ":frameRate")) {
-                    ttml.tt.frameRate = parseInt(ttml.tt[nsttp + ":frameRate"], 10);
+                if (ttml.tt.hasOwnProperty(nsttp + "frameRate")) {
+                    ttml.tt.frameRate = parseInt(ttml.tt[nsttp + "frameRate"], 10);
                 }
 
                 cues = ttml.tt.body.div_asArray[0].p_asArray;
@@ -181,8 +186,11 @@ MediaPlayer.utils.TTMLParser = function () {
 
                 for (i = 0; i < cues.length; i += 1) {
                     cue = cues[i];
-                    startTime = parseTimings(cue.begin);
-                    endTime = parseTimings(cue.end);
+
+                    nscue = getNamespacePrefix(cue,"http://www.w3.org/2006/10/ttaf1");
+
+                    startTime = parseTimings(cue[nscue+'begin']);
+                    endTime = parseTimings(cue[nscue+'end']);
 
                     if (isNaN(startTime) || isNaN(endTime)) {
                         errorMsg = "TTML document has incorrect timing value";
