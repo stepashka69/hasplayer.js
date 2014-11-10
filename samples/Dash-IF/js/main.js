@@ -131,6 +131,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     video,
     context,
     config = null,
+    configMetrics = null,
     videoSeries = [],
     dlSeries = [],
     playSeries = [],
@@ -587,6 +588,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     req.send();
     if (req.status === 200) {
         config = JSON.parse(req.responseText);
+    }
+
+    ////////////////////////////////////////
+    //
+    // Metrics Agent Configuration file
+    //
+    ////////////////////////////////////////
+    var req = new XMLHttpRequest();
+    req.open("GET", "../../MetricsAgent/MetricsAgent.json", false);
+    req.setRequestHeader("Content-type", "application/json");
+    req.send();
+    if (req.status === 200) {
+        configMetrics = JSON.parse(req.responseText);
+        $scope.configMetrics = configMetrics.items;
+        $scope.selected_metric_option = $scope.configMetrics[1];
     }
 
     ////////////////////////////////////////
