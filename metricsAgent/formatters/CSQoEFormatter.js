@@ -61,11 +61,8 @@ CSQoE.prototype.formatterRecurring = function() {
 
 	data.type = 0;
 
-	if(this.firstAccess) {
-		data.session = this.formatSessionObject([]);
-	} else {
-		data.session = this.formatSessionObject([]);
-	}
+	data.session = this.formatSessionObject([]);
+	
 	data.state = this.formatStateObject([]);
 	data.Playing = this.formatPlayingObject([]);
 	data.Buffering = this.formatBufferingObject([]);
