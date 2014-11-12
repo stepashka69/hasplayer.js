@@ -6,10 +6,10 @@ define({
 	proxyPort: 3555,
 
 	// A fully qualified URL to the Intern proxy
-	proxyUrl: 'http://0.0.0.0:3555',
+	proxyUrl: 'http://10.194.60.33:3555',
 	tunnel: 'NullTunnel',
 	tunnelOptions: {
-        hostname: '10.194.60.62',
+        hostname: 'r-lnx-fitforme4',
         port: '4444',
         verbose: true
     },
