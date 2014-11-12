@@ -141,6 +141,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     previousDownloadedQuality= 0,
     maxGraphPoints = 50,
     initAudioTracks = true,
+    MetricsAgentInstance = null,
     initTextTracks = true;
 
     $scope.chromecast = {};
@@ -678,27 +679,15 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.activateMetricsAgent = false;
 
-    if (typeof MetricsAgent == 'function') {
-        var MetricsAgentInstance = new MetricsAgent(player, video, {
-            activationUrl: 'http://p-collector.orange-labs.fr/config',
-            serverUrl: 'http://p-collector.orange-labs.fr',
-            //activationUrl: 'http://10.192.224.13/config',
-            //serverUrl: 'http://10.192.224.13',
-            // activationUrl: 'http://localhost:8080/config',
-            // serverUrl: 'http://localhost:8080/metrics',
-            //dbServerUrl: 'http://localhost:8080/metricsDB',
-            collector: 'HasPlayerCollector',
-            formatter: 'CSQoE',
-            sendingTime: 10000
-        }, player.getDebug());
-
-        $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
-    }
-
     $scope.setMetricsAgent = function(value) {
         $scope.activateMetricsAgent = value;
 
         if (typeof MetricsAgent == 'function') {
+        debugger;
+        
+        MetricsAgentInstance = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
+
+        $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
             if ($scope.activateMetricsAgent) {
                 MetricsAgentInstance.init(function (activated) {
                     $scope.activateMetricsAgent = activated;

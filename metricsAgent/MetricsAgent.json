@@ -9,8 +9,8 @@
          "sendingTime": 10000
 	},
   	{"name": "local",
-	 "activationUrl":"http://10.192.224.13/config",
-	 "serverUrl":"http://10.192.224.13",
+	 "activationUrl":"http://localhost:8080/config",
+	 "serverUrl":"http://localhost:8080",
 	 "dbServerUrl":"http://localhost:8080/metricsDB",
 	 "collector":"HasPlayerCollector",
          "formatter":"CSQoE",
