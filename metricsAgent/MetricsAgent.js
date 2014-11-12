@@ -75,7 +75,14 @@ MetricsAgent.prototype.createSession = function() {
 };
 
 MetricsAgent.prototype.getActivation = function(callback) {
-	this.sender.http('GET', this.parameters.activationUrl, null, callback, callback ? true : false);
+	if (this.parameters.activationUrl) {
+		this.sender.http('GET', this.parameters.activationUrl, null, callback, callback ? true : false);
+	}else{
+		//no activation url, MetricsAgent is activated by parameter enable value 
+		var activation = {};
+		activation.active = this.parameters.enable;
+		callback(activation);
+	}
 };
 
 MetricsAgent.prototype.sendPeriodicMessage = function() {
