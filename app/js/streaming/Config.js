@@ -30,7 +30,7 @@ MediaPlayer.utils.Config = function () {
             "ABR.maxBandwidth": -1,
             "ABR.minQuality": -1,
             "ABR.maxQuality": -1,
-            "ABR.switchIncremental": false,
+            "ABR.switchUpIncrementally": false,
             "ABR.switchUpRatioSafetyFactor": -1,
             "ABR.latencyInBandwidth": true,
             "ABR.switchDownBufferTime": -1,
@@ -62,14 +62,17 @@ MediaPlayer.utils.Config = function () {
                 typeItem;
 
             for (item in newParams) {
-                // check if type parameters
-                if (paramsType.indexOf(item) > -1) {
-                    typeParams = newParams[item];
-                    for (typeItem in typeParams) {
-                        params[item][typeItem] = newParams[item][typeItem];
+                // Check if comment
+                if (item.indexOf('//') === -1) {
+                    // Check if type parameters
+                    if (paramsType.indexOf(item) > -1) {
+                        typeParams = newParams[item];
+                        for (typeItem in typeParams) {
+                            params[item][typeItem] = newParams[item][typeItem];
+                        }
+                    } else {
+                        params[item] = newParams[item];
                     }
-                } else {
-                    params[item] = newParams[item];
                 }
             }
         },
