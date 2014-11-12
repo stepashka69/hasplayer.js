@@ -131,9 +131,7 @@ MetricsAgent.prototype.sendMetrics = function(type) {
 	}
 	this.isSending = true;
 
-	//get all metrics and format them
-	var metrics = this.database.getMetrics();
-	var formattedData = this.formatter.process(type, metrics);
+	var formattedData = this.formatter.process(type);
 
 	//send formated Metrics to serverUrl in param
 	this.sender.http('POST', this.parameters.serverUrl, JSON.stringify(formattedData));
