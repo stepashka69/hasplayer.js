@@ -683,12 +683,13 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.activateMetricsAgent = value;
 
         if (typeof MetricsAgent == 'function') {
-        debugger;
         
-        MetricsAgentInstance = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-
-        $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
             if ($scope.activateMetricsAgent) {
+        
+                MetricsAgentInstance = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
+
+                $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
+            
                 MetricsAgentInstance.init(function (activated) {
                     $scope.activateMetricsAgent = activated;
                     console.log("Metrics agent state: ", activated);
