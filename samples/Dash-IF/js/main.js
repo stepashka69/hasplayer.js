@@ -606,6 +606,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.selected_metric_option = $scope.configMetrics[1];
     }
 
+    $scope.setMetricOption = function(metricOption) {
+        $scope.selected_metric_option = metricOption;
+    };
+
     ////////////////////////////////////////
     //
     // Player Setup

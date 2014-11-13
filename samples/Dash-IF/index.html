@@ -431,14 +431,19 @@
                         <button type="button" class="btn btn-default" ng-class="{active:activateMetricsAgent == true}" ng-click="setMetricsAgent(true)">
                             <span>On</span>
                         </button>
+
+
                     </div>
-                    <ul>
-                        <li ng-repeat="metricOption in configMetrics">
-                             <label>{{metricOption.name}}
-                                <input type="radio" ng-model="$parent.selected_metric_option" name="name" ng-value="metricOption" name="name" required />
-                            </label>
-                        </li>
-                    </ul>
+
+
+                    
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical full-width" role="group">
+                        <div ng-repeat="metricOption in configMetrics">
+                            <button class="btn btn-default full-width" ng-click="setMetricOption(metricOption)" ng-class="{'active': selected_metric_option === metricOption}">{{metricOption.name}}</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel-heading panel-top">
                         <span class="panel-title">ABR</span>
