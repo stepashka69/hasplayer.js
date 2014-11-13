@@ -7,6 +7,10 @@ CSQoE.prototype.init = function(database) {
 	this.msgnbr = 0;
 };
 
+CSQoE.prototype.generateSessionId = function() {
+	return ;
+};
+
 CSQoE.prototype.getMessageType = function(metric) {
 
 	var type = -1;

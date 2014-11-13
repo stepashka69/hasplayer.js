@@ -64,7 +64,7 @@ MetricsAgent.prototype.stop = function() {
 MetricsAgent.prototype.createSession = function() {
 
 	//console.log('%c START OF SESSION ', 'color: #2980b9');
-	this.sessionId = new Date().getTime()+"."+String(Math.random()).substring(2);
+	this.sessionId = this.formatter.generateSessionId();
 
 	this.database.init(this.sessionId);
 	this.collector.init(this.sessionId);

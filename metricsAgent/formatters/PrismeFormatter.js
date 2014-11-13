@@ -7,6 +7,10 @@ Prisme.prototype.init = function(database) {
 	this.msgnbr = 0;
 };
 
+Prisme.prototype.generateSessionId = function() {
+	return new Date().getTime()+"-"+String(Math.random()).substring(2);
+};
+
 Prisme.prototype.getMessageType = function(metric) {
 
 	var type = -1;
@@ -36,16 +40,10 @@ Prisme.prototype.process = function(type) {
 			formattedData = this.formatterRecurring();
 			break;
 		case 1:
-			formattedData = this.formatterNewState();
+			formattedData = this.formatterRealTime();
 			break;
 		case 2:
-			formattedData = this.formatterMetadata();
-			break;
-		case 3:
-			formattedData = this.formatterChangeBitrate();
-			break;
-		case 10:
-			formattedData = this.formatterError();
+			formattedData = this.formatterSession();
 			break;
 	}
 
@@ -85,7 +83,7 @@ Prisme.prototype.formatterRecurring = function() {
 };
 
 //type 1
-Prisme.prototype.formatterNewState = function() {
+Prisme.prototype.formatterRealTime = function() {
 	var data = {};
 
 	data.type = 1;
@@ -115,69 +113,16 @@ Prisme.prototype.formatterNewState = function() {
 };
 
 //type 2
-Prisme.prototype.formatterMetadata = function() {
+Prisme.prototype.formatterSession = function() {
 	var data = {};
 
-	data.type = 2;
 
-	if(this.firstAccess) {
-		data.session = this.formatSessionObject([]);
-	} else {
-		data.session = this.formatSessionObject(['playerid', 'browserid', 'uri', 'provider', 'repeatMode', 'repeatCount']); // only id	
-	}
 
-	data.metadata = this.formatMetadataObject([]);
-
-	this.firstAccess = false;
-
-	return data;
-};
-
-//type 3
-Prisme.prototype.formatterChangeBitrate = function() {
-	var data = {};
-
-	data.type = 3;
-
-	if(this.firstAccess) {
-		data.session = this.formatSessionObject([]); // only id, playerid, browserid, repeatMode, repeatCount
-	} else {
-		data.session = this.formatSessionObject(['playerid', 'browserid', 'uri', 'provider', 'repeatMode', 'repeatCount']); // only id
-	}
+	data.session = this.formatSessionObject([]);
 
 	data.state = this.formatStateObject(['previous', 'previoustime', 'progress']); // only current, detail
 	data.encoding = this.formatEncodingObject([]);
 	data.condition = this.formatConditionObject([]);
-
-	this.firstAccess = false;
-
-	return data;
-};
-
-//type 10
-Prisme.prototype.formatterError = function() {
-	var data = {};
-
-	data.type = 10;
-
-	if(this.firstAccess) {
-		data.session = this.formatSessionObject([]);
-	} else {
-		data.session = this.formatSessionObject(['playerid', 'browserid', 'uri', 'provider', 'repeatMode', 'repeatCount']); // only id	
-	}
-
-	data.Playing = this.formatPlayingObject([]);
-	data.Buffering = this.formatBufferingObject([]);
-	data.Paused = this.formatPausedObject([]);
-	data.Stopped = this.formatStoppedObject([]);
-	data.Seeking = this.formatSeekingObject([]);
-	data.state = this.formatStateObject([]);
-	data.encoding = this.formatEncodingObject([]);
-	data.condition = this.formatConditionObject([]);
-	data.error = this.formatErrorObject([]);
-
-	//non objects fields
-	this.formatStartuptime(data);
 
 	this.firstAccess = false;
 
@@ -225,27 +170,46 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 };
 
 Prisme.prototype.formatPlayingObject = function() {
-	var Playing = this.countState('playing');
+	if(!this.database) {
+		return {};
+	}
+
+	var Playing = this.database.getCountState('playing');
 	return Playing;
 };
 
 Prisme.prototype.formatBufferingObject = function() {
-	var Buffering = this.countState('buffering');
+	if(!this.database) {
+		return {};
+	}
+
+	var Buffering = this.database.getCountState('buffering');
 	return Buffering;
 };
 
 Prisme.prototype.formatPausedObject = function() {
-	var Paused = this.countState('paused');
+	if(!this.database) {
+		return {};
+	}
+
+	var Paused = this.database.getCountState('paused');
 	return Paused;
 };
 
 Prisme.prototype.formatStoppedObject = function() {
-	var Paused = this.countState('stopped');
+	if(!this.database) {
+		return {};
+	}
+	var Paused = this.database.getCountState('stopped');
 	return Paused;
 };
 
 Prisme.prototype.formatSeekingObject = function() {
-	var Seeking = this.countState('seeking');
+	if(!this.database) {
+		return {};
+	}
+
+	var Seeking = this.database.getCountState('seeking');
 	return Seeking;
 };
 
@@ -274,7 +238,6 @@ Prisme.prototype.formatStateObject = function(excludedList) {
 	this.setFieldValue('progress', state.position);
 
 	return this.data;
-
 };
 
 Prisme.prototype.formatEncodingObject = function(excludedList) {
@@ -414,35 +377,6 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 
 };
 //RULES FORMAT END
-
-
-Prisme.prototype.countState = function(state) {
-	if(!this.database) {
-		return {};
-	}
-	
-	var metrics = this.database.getMetrics(),
-		i = 0,
-		len = metrics.length,
-		result = {
-			count: 0,
-			duration: 0
-		};
-
-	for(i = 0; i < len; i++) {
-		if (metrics[i].hasOwnProperty('state')) {
-			if (metrics[i].state.current === state) {
-				result.count++;
-				result.duration += metrics[i].state.duration;
-			}
-		}
-	}
-
-	// Set duration in seconds and round to 3 decimals
-	result.duration = Math.round(result.duration) / 1000;
-
-	return result;
-};
 
 Prisme.prototype.isExcluded = function(value, array) {
 	return array.indexOf(value) > -1;
