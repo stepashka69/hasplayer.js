@@ -8,7 +8,7 @@ CSQoE.prototype.init = function(database) {
 };
 
 CSQoE.prototype.generateSessionId = function() {
-	return ;
+	return new Date().getTime()+"."+String(Math.random()).substring(2);
 };
 
 CSQoE.prototype.getMessageType = function(metric) {
