@@ -209,22 +209,17 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.data = {};
 	this.excludedList = excludedList;
 
-	this.setFieldValue('id', session.id);
-	this.setFieldValue('playerid', session.playerid);
-	this.setFieldValue('browserid', session.browserid);
-
-	this.data.msgnbr = this.msgnbr;
-
-	if(session.hasOwnProperty('uri') && !this.isExcluded('uri', this.excludedList)) {
-		var parser = document.createElement('a');
-        parser.href = session.uri;
-		this.data.uri = (parser.pathname.charAt(0) == "/") ? parser.pathname : "/" + parser.pathname;
-		this.data.dhost = parser.hostname;
-	}
-
-	this.setFieldValue('provider', session.provider);
-	this.setFieldValue('repeatMode', session.loopMode);
-	this.setFieldValue('repeatCount', session.loopCount);
+	this.setFieldValue('sessionId', session.id);
+	this.setFieldValue('playerId', session.playerid);
+	this.setFieldValue('uuid', "undefined");
+	this.setFieldValue('url', session.uri);
+	this.setFieldValue('status', "undefined");
+	this.setFieldValue('userAgent', session.userAgent);
+	this.setFieldValue('contentId', "undefined");
+	//this.setFieldValue('contentDuration', session.);
+	//this.setFieldValue('watchStartDate', "undefined");
+	//this.setFieldValue('watchEndDate', "undefined");
+	//this.setFieldValue('maxPosition', "undefined");
 
 	return this.data;
 };
@@ -454,7 +449,5 @@ Prisme.prototype.isExcluded = function(value, array) {
 };
 
 Prisme.prototype.MESSAGE_PERIODIC = 0;
-Prisme.prototype.MESSAGE_STATE_CHANGE = 1;
+Prisme.prototype.MESSAGE_REAL_TIME = 1;
 Prisme.prototype.MESSAGE_SESSION = 2;
-Prisme.prototype.MESSAGE_BITRATE_CHANGE = 3;
-Prisme.prototype.MESSAGE_ERROR = 10;
