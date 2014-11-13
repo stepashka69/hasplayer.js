@@ -193,6 +193,30 @@ MetricsDatabase.prototype.updateCurrentState = function(date) {
 	}
 };
 
+MetricsDatabase.prototype.getCountState = function(state) {
+	var metrics = this.getMetrics(),
+		i = 0,
+		len = metrics.length,
+		result = {
+			count: 0,
+			duration: 0
+		};
+
+	for(i = 0; i < len; i++) {
+		if (metrics[i].hasOwnProperty('state')) {
+			if (metrics[i].state.current === state) {
+				result.count++;
+				result.duration += metrics[i].state.duration;
+			}
+		}
+	}
+
+	// Set duration in seconds and round to 3 decimals
+	result.duration = Math.round(result.duration) / 1000;
+
+	return result;
+};
+
 MetricsDatabase.prototype.clear = function() {
 
 	this.metrics = [];

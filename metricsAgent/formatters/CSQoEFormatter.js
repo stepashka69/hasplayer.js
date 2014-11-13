@@ -227,27 +227,46 @@ CSQoE.prototype.formatSessionObject = function(excludedList) {
 };
 
 CSQoE.prototype.formatPlayingObject = function() {
-	var Playing = this.countState('playing');
+	if(!this.database) {
+		return {};
+	}
+
+	var Playing = this.database.getCountState('playing');
 	return Playing;
 };
 
 CSQoE.prototype.formatBufferingObject = function() {
-	var Buffering = this.countState('buffering');
+	if(!this.database) {
+		return {};
+	}
+
+	var Buffering = this.database.getCountState('buffering');
 	return Buffering;
 };
 
 CSQoE.prototype.formatPausedObject = function() {
-	var Paused = this.countState('paused');
+	if(!this.database) {
+		return {};
+	}
+
+	var Paused = this.database.getCountState('paused');
 	return Paused;
 };
 
 CSQoE.prototype.formatStoppedObject = function() {
-	var Paused = this.countState('stopped');
+	if(!this.database) {
+		return {};
+	}
+	var Paused = this.database.getCountState('stopped');
 	return Paused;
 };
 
 CSQoE.prototype.formatSeekingObject = function() {
-	var Seeking = this.countState('seeking');
+	if(!this.database) {
+		return {};
+	}
+
+	var Seeking = this.database.getCountState('seeking');
 	return Seeking;
 };
 
@@ -416,35 +435,6 @@ CSQoE.prototype.formatMetadataObject = function(excludedList) {
 
 };
 //RULES FORMAT END
-
-
-CSQoE.prototype.countState = function(state) {
-	if(!this.database) {
-		return {};
-	}
-	
-	var metrics = this.database.getMetrics(),
-		i = 0,
-		len = metrics.length,
-		result = {
-			count: 0,
-			duration: 0
-		};
-
-	for(i = 0; i < len; i++) {
-		if (metrics[i].hasOwnProperty('state')) {
-			if (metrics[i].state.current === state) {
-				result.count++;
-				result.duration += metrics[i].state.duration;
-			}
-		}
-	}
-
-	// Set duration in seconds and round to 3 decimals
-	result.duration = Math.round(result.duration) / 1000;
-
-	return result;
-};
 
 CSQoE.prototype.isExcluded = function(value, array) {
 	return array.indexOf(value) > -1;
