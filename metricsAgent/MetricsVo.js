@@ -44,7 +44,6 @@ MetricsVo.Session = function (){
 
 
 MetricsVo.MetaData = function (){
-		this.id = null;
 		this.contentType = null;
 		this.codec = null;
 		this.format = null;
