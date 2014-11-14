@@ -1,8 +1,8 @@
-function CSQoE () {
+function CSQoE (database) {
+	this.database = database;
 }
 
-CSQoE.prototype.init = function(database) {
-	this.database = database;
+CSQoE.prototype.init = function() {
 	this.firstAccess = true;
 	this.msgnbr = 0;
 };
