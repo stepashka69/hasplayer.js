@@ -1,8 +1,56 @@
-function Prisme () {
+function EventParameter(event) {
+	this.param = [];
+	this.enable = false;
+	
+	if (event) {
+		this.enable = true;
+		for (var i = 0; i < event.length; i++) {
+			this.param.push(parseInt(event[i]));
+		}
+	}
 }
 
-Prisme.prototype.init = function(database) {
+function EventTypeFilter() {
+	this.error = null;
+	this.profil = null;
+	this.usage = null;
+}
+
+EventTypeFilter.prototype.setFilter = function(type,eventParameter) {
+	this[type] = eventParameter;
+};
+
+function Prisme (database, eventTypeSessionFilter, eventTypeRealTimeFilter) {
 	this.database = database;
+	
+	this.eventTypeSessionFilter = this.parseEventsFilter(eventTypeSessionFilter);
+	this.eventTypeRealTimeFilter = this.parseEventsFilter(eventTypeRealTimeFilter);
+}
+
+Prisme.prototype.parseEventsFilter = function(eventsFilter){
+	var eventTypeFilter = new EventTypeFilter();
+	//parse units events => error, usage and profil
+	var events = eventsFilter.split(';');
+
+	var parsedElements = [];
+	//parse for each unit events, numbers of elements to return (n first, and m last)
+	for (var i = 0; i < events.length; i++) {
+		var tabTemp = events[i].split(',');
+		parsedElements[tabTemp[0]] = [];
+		for (var j = 1; j < tabTemp.length; j++) {
+				parsedElements[tabTemp[0]].push(tabTemp[j]);
+		}
+	}
+
+	//set, for each type filter, the different parameters : enable, n first and m last elements.
+    eventTypeFilter.setFilter('error',new EventParameter(parsedElements['error']));
+	eventTypeFilter.setFilter('profil',new EventParameter(parsedElements['profil']));
+	eventTypeFilter.setFilter('usage',new EventParameter(parsedElements['usage']));
+
+	return eventTypeFilter;
+};
+
+Prisme.prototype.init = function() {
 	this.firstAccess = true;
 	this.msgnbr = 0;
 };
@@ -15,19 +63,21 @@ Prisme.prototype.getMessageType = function(metric) {
 
 	var type = -1;
 	
-	if (metric.hasOwnProperty('state')) {
-		if (metric.state.current === 'init') {
+	if (metric.hasOwnProperty('session')) {
+		type = this.MESSAGE_SESSION;
+	}
+		/*if (metric.state.current === 'init') {
 			type = -1;
 		} else {
 			type = this.MESSAGE_STATE_CHANGE;
-		}
-	} else if (metric.hasOwnProperty('metadata')) {
+		}*/
+	/*} else if (metric.hasOwnProperty('metadata')) {
 		type = this.MESSAGE_SESSION;
 	} else if (metric.hasOwnProperty('encoding') && (metric.encoding.contentType === 'video')) {
 		type = this.MESSAGE_BITRATE_CHANGE;
 	} else if (metric.hasOwnProperty('error')) {
 		type = this.MESSAGE_ERROR;
-	}
+	}*/
 
 	return type;
 };
@@ -114,15 +164,43 @@ Prisme.prototype.formatterRealTime = function() {
 
 //type 2
 Prisme.prototype.formatterSession = function() {
-	var data = {};
-
-
+	var data = {session:{}};
 
 	data.session = this.formatSessionObject([]);
+	data.session.events = [];
+	data.session.events.usage = [];
+	data.session.events.error = [];
+	data.session.events.profil = [];
+	
+	var firstElts = this.database.getMetricsObjects('action',false,this.eventTypeSessionFilter['usage'].param[0]);
+	var lastElts = this.database.getMetricsObjects('action',true,this.eventTypeSessionFilter['usage'].param[1]);
+	if (firstElts.length >0) {
+		data.session.events['usage'].push(firstElts);
+	}
 
-	data.state = this.formatStateObject(['previous', 'previoustime', 'progress']); // only current, detail
-	data.encoding = this.formatEncodingObject([]);
-	data.condition = this.formatConditionObject([]);
+	if (lastElts.length >0) {
+		data.session.events['usage'].push(lastElts);
+	}
+
+	firstElts = this.database.getMetricsObjects('error',false,this.eventTypeSessionFilter['error'].param[0]);
+	lastElts = this.database.getMetricsObjects('error',true,this.eventTypeSessionFilter['error'].param[1]);
+	if (firstElts.length >0) {
+		data.session.events['error'].push(firstElts);
+	}
+
+	if (lastElts.length >0) {
+		data.session.events['error'].push(lastElts);
+	}
+	
+	firstElts = this.database.getMetricsObjects('encoding',false,this.eventTypeSessionFilter['profil'].param[0]);
+	lastElts = this.database.getMetricsObjects('encoding',true,this.eventTypeSessionFilter['profil'].param[1]);
+	if (firstElts.length >0) {
+		data.session.events['profil'].push(firstElts);
+	}
+
+	if (lastElts.length >0) {
+		data.session.events['profil'].push(lastElts);
+	}
 
 	this.firstAccess = false;
 
@@ -374,7 +452,6 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 	this.setFieldValue('encapsulation', metadata.format);
 
 	return this.data;
-
 };
 //RULES FORMAT END
 

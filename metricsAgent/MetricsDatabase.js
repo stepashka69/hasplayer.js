@@ -177,6 +177,26 @@ MetricsDatabase.prototype.getMetricObject = function(type, reverseSearch, condit
 	return null;
 };
 
+MetricsDatabase.prototype.getMetricsObjects = function(type, reverseSearch, nbElts, condition) {
+	var metricsList = [];
+
+	if ((reverseSearch !== undefined) && (reverseSearch === true)) {
+		for (i = (this.metrics.length - 1); i >= 0 && (nbElts?metricsList.length < nbElts:true); i--) {
+			if (this.checkMetric(this.metrics[i], type, condition)) {
+					metricsList.push(this.metrics[i]);
+			}
+		}
+	} else {
+		for (i = 0; i < this.metrics.length && (nbElts?metricsList.length < nbElts:true); i++) {
+			if (this.checkMetric(this.metrics[i], type, condition)) {
+				metricsList.push(this.metrics[i]);
+			}
+		}
+	}
+
+	return metricsList;
+};
+
 MetricsDatabase.prototype.getMetrics = function() {
 //	var metrics = JSON.parse(localStorage.getItem(this.sessionId));
 //	return metrics;
