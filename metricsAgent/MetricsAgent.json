@@ -5,16 +5,16 @@
 	 "serverUrl":"http://p-collector.orange-labs.fr",
 	 "dbServerUrl":"",
 	 "collector":"HasPlayerCollector",
-         "formatter":"CSQoE",
-         "sendingTime": 10000
+     "formatter":"CSQoE",
+     "sendingTime": 10000
 	},
   	{"name": "local",
 	 "activationUrl":"http://localhost:8080/config",
 	 "serverUrl":"http://localhost:8080",
 	 "dbServerUrl":"http://localhost:8080/metricsDB",
 	 "collector":"HasPlayerCollector",
-         "formatter":"CSQoE",
-         "sendingTime": 10000
+     "formatter":"CSQoE",
+     "sendingTime": 10000
 	},
     	{"name": "prisme",
 	 "activationUrl":"",
@@ -25,8 +25,8 @@
 	 "eventTypeRealTimeFilter":"error,10",
 	 "dbServerUrl":"",
 	 "collector":"HasPlayerCollector",
-         "formatter":"Prisme",
-         "sendingTime": 10000
+     "formatter":"Prisme",
+     "sendingTime": 10000
 	}]
 }
 

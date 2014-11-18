@@ -26,7 +26,7 @@ function MetricsAgent(player, video, parameters, debug) {
 	this.sessionId = null;
 	this.database = new MetricsDatabase(this.video);
 	this.collector = new window[this.parameters.collector](this.player, this.database);
-	this.formatter = new window[this.parameters.formatter](this.database, this.parameters.eventTypeSessionFilter, this.parameters.eventTypeRealTimeFilter);
+	this.formatter = new window[this.parameters.formatter](this.database, this.parameters.eventsObjectFilter,this.parameters.eventTypeSessionFilter, this.parameters.eventTypeRealTimeFilter);
 	this.sender = new MetricsSender(this.debug);
 	this.isSending = false;
 

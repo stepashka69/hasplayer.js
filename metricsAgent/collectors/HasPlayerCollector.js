@@ -226,6 +226,7 @@ HasPlayerCollector.prototype.mapEncodingObject = function(metric) {
     encodingVo.codec = metric.codec;
     encodingVo.index = metric.index;
     encodingVo.bitrate = metric.bandwith;
+    encodingVo.position = metric.value.mt;
 
     return encodingVo;
 };

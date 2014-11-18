@@ -20,11 +20,13 @@ EventTypeFilter.prototype.setFilter = function(type,eventParameter) {
 	this[type] = eventParameter;
 };
 
-function Prisme (database, eventTypeSessionFilter, eventTypeRealTimeFilter) {
+function Prisme (database, eventsObjectFilter, eventTypeSessionFilter, eventTypeRealTimeFilter) {
 	this.database = database;
 	
 	this.eventTypeSessionFilter = this.parseEventsFilter(eventTypeSessionFilter);
 	this.eventTypeRealTimeFilter = this.parseEventsFilter(eventTypeRealTimeFilter);
+
+	this.currentBitrate = 0;
 }
 
 Prisme.prototype.parseEventsFilter = function(eventsFilter){
@@ -65,20 +67,18 @@ Prisme.prototype.getMessageType = function(metric) {
 	
 	if (metric.hasOwnProperty('session')) {
 		type = this.MESSAGE_SESSION;
+	}/*error is defined in eventTypeRealTimeFilter ? error type code also defined?*/
+	else if ((metric.hasOwnProperty('error') && (this.eventTypeRealTimeFilter.error != undefined && this.eventTypeRealTimeFilter.error.param[0] === metric.value.code)))
+	{
+		type = this.MESSAGE_REAL_TIME_ERROR;
+	}/*use is defined in eventTypeRealTimeFilter ? */
+	else if ((metric.hasOwnProperty('action') && (this.eventTypeRealTimeFilter.usage != undefined))){
+		type = this.MESSAGE_REAL_TIME_USE;
+	}/*profil is defined in eventTypeRealTimeFilter ?*/
+	else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil != undefined))){
+		type = this.MESSAGE_REAL_TIME_PROFIL;
 	}
-		/*if (metric.state.current === 'init') {
-			type = -1;
-		} else {
-			type = this.MESSAGE_STATE_CHANGE;
-		}*/
-	/*} else if (metric.hasOwnProperty('metadata')) {
-		type = this.MESSAGE_SESSION;
-	} else if (metric.hasOwnProperty('encoding') && (metric.encoding.contentType === 'video')) {
-		type = this.MESSAGE_BITRATE_CHANGE;
-	} else if (metric.hasOwnProperty('error')) {
-		type = this.MESSAGE_ERROR;
-	}*/
-
+	
 	return type;
 };
 
@@ -90,9 +90,15 @@ Prisme.prototype.process = function(type) {
 			formattedData = this.formatterRecurring();
 			break;
 		case 1:
-			formattedData = this.formatterRealTime();
+			formattedData = this.formatterRealTimeError();
 			break;
 		case 2:
+			formattedData = this.formatterRealTimeProfil();
+			break;
+		case 3:
+			formattedData = this.formatterRealTimeUse();
+			break;
+		case 4:
 			formattedData = this.formatterSession();
 			break;
 	}
@@ -105,7 +111,8 @@ Prisme.prototype.process = function(type) {
 //type 0
 Prisme.prototype.formatterRecurring = function() {
 
-	var data = {};
+	//même traitement que session si besoin => uniquement en LIVE
+	/*var data = {};
 
 	data.type = 0;
 
@@ -129,80 +136,122 @@ Prisme.prototype.formatterRecurring = function() {
 
 	this.firstAccess = false;
 
-	return data;
+	return data;*/
 };
 
 //type 1
-Prisme.prototype.formatterRealTime = function() {
-	var data = {};
+Prisme.prototype.formatterRealTimeError = function() {
+	var data = [];
 
-	data.type = 1;
-	
-	if(this.firstAccess) {
-		data.session = this.formatSessionObject([]); // only id, playerid, browserid, repeatMode, repeatCount	
-	} else {
-		data.session = this.formatSessionObject(['playerid', 'browserid', 'uri', 'provider', 'repeatMode', 'repeatCount']); // only id
-	}
+	data.push(new Date().getTime());
+	data.push('has/realtime/error/');
 
-	data.state = this.formatStateObject([]);
-	data.Playing = this.formatPlayingObject([]);
-	data.Buffering = this.formatBufferingObject([]);
-	data.Paused = this.formatPausedObject([]);
-	data.Stopped = this.formatStoppedObject([]);
-	data.Seeking = this.formatSeekingObject([]);
-	data.encoding = this.formatEncodingObject([]);
-	data.condition = this.formatConditionObject([]);
-	data.error = this.formatErrorObject(['code']); //only count
+	this.data = {};
 
-	//non objects fields
-	this.formatStartuptime(data);
+	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
 
-	this.firstAccess = false;
+	//Add error info in realTimeErrorObj
+	this.formatErrorObject([]);
+
+	data.push(this.data);
 
 	return data;
 };
 
 //type 2
-Prisme.prototype.formatterSession = function() {
-	var data = {session:{}};
+Prisme.prototype.formatterRealTimeProfil = function() {
+	var data = [];
 
-	data.session = this.formatSessionObject([]);
-	data.session.events = [];
-	data.session.events.usage = [];
-	data.session.events.error = [];
-	data.session.events.profil = [];
+	data.push(new Date().getTime());
+	data.push('has/realtime/profil/');
+
+	this.data = {};
+
+	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
+
+	//Add encoding info in realTimeProfilObj
+	this.formatEncodingObject([]);
+
+	data.push(this.data);
+
+	return data;
+};
+
+//type 3
+Prisme.prototype.formatterRealTimeUse = function() {
+	var data = [];
+
+	data.push(new Date().getTime());
+	data.push('has/realtime/use/');
+
+	this.data = {};
+
+	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
+
+	//Add action info in realTimeUseObj
+	this.formatActionObject([]);
+
+	data.push(this.data);
+
+	return data;
+};
+
+//type 4
+Prisme.prototype.formatterSession = function() {
+	var data = [];
+
+	data.push(new Date().getTime());
+	data.push('has/session/');
+	
+	var sessionObj = {};
+
+	sessionObj = this.formatSessionObject([]);
+	sessionObj.events = [];
+	sessionObj.events.usage = [];
+	sessionObj.events.error = [];
+	sessionObj.events.profil = [];
+
+	sessionObj.counts = [];
+	sessionObj.counts.error = [];
+	sessionObj.counts.profil = [];
+	//sessionObj.counts.playing = [];
+	//sessionObj.counts.buffering = [];
+	//sessionObj.counts.seeking = [];
+	//sessionObj.counts.paused = [];
 	
 	var firstElts = this.database.getMetricsObjects('action',false,this.eventTypeSessionFilter['usage'].param[0]);
 	var lastElts = this.database.getMetricsObjects('action',true,this.eventTypeSessionFilter['usage'].param[1]);
 	if (firstElts.length >0) {
-		data.session.events['usage'].push(firstElts);
+		sessionObj.events['usage'].push(firstElts);
 	}
 
 	if (lastElts.length >0) {
-		data.session.events['usage'].push(lastElts);
+		sessionObj.events['usage'].push(lastElts);
 	}
 
 	firstElts = this.database.getMetricsObjects('error',false,this.eventTypeSessionFilter['error'].param[0]);
 	lastElts = this.database.getMetricsObjects('error',true,this.eventTypeSessionFilter['error'].param[1]);
 	if (firstElts.length >0) {
-		data.session.events['error'].push(firstElts);
+		sessionObj.events['error'].push(firstElts);
 	}
 
 	if (lastElts.length >0) {
-		data.session.events['error'].push(lastElts);
+		sessionObj.events['error'].push(lastElts);
 	}
 	
 	firstElts = this.database.getMetricsObjects('encoding',false,this.eventTypeSessionFilter['profil'].param[0]);
 	lastElts = this.database.getMetricsObjects('encoding',true,this.eventTypeSessionFilter['profil'].param[1]);
 	if (firstElts.length >0) {
-		data.session.events['profil'].push(firstElts);
+		sessionObj.events['profil'].push(firstElts);
 	}
 
 	if (lastElts.length >0) {
-		data.session.events['profil'].push(lastElts);
+		sessionObj.events['profil'].push(lastElts);
 	}
 
-	this.firstAccess = false;
+	//add Counts content.
+
+	data.push(sessionObj);
 
 	return data;
 };
@@ -236,9 +285,13 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('playerId', session.playerid);
 	this.setFieldValue('uuid', "undefined");
 	this.setFieldValue('url', session.uri);
-	this.setFieldValue('status', "undefined");
 	this.setFieldValue('userAgent', session.userAgent);
 	this.setFieldValue('contentId', "undefined");
+
+	if (this.firstAccess === true) {
+		this.data.status = "OK";
+		this.firstAccess = false;
+	}
 	//this.setFieldValue('contentDuration', session.);
 	//this.setFieldValue('watchStartDate', "undefined");
 	//this.setFieldValue('watchEndDate', "undefined");
@@ -328,21 +381,55 @@ Prisme.prototype.formatEncodingObject = function(excludedList) {
 		return {};
 	}
 
-	var encoding = this.database.getMetricObject('encoding', true, isVideo),
-		metadata = this.database.getMetricObject('metadata', true, isVideo);
+	var encoding = this.database.getMetricObject('encoding', true, isVideo);
 
-	if(metadata === null || encoding === null) {
+	if(encoding === null) {
 		return {};
 	}
 
-	this.data = {};
 	this.excludedList = excludedList;
 
-	this.setFieldValue('current', metadata.bitrates[encoding.index]);
-	this.setFieldValue('min', 0);
-	this.setFieldValue('max', metadata.bitrates[metadata.bitrates.length-1]);
+	this.setFieldValue('originBitrate', this.currentBitrate);
+	this.setFieldValue('changeBitrate', encoding.bitrate);
+	this.setFieldValue('position',encoding.position);
 
-	return this.data;
+	this.currentBitrate = encoding.bitrate;
+};
+
+Prisme.prototype.formatActionObject = function(excludedList){
+	
+	if(!this.database) {
+		return {};
+	}
+
+	var action = this.database.getMetricObject('action', true),
+		prismeTypeCode = -1;
+
+	if(action === null) {
+		return {};
+	}
+
+	this.excludedList = excludedList;
+
+	switch (action.type) {
+		case "seek":
+			prismeTypeCode = this.USE_SEEK;
+			break;
+		case "play":
+			prismeTypeCode = this.USE_PLAY;
+			break;
+		case "pause":
+			prismeTypeCode = this.USE_PAUSE;
+			break;
+		case "initial_start":
+			prismeTypeCode = this.USE_PLAY;
+			break;
+	}
+
+	this.setFieldValue('typeCode', prismeTypeCode);
+	//Fast forward and fast backward are not possible in the player
+	//this.setFieldValue('addInfos', undefined);
+	this.setFieldValue('position', action.position);
 };
 
 Prisme.prototype.formatStartuptime = function(data) {
@@ -387,7 +474,22 @@ Prisme.prototype.formatErrorObject = function(excludedList) {
 		return {};
 	}
 
-	var data = {},
+	var error = this.database.getMetricObject('error', true);
+
+	if(error === null) {
+		return {};
+	}
+
+	this.excludedList = excludedList;
+
+	this.setFieldValue('orangeErrorCode', undefined);
+	this.setFieldValue('chunkURL', undefined);
+	this.setFieldValue('errorCode', error.code);
+	this.setFieldValue('comment', error.message);
+
+	this.currentBitrate = encoding.bitrate;
+
+	/*var data = {},
 		metrics = this.database.getMetrics(),
 		i = 0,
 		len = metrics.length,
@@ -410,7 +512,7 @@ Prisme.prototype.formatErrorObject = function(excludedList) {
 		}
 	}
 
-	return data;
+	return data;*/
 };
 
 Prisme.prototype.formatMetadataObject = function(excludedList) {
@@ -460,5 +562,21 @@ Prisme.prototype.isExcluded = function(value, array) {
 };
 
 Prisme.prototype.MESSAGE_PERIODIC = 0;
-Prisme.prototype.MESSAGE_REAL_TIME = 1;
-Prisme.prototype.MESSAGE_SESSION = 2;
+Prisme.prototype.MESSAGE_REAL_TIME_ERROR = 1;
+Prisme.prototype.MESSAGE_REAL_TIME_PROFIL = 2;
+Prisme.prototype.MESSAGE_REAL_TIME_USE = 3;
+Prisme.prototype.MESSAGE_SESSION = 4;
+
+Prisme.prototype.ORANGE_STREAM_BROKEN_ERROR = 10;
+Prisme.prototype.ORANGE_HTTP_ERROR = 20;
+Prisme.prototype.ORANGE_STALLED_STREAM_ERROR = 30;
+Prisme.prototype.ORANGE_DRM_OR_DECODER_ERROR = 40;
+Prisme.prototype.ORANGE_UNDEFINED_PLAYER_ERROR = 99;
+Prisme.prototype.ORANGE_DEVICE_CRASH_ERROR = 100;
+
+Prisme.prototype.USE_PLAY = 1;
+Prisme.prototype.USE_PAUSE = 2;
+Prisme.prototype.USE_STOP = 3;
+Prisme.prototype.USE_FAST_FORWARD = 4;
+Prisme.prototype.USE_FAST_BACKWARD = 5;
+Prisme.prototype.USE_SEEK = 6;
