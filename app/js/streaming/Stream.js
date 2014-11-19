@@ -141,9 +141,8 @@ MediaPlayer.dependencies.Stream = function () {
 
             session = event.target;
 
-            // ORANGE: conversion from multi-byte to unicode
-            //bytes = new Uint16Array(event.message.buffer);
-            bytes = multiBytetoUnicode(event.message);
+            // ORANGE: Uint16Array if conversion from multi-byte to unicode is required
+            bytes = event.message[1] === 0 ? new Uint16Array(event.message.buffer) : new Uint8Array(event.message.buffer);
 
             msg = String.fromCharCode.apply(null, bytes);
             laURL = event.destinationURL;
