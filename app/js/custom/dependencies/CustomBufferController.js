@@ -1173,8 +1173,8 @@ Custom.dependencies.CustomBufferController = function () {
         updateBufferState: function() {
             if (bufferLevel <= 0 && htmlVideoState !== this.BUFFERING) {
                 htmlVideoState = this.BUFFERING;
-                this.debug.log("[BufferController]["+this.getType()+"] ******************** BUFFERING at "+this.videoModel.getCurrentTime());
-                this.metricsModel.addState(this.getType(), "buffering", this.videoModel.getCurrentTime());
+                this.debug.log("[BufferController]["+type+"] BUFFERING - " + this.videoModel.getCurrentTime());
+                this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
                 if (this.stallTime != null && this.nbJumpChunkMissing<=this.MAX_JUMP_CHUNK_MISSING) {
                     if (isDynamic) {
                         this.stallTime = null;
@@ -1193,8 +1193,8 @@ Custom.dependencies.CustomBufferController = function () {
             }
             else  if(bufferLevel > 0 && htmlVideoState !== this.PLAYING){
                 htmlVideoState = this.PLAYING;
-                this.debug.log("[BufferController]["+this.getType()+"] ******************** PLAYING at "+this.videoModel.getCurrentTime());
-                this.metricsModel.addState(this.getType(), "playing", this.videoModel.getCurrentTime());
+                this.debug.log("[BufferController]["+type+"] PLAYING - " + this.videoModel.getCurrentTime());
+                this.metricsModel.addState(type, "playing", this.videoModel.getCurrentTime());
             }
 
             // if the buffer controller is stopped and the buffer is full we should try to clear the buffer
