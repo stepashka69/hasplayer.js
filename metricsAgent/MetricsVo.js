@@ -22,6 +22,7 @@ MetricsVo.Encoding = function (){
     this.index = null;
     this.bitrate = null;
     this.position = null;
+    this.previousBitrate = null;
 };
 
 MetricsVo.Session = function (){

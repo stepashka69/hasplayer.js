@@ -78,7 +78,7 @@ MetricsDatabase.prototype.processMetric = function(metric) {
 	// "state" metric
 	if (metric.hasOwnProperty('state')) {
 		// => Get previous state, and update it
-		previousStateMetric = this.getMetric('state', true);
+		previousStateMetric = this.getMetric('state', true)[0];
 		if (previousStateMetric) {
 			metric.state.previousState = previousStateMetric.state.current;
 			metric.state.previousTime = previousStateMetric.date;
@@ -149,45 +149,18 @@ MetricsDatabase.prototype.checkMetric = function (metric, type, condition) {
 	return false;
 };
 
-MetricsDatabase.prototype.getMetric = function(type, reverseSearch, condition) {
-	var i;
+MetricsDatabase.prototype.getMetric = function(type, reverseSearch,nbElts, condition) {
+	var i,
+		metricsList = [];
 
 	if ((reverseSearch !== undefined) && (reverseSearch === true)) {
-		for (i = (this.metrics.length - 1); i >= 0; i--) {
+		for (i = (this.metrics.length - 1); (i >= 0) && (nbElts?metricsList.length<nbElts:true); i--) {
 			if (this.checkMetric(this.metrics[i], type, condition)) {
-				return this.metrics[i];
+				metricsList.push(this.metrics[i]);
 			}
 		}
 	} else {
-		for (i = 0; i < this.metrics.length; i++) {
-			if (this.checkMetric(this.metrics[i], type, condition)) {
-				return this.metrics[i];
-			}
-		}
-	}
-
-	return null;
-};
-
-MetricsDatabase.prototype.getMetricObject = function(type, reverseSearch, condition) {
-	var metric = this.getMetric(type, reverseSearch, condition);
-	if (metric) {
-		return metric[type];
-	}
-	return null;
-};
-
-MetricsDatabase.prototype.getMetricsObjects = function(type, reverseSearch, nbElts, condition) {
-	var metricsList = [];
-
-	if ((reverseSearch !== undefined) && (reverseSearch === true)) {
-		for (i = (this.metrics.length - 1); i >= 0 && (nbElts?metricsList.length < nbElts:true); i--) {
-			if (this.checkMetric(this.metrics[i], type, condition)) {
-					metricsList.push(this.metrics[i]);
-			}
-		}
-	} else {
-		for (i = 0; i < this.metrics.length && (nbElts?metricsList.length < nbElts:true); i++) {
+		for (i = 0; (i < this.metrics.length) && (nbElts?metricsList.length<nbElts:true); i++) {
 			if (this.checkMetric(this.metrics[i], type, condition)) {
 				metricsList.push(this.metrics[i]);
 			}
@@ -197,6 +170,59 @@ MetricsDatabase.prototype.getMetricsObjects = function(type, reverseSearch, nbEl
 	return metricsList;
 };
 
+MetricsDatabase.prototype.getMetricObject = function(type, reverseSearch, condition) {
+	var metric = this.getMetric(type, reverseSearch,1, condition);
+	if (metric.length > 0 ) {
+		return metric[0][type];
+	}
+	return null;
+};
+
+MetricsDatabase.prototype.getMetricsObjects = function(type, nbFirstElts, nbLastElements, condition) {
+	var metricsList = [],
+		nbElts = 0,
+		tempMetric = [],
+		lastElts = [];
+		i = 0;
+
+	if (nbFirstElts) {
+		nbElts = nbFirstElts;
+	}
+
+	if (nbLastElements) {
+		nbElts += nbLastElements;
+	}
+
+	//no limit, returns all the elements or
+	//prisme just wants the X first elements
+	if (nbElts === 0 || (nbFirstElts && !nbLastElements)) {
+		metricsList = this.getMetric(type, false,nbFirstElts, condition);
+		return metricsList;
+	}else //prisme just wants the Y last elements
+	if (nbLastElements && !nbFirstElts) {
+		metricsList = this.getMetric(type, true,nbLastElements, condition);
+		return metricsList.reverse();
+	}
+	else
+	{
+		//determine the number of specific metric that could be returned
+		tempMetric = this.getMetric(type, false, undefined, condition);
+		
+		//get nbFirstElts
+		metricsList = this.getMetric(type, false, nbFirstElts, condition);
+		//if number of elements to return is less than metrics elements to return
+		//get nbLastElements
+		if (nbElts<tempMetric.length) {	
+			//get nbLastElts
+			lastElts = this.getMetric(type, true, nbLastElements, condition);
+		}//get tempMetric.length-nbFirstElts elements => not duplicate elements
+		else {		
+			lastElts = this.getMetric(type, true, tempMetric.length-nbFirstElts, condition);
+		}
+		return metricsList = metricsList.concat(lastElts.reverse());
+	}
+};
+
 MetricsDatabase.prototype.getMetrics = function() {
 //	var metrics = JSON.parse(localStorage.getItem(this.sessionId));
 //	return metrics;
@@ -204,7 +230,7 @@ MetricsDatabase.prototype.getMetrics = function() {
 };
 
 MetricsDatabase.prototype.updateCurrentState = function(date) {
-	var stateMetric = this.getMetric('state', true),
+	var stateMetric = this.getMetric('state', true)[0],
 		currentDate = date ? date : new Date().getTime();
 
 	if (stateMetric) {
