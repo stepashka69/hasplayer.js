@@ -201,47 +201,49 @@ Prisme.prototype.formatterSession = function() {
 	sessionObj.events.error = [];
 	sessionObj.events.profil = [];
 
+	sessionObj.events['profil'] = this.formatMetricsList('encoding',this.eventTypeSessionFilter['profil'].param[0],this.eventTypeSessionFilter['profil'].param[1],isVideo);
+	sessionObj.events['usage'] = this.formatMetricsList('action',this.eventTypeSessionFilter['usage'].param[0],this.eventTypeSessionFilter['usage'].param[1]);
+	sessionObj.events['error'] = this.formatMetricsList('error',this.eventTypeSessionFilter['error'].param[0],this.eventTypeSessionFilter['error'].param[1]);
+
 	sessionObj.counts = {};
 	sessionObj.counts.error = [];
 	sessionObj.counts.profil = [];
-	//sessionObj.counts.playing = [];
-	//sessionObj.counts.buffering = [];
-	//sessionObj.counts.seeking = [];
-	//sessionObj.counts.paused = [];
-
-	var elts = this.database.getMetricsObjects('action',this.eventTypeSessionFilter['usage'].param[0],this.eventTypeSessionFilter['usage'].param[1]);
-	if (elts.length >0) {
-		for (i = 0; i < elts.length; i++) {
-			this.data = {};
-			this.formatActionObject([],elts[i]['action']);
-			sessionObj.events['usage'].push(this.data);
-		}
-	}
-
-	elts = this.database.getMetricsObjects('error',this.eventTypeSessionFilter['error'].param[0],this.eventTypeSessionFilter['error'].param[1]);
-	if (elts.length >0) {
-		for (i = 0; i < elts.length; i++) {
-			this.data = {};
-			this.formatErrorObject([],elts[i]['error']);
-			sessionObj.events['error'].push(this.data);
-		}
-	}
-
-	elts = this.database.getMetricsObjects('encoding',this.eventTypeSessionFilter['profil'].param[0],this.eventTypeSessionFilter['profil'].param[1],isVideo);
-	if (elts.length >0) {
-		debugger;
-		for (i = 0; i < elts.length; i++) {
-			this.data = {};
-			this.formatEncodingObject([],elts[i]['encoding']);
-			sessionObj.events['profil'].push(this.data);
-		}
-	}
 	
 	//add Counts content.
+	sessionObj.counts.playing = this.formatPlayingObject([]);
+	sessionObj.counts.buffering = this.formatBufferingObject([]);
+	sessionObj.counts.seeking = this.formatSeekingObject([]);
+	sessionObj.counts.paused = this.formatPausedObject([]);
+	sessionObj.counts.profil = this.getCountsMetricTypeObject('encoding','bitrate',['originBitrate','position'],isVideo);
+	sessionObj.counts.error = this.getCountsMetricTypeObject('error','orangeErrorCode',['chunkURL','errorCode','comment']);
 
 	data.push(sessionObj);
 
 	return data;
+};
+
+Prisme.prototype.formatMetricsList = function (metricType, nbFirstElts, nbLastElts, condition) {
+	var tab = [],
+		elts = this.database.getMetricsObjects(metricType,nbFirstElts,nbLastElts,condition);
+	
+	if (elts.length >0) {
+		for (i = 0; i < elts.length; i++) {
+			this.data = {};
+			if (metricType === 'encoding') {
+				this.formatEncodingObject([],elts[i][metricType]);
+			}else{
+				return [];
+			}
+			tab.push(this.data);
+		}
+	}
+
+	return tab;
+};
+
+Prisme.prototype.getCountsMetricTypeObject = function (metricType, paramRef, excludedList, condition) {
+	var elts = this.database.getMetricsObjects(metricType,undefined,undefined,condition);
+	return this.formatMetricCounts(excludedList,elts,metricType,paramRef);
 };
 
 Prisme.prototype.setFieldValue = function(nameDst, value) {
@@ -367,6 +369,50 @@ Prisme.prototype.formatEncodingObject = function(excludedList, encoding) {
 	this.setFieldValue('position',encoding.position);
 };
 
+Prisme.prototype.formatMetricCounts = function (excludedList, metricsList, metricType, paramRef) {
+	var	i = 0,
+		j = 0,
+		len = metricsList.length,
+		profiltab = [],
+		paramTreated,
+		alreadyTreatedParam = [],
+		nbChange = 0,
+		metric = null;
+	
+	//analyse all bitrate changed
+	for(i = 0; i < len; i++) {
+		metric = metricsList[i][metricType];
+		paramTreated = metric[paramRef];
+		nbChange = 1;
+		//test to know if this param has already been treated
+		if (alreadyTreatedParam[paramTreated] === undefined) {
+			this.data = {};
+			//search if this param has been memorized later during the video viewing
+			for (j = i+1; j < len; j++) {
+				if (metricsList[j][metricType][paramRef] === paramTreated) {
+					nbChange++;
+				}
+			}
+			this.setFieldValue('nb', nbChange);
+
+			if (metricType === 'encoding') {
+				this.formatEncodingObject(excludedList,metric);
+			}else if (metricType === 'error') {
+				this.formatErrorObject(excludedList,metric);
+			} else{
+				return {};
+			}
+
+			profiltab.push(this.data);
+
+			//keep in memory, we have already summaryse this param
+			alreadyTreatedParam[paramTreated] = true;
+		}
+	}	
+
+	return profiltab;
+};
+
 Prisme.prototype.formatLastEncodingObject = function(excludedList) {
 
 	var isVideo = function(metric) {
@@ -469,31 +515,6 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 	this.setFieldValue('chunkURL', undefined);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
-
-	/*var data = {},
-		metrics = this.database.getMetrics(),
-		i = 0,
-		len = metrics.length,
-		error = null;
-
-	if(!this.isExcluded('count', excludedList)) {
-		data.count = 0;
-		for (i = 0; i < len; i++) {
-			if (metrics[i].hasOwnProperty('error')) {
-				data.count++;
-			}
-		}
-	}
-
-	if(!this.isExcluded('code', excludedList)) {
-		error = this.database.getMetricObject('error', true);
-		if (error !== null) {
-			data.code = error.code;
-			data.message = error.message;
-		}
-	}
-
-	return data;*/
 };
 
 Prisme.prototype.formatLastErrorObject = function(excludedList) {
