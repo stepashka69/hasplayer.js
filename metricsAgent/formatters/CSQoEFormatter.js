@@ -1,10 +1,12 @@
 function CSQoE (database) {
-	this.database = database;
+	AbstractFormatter.call(this,database);
 }
 
+CSQoE.prototype = Object.create(AbstractFormatter.prototype);
+CSQoE.prototype.constructor = CSQoE;
+
 CSQoE.prototype.init = function() {
-	this.firstAccess = true;
-	this.msgnbr = 0;
+	AbstractFormatter.prototype.init.call(this);
 };
 
 CSQoE.prototype.generateSessionId = function() {
@@ -185,16 +187,6 @@ CSQoE.prototype.formatterError = function() {
 	return data;
 };
 
-CSQoE.prototype.setFieldValue = function(nameDst, value) {
-	if (value !== undefined && value !== null && value !== '' && !this.isExcluded(nameDst, this.excludedList)) {
-		// Round numbers to 3 decimals
-		if ((typeof value == "number") && isFinite(value) && (value % 1 !== 0)) {
-			value = Math.round(value * 1000) / 1000;
-		}
-		this.data[nameDst] = value;
-	}
-};
-
 //RULES FORMAT
 CSQoE.prototype.formatSessionObject = function(excludedList) {
 	
@@ -228,50 +220,6 @@ CSQoE.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('repeatCount', session.loopCount);
 
 	return this.data;
-};
-
-CSQoE.prototype.formatPlayingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Playing = this.database.getCountState('playing');
-	return Playing;
-};
-
-CSQoE.prototype.formatBufferingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Buffering = this.database.getCountState('buffering');
-	return Buffering;
-};
-
-CSQoE.prototype.formatPausedObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Paused = this.database.getCountState('paused');
-	return Paused;
-};
-
-CSQoE.prototype.formatStoppedObject = function() {
-	if(!this.database) {
-		return {};
-	}
-	var Paused = this.database.getCountState('stopped');
-	return Paused;
-};
-
-CSQoE.prototype.formatSeekingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Seeking = this.database.getCountState('seeking');
-	return Seeking;
 };
 
 CSQoE.prototype.formatStateObject = function(excludedList) {
@@ -439,10 +387,6 @@ CSQoE.prototype.formatMetadataObject = function(excludedList) {
 
 };
 //RULES FORMAT END
-
-CSQoE.prototype.isExcluded = function(value, array) {
-	return array.indexOf(value) > -1;
-};
 
 CSQoE.prototype.MESSAGE_PERIODIC = 0;
 CSQoE.prototype.MESSAGE_STATE_CHANGE = 1;

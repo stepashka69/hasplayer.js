@@ -18,6 +18,8 @@ function HasPlayerCollector (player, database) {
 	this.database = database;
 	this.sessionId = null;
 	this.playerId = String(Math.random()).substring(2);
+	this.previousVideoBandwith = null;
+	this.previousAudioBandwith = null;
 }
 
 HasPlayerCollector.prototype.init = function(sessionId) {
@@ -38,6 +40,11 @@ HasPlayerCollector.prototype.metricAddedListener = function(metric) {
 				metric.data.max = this.customMetricsExtension.getMaxIndexForBufferType(metric.data.stream);
 				objStorage.encoding = this.mapEncodingObject(metric.data);
 				this.database.addMetric(objStorage);
+				if (metric.data.stream === "video") {
+					this.previousVideoBandwith = metric.data.bandwith;
+				}else if (metric.data.stream === "audio") {
+					this.previousAudioBandwith = metric.data.bandwith;
+				}
 				break;
 		case "Condition" :
 				objStorage.condition = this.mapConditionObject(metric.data);
@@ -227,6 +234,12 @@ HasPlayerCollector.prototype.mapEncodingObject = function(metric) {
     encodingVo.index = metric.index;
     encodingVo.bitrate = metric.bandwith;
     encodingVo.position = metric.value.mt;
+
+    if (metric.stream === "video") {
+		encodingVo.previousBitrate = this.previousVideoBandwith;
+	}else if (metric.stream === "audio") {
+		encodingVo.previousBitrate = this.previousAudioBandwith;
+	}
 
     return encodingVo;
 };
