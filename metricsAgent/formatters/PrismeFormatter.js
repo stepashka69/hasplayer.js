@@ -21,11 +21,14 @@ EventTypeFilter.prototype.setFilter = function(type,eventParameter) {
 };
 
 function Prisme (database, eventsObjectFilter, eventTypeSessionFilter, eventTypeRealTimeFilter) {
-	this.database = database;
+	AbstractFormatter.call(this,database);
 	
 	this.eventTypeSessionFilter = this.parseEventsFilter(eventTypeSessionFilter);
 	this.eventTypeRealTimeFilter = this.parseEventsFilter(eventTypeRealTimeFilter);
 }
+
+Prisme.prototype = Object.create(AbstractFormatter.prototype);
+Prisme.prototype.constructor = Prisme;
 
 Prisme.prototype.parseEventsFilter = function(eventsFilter){
 	var eventTypeFilter = new EventTypeFilter();
@@ -51,8 +54,7 @@ Prisme.prototype.parseEventsFilter = function(eventsFilter){
 };
 
 Prisme.prototype.init = function() {
-	this.firstAccess = true;
-	this.msgnbr = 0;
+	AbstractFormatter.prototype.init.call(this);
 	this.duration = 0;
 };
 
@@ -246,16 +248,6 @@ Prisme.prototype.getCountsMetricTypeObject = function (metricType, paramRef, exc
 	return this.formatMetricCounts(excludedList,elts,metricType,paramRef);
 };
 
-Prisme.prototype.setFieldValue = function(nameDst, value) {
-	if (value !== undefined && value !== null && value !== '' && !this.isExcluded(nameDst, this.excludedList)) {
-		// Round numbers to 3 decimals
-		if ((typeof value == "number") && isFinite(value) && (value % 1 !== 0)) {
-			value = Math.round(value * 1000) / 1000;
-		}
-		this.data[nameDst] = value;
-	}
-};
-
 //RULES FORMAT
 Prisme.prototype.formatSessionObject = function(excludedList) {
 	
@@ -288,50 +280,6 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	//this.setFieldValue('maxPosition', "undefined");
 
 	return this.data;
-};
-
-Prisme.prototype.formatPlayingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Playing = this.database.getCountState('playing');
-	return Playing;
-};
-
-Prisme.prototype.formatBufferingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Buffering = this.database.getCountState('buffering');
-	return Buffering;
-};
-
-Prisme.prototype.formatPausedObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Paused = this.database.getCountState('paused');
-	return Paused;
-};
-
-Prisme.prototype.formatStoppedObject = function() {
-	if(!this.database) {
-		return {};
-	}
-	var Paused = this.database.getCountState('stopped');
-	return Paused;
-};
-
-Prisme.prototype.formatSeekingObject = function() {
-	if(!this.database) {
-		return {};
-	}
-
-	var Seeking = this.database.getCountState('seeking');
-	return Seeking;
 };
 
 Prisme.prototype.formatStateObject = function(excludedList) {
@@ -573,10 +521,6 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 	return this.data;
 };
 //RULES FORMAT END
-
-Prisme.prototype.isExcluded = function(value, array) {
-	return array.indexOf(value) > -1;
-};
 
 Prisme.prototype.MESSAGE_PERIODIC = 0;
 Prisme.prototype.MESSAGE_REAL_TIME_ERROR = 1;
