@@ -198,6 +198,7 @@ Prisme.prototype.formatterSession = function() {
 	var sessionObj = {};
 
 	sessionObj = this.formatSessionObject([]);
+	sessionObj = this.formatMetadataObject([]);
 	sessionObj.events = {};
 	sessionObj.events.usage = [];
 	sessionObj.events.error = [];
@@ -269,42 +270,24 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('url', session.uri);
 	this.setFieldValue('userAgent', session.userAgent);
 	this.setFieldValue('contentId', "undefined");
+	this.setFieldValue('minBitrate', session.minBitrate);
+	this.setFieldValue('maxBitrate', session.maxBitrate);
+
 
 	if (this.firstAccess === true) {
 		this.data.status = "OK";
 		this.firstAccess = false;
 	}
-	//this.setFieldValue('contentDuration', session.);
+
+	var metadata = this.database.getMetricObject('metadata', true, isVideo);
+	if(metadata === null) {
+		return this.data;
+	}
+
+	this.setFieldValue('contentDuration', metadata.duration);
 	//this.setFieldValue('watchStartDate', "undefined");
 	//this.setFieldValue('watchEndDate', "undefined");
 	//this.setFieldValue('maxPosition', "undefined");
-
-	return this.data;
-};
-
-Prisme.prototype.formatStateObject = function(excludedList) {
-
-	function capitaliseFirstLetter(string) {
-		return string.charAt(0).toUpperCase() + string.slice(1);
-	}
-	
-	if(!this.database) {
-		return {};
-	}
-
-	var state = this.database.getMetricObject('state', true);
-	if(state === null) {
-		return {};
-	}
-
-	this.data = {};
-	this.excludedList = excludedList;
-
-	this.setFieldValue('current', capitaliseFirstLetter(state.current));
-	this.setFieldValue('detail', state.reason);
-	this.setFieldValue('previous', capitaliseFirstLetter(state.previousState));
-	this.setFieldValue('previoustime', state.previousTime);
-	this.setFieldValue('progress', state.position);
 
 	return this.data;
 };
@@ -420,19 +403,6 @@ Prisme.prototype.formatLastActionObject = function(excludedList){
 	this.formatActionObject(excludedList, action);
 };
 
-Prisme.prototype.formatStartuptime = function(data) {
-	if(!this.database) {
-		return {};
-	}
-
-	var session = this.database.getMetricObject('session');
-
-	if (session.startTime && session.startPlayingTime) {
-		// Set startup time in seconds and round to 3 decimals
-		data.startuptime = Math.round(session.startPlayingTime - session.startTime) / 1000;
-	}
-};
-
 Prisme.prototype.formatConditionObject = function(excludedList) {
 	
 	if(!this.database) {
@@ -497,7 +467,7 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 	this.data = {};
 	this.excludedList = excludedList;
 	
-	this.setFieldValue('playertype', session.playerType);
+	this.setFieldValue('playerType', session.playerType);
 
 	if(metadata === null) {
 		return this.data;
@@ -511,12 +481,14 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 		}
 	}
 
-	this.setFieldValue('videoid', metadata.id);
-	this.setFieldValue('encodingbr', metadata.bitrates);
-	this.setFieldValue('contenttype', contentType);
-	this.setFieldValue('contentduration', metadata.duration);
-	this.setFieldValue('encodingformat', metadata.codec);
+	this.setFieldValue('encodingBr', metadata.bitrates);
+	this.setFieldValue('contentType', contentType);
+	this.setFieldValue('encodingFormat', metadata.codec);
 	this.setFieldValue('encapsulation', metadata.format);
+
+	//diffusionMode
+	//encodingFr
+	//fdc
 
 	return this.data;
 };
