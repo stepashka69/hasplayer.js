@@ -99,13 +99,13 @@ Prisme.prototype.process = function(type) {
 			formattedData = this.formatterRecurring();
 			break;
 		case 1:
-			formattedData = this.formatterRealTimeError();
+			formattedData = this.formatterRealTimeObject('has/realtime/error/');
 			break;
 		case 2:
-			formattedData = this.formatterRealTimeProfil();
+			formattedData = this.formatterRealTimeObject('has/realtime/profil/');
 			break;
 		case 3:
-			formattedData = this.formatterRealTimeUse();
+			formattedData = this.formatterRealTimeObject('has/realtime/use/');
 			break;
 		case 4:
 			formattedData = this.formatterSession();
@@ -126,58 +126,42 @@ Prisme.prototype.formatterRecurring = function() {
 	}
 };
 
-//type 1
-Prisme.prototype.formatterRealTimeError = function() {
+//type 1, 2 and 3
+Prisme.prototype.formatterRealTimeObject = function(realTimeName) {
 	var data = [];
 
 	data.push(new Date().getTime());
-	data.push('has/realtime/error/');
+	data.push(realTimeName);
 
 	this.data = {};
 
 	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
 
-	//Add error info in realTimeErrorObj
-	this.formatErrorObject([]);
+	switch(realTimeName) {
+		case 'has/realtime/use/' :
+			//Add action info in realTimeUseObj
+			this.formatLastActionObject([]);
+			break;
+		case 'has/realtime/profil/': 
+			//Add encoding info in realTimeProfilObj
+			this.formatLastEncodingObject([]);
+			break;
+		case 'has/realtime/error/' :
+			//Add error info in realTimeErrorObj
+			this.formatErrorObject([]);
+			this.formatLastConditionObject([]);
+			break;
+	}
 
-	data.push(this.data);
+	this.data.Playing = this.formatPlayingObject([]);
+	this.data.Buffering = this.formatBufferingObject([]);
+	this.data.Seeking = this.formatSeekingObject([]);
+	this.data.Paused = this.formatPausedObject([]);
 
-	return data;
-};
+	this.formatStateObject();
 
-//type 2
-Prisme.prototype.formatterRealTimeProfil = function() {
-	var data = [];
-
-	data.push(new Date().getTime());
-	data.push('has/realtime/profil/');
-
-	this.data = {};
-
-	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
-
-	//Add encoding info in realTimeProfilObj
-	this.formatLastEncodingObject([]);
-
-	data.push(this.data);
-
-	return data;
-};
-
-//type 3
-Prisme.prototype.formatterRealTimeUse = function() {
-	var data = [];
-
-	data.push(new Date().getTime());
-	data.push('has/realtime/use/');
-
-	this.data = {};
-
-	this.formatSessionObject(['playerId', 'browserid', 'uuid']);
-
-	//Add action info in realTimeUseObj
-	this.formatLastActionObject([]);
-
+	this.data.msgnbr = this.msgnbr;
+	
 	data.push(this.data);
 
 	return data;
@@ -252,6 +236,10 @@ Prisme.prototype.getCountsMetricTypeObject = function (metricType, paramRef, exc
 //RULES FORMAT
 Prisme.prototype.formatSessionObject = function(excludedList) {
 	
+	var isVideo = function(metric) {
+		return (metric.contentType === 'video');
+	};
+
 	if(!this.database) {
 		return {};
 	}
@@ -264,15 +252,19 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.data = {};
 	this.excludedList = excludedList;
 
-	this.setFieldValue('sessionId', session.id);
+	this.setFieldValue('clientSessionId', session.id);
 	this.setFieldValue('playerId', session.playerid);
-	this.setFieldValue('uuid', "undefined");
+	this.setFieldValue('uuid', undefined);
 	this.setFieldValue('url', session.uri);
 	this.setFieldValue('userAgent', session.userAgent);
-	this.setFieldValue('contentId', "undefined");
+	this.setFieldValue('contentId', undefined);
 	this.setFieldValue('minBitrate', session.minBitrate);
 	this.setFieldValue('maxBitrate', session.maxBitrate);
-
+	this.setFieldValue('startLaunchDate', session.startTime)
+	this.setFieldValue('startBufferingDate', session.startBufferingTime);
+	this.setFieldValue('watchStartDate', session.startPlayingTime);
+	//TBD uuid, contentName, maxPosition, listBitrate, httpBitrate
+	//this.setFieldValue('maxPosition', "undefined");
 
 	if (this.firstAccess === true) {
 		this.data.status = "OK";
@@ -285,11 +277,30 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	}
 
 	this.setFieldValue('contentDuration', metadata.duration);
-	//this.setFieldValue('watchStartDate', "undefined");
-	//this.setFieldValue('watchEndDate', "undefined");
-	//this.setFieldValue('maxPosition', "undefined");
 
 	return this.data;
+};
+
+Prisme.prototype.formatStateObject = function() {
+
+	function capitaliseFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+	
+	if(!this.database) {
+		return {};
+	}
+
+	var state = this.database.getMetricObject('state', true);
+	if(state === null) {
+		return {};
+	}
+	this.data.State = {};
+
+	this.data.State.current = capitaliseFirstLetter(state.current);
+	this.data.State.detail = state.reason;
+	this.data.State.previous = capitaliseFirstLetter(state.previousState);
+	this.data.State.previoustime = state.previousTime;
 };
 
 Prisme.prototype.formatEncodingObject = function(excludedList, encoding) {
@@ -364,6 +375,8 @@ Prisme.prototype.formatLastEncodingObject = function(excludedList) {
 };
 
 Prisme.prototype.formatActionObject = function(excludedList, action){
+	var prismeTypeCode = -1;
+
 	this.excludedList = excludedList;
 
 	switch (action.type) {
@@ -393,8 +406,7 @@ Prisme.prototype.formatLastActionObject = function(excludedList){
 		return {};
 	}
 
-	var action = this.database.getMetricObject('action', true),
-		prismeTypeCode = -1;
+	var action = this.database.getMetricObject('action', true);
 
 	if(action === null) {
 		return {};
@@ -403,18 +415,23 @@ Prisme.prototype.formatLastActionObject = function(excludedList){
 	this.formatActionObject(excludedList, action);
 };
 
-Prisme.prototype.formatConditionObject = function(excludedList) {
+Prisme.prototype.formatLastConditionObject = function(excludedList){
 	
 	if(!this.database) {
 		return {};
 	}
 
 	var condition = this.database.getMetricObject('condition');
+
 	if(condition === null) {
 		return {};
 	}
 
-	this.data = {};
+	this.formatConditionObject(excludedList,condition);
+};
+
+Prisme.prototype.formatConditionObject = function(excludedList, condition) {
+	
 	this.excludedList = excludedList;
 
 	this.setFieldValue('fdc', condition.droppedFrames);
@@ -431,8 +448,10 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 
 	this.setFieldValue('orangeErrorCode', undefined);
 	this.setFieldValue('chunkURL', undefined);
+	this.setFieldValue('position', undefined);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
+	//TBD position, chunkURL, orangeErrorCode
 };
 
 Prisme.prototype.formatLastErrorObject = function(excludedList) {
@@ -486,9 +505,15 @@ Prisme.prototype.formatMetadataObject = function(excludedList) {
 	this.setFieldValue('encodingFormat', metadata.codec);
 	this.setFieldValue('encapsulation', metadata.format);
 
+	var condition = this.database.getMetricObject('condition');
+	if(condition === null) {
+		return this.data;
+	}
+	
+	this.setFieldValue('fdc', condition.droppedFrames);
+
 	//diffusionMode
 	//encodingFr
-	//fdc
 
 	return this.data;
 };
