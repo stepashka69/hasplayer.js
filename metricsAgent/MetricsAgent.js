@@ -89,7 +89,7 @@ MetricsAgent.prototype.sendPeriodicMessage = function() {
 
 	//console.log('%c SEND PERIODIC MESSAGE ', 'color: #2980b9');
 	this.database.updateCurrentState();
-	this.sendMetrics(this.formatter.MESSAGE_PERIODIC);
+	this.sendMetrics();
 };
 
 MetricsAgent.prototype.metricAdded = function(event) {
@@ -115,23 +115,17 @@ MetricsAgent.prototype.metricAdded = function(event) {
 		}
 	}
 
-	// Check if we have to send a new message
-	messageType = this.formatter.getMessageType(metric);
-
-	if (messageType !== -1) {
-		//console.log('%c SEND MESSAGE %s', 'color: #2980b9', messageType);
-		this.sendMetrics(messageType);
-	}
+	this.sendMetrics(metric);
 };
 
-MetricsAgent.prototype.sendMetrics = function(type) {
+MetricsAgent.prototype.sendMetrics = function(metric) {
 	//avoid sending same metrics twice
 	if(this.isSending) {
 		return;
 	}
 	this.isSending = true;
 
-	var formattedData = this.formatter.process(type);
+	var formattedData = this.formatter.process(metric);
 
 	//send formated Metrics to serverUrl in param
 	if (formattedData) {

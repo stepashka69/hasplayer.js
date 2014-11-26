@@ -10,52 +10,32 @@ CSQoE.prototype.init = function() {
 };
 
 CSQoE.prototype.generateSessionId = function() {
-	return new Date().getTime()+"."+String(Math.random()).substring(2);
+	return AbstractFormatter.prototype.generateSessionId.call(this, ".");
 };
 
-CSQoE.prototype.getMessageType = function(metric) {
-
-	var type = -1;
-	
-	if (metric.hasOwnProperty('state')) {
-		if (metric.state.current === 'init') {
-			type = -1;
-		} else {
-			type = this.MESSAGE_STATE_CHANGE;
-		}
-	} else if (metric.hasOwnProperty('metadata')) {
-		type = this.MESSAGE_SESSION;
-	} else if (metric.hasOwnProperty('encoding') && (metric.encoding.contentType === 'video')) {
-		type = this.MESSAGE_BITRATE_CHANGE;
-	} else if (metric.hasOwnProperty('error')) {
-		type = this.MESSAGE_ERROR;
-	}
-
-	return type;
-};
-
-CSQoE.prototype.process = function(type) {
+CSQoE.prototype.process = function(metric) {
 	var formattedData = null;
 
-	switch (type) {
-		case 0:
-			formattedData = this.formatterRecurring();
-			break;
-		case 1:
-			formattedData = this.formatterNewState();
-			break;
-		case 2:
-			formattedData = this.formatterMetadata();
-			break;
-		case 3:
-			formattedData = this.formatterChangeBitrate();
-			break;
-		case 10:
-			formattedData = this.formatterError();
-			break;
+	if(!this.database) {
+		return formattedData;
 	}
 
-	this.msgnbr++;
+	if (!metric) {
+		formattedData = this.formatterRecurring();
+	}
+	else if (metric.hasOwnProperty('state') && (metric.state.current !== 'init')) {
+		formattedData = this.formatterNewState();
+	} else if (metric.hasOwnProperty('metadata')) {
+		formattedData = this.formatterMetadata();
+	} else if (metric.hasOwnProperty('encoding') && (metric.encoding.contentType === 'video')) {
+		formattedData = this.formatterChangeBitrate();
+	} else if (metric.hasOwnProperty('error')) {
+		formattedData = this.formatterError();
+	}
+
+	if (formattedData) {
+		this.msgnbr++;
+	}
 
 	return formattedData;
 };
@@ -189,11 +169,6 @@ CSQoE.prototype.formatterError = function() {
 
 //RULES FORMAT
 CSQoE.prototype.formatSessionObject = function(excludedList) {
-	
-	if(!this.database) {
-		return {};
-	}
-
 	var session = this.database.getMetricObject('session');
 	if(session === null) {
 		return {};
@@ -228,10 +203,6 @@ CSQoE.prototype.formatStateObject = function(excludedList) {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	}
 	
-	if(!this.database) {
-		return {};
-	}
-
 	var state = this.database.getMetricObject('state', true);
 	if(state === null) {
 		return {};
@@ -251,17 +222,8 @@ CSQoE.prototype.formatStateObject = function(excludedList) {
 };
 
 CSQoE.prototype.formatEncodingObject = function(excludedList) {
-
-	var isVideo = function(metric) {
-		return (metric.contentType === 'video');
-	};
-
-	if(!this.database) {
-		return {};
-	}
-
-	var encoding = this.database.getMetricObject('encoding', true, isVideo),
-		metadata = this.database.getMetricObject('metadata', true, isVideo);
+	var encoding = this.database.getMetricObject('encoding', true, this.isVideo),
+		metadata = this.database.getMetricObject('metadata', true, this.isVideo);
 
 	if(metadata === null || encoding === null) {
 		return {};
@@ -278,10 +240,6 @@ CSQoE.prototype.formatEncodingObject = function(excludedList) {
 };
 
 CSQoE.prototype.formatStartuptime = function(data) {
-	if(!this.database) {
-		return {};
-	}
-
 	var session = this.database.getMetricObject('session');
 
 	if (session.startTime && session.startPlayingTime) {
@@ -291,11 +249,6 @@ CSQoE.prototype.formatStartuptime = function(data) {
 };
 
 CSQoE.prototype.formatConditionObject = function(excludedList) {
-	
-	if(!this.database) {
-		return {};
-	}
-
 	var condition = this.database.getMetricObject('condition');
 	if(condition === null) {
 		return {};
@@ -314,11 +267,6 @@ CSQoE.prototype.formatConditionObject = function(excludedList) {
 };
 
 CSQoE.prototype.formatErrorObject = function(excludedList) {
-
-	if(!this.database) {
-		return {};
-	}
-
 	var data = {},
 		metrics = this.database.getMetrics(),
 		i = 0,
@@ -346,17 +294,8 @@ CSQoE.prototype.formatErrorObject = function(excludedList) {
 };
 
 CSQoE.prototype.formatMetadataObject = function(excludedList) {
-
-	var isVideo = function(metric) {
-		return (metric.contentType === 'video');
-	};
-
-	if(!this.database) {
-		return {};
-	}
-
 	var session = this.database.getMetricObject('session'),
-		metadata = this.database.getMetricObject('metadata', false, isVideo),
+		metadata = this.database.getMetricObject('metadata', false, this.isVideo),
 		contentType;
 
 	this.data = {};
@@ -387,9 +326,3 @@ CSQoE.prototype.formatMetadataObject = function(excludedList) {
 
 };
 //RULES FORMAT END
-
-CSQoE.prototype.MESSAGE_PERIODIC = 0;
-CSQoE.prototype.MESSAGE_STATE_CHANGE = 1;
-CSQoE.prototype.MESSAGE_SESSION = 2;
-CSQoE.prototype.MESSAGE_BITRATE_CHANGE = 3;
-CSQoE.prototype.MESSAGE_ERROR = 10;
