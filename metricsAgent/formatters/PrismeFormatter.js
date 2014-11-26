@@ -91,6 +91,9 @@ Prisme.prototype.process = function(metric) {
 			if (metric.state.current === 'stopped' && metric.state.reason === 0) {
 				formattedData = this.formatterSession();
 			}
+			else if (metric.state.current === 'buffering') {
+				formattedData = this.formatterRealTime('has/realtime/error/','buffering');
+			};
 		}
 	}
 
@@ -111,7 +114,7 @@ Prisme.prototype.formatterRecurring = function() {
 };
 
 //type 1, 2 and 3
-Prisme.prototype.formatterRealTime = function(realTimeName) {
+Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 	var data = [];
 
 	data.push(new Date().getTime());
@@ -133,7 +136,21 @@ Prisme.prototype.formatterRealTime = function(realTimeName) {
 			break;
 		case 'has/realtime/error/' :
 			//Add error info in realTimeErrorObj
-			realTimeTempObj = this.formatErrorObject([]);
+			if (param && param === "buffering") {
+				//send an error object with orangeCode = 30
+				var state = this.database.getMetricObject('state', true);
+				if(state === null) {
+					return {};
+				}
+				var errorVo =  new MetricsVo.Error();
+
+				errorVo.code = 0;
+				errorVo.message = "buffering state";
+
+				realTimeTempObj = this.formatErrorObject([],errorVo);
+			}else{
+				realTimeTempObj = this.formatLastErrorObject([]);
+			}
 			realTimeTempObj.Condition = this.formatLastConditionObject([]);
 			break;
 	}
@@ -410,11 +427,23 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 
 	this.excludedList = excludedList;
 
-	this.setFieldValue('orangeErrorCode', undefined);
+	switch (error.code) {
+		case 22 :
+			this.setFieldValue('orangeErrorCode', this.ORANGE_UNDEFINED_PLAYER_ERROR);
+			break;
+		case 0 :
+			this.setFieldValue('orangeErrorCode', this.ORANGE_STALLED_STREAM_ERROR);
+			break;
+		default:
+			this.setFieldValue('orangeErrorCode', this.ORANGE_UNDEFINED_PLAYER_ERROR);
+			break;
+	}
+
 	this.setFieldValue('chunkURL', undefined);
 	this.setFieldValue('position', undefined);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
+
 	//TBD position, chunkURL, orangeErrorCode
 
 	return this.data;
