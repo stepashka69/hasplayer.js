@@ -359,7 +359,7 @@ Custom.dependencies.CustomBufferController = function () {
                                 },
                                 function(result) {
                                     // ORANGE : add metric
-                                    self.metricsModel.addError(type,result.err.code,result.err.message);
+                                    self.metricsModel.addError(type,result.err.code,result.err.message,self.videoModel.getCurrentTime());
 
                                     self.debug.log("[BufferController]["+type+"] Buffer failed");
                                     // if the append has failed because the buffer is full we should store the data

@@ -60,13 +60,14 @@ MetricsDatabase.prototype.processMetric = function(metric) {
 	var updateOnly = false,
 		session = null,
 		condition = null,
-		previousStateMetric = null;
+		previousStateMetric = null,
+		key = null;
 
 	// "session" metric => update session fields if already exists
 	if (metric.hasOwnProperty('session')) {
 		session = this.getMetricObject('session');
 		if (session) {
-			for (var key in metric.session) {
+			for (key in metric.session) {
 				if (this.isDefined(metric.session[key])) {
 					session[key] = metric.session[key];
 				}
@@ -112,7 +113,7 @@ MetricsDatabase.prototype.processMetric = function(metric) {
 	if (metric.hasOwnProperty('condition')) {
 		condition = this.getMetricObject('condition');
 		if (condition) {
-			for (var key in metric.condition) {
+			for (key in metric.condition) {
 				if (this.isDefined(metric.condition[key])) {
 					condition[key] = metric.condition[key];
 				}
@@ -183,7 +184,6 @@ MetricsDatabase.prototype.getMetricsObjects = function(type, nbFirstElts, nbLast
 		nbElts = 0,
 		tempMetric = [],
 		lastElts = [];
-		i = 0;
 
 	if (nbFirstElts) {
 		nbElts = nbFirstElts;
@@ -219,7 +219,7 @@ MetricsDatabase.prototype.getMetricsObjects = function(type, nbFirstElts, nbLast
 		else {		
 			lastElts = this.getMetric(type, true, tempMetric.length-nbFirstElts, condition);
 		}
-		return metricsList = metricsList.concat(lastElts.reverse());
+		return (metricsList = metricsList.concat(lastElts.reverse()));
 	}
 };
 
