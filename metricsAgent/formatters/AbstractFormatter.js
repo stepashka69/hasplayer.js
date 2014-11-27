@@ -47,7 +47,7 @@ AbstractFormatter.prototype.isExcluded = function(value, array) {
 AbstractFormatter.prototype.setFieldValue = function(nameDst, value) {
 	if (value !== undefined && value !== null && value !== '' && !this.isExcluded(nameDst, this.excludedList)) {
 		// Round numbers to 3 decimals
-		if ((typeof value == "number") && isFinite(value) && (value % 1 !== 0)) {
+		if ((typeof value == 'number') && isFinite(value) && (value % 1 !== 0)) {
 			value = Math.round(value * 1000) / 1000;
 		}
 		this.data[nameDst] = value;

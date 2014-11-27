@@ -33,7 +33,7 @@ function MetricsAgent(player, video, parameters, debug) {
 
 	//activate metrics listener
 	this.collector.listen();
-	this.video.addEventListener("newMetricStored", this.metricAdded.bind(this), false);
+	this.video.addEventListener('newMetricStored', this.metricAdded.bind(this), false);
 }
 
 MetricsAgent.prototype.getVersion = function() {
@@ -45,7 +45,7 @@ MetricsAgent.prototype.init = function(callback) {
 	this.getActivation(function(activation) {
 		if (callback) {
 			if (activation.active) {
-				this.debug.log("[MetricsAgent][" + this.parameters.activationUrl + "] - Activation: " + activation.active);
+				this.debug.log('[MetricsAgent][' + this.parameters.activationUrl + '] - Activation: ' + activation.active);
 			}
 			callback(activation.active);
 		}
@@ -93,8 +93,7 @@ MetricsAgent.prototype.sendPeriodicMessage = function() {
 };
 
 MetricsAgent.prototype.metricAdded = function(event) {
-	var metric = event.detail.metric,
-		messageType = -1;
+	var metric = event.detail.metric;
 
 	// Send metric details for debugging
 	if (this.parameters.dbServerUrl) {

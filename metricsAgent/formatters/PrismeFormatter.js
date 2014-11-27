@@ -46,9 +46,9 @@ Prisme.prototype.parseEventsFilter = function(eventsFilter){
 	}
 
 	//set, for each type filter, the different parameters : enable, n first and m last elements.
-    eventTypeFilter.setFilter('error',new EventParameter(parsedElements['error']));
-	eventTypeFilter.setFilter('profil',new EventParameter(parsedElements['profil']));
-	eventTypeFilter.setFilter('usage',new EventParameter(parsedElements['usage']));
+    eventTypeFilter.setFilter('error',new EventParameter(parsedElements.error));
+	eventTypeFilter.setFilter('profil',new EventParameter(parsedElements.profil));
+	eventTypeFilter.setFilter('usage',new EventParameter(parsedElements.usage));
 
 	return eventTypeFilter;
 };
@@ -59,7 +59,7 @@ Prisme.prototype.init = function() {
 };
 
 Prisme.prototype.generateSessionId = function() {
-	return AbstractFormatter.prototype.generateSessionId.call(this, "-");
+	return AbstractFormatter.prototype.generateSessionId.call(this, '-');
 };
 
 Prisme.prototype.process = function(metric) {
@@ -78,22 +78,22 @@ Prisme.prototype.process = function(metric) {
 		if (metric.hasOwnProperty('session')) {
 			formattedData = this.formatterSession();
 		}// error is defined in eventTypeRealTimeFilter ? error type code also defined?
-		else if ((metric.hasOwnProperty('error') && (this.eventTypeRealTimeFilter.error != undefined && this.eventTypeRealTimeFilter.error.param[0] === metric.value.code)))
+		else if ((metric.hasOwnProperty('error') && (this.eventTypeRealTimeFilter.error !== undefined && this.eventTypeRealTimeFilter.error.param[0] === metric.value.code)))
 		{
 			formattedData = this.formatterRealTime('has/realtime/error/');
 		}//use is defined in eventTypeRealTimeFilter ?
-		else if ((metric.hasOwnProperty('action') && (this.eventTypeRealTimeFilter.usage != undefined))){
+		else if ((metric.hasOwnProperty('action') && (this.eventTypeRealTimeFilter.usage !== undefined))){
 			formattedData = this.formatterRealTime('has/realtime/use/');
 		}// profil is defined in eventTypeRealTimeFilter ?
-		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil != undefined))){
+		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil !== undefined))){
 			formattedData = this.formatterRealTime('has/realtime/profil/');
 		}else if (metric.hasOwnProperty('state') && this.firstAccess === false) {
 			if (metric.state.current === 'stopped' && metric.state.reason === 0) {
 				formattedData = this.formatterSession();
-			}
+			}//For Prisme, stalled state is an error
 			else if (metric.state.current === 'buffering') {
 				formattedData = this.formatterRealTime('has/realtime/error/','buffering');
-			};
+			}
 		}
 	}
 
@@ -136,7 +136,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 			break;
 		case 'has/realtime/error/' :
 			//Add error info in realTimeErrorObj
-			if (param && param === "buffering") {
+			if (param && param === 'buffering') {
 				//send an error object with orangeCode = 30
 				var state = this.database.getMetricObject('state', true);
 				if(state === null) {
@@ -145,7 +145,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 				var errorVo =  new MetricsVo.Error();
 
 				errorVo.code = 0;
-				errorVo.message = "buffering state";
+				errorVo.message = 'buffering state';
 
 				realTimeTempObj = this.formatErrorObject([],errorVo);
 			}else{
@@ -175,8 +175,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 
 //type 4
 Prisme.prototype.formatterSession = function() {
-	var data = [],
-		i = 0;
+	var data = [];
 
 	data.push(new Date().getTime());
 	data.push('has/session/');
@@ -190,9 +189,9 @@ Prisme.prototype.formatterSession = function() {
 	sessionObj.events.error = [];
 	sessionObj.events.profil = [];
 
-	sessionObj.events['profil'] = this.formatMetricsList('encoding',this.eventTypeSessionFilter['profil'].param[0],this.eventTypeSessionFilter['profil'].param[1],this.isVideo);
-	sessionObj.events['usage'] = this.formatMetricsList('action',this.eventTypeSessionFilter['usage'].param[0],this.eventTypeSessionFilter['usage'].param[1]);
-	sessionObj.events['error'] = this.formatMetricsList('error',this.eventTypeSessionFilter['error'].param[0],this.eventTypeSessionFilter['error'].param[1]);
+	sessionObj.events.profil = this.formatMetricsList('encoding',this.eventTypeSessionFilter.profil.param[0],this.eventTypeSessionFilter.profil.param[1],this.isVideo);
+	sessionObj.events.usage = this.formatMetricsList('action',this.eventTypeSessionFilter.usage.param[0],this.eventTypeSessionFilter.usage.param[1]);
+	sessionObj.events.error = this.formatMetricsList('error',this.eventTypeSessionFilter.error.param[0],this.eventTypeSessionFilter.error.param[1]);
 
 	sessionObj.counts = {};
 	sessionObj.counts.error = [];
@@ -211,11 +210,10 @@ Prisme.prototype.formatterSession = function() {
 	return data;
 };
 
-
-
 Prisme.prototype.formatMetricsList = function (metricType, nbFirstElts, nbLastElts, condition) {
 	var tab = [],
-		elts = this.database.getMetricsObjects(metricType,nbFirstElts,nbLastElts,condition);
+		elts = this.database.getMetricsObjects(metricType,nbFirstElts,nbLastElts,condition),
+		i = 0;
 	
 	if (elts.length >0) {
 		for (i = 0; i < elts.length; i++) {
@@ -253,14 +251,14 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('contentId', undefined);
 	this.setFieldValue('minBitrate', session.minBitrate);
 	this.setFieldValue('maxBitrate', session.maxBitrate);
-	this.setFieldValue('startLaunchDate', session.startTime)
+	this.setFieldValue('startLaunchDate', session.startTime);
 	this.setFieldValue('startBufferingDate', session.startBufferingTime);
 	this.setFieldValue('watchStartDate', session.startPlayingTime);
 	//TBD uuid, contentName, maxPosition, listBitrate, httpBitrate
 	//this.setFieldValue('maxPosition', "undefined");
 
 	if (this.firstAccess === true) {
-		this.data.status = "OK";
+		this.data.status = 'OK';
 		this.firstAccess = false;
 	}
 
@@ -366,16 +364,16 @@ Prisme.prototype.formatActionObject = function(excludedList, action){
 	this.excludedList = excludedList;
 
 	switch (action.type) {
-		case "seek":
+		case 'seek':
 			prismeTypeCode = this.USE_SEEK;
 			break;
-		case "play":
+		case 'play':
 			prismeTypeCode = this.USE_PLAY;
 			break;
-		case "pause":
+		case 'pause':
 			prismeTypeCode = this.USE_PAUSE;
 			break;
-		case "initial_start":
+		case 'initial_start':
 			prismeTypeCode = this.USE_PLAY;
 			break;
 	}
