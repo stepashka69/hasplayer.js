@@ -97,8 +97,8 @@ HasPlayerCollector.prototype.listen = function() {
 
     this.customMetricsExtension = this.player.getMetricsExt();
 
-    this.player.addEventListener('metricAdded', this.metricAddedListener.bind(this));
-    this.player.addEventListener('metricUpdated', this.metricUpdatedListener.bind(this));
+    this.player.addEventListener("metricAdded", this.metricAddedListener.bind(this));
+    this.player.addEventListener("metricUpdated", this.metricUpdatedListener.bind(this));
 
     window.addEventListener("beforeunload", function (){
     	if(this.sessionId === null) {
@@ -189,7 +189,7 @@ HasPlayerCollector.prototype.mapStateObject = function(metric) {
 HasPlayerCollector.prototype.mapConditionObject = function(metric) {
 	var conditionVo = new MetricsVo.Condition();
 
-	if(metric.stream && metric.stream === 'video') {
+	if(metric.stream && metric.stream === "video") {
 		var httpRequest = metric.value;
 
 		if(httpRequest.type === "Media Segment" && httpRequest.tfinish){

@@ -4,7 +4,8 @@ function MetricsSender (debug) {
 
 MetricsSender.prototype.http = function(type, url, data, callback) {
 
-	var http = new XMLHttpRequest();
+	var http = new XMLHttpRequest(),
+		result = null;
 
 	http.open(type, url, true);
 	http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
@@ -14,11 +15,11 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 		
 		if(http.readyState == 4 && (http.status == 204 || http.status == 200)) {
 			if(callback) {
-				var result = JSON.parse(http.response);
+				result = JSON.parse(http.response);
 				callback(result);
 			}
 		} else if(http.readyState == 4 && callback){
-			var result = {
+			result = {
 				active: false
 			};
 			callback(result);
@@ -28,7 +29,7 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 	if(type === 'GET') {
 		http.send();
 	} else {
-		this.debug.log("[MetricsAgent][" + url + "] - Send message: " + data);
+		this.debug.log('[MetricsAgent][' + url + '] - Send message: ' + data);
 		http.send(data);
 	}
 
