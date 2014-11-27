@@ -80,4 +80,5 @@ MetricsVo.Condition = function () {
 MetricsVo.Error = function () {
 		this.code = null;
 		this.message = null;
+		this.position = null;
 };

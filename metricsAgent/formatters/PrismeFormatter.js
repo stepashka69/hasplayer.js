@@ -146,6 +146,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 
 				errorVo.code = 0;
 				errorVo.message = 'buffering state';
+				errorVo.position = state.position;
 
 				realTimeTempObj = this.formatErrorObject([],errorVo);
 			}else{
@@ -438,7 +439,7 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 	}
 
 	this.setFieldValue('chunkURL', undefined);
-	this.setFieldValue('position', undefined);
+	this.setFieldValue('position', error.position);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
 
