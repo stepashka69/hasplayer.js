@@ -28,7 +28,7 @@ MetricsSender.prototype.http = function(type, url, data, callback) {
 	if(type === 'GET') {
 		http.send();
 	} else {
-		this.debug.log("[MetricsAgent][" + url + "] - Send message: " + JSON.stringify(data));
+		this.debug.log("[MetricsAgent][" + url + "] - Send message: " + data);
 		http.send(data);
 	}
 

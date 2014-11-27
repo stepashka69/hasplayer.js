@@ -151,7 +151,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 			}else{
 				realTimeTempObj = this.formatLastErrorObject([]);
 			}
-			realTimeTempObj.Condition = this.formatLastConditionObject([]);
+			realTimeTempObj.Condition = this.formatTheConditionObject([]);
 			break;
 	}
 	
@@ -398,7 +398,7 @@ Prisme.prototype.formatLastActionObject = function(excludedList){
 	return this.formatActionObject(excludedList, action);
 };
 
-Prisme.prototype.formatLastConditionObject = function(excludedList){
+Prisme.prototype.formatTheConditionObject = function(excludedList){
 	var condition = this.database.getMetricObject('condition');
 
 	if(condition === null) {
