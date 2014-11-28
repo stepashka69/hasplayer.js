@@ -275,17 +275,19 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('startLaunchDate', session.startTime);
 	this.setFieldValue('startBufferingDate', session.startBufferingTime);
 	this.setFieldValue('watchStartDate', session.startPlayingTime);
-	//TBD uuid, contentName, maxPosition, httpBitrate
-	//this.setFieldValue('maxPosition', "undefined");
-
+	//TBD uuid, contentName, httpBitrate
+	
+	this.data.status = 'OK';
 	if (this.firstAccess === true) {
-		this.data.status = 'OK';
 		this.firstAccess = false;
 	}else {
 		var state = this.database.getMetricObject('state',true);
-		if(session !== null) {
-			if (state.current === 'stopped' && state.reason === 2) {
-				this.data.status = 'KO';
+		if(state !== null) {
+			if (state.current === 'stopped') {
+				if (state.reason === 2) {
+					this.data.status = 'KO';
+				}
+				this.setFieldValue('maxPosition', state.position);
 			}
 		}
 	}
@@ -474,8 +476,6 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 	this.setFieldValue('position', error.position);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
-
-	//TBD position, chunkURL, orangeErrorCode
 
 	return this.data;
 };
