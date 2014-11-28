@@ -112,6 +112,7 @@ MediaPlayer.dependencies.Stream = function () {
                     self.debug.log(error);
                     self.errHandler.mediaKeySystemSelectionError(error);
                     // ORANGE
+                    self.metricsModel.addState(self.type, "stopped", self.videoModel.getCurrentTime(), 2);
                     self.reset();
                 }
             }
@@ -147,6 +148,7 @@ MediaPlayer.dependencies.Stream = function () {
                     self.debug.log(error);
                     self.errHandler.mediaKeyMessageError(error);
                     // ORANGE
+                    self.metricsModel.addState(self.type, "stopped", self.videoModel.getCurrentTime(), 2);
                     self.reset();
             });
 
