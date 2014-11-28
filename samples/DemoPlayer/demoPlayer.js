@@ -443,25 +443,26 @@ function initControlBar () {
 //init player by attaching source stream
 function initPlayer() {
     var query = window.location.search,
-        params = window.location.hash;
+        anchor = window.location.hash,
+        params,
+        i,
+        name,
+        value;
 
     if (query) {
-        query = query.substring(query.indexOf("?file=")+6);
-        if (query) {
 
-            if(params) {
-                query += params;
+        params = query.substring(1).split('&');
+        for (i = 0; i < params.length; i++) {
+            name = params[i].split('=')[0];
+            value = params[i].split('=')[1];
+
+            if ((name === 'file') || (name === 'url')) {
+                player.attachSource(value);
+                update();
             }
-
-            console.log(query);
-
-            player.attachSource(query);
-            update();
         }
     }
 }
-
-
 
 function onLoaded () {
     player = new MediaPlayer(new Custom.di.CustomContext());
@@ -477,27 +478,7 @@ function onLoaded () {
         var ccastReceiver = new HasCastReceiver(player);
     }
 
-    
-
-    //check for metrics Agent that will init player after activation
-    if(typeof MetricsAgent == 'function') {
-        var MetricsAgentInstance = new MetricsAgent(player, video, {
-            activationUrl: 'http://p-collector.orange-labs.fr/config',
-            serverUrl: 'http://p-collector.orange-labs.fr',
-            //activationUrl: 'http://10.192.224.13/config',
-            //serverUrl: 'http://10.192.224.13',
-            // activationUrl: 'http://localhost:8080/config',
-            // serverUrl: 'http://localhost:8080/metrics',
-            //dbServerUrl: 'http://localhost:8080/metricsDB',
-            collector: 'HasPlayerCollector',
-            formatter: 'CSQoE',
-            sendingTime: 10000
-        }, player.getDebug());
-
-        MetricsAgentInstance.init(initPlayer);
-    } else {
-        initPlayer();
-    }
+    initPlayer();
 
 	// catch ctrl+i key stoke    
     $(document).keydown(function(e) {
