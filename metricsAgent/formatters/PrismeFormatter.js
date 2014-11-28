@@ -97,7 +97,7 @@ Prisme.prototype.process = function(metric) {
 		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil.enable === true))){
 			formattedData = this.formatterRealTime('has/realtime/profil/');
 		}else if (metric.hasOwnProperty('state') && this.firstAccess === false) {
-			if (metric.state.current === 'stopped' && metric.state.reason === 0) {
+			if (metric.state.current === 'stopped') {
 				formattedData = this.formatterSession();
 			}//For Prisme, stalled state is an error
 			else if (metric.state.current === 'buffering') {
@@ -281,6 +281,13 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	if (this.firstAccess === true) {
 		this.data.status = 'OK';
 		this.firstAccess = false;
+	}else {
+		var state = this.database.getMetricObject('state',true);
+		if(session !== null) {
+			if (state.current === 'stopped' && state.reason === 2) {
+				this.data.status = 'KO';
+			}
+		}
 	}
 
 	var metadata = this.database.getMetricObject('metadata', true, this.isVideo);
@@ -456,6 +463,11 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 		default:
 			this.setFieldValue('orangeErrorCode', this.ORANGE_UNDEFINED_PLAYER_ERROR);
 			break;
+	}
+
+	if ((error.message.indexOf('key_system_selection') !== -1) || (error.message.indexOf('key_message') !== -1)
+		|| (error.message.indexOf('key_session') !== -1)) {
+		this.setFieldValue('orangeErrorCode', this.ORANGE_DRM_OR_DECODER_ERROR);
 	}
 
 	this.setFieldValue('chunkURL', error.chunkURL);

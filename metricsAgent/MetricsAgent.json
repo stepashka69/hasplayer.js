@@ -22,7 +22,7 @@
 	 "enable": true,
 	 "eventsObjectFilter": "session;realtime",
 	 "eventTypeSessionFilter":"error;profil,10,10;usage",
-	 "eventTypeRealTimeFilter":"error,10,99;profil",
+	 "eventTypeRealTimeFilter":"error,10,40,99;profil",
 	 "dbServerUrl":"http://localhost:8080/metricsDB",
 	 "collector":"HasPlayerCollector",
      "formatter":"Prisme",
