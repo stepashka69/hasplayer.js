@@ -11,6 +11,7 @@ function EventParameter(event) {
 }
 
 function EventTypeFilter() {
+	this.enable = false;
 	this.error = null;
 	this.profil = null;
 	this.usage = null;
@@ -20,11 +21,20 @@ EventTypeFilter.prototype.setFilter = function(type,eventParameter) {
 	this[type] = eventParameter;
 };
 
+EventTypeFilter.prototype.isEnabled = function() {
+	return this.enable;
+};
+
 function Prisme (database, eventsObjectFilter, eventTypeSessionFilter, eventTypeRealTimeFilter) {
 	AbstractFormatter.call(this,database);
 	
+	var eventsObject = eventsObjectFilter.split(';');
+
 	this.eventTypeSessionFilter = this.parseEventsFilter(eventTypeSessionFilter);
 	this.eventTypeRealTimeFilter = this.parseEventsFilter(eventTypeRealTimeFilter);
+
+	this.eventTypeSessionFilter.enable = eventsObject.indexOf('session') === -1? false : true;
+	this.eventTypeRealTimeFilter.enable = eventsObject.indexOf('realtime') === -1? false : true;
 }
 
 Prisme.prototype = Object.create(AbstractFormatter.prototype);
@@ -114,13 +124,16 @@ Prisme.prototype.formatterRecurring = function() {
 
 //type 1, 2 and 3
 Prisme.prototype.formatterRealTime = function(realTimeName, param) {
-	var data = [];
+	var data = [],
+		realTimeObj = {},
+		realTimeTempObj = {};
 
 	data.push(new Date().getTime());
 	data.push(realTimeName);
 
-	var realTimeObj = {},
-		realTimeTempObj = {};
+	//Real time events are disable, send nothing.
+	if(!this.eventTypeRealTimeFilter.isEnabled())
+		return null;
 
 	realTimeObj = this.formatSessionObject(['playerId', 'browserid', 'uuid']);
 
@@ -139,7 +152,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 				//send an error object with orangeCode = 30
 				var state = this.database.getMetricObject('state', true);
 				if(state === null) {
-					return {};
+					return null;
 				}
 				var errorVo =  new MetricsVo.Error();
 
@@ -183,6 +196,10 @@ Prisme.prototype.formatterSession = function() {
 
 	data.push(new Date().getTime());
 	data.push('has/session/');
+
+	//Session events are disable, send nothing.
+	if(!this.eventTypeSessionFilter.isEnabled())
+		return null;
 	
 	var sessionObj = {};
 
