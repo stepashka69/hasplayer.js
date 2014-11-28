@@ -77,6 +77,35 @@ HasPlayerCollector.prototype.metricAddedListener = function(metric) {
     }
 };
 
+HasPlayerCollector.prototype.onError = function(error){
+	var errorVo = new MetricsVo.Error();
+
+	switch(error.error) {
+		case "manifestError" :
+		case "cc" :
+			errorVo.message = error.event.message+" "+error.type;
+			errorVo.code = error.event.id;
+			break;
+		case "download" :
+			errorVo.message = error.error+" "+error.event.id+" "+error.type;
+			if (error.event.request.status) {
+				errorVo.code = error.event.request.status;
+			}else{
+				errorVo.chunkURL = error.event.url;
+			}
+			break;
+		default :
+			errorVo.message = error.error+" "+error.type;
+			errorVo.code = error.event.code;
+			break;
+	}
+
+	var objError = {};
+	objError.error = errorVo;
+
+	this.database.addMetric(objError);
+};
+
 HasPlayerCollector.prototype.metricUpdatedListener = function(metric) {
 	if(this.sessionId === null) {
 		return;
@@ -99,6 +128,7 @@ HasPlayerCollector.prototype.listen = function() {
 
     this.player.addEventListener("metricAdded", this.metricAddedListener.bind(this));
     this.player.addEventListener("metricUpdated", this.metricUpdatedListener.bind(this));
+    this.player.addEventListener("error", this.onError.bind(this));
 
     window.addEventListener("beforeunload", function (){
     	if(this.sessionId === null) {

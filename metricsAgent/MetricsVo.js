@@ -81,4 +81,5 @@ MetricsVo.Error = function () {
 		this.code = null;
 		this.message = null;
 		this.position = null;
+		this.chunkURL = null;
 };

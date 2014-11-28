@@ -78,14 +78,13 @@ Prisme.prototype.process = function(metric) {
 		if (metric.hasOwnProperty('session')) {
 			formattedData = this.formatterSession();
 		}// error is defined in eventTypeRealTimeFilter ? error type code also defined?
-		else if ((metric.hasOwnProperty('error') && (this.eventTypeRealTimeFilter.error !== undefined && this.eventTypeRealTimeFilter.error.param[0] === metric.value.code)))
-		{
+		else if (metric.hasOwnProperty('error')) {
 			formattedData = this.formatterRealTime('has/realtime/error/');
 		}//use is defined in eventTypeRealTimeFilter ?
-		else if ((metric.hasOwnProperty('action') && (this.eventTypeRealTimeFilter.usage !== undefined))){
+		else if ((metric.hasOwnProperty('action') && (this.eventTypeRealTimeFilter.usage.enable === true))){
 			formattedData = this.formatterRealTime('has/realtime/use/');
 		}// profil is defined in eventTypeRealTimeFilter ?
-		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil !== undefined))){
+		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil.enable === true))){
 			formattedData = this.formatterRealTime('has/realtime/profil/');
 		}else if (metric.hasOwnProperty('state') && this.firstAccess === false) {
 			if (metric.state.current === 'stopped' && metric.state.reason === 0) {
@@ -153,6 +152,10 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 				realTimeTempObj = this.formatLastErrorObject([]);
 			}
 			realTimeTempObj.Condition = this.formatTheConditionObject([]);
+			//if OrangeErrorCode should not be returned by real time
+			if((this.eventTypeRealTimeFilter.error.enable === false) || (this.eventTypeRealTimeFilter.error.enable === true && (this.eventTypeRealTimeFilter.error.param.indexOf(realTimeTempObj.orangeErrorCode) === -1))){
+				return null;
+			}
 			break;
 	}
 	
@@ -255,7 +258,7 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('startLaunchDate', session.startTime);
 	this.setFieldValue('startBufferingDate', session.startBufferingTime);
 	this.setFieldValue('watchStartDate', session.startPlayingTime);
-	//TBD uuid, contentName, maxPosition, listBitrate, httpBitrate
+	//TBD uuid, contentName, maxPosition, httpBitrate
 	//this.setFieldValue('maxPosition', "undefined");
 
 	if (this.firstAccess === true) {
@@ -438,7 +441,7 @@ Prisme.prototype.formatErrorObject = function(excludedList, error) {
 			break;
 	}
 
-	this.setFieldValue('chunkURL', undefined);
+	this.setFieldValue('chunkURL', error.chunkURL);
 	this.setFieldValue('position', error.position);
 	this.setFieldValue('errorCode', error.code);
 	this.setFieldValue('comment', error.message);
