@@ -97,7 +97,7 @@ Prisme.prototype.process = function(metric) {
 		else if ((metric.hasOwnProperty('encoding') && (this.eventTypeRealTimeFilter.profil.enable === true))){
 			formattedData = this.formatterRealTime('has/realtime/profil/');
 		}else if (metric.hasOwnProperty('state') && this.firstAccess === false) {
-			if (metric.state.current === 'stopped') {
+			if (metric.state.current === 'stopped' && metric.state.previousState !== 'init') {
 				formattedData = this.formatterSession();
 			}//For Prisme, stalled state is an error
 			else if (metric.state.current === 'buffering') {
@@ -135,7 +135,7 @@ Prisme.prototype.formatterRealTime = function(realTimeName, param) {
 	if(!this.eventTypeRealTimeFilter.isEnabled())
 		return null;
 
-	realTimeObj = this.formatSessionObject(['playerId', 'browserid', 'uuid']);
+	realTimeObj = this.formatSessionObject(['playerId', 'browserid', 'uuid', 'status']);
 
 	switch(realTimeName) {
 		case 'has/realtime/use/' :
@@ -277,7 +277,7 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 	this.setFieldValue('watchStartDate', session.startPlayingTime);
 	//TBD uuid, contentName, httpBitrate
 	
-	this.data.status = 'OK';
+	this.setFieldValue('status', 'OK');
 	if (this.firstAccess === true) {
 		this.firstAccess = false;
 	}else {
@@ -285,9 +285,10 @@ Prisme.prototype.formatSessionObject = function(excludedList) {
 		if(state !== null) {
 			if (state.current === 'stopped') {
 				if (state.reason === 2) {
-					this.data.status = 'KO';
+					this.setFieldValue('status', 'KO');
 				}
 				this.setFieldValue('maxPosition', state.position);
+				this.setFieldValue('watchEndDate', new Date().getTime());
 			}
 		}
 	}
