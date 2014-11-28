@@ -118,7 +118,7 @@ Prisme.prototype.formatterRecurring = function() {
 	if (this.duration >= 0) {
 		return null;
 	}else {	//send Session event, it's a LIVE content
-		return this.formatterSession();
+		return this.formatterSession(['status']);
 	}
 };
 
