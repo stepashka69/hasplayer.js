@@ -2,8 +2,26 @@
     "items": [
         {
             "type": "HLS",
-            "name": "VIM 1",
-            "url": "http://vimtv2.orange-labs.fr/streaming/1.m3u8",
+            "name": "VIMTV - D17",
+            "url": "http://vimtv2.orange-labs.fr/streaming/3.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - iTélé",
+            "url": "http://vimtv2.orange-labs.fr/streaming/4.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - BFMTV",
+            "url": "http://vimtv2.orange-labs.fr/streaming/5.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - D8",
+            "url": "http://vimtv2.orange-labs.fr/streaming/6.m3u8",
             "browsers": "cdsbi"
         },
         {
