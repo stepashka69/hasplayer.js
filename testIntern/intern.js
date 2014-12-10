@@ -6,10 +6,10 @@ define({
 	proxyPort: 3555,
 
 	// A fully qualified URL to the Intern proxy
-	proxyUrl: 'http://10.194.60.33:3555',
+	proxyUrl: 'http://localhost:3555',
 	tunnel: 'NullTunnel',
 	tunnelOptions: {
-        hostname: 'r-lnx-fitforme4',
+        hostname: 'localhost',
         port: '4444',
         verbose: true
     },
@@ -29,8 +29,8 @@ define({
 	// capabilities options specified for an environment will be copied as-is
 	environments: [
 		
-		{ browserName: 'chrome', version: '2.11', platform: 'WIN8_1' },
-		{ browserName: 'internet explorer', version: '11', platform: 'WIN8_1' }
+		{ browserName: 'chrome', /*version: '2.11', */platform: 'WIN8_1' }//,
+		//{ browserName: 'internet explorer', /*version: '11', */platform: 'WIN8_1' }
 		
 	],
 
@@ -43,9 +43,9 @@ define({
 	functionalSuites: [ 
 	'testIntern/functional/live',
 	// 'testIntern/functional/DRM',
-	'testIntern/functional/seek',
-	'testIntern/functional/startTime', 
-	'testIntern/functional/multiAudio' 
+	//'testIntern/functional/seek',
+	//'testIntern/functional/startTime', 
+	//'testIntern/functional/multiAudio' 
 	],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis

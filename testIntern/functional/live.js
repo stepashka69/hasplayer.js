@@ -42,7 +42,7 @@ define([
 
 		var tests = function(i) {
 
-			var url = "../../samples/DemoPlayer/index.html?url=" + config.live[i];
+			var url = config.testPage + "?url=" + config.live[i];
 
 			registerSuite({
 				name: 'Sequence of playing a live stream',

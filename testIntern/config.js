@@ -1,4 +1,8 @@
 define({
+	//Test startTime param: seek at start
+	testPage: [
+		'http://tv-has.orange-labs.fr/hasplayer_orange/1.2.0_dev/player.html'
+	],
 	//Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
 	live: [
 		'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest',
