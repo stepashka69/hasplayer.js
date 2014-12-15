@@ -27,7 +27,7 @@ define([
 			document.querySelector("video").currentTime = time;
 		};
 
-		var tests = function(stream) {
+		var test_init = function(stream) {
 
 			var url = config.testPage + "?url=" + stream;
 
@@ -46,7 +46,7 @@ define([
 					});
 				},
 
-				'Check if playing': function() {
+				'Check playing': function() {
 					console.log('[TEST_SEEK] Wait 5s ...');
 
 					return command.sleep(5000)
@@ -56,18 +56,27 @@ define([
 						assert.ok(time > videoCurrentTime);
 						videoCurrentTime = time;
 					});
-				},
+				}
+			});
+		};
+
+
+		var test_seek = function(seekTime) {
+
+			registerSuite({
+				name: 'Test seeking functionnality',
 
 				'Do seek': function() {
-					console.log('[TEST_SEEK] Seek to 30s...');
 
-					return command.execute(seek, [30])
+					console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
+
+					return command.execute(seek, [seekTime])
 					// Wait for current time > 30, i.e. seek has been done and video is playing
 					.then(pollUntil(
-						function () {
+						function (seekTime) {
 							var time = document.querySelector("video").currentTime;
-							return (time > 30) ? true : null;
-						}, null, 10000))
+							return (time > seekTime) ? true : null;
+						}, [seekTime], 10000))
 					.then(function () {
 						return command.execute(getVideoCurrentTime)
 						.then(function (time) {
@@ -79,24 +88,27 @@ define([
 					});
 				},
 
-				'Check playing time after 10 sec.': function() {
-					console.log('[TEST_SEEK] Wait 10s ...');
+				'Check playing': function() {
+					console.log('[TEST_PLAY] Wait 2s ...');
 
-					return command.sleep(10000)
+					return command.sleep(2000)
 					.execute(getVideoCurrentTime)
 					.then(function (time) {
 						var delay = time - videoCurrentTime;
-						console.log("[TEST_SEEK] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
-						assert.ok(delay >= 9); // 9 for sleep precision
+						console.log("[TEST_PLAY] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+						assert.ok(delay >= 1.5);
 					});
 				}
 			});
 		};
 
-		var i = 0,
-			len = config.seek.length;
+		var i, j;
 
-		for(i; i < len; i++) {
-			tests(config.seek[i].stream);
+		for (i = 0; i < config.seek.length; i++) {
+			test_init(config.seek[i].stream);
+			for (j = 0; j < config.seek[i].seekCount; j++) {
+				// Generate a random seek time
+				test_seek(Math.random() * config.seek[i].duration);
+			}
 		}
 });
