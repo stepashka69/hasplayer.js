@@ -6,10 +6,10 @@ define({
 	proxyPort: 3555,
 
 	// A fully qualified URL to the Intern proxy
-	proxyUrl: 'http://localhost:3555',
+	proxyUrl: 'http://10.194.60.158:3555',
 	tunnel: 'NullTunnel',
 	tunnelOptions: {
-        hostname: 'localhost',
+        hostname: '10.194.60.158',
         port: '4444',
         verbose: true
     },
@@ -41,10 +41,10 @@ define({
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
 	functionalSuites: [ 
-	'testIntern/functional/live',
+	'testIntern/functional/play',
 	// 'testIntern/functional/DRM',
-	//'testIntern/functional/seek',
-	//'testIntern/functional/startTime', 
+	'testIntern/functional/seek',
+	'testIntern/functional/startTime', 
 	//'testIntern/functional/multiAudio' 
 	],
 

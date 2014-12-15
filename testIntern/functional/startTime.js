@@ -1,80 +1,65 @@
+
+
 define([
 	'intern!object',
 	'intern/chai!assert',
 	'intern/dojo/node!leadfoot/helpers/pollUntil',
-	'require', 
+	'require',
 	'testIntern/config'
-	], function(registerSuite, assert,pollUntil, require, config){
-
-		var playDetection = function(){
-			var videoNode = document.querySelector("video");
-			var body = document.querySelector("body");
-			var div = document.createElement("div");
-			div.id = "functionalTestStatus";
-			div.innerHTML = "not playing";
-
-			body.appendChild(div);
-
-			var onContentPlay = function(){
-				document.getElementById("functionalTestStatus").innerHTML = "playing";
-			};
-
-			videoNode.addEventListener("play", onContentPlay);
-			videoNode.loop = true;
-
-		};
+	], function(registerSuite, assert, pollUntil, require, config) {
 
 		var command = null;
+		var videoCurrentTime = 0;
 
-		var tests = function(i) {
-			var url = "../../samples/DemoPlayer/index.html?url=" + config.startTime[i];
+		var getVideoCurrentTime = function() {
+			return document.querySelector("video").currentTime;
+		};
+
+		var tests = function(stream, startTime) {
+
+			var url = config.testPage + "?url=" + stream + "#s=" + startTime;
 
 			registerSuite({
-				name: 'Seek at start',
+				name: 'Test playing streams with start time',
 
-				'initTest': function() {
-					console.log('INIT');
+				'Initialize the test': function() {
+					console.log("[TEST_START-TIME] stream: " + stream);
+					console.log("[TEST_START-TIME] startTime: " + startTime);
+
 					command = this.remote.get(require.toUrl(url));
-
-					return command.execute(playDetection).findById("functionalTestStatus").getVisibleText(function(text){
-						assert.equal(text, "not playing");
-					});
 					
-				},
-
-				'contentPlaying': function(){
-					console.log('PLAYING');
-					return command.sleep(20000)
-					.then(
-						pollUntil(function(){
-							var div = document.getElementById("functionalTestStatus");
-							return div.innerHTML;
-						},null,60000))
-					.then(function(isOk){
-						return assert.equal(isOk, "playing");
+					return command.execute(getVideoCurrentTime)
+					.then(function (time) {
+						videoCurrentTime = time;
+						console.log("[TEST_START-TIME] current time = " + videoCurrentTime);
 					});
 				},
 
-				'currentTimeDifferentAfterSeekAtStart':function(){
-					console.log('STILL PLAYING');
-					return command.sleep(10000)
-					.then(
-						pollUntil(function(){
-							return document.querySelector("video").currentTime;
-						},null,100000))
-					.then(function(time){
-						return assert.ok(time>=60,"the content is still playing after the seek at start at 50 seconds and playing for 20 seconds");
+				'Check playing time': function() {
+					console.log('[TEST_START-TIME] Check if playing is > ' + startTime);
+
+					return command.then(pollUntil(
+						function (_startTime) {
+							var time = document.querySelector("video").currentTime;
+							return (time > _startTime) ? true : null;
+						}, [startTime], 10000))
+					.then(function () {
+						return command.execute(getVideoCurrentTime)
+						.then(function (time) {
+							console.log("[TEST_START-TIME] current time = " + time);
+							videoCurrentTime = time;
+						});
+					}, function (error) {
+						assert.ok(false, "[TEST_START-TIME] Failed to start at time " + startTime);
 					});
 				}
-
 			});
 		};
 
 		var i = 0,
 			len = config.startTime.length;
 
-		for(i; i<len; i++) {
-			tests(i);
+		for (i; i < len; i++) {
+			tests(config.startTime[i].stream, config.startTime[i].time);
 		}
-
 });
