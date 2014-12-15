@@ -223,7 +223,7 @@ rslt.planRequests = function (req) {
         that.doLoad(req).then(function (result){
           d.resolve(result);
         },function (reqerror){
-          that.retry(reqerror,d,that);
+          that.retry(req,d,that);
     });
   }
     return d.promise;
@@ -237,7 +237,7 @@ rslt.retry = function (request, d, that) {
     }, function (error) {
       retryCount++;
       if (retryCount < RETRY_ATTEMPTS) {
-        that.retry(error,d,that);
+        that.retry(request,d,that);
       }
       else {
         retryCount = 0;
