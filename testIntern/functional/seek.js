@@ -89,13 +89,13 @@ define([
 				},
 
 				'Check playing': function() {
-					console.log('[TEST_PLAY] Wait 2s ...');
+					console.log('[TEST_SEEK] Wait 2s ...');
 
 					return command.sleep(2000)
 					.execute(getVideoCurrentTime)
 					.then(function (time) {
 						var delay = time - videoCurrentTime;
-						console.log("[TEST_PLAY] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+						console.log("[TEST_SEEK] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
 						assert.ok(delay >= 1.5);
 					});
 				}

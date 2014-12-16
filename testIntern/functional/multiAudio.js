@@ -4,129 +4,115 @@ define([
 	'intern/dojo/node!leadfoot/helpers/pollUntil',
 	'require', 
 	'testIntern/config'
-	], function(registerSuite, assert,pollUntil, require, config){
-
-		var playDetection = function(matchTrack1, matchTrack2){
-
-			var videoNode = document.querySelector("video"),
-			body = document.querySelector("body"),
-			div = document.createElement("div"),
-			audioDiv = document.createElement("div"),
-			player = window.player,
-			track1 = new RegExp(matchTrack1),
-			track2 = new RegExp(matchTrack2);
-
-			audioDiv.id = "functionalTestAudio";
-			div.id = "functionalTestStatus";
-			div.innerHTML = "not playing";
-
-			body.appendChild(div);
-			body.appendChild(audioDiv);
-
-			var onContentPlay = function(){
-				document.getElementById("functionalTestStatus").innerHTML = "playing";
-			};
-
-			var getAudioTrack = function (e) {
-
-				if(e && e.data.stream === 'audio' && e.data.value.url) {
-					var audio = e.data.value.url;
-
-					if(track1.test(audio)) {
-						document.getElementById("functionalTestAudio").innerHTML = "track1";
-					} else if(track2.test(audio)) {
-						document.getElementById("functionalTestAudio").innerHTML = "track2";
-					} else {
-						document.getElementById("functionalTestAudio").innerHTML = "no match";
-					}
-				}
-				
-			};
-
-			videoNode.addEventListener("play", onContentPlay);
-			videoNode.loop = true;
-
-			player.addEventListener("metricUpdated", getAudioTrack, false);
-
-		};
+	], function(registerSuite, assert, pollUntil, require, config){
 
 		var command = null;
+		var videoCurrentTime = 0;
+		var audioTracks = null;
 
-		var tests = function(i) {
+		var getAudioTracks = function () {
+			audioTracks = window.player.getAudioTracks();
+			return audioTracks;
+		};
 
-			var changeAudioTrack = function() {
-				var player = window.player,
-				audioDatas = player.getAudioTracks();
+		var setAudioTrack = function (track) {
+			window.player.setAudioTrack(track);
+		};
 
-				player.setAudioTrack(audioDatas[1]);
-			};
+		var getVideoCurrentTime = function () {
+			return document.querySelector("video").currentTime;
+		};
 
-			var url = "../../samples/DemoPlayer/index.html?url=" + config.multiAudio[i][0];
+		var test_init = function(stream) {
+
+			var url = config.testPage + "?url=" + stream;
 
 			registerSuite({
-				name: 'Multi Audio',
+				name: 'Test multi-audio functionnality',
 
-				'initTest': function() {
-					console.log('INIT');
+				'Initialize the test': function() {
+					console.log("[TEST_MULTI-AUDIO] stream: " + stream);
+
 					command = this.remote.get(require.toUrl(url));
-
-					return command.execute(playDetection, [config.multiAudio[i][1], config.multiAudio[i][2]]).findById("functionalTestStatus").getVisibleText(function(text){
-						assert.equal(text, "not playing");
-					});
-
-				},
-
-				'contentPlaying': function(){
-					console.log('PLAYING');
-					return command.sleep(20000)
-					.then(
-						pollUntil(function(){
-							var div = document.getElementById("functionalTestStatus");
-							return div.innerHTML;
-						},null,60000))
-					.then(function(isOk){
-						return assert.equal(isOk, "playing");
+					
+					return command.execute(getAudioTracks)
+					.then(function (tracks) {
+						if (tracks) {
+							for (var i = 0; i < tracks.length; i++) {
+								console.log("[TEST_MULTI-AUDIO] audioTrack["+i+"].id = " + tracks[i].id);
+							}
+						}
 					});
 				},
 
-				'checkAudioTrack1': function(){
-					console.log('CHECK IF AUDIO TRACK IS THE FIRST ONE');
+				'Check playing': function() {
+					console.log('[TEST_MULTI-AUDIO] Wait 5s ...');
 
 					return command.sleep(5000)
-					.then(
-						pollUntil(function(){
-							var div = document.getElementById("functionalTestAudio");
-							return div.innerHTML;
-						},null,60000))
-					.then(function(isOk){
-						return assert.equal(isOk, "track1");
+					.execute(getVideoCurrentTime)
+					.then(function (time) {
+						console.log("[TEST_MULTI-AUDIO] current time = " + time);
+						assert.ok(time > videoCurrentTime);
+						videoCurrentTime = time;
 					});
-				},
-
-				'checkAudioTrack2': function(){
-					console.log('CHANGE AUDIO TRACK TO THE SECOND ONE');
-					command.execute(changeAudioTrack);
-
-					return command.sleep(10000)
-					.then(
-						pollUntil(function(){
-							var div = document.getElementById("functionalTestAudio");
-							return div.innerHTML;
-						},null,60000))
-					.then(function(isOk){
-						return assert.equal(isOk, "track2");
-					});
-				},
-
+				}
 			});
-};
-
-var i = 0,
-len = config.multiAudio.length;
+		};
 
 
-for(i; i<len; i++) {
-	tests(i);
-}
+		var test_setAudioTrack = function(track) {
+
+			registerSuite({
+				name: 'Test seeking functionnality',
+
+				'Set audio track': function() {
+
+					console.log('[TEST_MULTI-AUDIO] set audio track ' + track.id);
+
+					return command.execute(setAudioTrack, [track])
+					.then(pollUntil(
+						function (urlPattern) {
+							// Check if new track has been activated
+							// 1 - Get the metrics for audio track
+							// 2 - Check if last audio segment url contains the provided pattern
+							var metrics = window.player.getMetricsFor("audio"),
+								metricsExt = window.player.getMetricsExt(),
+								httpRequests = metricsExt.getHttpRequests(metrics);
+
+							if (httpRequests.length === 0) {
+								return false;
+							}
+
+							return httpRequests[httpRequests.length-1].url.indexOf(urlPattern) > 0 ? true : null;
+						}, [track.urlPattern], 10000, 1000))
+					.then(function () {
+						assert.ok(true, "");
+					}, function (error) {
+						assert.ok(false, "[TEST_MULTI-AUDIO] Failed to change audio track");
+					});
+				},
+
+				'Check playing': function() {
+					console.log('[TEST_MULTI-AUDIO] Wait 5s ...');
+
+					return command.sleep(5000)
+					.execute(getVideoCurrentTime)
+					.then(function (time) {
+						var delay = time - videoCurrentTime;
+						console.log("[TEST_MULTI-AUDIO] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+						assert.ok(delay >= 4.5);
+					});
+				}
+			});
+		};
+
+		var i, j;
+
+		for (i = 0; i < config.multiAudio.length; i++) {
+			test_init(config.multiAudio[i].stream);
+			for (j = 0; j < config.multiAudio[i].tracks.length; j++) {
+				test_setAudioTrack(config.multiAudio[i].tracks[j]);
+			}
+		}
 
 });
