@@ -1,4 +1,3 @@
-var DEBUG = true;
 
 // /!\ if you modify thi title don't forget to modify the css rule ".reflected:before"
 var pageTitle = "<b>UHDTV</b> in an <b>HTML5</b> browser with <b>DASH-HEVC</b> content adaptation";

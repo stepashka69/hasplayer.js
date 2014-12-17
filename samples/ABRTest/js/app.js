@@ -1,5 +1,4 @@
 'use strict';
-var DEBUG = true;
 
 var app = angular.module('HASPlayer', ['ngResource', 'highcharts-ng', 'ngRoute']);
 
