@@ -108,7 +108,7 @@ define([
 			test_init(config.seek[i].stream);
 			for (j = 0; j < config.seek[i].seekCount; j++) {
 				// Generate a random seek time
-				test_seek(Math.random() * config.seek[i].duration);
+				test_seek(Math.round(Math.random() * config.seek[i].duration * 100) / 100);
 			}
 		}
 });
