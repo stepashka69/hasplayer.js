@@ -639,7 +639,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     };
 
     $scope.abrUp = function (type) {
-        var newQuality,
+        /*var newQuality,
         metricsExt = player.getMetricsExt(),
         max = metricsExt.getMaxIndexForBufferType(type);
 
@@ -648,7 +648,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         if (newQuality >= max) {
             newQuality = max - 1;
         }
-        player.setQualityFor(type, newQuality);
+        player.setQualityFor(type, newQuality);*/
+
+        video.playbackRate = video.playbackRate * 2;
     };
 
     $scope.abrDown = function (type) {
@@ -657,6 +659,32 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             newQuality = 0;
         }
         player.setQualityFor(type, newQuality);
+    };
+
+    $scope.playbackRateUp = function () {
+
+        if (video.playbackRate === 64.0) {
+            return;
+        }
+
+        video.playbackRate = video.playbackRate * 2;
+        console.log("playbackRate = " + video.playbackRate);
+        player.setAutoSwitchQuality(false);
+        player.setQualityFor('video', 0);
+    };
+
+    $scope.playbackRateDown = function () {
+
+        if (video.playbackRate === 1.0) {
+            return;
+        }
+
+        video.playbackRate = video.playbackRate / 2;
+        console.log("playbackRate = " + video.playbackRate);
+
+        if (video.playbackRate === 1.0) {
+            player.setAutoSwitchQuality(true);
+        }
     };
 
     ////////////////////////////////////////
@@ -805,21 +833,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     function resetBitratesSlider () {
         $('#sliderBitrate').labeledslider({
-                    max: 0,
-                    step: 1,
-                    values: [0],
-                    tickLabels: [],
-                    orientation: 'vertical',
-                    range: true,
-                    stop: function(evt, ui) {
-                        player.setConfig( {
-                            "video": {
-                                "ABR.minQuality": ui.values[0],
-                                "ABR.maxQuality": ui.values[1]
-                        }
+            max: 0,
+            step: 1,
+            values: [0],
+            tickLabels: [],
+            orientation: 'vertical',
+            range: true,
+            stop: function(evt, ui) {
+                player.setConfig({
+                    "video": {
+                        "ABR.minQuality": ui.values[0],
+                        "ABR.maxQuality": ui.values[1]
+                    }
                 });
             }
-        });        
+        });
     }
     function initPlayer() {
         initAudioTracks = initTextTracks = true;
