@@ -1,7 +1,6 @@
 // variable to now if we are on chromecast
 var isCrKey = (cast && cast.receiver && navigator.userAgent.lastIndexOf("CrKey") != -1);
 
-var DEBUG = isCrKey ? false:true;
 // customizable settings
 // hideMetricsAtStart : if true all metrics are hidden at start and ctrl+i show them one by one; else all metrics are shown at start and ctrl+i hide them one by one
 var hideMetricsAtStart = false;
@@ -443,25 +442,25 @@ function initControlBar () {
 //init player by attaching source stream
 function initPlayer() {
     var query = window.location.search,
-        params = window.location.hash;
+        anchor = window.location.hash,
+        params,
+        i,
+        name,
+        value;
 
     if (query) {
-        query = query.substring(query.indexOf("?file=")+6);
-        if (query) {
+        params = query.substring(1).split('&');
+        for (i = 0; i < params.length; i++) {
+            name = params[i].split('=')[0];
+            value = params[i].split('=')[1];
 
-            if(params) {
-                query += params;
+            if ((name === 'file') || (name === 'url')) {
+                player.attachSource(value + anchor);
+                update();
             }
-
-            console.log(query);
-
-            player.attachSource(query);
-            update();
         }
     }
 }
-
-
 
 function onLoaded () {
     player = new MediaPlayer(new Custom.di.CustomContext());
@@ -475,6 +474,7 @@ function onLoaded () {
     // Initialize receiver only if cast.receiver is available
     if (isCrKey) {
         var ccastReceiver = new HasCastReceiver(player);
+        player.getDebug().setLogToBrowserConsole(false);
     }
 
     initPlayer();

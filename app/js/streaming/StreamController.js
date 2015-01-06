@@ -141,7 +141,7 @@
                 playBackQuality = self.videoExt.getPlaybackQuality(videoElement),
                 elapsedTime = (new Date().getTime()- self.startPlayingTime)/1000;
 
-            self.debug.log("[StreamController]", "FPS = " + playBackQuality.totalVideoFrames/elapsedTime);
+            //self.debug.log("[StreamController]", "FPS = " + playBackQuality.totalVideoFrames/elapsedTime);
 
             //ORANGE : replace addDroppedFrames metric by addConditionMetric
             //self.metricsModel.addDroppedFrames("video", playBackQuality);
@@ -476,12 +476,12 @@
             self.currentURL = url;
             self.currentParams = params;
 
-            self.debug.log("[StreamController]", "load url: " + url);
+            self.debug.info("[StreamController] load url: " + url);
 
             self.manifestLoader.load(url).then(
                 function(manifest) {
                     // ORANGE: get licenser backUrl and customData parameters
-                    if (params !== undefined) {
+                    if (params) {
                         if (params.backUrl) {
                             manifest.backUrl = params.backUrl;
                         }
@@ -492,7 +492,7 @@
                     self.manifestModel.setValue(manifest);
                     //ORANGE : add Metadata metric
                     self.metricsModel.addMetaData();
-                    self.debug.log("Manifest has loaded.");
+                    self.debug.info("[StreamController] Manifest has loaded.");
                     //self.debug.log(self.manifestModel.getValue());
                     self.manifestUpdater.start();
                 },
@@ -503,6 +503,8 @@
         },
 
         reset: function () {
+
+            this.debug.info("[StreamController] Reset");
 
             if (!!activeStream) {
                 detachVideoEvents.call(this, activeStream.getVideoModel());

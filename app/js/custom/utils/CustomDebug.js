@@ -18,29 +18,65 @@ Custom.utils.CustomDebug = function () {
 
     var rslt = Custom.utils.copyMethods(MediaPlayer.utils.Debug);
 
-    rslt.log = function () {
-        if (rslt.getLogToBrowserConsole() && DEBUG){
-            var _logger = ('undefined' !== typeof(log4javascript)) ? log4javascript.getLogger() : null;
-            if(_logger){
-                if(!_logger.initialized){
-                    var appender = new log4javascript.PopUpAppender();
-                    var layout = new log4javascript.PatternLayout("%d{HH:mm:ss.SSS} %-5p - %m%n");
-                    appender.setLayout(layout);
-                    _logger.addAppender(appender);
-                    _logger.setLevel(log4javascript.Level.ALL);
-                    _logger.initialized = true;
-                }
-                
-                _logger.info.apply(_logger,arguments);
-                
-            }else{
-                console.log.apply(console,arguments);
+    rslt.getLogger = function () {
+        var _logger = ('undefined' !== typeof(log4javascript)) ? log4javascript.getLogger() : null;
+        if (_logger) {
+            if(!_logger.initialized) {
+                var appender = new log4javascript.PopUpAppender();
+                var layout = new log4javascript.PatternLayout("%d{HH:mm:ss.SSS} %-5p - %m%n");
+                appender.setLayout(layout);
+                _logger.addAppender(appender);
+                _logger.setLevel(log4javascript.Level.ALL);
+                _logger.initialized = true;
             }
         }
+        return _logger;
+    };
+
+    rslt._log = function (level, args) {
+        if (this.getLogToBrowserConsole() && (level <= rslt.getLevel())) {
+            var _logger = this.getLogger();
+            if ((_logger === undefined) || (_logger === null)) {
+                _logger = console;
+            }
+
+            switch (level) {
+                case this.ERROR:
+                    _logger.error.apply(_logger, args);
+                    break;
+                case this.WARN:
+                    _logger.warn.apply(_logger, args);
+                    break;
+                case this.INFO:
+                    _logger.info.apply(_logger, args);
+                    break;
+                case this.DEBUG:
+                    _logger.debug.apply(_logger, args);
+                    break;
+            }
+        }
+
         this.eventBus.dispatchEvent({
             type: "log",
             message: arguments[0]
         });
+    };
+
+    rslt.error = function () {
+        this._log(this.ERROR, arguments);
+    };
+
+    rslt.warn = function () {
+        this._log(this.WARN, arguments);
+    };
+
+    rslt.info = function () {
+        this._log(this.INFO, arguments);
+    };
+
+    // Keep this function for compatibility
+    rslt.log = function () {
+        this._log(this.DEBUG, arguments);
     };
 
     return rslt;

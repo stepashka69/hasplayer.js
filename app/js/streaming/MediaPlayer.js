@@ -251,6 +251,9 @@ MediaPlayer = function (aContext) {
             if (!initialized) {
                 system.injectInto(this);
                 initialized = true;
+
+                this.debug.log("[MediaPlayer] Version: " + this.getVersionFull() + " - " + this.getBuildDate());
+                this.debug.log("[MediaPlayer] user-agent: " + navigator.userAgent);
             }
         },
 
@@ -372,20 +375,19 @@ MediaPlayer = function (aContext) {
             if (!initialized) {
                 throw "MediaPlayer not initialized!";
             }
-
             // ORANGE : add metric
             var loop = this.getVideoModel().getElement().loop;
             this.metricsModel.addSession(null, url, loop, null,"HasPlayer.js_"+this.getVersionHAS());
 
             this.uriQueryFragModel.reset();
-            source = this.uriQueryFragModel.parseURI(url);
+            if (url) {
+                source = this.uriQueryFragModel.parseURI(url);
+            }else {
+                source = null;
+            }
+
             // ORANGE: store source stream params
             sourceParams = params;
-
-            this.setQualityFor('video', 0);
-            this.setQualityFor('audio', 0);
-
-            // TODO : update
 
             if (playing && streamController) {
                 streamController.reset();
