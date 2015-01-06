@@ -95,7 +95,9 @@ MediaPlayer.dependencies.Stream = function () {
             var self = this,
                 type;
 
-            type = (event.type !== "msneedkey") ? event.type : videoCodec;
+            // ORANGE: set videoCodec as type
+            //type = (event.type !== "msneedkey") ? event.type : videoCodec;
+            type = videoCodec;
             initData.push({type: type, initData: event.initData});
 
             this.debug.log("[DRM] Key required for - " + type);
@@ -132,7 +134,10 @@ MediaPlayer.dependencies.Stream = function () {
             this.debug.log("[DRM] Got a key message...");
 
             session = event.target;
-            bytes = new Uint16Array(event.message.buffer);
+
+            // ORANGE: Uint16Array if conversion from multi-byte to unicode is required
+            bytes = event.message[1] === 0 ? new Uint16Array(event.message.buffer) : new Uint8Array(event.message.buffer);
+
             msg = String.fromCharCode.apply(null, bytes);
             laURL = event.destinationURL;
             
