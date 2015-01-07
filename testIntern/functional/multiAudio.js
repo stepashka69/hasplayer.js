@@ -35,9 +35,16 @@ define([
 
 					command = this.remote.get(require.toUrl(url));
 					
-					return command.execute(getAudioTracks)
+					return command.execute(getVideoCurrentTime)
+					.then(function(time) {
+						videoCurrentTime = time;
+						console.log("[TEST_MULTI-AUDIO] current time = " + videoCurrentTime);
+						//console.log("Before getAudioTracks call "+new Date().toLocaleTimeString());
+					})
+					.execute(getAudioTracks)
 					.then(function (tracks) {
 						if (tracks) {
+							//console.log("After getAudioTracks call "+new Date().toLocaleTimeString());
 							for (var i = 0; i < tracks.length; i++) {
 								console.log("[TEST_MULTI-AUDIO] audioTrack["+i+"].id = " + tracks[i].id);
 							}
@@ -63,7 +70,7 @@ define([
 		var test_setAudioTrack = function(track) {
 
 			registerSuite({
-				name: 'Test seeking functionnality',
+				name: 'Test multi audio functionnality',
 
 				'Set audio track': function() {
 
