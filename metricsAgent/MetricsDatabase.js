@@ -229,6 +229,21 @@ MetricsDatabase.prototype.getMetrics = function() {
 	return this.metrics;
 };
 
+MetricsDatabase.prototype.deleteMetrics = function(type) {
+	var i = 0,
+		isLastState = true;
+
+	for (i = (this.metrics.length - 1); i >= 0 ; i--) {
+			if (this.checkMetric(this.metrics[i], type)) {
+				if (isLastState) {
+					isLastState = false;
+				}else {
+					this.metrics.splice(i,1);
+				}
+			}
+	}
+};
+
 MetricsDatabase.prototype.updateCurrentState = function(date) {
 	var stateMetric = this.getMetric('state', true)[0],
 		currentDate = date ? date : new Date().getTime();
