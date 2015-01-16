@@ -60,8 +60,10 @@ HasPlayerCollector.prototype.metricAddedListener = function(metric) {
 				break;
 		case  "State" :
 				//store current state
-				objStorage.state = this.mapStateObject(metric.data);
-				this.database.addMetric(objStorage);
+				if (metric.data.stream === "video") {
+					objStorage.state = this.mapStateObject(metric.data);
+					this.database.addMetric(objStorage);
+				}
 				break;
 		case "Session" :
 				objStorage.session = this.mapSessionObject(metric.data);
