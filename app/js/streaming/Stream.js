@@ -753,7 +753,9 @@ MediaPlayer.dependencies.Stream = function () {
             }
 
             if (textController) {
-                if (time !== undefined) {
+                if (time === undefined) {
+                    textController.start();
+                } else {
                     textController.seek(time);
                 }
             }
