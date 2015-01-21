@@ -77,8 +77,12 @@
 	                		EMEVersion.innerHTML = "10-05-2013 : event.type is undefined";
 	                	}
 	                	else
-	                	{
-	                		if (this.mediaKeys.loadSession === undefined) {
+	                	{	
+	                		if (this.mediaKeys.create)
+	                		{
+	                			EMEVersion.innerHTML = "28-08-2014  : create function is defined on mediaKeys object";
+	                		}
+	                		else if (this.mediaKeys.loadSession === undefined) {
 								EMEVersion.innerHTML = "22-10-2013 : loadSession on mediaKeys object is undefined";
 			    			}
 							else {
@@ -125,7 +129,7 @@
 		    	this.supportsMediaKeys();
 	    		
 		    	if(this.mediaKeys && this.mediaKeys.isTypeSupported){
-		    		return this.mediaKeys.isTypeSupported(flavor,codec);
+					return this.mediaKeys.isTypeSupported(flavor,codec);
 		    	}else{
 		    		// for chrome ... use canPlayType which is not for that
 		    		var video = document.createElement("video");
