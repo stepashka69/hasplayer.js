@@ -55,6 +55,9 @@ MediaPlayer.dependencies.Stream = function () {
         canplayListener,
         playingListener,
 
+        // ORANGE: interval id for checking buffers start time
+        checkStartTimeIntervalId,
+
         eventController = null,
 
         play = function () {
@@ -584,10 +587,9 @@ MediaPlayer.dependencies.Stream = function () {
         waitForStartTime = function (time, tolerance) {
             var self = this,
                 defer = Q.defer(),
-                intervalId,
                 videoBuffer = videoController.getBuffer(),
                 audioBuffer = audioController.getBuffer(),
-                CHECK_INTERVAL = 50,
+                CHECK_INTERVAL = 100,
                 videoRange,
                 audioRange,
                 startTime,
@@ -615,12 +617,12 @@ MediaPlayer.dependencies.Stream = function () {
                     }
                     self.debug.info("[Stream] Check start time: OK");
                     // Updating is completed, now we can stop checking and resolve the promise
-                    clearInterval(intervalId);
+                    clearInterval(checkStartTimeIntervalId);
 
                     defer.resolve(startTime);
                 };
 
-            intervalId = setInterval(checkStartTime, CHECK_INTERVAL);
+            checkStartTimeIntervalId = setInterval(checkStartTime, CHECK_INTERVAL);
             return defer.promise;
         },
 
@@ -783,6 +785,8 @@ MediaPlayer.dependencies.Stream = function () {
             if (!this.scheduleWhilePaused || this.manifestExt.getIsDynamic(manifest)) {
                 stopBuffering.call(this);
             }
+
+            clearInterval(checkStartTimeIntervalId);
         },
 
         updateCurrentTime = function() {
