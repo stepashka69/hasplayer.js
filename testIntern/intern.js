@@ -45,7 +45,8 @@ define({
 	//'testIntern/functional/DRM',
 	'testIntern/functional/seek',
 	'testIntern/functional/startTime', 
-	'testIntern/functional/multiAudio' 
+	'testIntern/functional/multiAudio',
+	'testIntern/functional/pause'
 	],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis

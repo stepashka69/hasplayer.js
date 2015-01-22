@@ -1,5 +1,11 @@
 function CSQoE (database) {
 	AbstractFormatter.call(this,database);
+	this.StateObject = {};
+	this.StateObject.Playing = {count:0, duration:0, lastNewStateDuration:0};
+	this.StateObject.Buffering = {count:0, duration:0, lastNewStateDuration:0};
+	this.StateObject.Paused = {count:0, duration:0, lastNewStateDuration:0};
+	this.StateObject.Stopped = {count:0, duration:0, lastNewStateDuration:0};
+	this.StateObject.Seeking = {count:0, duration:0, lastNewStateDuration:0};
 }
 
 CSQoE.prototype = Object.create(AbstractFormatter.prototype);
@@ -24,7 +30,7 @@ CSQoE.prototype.process = function(metric) {
 		formattedData = this.formatterRecurring();
 	}
 	else if (metric.hasOwnProperty('state') && (metric.state.current !== 'init')) {
-		formattedData = this.formatterNewState();
+		formattedData = this.formatterNewState(metric);
 	} else if (metric.hasOwnProperty('metadata')) {
 		formattedData = this.formatterMetadata();
 	} else if (metric.hasOwnProperty('encoding') && (metric.encoding.contentType === 'video')) {
@@ -40,6 +46,82 @@ CSQoE.prototype.process = function(metric) {
 	return formattedData;
 };
 
+CSQoE.prototype.updateFormatterState = function(formattedData, isNewState, newMetric) {
+	//new metric state has been added
+	if (isNewState) {
+		//increase the count value
+		switch(newMetric.state.current) {
+			case "playing" : 
+				this.StateObject.Playing.count += formattedData.Playing.count;
+				break;
+			case "buffering" :
+				this.StateObject.Buffering.count += formattedData.Buffering.count;
+				break;
+			case "paused" :
+				this.StateObject.Paused.count += formattedData.Paused.count;
+				break;
+			case "stopped" :
+				this.StateObject.Stopped.count += formattedData.Stopped.count;
+				break;
+			case "seeking" :
+				this.StateObject.Seeking.count += formattedData.Seeking.count;
+				break;
+		}
+		//update, for the previous state, the duration
+		switch(newMetric.state.previousState) {
+			case "playing" : 
+				this.StateObject.Playing.lastNewStateDuration += formattedData.Playing.duration;
+				this.StateObject.Playing.duration = this.StateObject.Playing.lastNewStateDuration;
+				break;
+			case "buffering" :
+				this.StateObject.Buffering.lastNewStateDuration += formattedData.Buffering.duration;
+				this.StateObject.Buffering.duration = this.StateObject.Buffering.lastNewStateDuration;
+				break;
+			case "paused" :
+				this.StateObject.Paused.lastNewStateDuration += formattedData.Paused.duration;
+				this.StateObject.Paused.duration = this.StateObject.Paused.lastNewStateDuration;
+				break;
+			case "stopped" :
+				this.StateObject.Stopped.lastNewStateDuration += formattedData.Stopped.duration;
+				this.StateObject.Stopped.duration = this.StateObject.Stopped.lastNewStateDuration;
+				break;
+			case "seeking" :
+				this.StateObject.Seeking.lastNewStateDuration += formattedData.Seeking.duration;
+				this.StateObject.Seeking.duration = this.StateObject.Stopped.lastNewStateDuration;
+				break;
+		}
+	}else{
+		//a reccurent or error metric has been added
+		//update the current state duration = global duration + duration since the last new state metric
+		switch(formattedData.state.current) {
+			case "Playing" : 
+				this.StateObject.Playing.duration = (formattedData.Playing.duration + this.StateObject.Playing.lastNewStateDuration).toFixed(3);
+				break;
+			case "Buffering" :
+				this.StateObject.Buffering.duration = (formattedData.Buffering.duration + this.StateObject.Buffering.lastNewStateDuration).toFixed(3);
+				break;
+			case "Paused" :
+				this.StateObject.Paused.duration = (formattedData.Paused.duration + this.StateObject.Paused.lastNewStateDuration).toFixed(3);
+				break;
+			case "Stopped" :
+				this.StateObject.Stopped.duration = (formattedData.Stopped.duration + this.StateObject.Stopped.lastNewStateDuration).toFixed(3);
+				break;
+			case "Seeking" :
+				this.StateObject.Seeking.duration = (formattedData.Seeking.duration + this.StateObject.Seeking.lastNewStateDuration).toFixed(3);
+				break;
+		}		
+	}
+};
+
+CSQoE.prototype.setStateObject = function(stateObject) {
+	var data = {};
+
+	data.count = stateObject.count;
+	data.duration = stateObject.duration;
+
+	return data;
+};
+
 //type 0
 CSQoE.prototype.formatterRecurring = function() {
 
@@ -50,11 +132,33 @@ CSQoE.prototype.formatterRecurring = function() {
 	data.session = this.formatSessionObject([]);
 	
 	data.state = this.formatStateObject([]);
-	data.Playing = this.formatPlayingObject([]);
-	data.Buffering = this.formatBufferingObject([]);
-	data.Paused = this.formatPausedObject([]);
-	data.Stopped = this.formatStoppedObject([]);
-	data.Seeking = this.formatSeekingObject([]);
+
+	switch(data.state.current) {
+		case "Playing":
+			data.Playing = this.formatPlayingObject([]);
+			break;
+		case "Buffering" :
+			data.Buffering = this.formatBufferingObject([]);
+			break;
+		case "Paused" :
+			data.Paused = this.formatPausedObject([]);
+			break;
+		case "Stopped" :
+			data.Stopped = this.formatStoppedObject([]);
+			break;
+		case "Seeking" :
+			data.Seeking = this.formatSeekingObject([]);
+			break;
+	}
+	
+	this.updateFormatterState(data, false);
+	
+	data.Playing = this.setStateObject(this.StateObject.Playing);
+	data.Seeking = this.setStateObject(this.StateObject.Seeking);
+	data.Stopped = this.setStateObject(this.StateObject.Stopped);
+	data.Paused = this.setStateObject(this.StateObject.Paused);
+	data.Buffering = this.setStateObject(this.StateObject.Buffering);
+
 	data.encoding = this.formatEncodingObject([]);
 	data.condition = this.formatConditionObject([]);
 	data.error = this.formatErrorObject([]);
@@ -68,7 +172,7 @@ CSQoE.prototype.formatterRecurring = function() {
 };
 
 //type 1
-CSQoE.prototype.formatterNewState = function() {
+CSQoE.prototype.formatterNewState = function(metric) {
 	var data = {};
 
 	data.type = 1;
@@ -85,6 +189,20 @@ CSQoE.prototype.formatterNewState = function() {
 	data.Paused = this.formatPausedObject([]);
 	data.Stopped = this.formatStoppedObject([]);
 	data.Seeking = this.formatSeekingObject([]);
+	
+	this.updateFormatterState(data, true, metric);
+	
+	//just keep the last state metric
+	this.database.deleteMetrics('state');
+	//action metrics are not used in CsQoE, delete them from database
+	this.database.deleteMetrics('action');
+	
+	data.Playing = this.setStateObject(this.StateObject.Playing);
+	data.Seeking = this.setStateObject(this.StateObject.Seeking);
+	data.Stopped = this.setStateObject(this.StateObject.Stopped);
+	data.Paused = this.setStateObject(this.StateObject.Paused);
+	data.Buffering = this.setStateObject(this.StateObject.Buffering);
+
 	data.encoding = this.formatEncodingObject([]);
 	data.condition = this.formatConditionObject([]);
 	data.error = this.formatErrorObject(['code']); //only count
@@ -131,6 +249,9 @@ CSQoE.prototype.formatterChangeBitrate = function() {
 	data.state = this.formatStateObject(['previous', 'previoustime', 'progress']); // only current, detail
 	data.encoding = this.formatEncodingObject([]);
 	data.condition = this.formatConditionObject([]);
+	
+	//player has changed his current encoding metric, we can delete old ones
+	this.database.deleteMetrics('encoding');
 
 	this.firstAccess = false;
 
@@ -149,12 +270,34 @@ CSQoE.prototype.formatterError = function() {
 		data.session = this.formatSessionObject(['playerid', 'browserid', 'uri', 'provider', 'repeatMode', 'repeatCount']); // only id	
 	}
 
-	data.Playing = this.formatPlayingObject([]);
-	data.Buffering = this.formatBufferingObject([]);
-	data.Paused = this.formatPausedObject([]);
-	data.Stopped = this.formatStoppedObject([]);
-	data.Seeking = this.formatSeekingObject([]);
 	data.state = this.formatStateObject([]);
+
+	switch(data.state.current) {
+		case "Playing":
+			data.Playing = this.formatPlayingObject([]);
+			break;
+		case "Buffering" :
+			data.Buffering = this.formatBufferingObject([]);
+			break;
+		case "Paused" :
+			data.Paused = this.formatPausedObject([]);
+			break;
+		case "Stopped" :
+			data.Stopped = this.formatStoppedObject([]);
+			break;
+		case "Seeking" :
+			data.Seeking = this.formatSeekingObject([]);
+			break;
+	}	
+
+	this.updateFormatterState(data, false);
+
+	data.Playing = this.setStateObject(this.StateObject.Playing);
+	data.Seeking = this.setStateObject(this.StateObject.Seeking);
+	data.Stopped = this.setStateObject(this.StateObject.Stopped);
+	data.Paused = this.setStateObject(this.StateObject.Paused);
+	data.Buffering = this.setStateObject(this.StateObject.Buffering);
+
 	data.encoding = this.formatEncodingObject([]);
 	data.condition = this.formatConditionObject([]);
 	data.error = this.formatErrorObject([]);
