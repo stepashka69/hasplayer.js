@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Measure XHR Request time...</title>
+		<style>
+		table, th, td {
+			width:auto;
+			min-width:200px;
+			border: 4px solid;
+			border-collapse: collapse;
+			border-color:green;
+		}
+		th {
+			font-family:sans-serif;
+			font-size:20pt;
+			color:white;
+			background-color:navy;
+		}
+		th, td {
+			padding: 5px;
+		}
+		td {
+			font-family:sans-serif;
+			font-size:14pt;
+			color:navy;
+			background-color:white;
+			vertical-align:middle;
+		}
+		td.duration{
+			text-align:center;
+		}	
+		button {
+			padding: 5px;
+			margin-top: 5px;
+		}
+	</style>
+    </head>
+    <body onload="fillRequestTable()">
+		<script>
+			var reqCount = 0;
+			
+			//fragments(video=0)
+			
+			var req = ['http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Manifest.xml',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=0).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=20000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=40000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=80000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=100000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=120000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=140000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=160000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=180000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=200000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=220000000).mp4',
+					   'http://tv-has.orange-labs.fr/mercury/tests/video/BBB/Fragments(video=240000000).mp4'];
+			
+			function startXHRRequestSend() {
+				var myReq = new XMLHttpRequest();
+				myReq.open('GET', req[reqCount], true);
+				myReq.onload = function(e) {
+					window.performance.mark('mark_end_xhr');
+					window.performance.measure(req[reqCount], 'mark_start_xhr', 'mark_end_xhr');
+					reqCount++;
+					showReqDuration();
+					window.performance.clearMeasures();
+					window.performance.clearMarks();
+					if(reqCount<req.length)
+						startXHRRequestSend();
+				}
+				window.performance.mark('mark_start_xhr');
+				myReq.send();
+			}
+			
+			function showReqDuration(){
+				var items = window.performance.getEntriesByType('measure');
+				var requestResu = items[0];
+				document.getElementById(requestResu.name).innerHTML = requestResu.duration.toFixed(3) + ' ms';
+			}
+			function fillRequestTable(){
+				var str='<table><tr><th>Request</th><th>duration</th></tr>';
+				for (var i=0; i<req.length; i++) {
+				  str += '<tr><td>'+req[i]+'</td><td id=\"'+req[i]+'\" class=\"duration\"></td></tr>';
+				}
+				str += '</table>';
+				document.getElementById('RequestTab').innerHTML = str;
+			}
+		</script><div id="RequestTab"></div>
+		<button width="100px" onclick="reqCount = 0;startXHRRequestSend()">send Request</button>
+	</body>
+</html>
