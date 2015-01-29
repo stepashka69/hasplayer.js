@@ -83,7 +83,7 @@
 					else {
 						dateEnd = new Date().getTime();
 					}
-					showReqDuration(e.loaded);
+					showReqDuration(myReq.getResponseHeader("Content-Length"));
 					reqCount++;
 					if(performanceAvailable){
 						window.performance.clearMeasures();
