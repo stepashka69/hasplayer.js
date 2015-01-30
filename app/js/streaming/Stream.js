@@ -487,7 +487,7 @@ MediaPlayer.dependencies.Stream = function () {
                                                     } else {
                                                         textController = self.system.getObject("bufferController");
                                                         textController.initialize("text", periodInfo, primarySubtitleData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource);
-                                                            
+
                                                         if (buffer.hasOwnProperty('initialize')) {
                                                                     buffer.initialize(mimeType, textController,primarySubtitleData);
                                                         }
