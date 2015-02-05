@@ -647,8 +647,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setAutoSwitchQuality(enabled);
     };
 
-    $scope.abrUp = function (/*type*/) {
-        /*var newQuality,
+    $scope.abrUp = function (type) {
+        var newQuality,
         metricsExt = player.getMetricsExt(),
         max = metricsExt.getMaxIndexForBufferType(type);
 
@@ -657,9 +657,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         if (newQuality >= max) {
             newQuality = max - 1;
         }
-        player.setQualityFor(type, newQuality);*/
-
-        video.playbackRate = video.playbackRate * 2;
+        player.setQualityFor(type, newQuality);
     };
 
     $scope.abrDown = function (type) {
