@@ -675,7 +675,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
 
         video.playbackRate = video.playbackRate * 2;
-        console.log("playbackRate = " + video.playbackRate);
+        $scope.playbackRate = "x" + video.playbackRate;
         player.setAutoSwitchQuality(false);
         player.setQualityFor('video', 0);
     };
@@ -687,7 +687,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
 
         video.playbackRate = video.playbackRate / 2;
-        console.log("playbackRate = " + video.playbackRate);
+        $scope.playbackRate = "x" + video.playbackRate;
 
         if (video.playbackRate === 1.0) {
             player.setAutoSwitchQuality(true);
@@ -875,6 +875,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setQualityFor("video", 0);
         player.setQualityFor("audio", 0);
 
+        $scope.playbackRate = "x1";
         player.attachSource($scope.selectedItem.url, params);
     }
 
