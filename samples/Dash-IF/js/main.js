@@ -592,7 +592,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             $scope.selected_metric_option = $scope.configMetrics[1];
         }
     };
-    reqMA.open("GET", "../../MetricsAgent/MetricsAgent.json", true);
+    reqMA.open("GET", "./MetricsAgent.json", true);
     reqMA.setRequestHeader("Content-type", "application/json");
     reqMA.send();
 
