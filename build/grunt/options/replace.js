@@ -21,7 +21,7 @@ module.exports = {
 			patterns: [
 			{
 				match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
-				replacement: '<%= grunt.file.read("samples/playerSrc.html") %>'
+				replacement: '<%= grunt.file.read("../samples/playerSrc.html") %>'
 			}
 			]
 		},
@@ -68,7 +68,7 @@ module.exports = {
 			patterns: [
 			{
 				match: 'COPYRIGHTTOREPLACE',
-				replacement: '<%= grunt.file.read("./LICENSE") %>\n\n'
+				replacement: '<%= grunt.file.read("../LICENSE") %>\n\n'
 			}
 			]
 		},
