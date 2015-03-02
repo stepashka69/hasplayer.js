@@ -16,27 +16,6 @@ module.exports = {
 		{expand: true, flatten: true, src: ['<%= path %>/hasplayer.js', '<%= path %>/dashif.js', '<%= path %>/player.js'], dest: '<%= path %>'}
 		]
 	},
-	agent: {
-		options: {
-			patterns: [
-			{
-				match: 'REVISIONTOREPLACE',
-				replacement: '<%= meta.revision %>'
-			},
-			{
-				match: 'TIMESTAMPTOREPLACE',
-				replacement: '<%= (new Date().getDate())+"."+(new Date().getMonth()+1)+"."+(new Date().getFullYear())+"_"+(new Date().getHours())+":"+(new Date().getMinutes())+":"+(new Date().getSeconds()) %>'
-			},
-			{
-				match: 'COPYRIGHTTOREPLACE',
-				replacement: '<%= grunt.file.read("./LICENSE") %>\n\n'
-			}
-			]
-		},
-		files: [
-		{expand: true, flatten: true, src: ['<%= path %>/metricsAgent.js'], dest: '<%= path %>'}
-		]
-	},
 	source: {
 		options: {
 			patterns: [
