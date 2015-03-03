@@ -55,6 +55,10 @@ module.exports = {
 			{
 				match: /<!-- source -->([\s\S]*?)<!-- \/source -->/,
 				replacement: '<script src="hasplayer.js"></script>'
+			},
+			{
+				match: /<!-- metricsagent -->([\s\S]*?)<!-- \/metricsagent -->/,
+				replacement: '<script src="metricsagent.js"></script>'
 			}
 			]
 		},

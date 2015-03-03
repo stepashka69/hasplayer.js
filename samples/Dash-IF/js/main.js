@@ -581,27 +581,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     ////////////////////////////////////////
     //
-    // Metrics Agent Configuration file
-    //
-    ////////////////////////////////////////
-    var reqMA = new XMLHttpRequest();
-    reqMA.onload = function () {
-        if (reqMA.status === 200) {
-            configMetrics = JSON.parse(reqMA.responseText);
-            $scope.configMetrics = configMetrics.items;
-            $scope.selected_metric_option = $scope.configMetrics[1];
-        }
-    };
-    reqMA.open("GET", "./MetricsAgent.json", true);
-    reqMA.setRequestHeader("Content-type", "application/json");
-    reqMA.send();
-
-    $scope.setMetricOption = function(metricOption) {
-        $scope.selected_metric_option = metricOption;
-    };
-
-    ////////////////////////////////////////
-    //
     // Player Setup
     //
     ////////////////////////////////////////
@@ -694,6 +673,30 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     };
 
+
+    ////////////////////////////////////////
+    //
+    // Metrics Agent Configuration file
+    //
+    ////////////////////////////////////////
+    var reqMA = new XMLHttpRequest();
+    reqMA.onload = function () {
+        if (reqMA.status === 200) {
+            configMetrics = JSON.parse(reqMA.responseText);
+            $scope.configMetrics = configMetrics.items;
+            $scope.selected_metric_option = $scope.configMetrics[0];
+            console.log($scope.selected_metric_option.name);
+        }
+    };
+    reqMA.open("GET", "./metricsagent_config.json", true);
+    reqMA.setRequestHeader("Content-type", "application/json");
+    reqMA.send();
+
+    $scope.setMetricOption = function (metricOption) {
+        $scope.selected_metric_option = metricOption;
+        console.log($scope.selected_metric_option.name);
+    };
+
     ////////////////////////////////////////
     //
     // Metrics Agent Setup
@@ -702,17 +705,12 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.activateMetricsAgent = false;
 
-    $scope.setMetricsAgent = function(value) {
+    $scope.setMetricsAgent = function (value) {
         $scope.activateMetricsAgent = value;
-
         if (typeof MetricsAgent == 'function') {
-        
             if ($scope.activateMetricsAgent) {
-        
                 MetricsAgentInstance = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-
                 $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
-            
                 MetricsAgentInstance.init(function (activated) {
                     $scope.activateMetricsAgent = activated;
                     console.log("Metrics agent state: ", activated);
@@ -726,7 +724,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     };
 
-    $scope.isMetricsAgentAvailable = function (str) {
+    $scope.isMetricsAgentAvailable = function () {
         if (typeof MetricsAgent == 'function') {
             return true;
         }

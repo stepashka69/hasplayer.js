@@ -1,5 +1,13 @@
 {
   "items": [
+  	{"name": "csQoE (local)",
+	 "activationUrl":"http://localhost:8080/config",
+	 "serverUrl":"http://localhost:8080/metrics",
+	 "dbServerUrl":"http://localhost:8080/metricsDB",
+	 "collector":"HasPlayerCollector",
+     "formatter":"CSQoE",
+     "sendingTime": 10000
+	},
   	{"name": "csQoE",
 	 "activationUrl":"http://p-collector.orange-labs.fr/config",
 	 "serverUrl":"http://p-collector.orange-labs.fr",
@@ -8,15 +16,7 @@
      "formatter":"CSQoE",
      "sendingTime": 10000
 	},
-  	{"name": "local-CSQoE",
-	 "activationUrl":"http://localhost:8080/config",
-	 "serverUrl":"http://localhost:8080/metrics",
-	 "dbServerUrl":"http://localhost:8080/metricsDB",
-	 "collector":"HasPlayerCollector",
-     "formatter":"CSQoE",
-     "sendingTime": 10000
-	},
-	{"name": "local-Prisme",
+	{"name": "Prisme (local)",
 	 "activationUrl":"",
 	 "serverUrl":"http://localhost:8080/metrics",
 	 "enable": true,
@@ -28,7 +28,7 @@
      "formatter":"Prisme",
      "sendingTime": 10000
 	},
-    {"name": "prisme",
+    {"name": "Prisme",
 	 "activationUrl":"",
 	 "serverUrl":"http://10.192.224.13",
 	 "enable": true,
