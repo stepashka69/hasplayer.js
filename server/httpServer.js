@@ -9,7 +9,7 @@ var app = express();
 // var port =  process.env.PORT || 3000;
 
 // set path to the parent folder 
-var dirname = __dirname.replace('server','');
+var dirname = __dirname.replace('server','..');
 
 app.set('views', __dirname + '/export-pdf');
 app.engine('html', require('hogan-express'));
