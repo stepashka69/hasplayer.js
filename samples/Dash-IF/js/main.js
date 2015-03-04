@@ -127,21 +127,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     function($scope, $window, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
 
     var player,
-    video,
-    context,
-    config = null,
-    configMetrics = null,
-    videoSeries = [],
-    dlSeries = [],
-    playSeries = [],
-    audioSeries = [],
-    qualityChangements = [],
-    previousPlayedQuality = 0,
-    previousDownloadedQuality= 0,
-    maxGraphPoints = 50,
-    initAudioTracks = true,
-    MetricsAgentInstance = null,
-    initTextTracks = true;
+        video,
+        context,
+        config = null,
+        videoSeries = [],
+        dlSeries = [],
+        playSeries = [],
+        audioSeries = [],
+        qualityChangements = [],
+        previousPlayedQuality = 0,
+        previousDownloadedQuality= 0,
+        maxGraphPoints = 50,
+        initAudioTracks = true,
+        initTextTracks = true,
+        metricsAgent = null,
+        configMetrics = null;
 
     $scope.chromecast = {};
     $scope.chromecast.apiOk = false;
@@ -673,63 +673,80 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     };
 
-
-    ////////////////////////////////////////
-    //
-    // Metrics Agent Configuration file
-    //
-    ////////////////////////////////////////
-    var reqMA = new XMLHttpRequest();
-    reqMA.onload = function () {
-        if (reqMA.status === 200) {
-            configMetrics = JSON.parse(reqMA.responseText);
-            $scope.configMetrics = configMetrics.items;
-            $scope.selected_metric_option = $scope.configMetrics[0];
-            console.log($scope.selected_metric_option.name);
-        }
-    };
-    reqMA.open("GET", "./metricsagent_config.json", true);
-    reqMA.setRequestHeader("Content-type", "application/json");
-    reqMA.send();
-
-    $scope.setMetricOption = function (metricOption) {
-        $scope.selected_metric_option = metricOption;
-        console.log($scope.selected_metric_option.name);
-    };
-
     ////////////////////////////////////////
     //
     // Metrics Agent Setup
     //
     ////////////////////////////////////////
 
-    $scope.activateMetricsAgent = false;
+    $scope.metricsAgentAvailable = (typeof MetricsAgent == 'function') ? true : false;
+    $scope.metricsAgentActive = false;
+
 
     $scope.setMetricsAgent = function (value) {
-        $scope.activateMetricsAgent = value;
+        $scope.metricsAgentActive = value;
         if (typeof MetricsAgent == 'function') {
-            if ($scope.activateMetricsAgent) {
-                MetricsAgentInstance = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-                $scope.metricsAgentVersion = MetricsAgentInstance.getVersion();
-                MetricsAgentInstance.init(function (activated) {
-                    $scope.activateMetricsAgent = activated;
+            if ($scope.metricsAgentActive) {
+                metricsAgent = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
+                $scope.metricsAgentVersion = metricsAgent.getVersion();
+                metricsAgent.init(function (activated) {
+                    $scope.metricsAgentActive = activated;
                     console.log("Metrics agent state: ", activated);
+                    $scope.$apply();
                     if (activated === false) {
                         alert("Metrics agent not available!");
                     }
                 });
             } else {
-                MetricsAgentInstance.stop();
+                metricsAgent.stop();
             }
         }
     };
 
-    $scope.isMetricsAgentAvailable = function () {
+    /*$scope.metricsAgentAvailable = function () {
         if (typeof MetricsAgent == 'function') {
             return true;
         }
         return false;
+    };*/
+
+
+    ////////////////////////////////////////
+    //
+    // Metrics Agent Configuration
+    //
+    ////////////////////////////////////////
+    if ($scope.metricsAgentAvailable) {
+        configMetrics = [
+            {"name": "csQoE (local)",
+             "activationUrl":"http://localhost:8080/config",
+             "serverUrl":"http://localhost:8080/metrics",
+             "dbServerUrl":"http://localhost:8080/metricsDB",
+             "collector":"HasPlayerCollector",
+             "formatter":"CSQoE",
+             "sendingTime": 10000
+            }];
+        $scope.configMetrics = configMetrics;
+        $scope.selected_metric_option = $scope.configMetrics[0];
+
+        var reqMA = new XMLHttpRequest();
+        reqMA.onload = function () {
+            if (reqMA.status === 200) {
+                configMetrics = JSON.parse(reqMA.responseText);
+                $scope.configMetrics = configMetrics.items;
+                $scope.selected_metric_option = $scope.configMetrics[0];
+            }
+        };
+        reqMA.open("GET", "./metricsagent_config.json", true);
+        reqMA.setRequestHeader("Content-type", "application/json");
+        reqMA.send();
+    }
+
+    $scope.setMetricOption = function (metricOption) {
+        $scope.selected_metric_option = metricOption;
+        console.log($scope.selected_metric_option.name);
     };
+
 
     ////////////////////////////////////////
     //
@@ -883,7 +900,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
 
         if ((typeof MetricsAgent == 'function') && ($scope.activateMetricsAgent)) {
-            MetricsAgentInstance.createSession();
+            metricsAgent.createSession();
         }
 
         initPlayer();
