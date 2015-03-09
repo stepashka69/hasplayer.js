@@ -242,6 +242,7 @@ Custom.dependencies.CustomBufferController = function () {
                         // if this is the initialization data for current quality we need to push it to the buffer
                         if (quality === currentQuality) {
                             self.debug.info("[BufferController]["+type+"] ### Buffer initialization segment ", (request.url !== null)?request.url:request.quality);
+                            //console.saveBinArray(data, type + "_init_" + request.quality + ".mp4");
                             appendToBuffer.call(self, data, request.quality).then(
                                 function() {
                                     self.debug.log("[BufferController]["+type+"] ### Initialization segment buffered");
@@ -288,6 +289,7 @@ Custom.dependencies.CustomBufferController = function () {
                         }
 
                         self.debug.info("[BufferController]["+type+"] ### Buffer segment from url ", request.url);
+                        //console.saveBinArray(data, type + "_" + request.index + "_" + request.quality + ".mp4");
                         deleteInbandEvents.call(self,data).then(
                             function(data) {
                                 appendToBuffer.call(self, data, request.quality, request.index).then(
