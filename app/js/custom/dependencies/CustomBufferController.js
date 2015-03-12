@@ -634,7 +634,7 @@ Custom.dependencies.CustomBufferController = function () {
             //if it's the first download error, try to load the same segment for a the lowest quality...
             if(this.ChunkMissingState === false)
             {
-                if (e.quality != 0) {
+                if (e.quality !== 0) {
                     currentRepresentation = getRepresentationForQuality.call(this, 0);
                     if (currentRepresentation !== undefined || currentRepresentation !== null) {
                         loadNextFragment.call(this);
@@ -648,7 +648,7 @@ Custom.dependencies.CustomBufferController = function () {
             this.errHandler.downloadError("chunk", e.url, e);
         },
 
-        signalStreamComplete = function (request) {
+        signalStreamComplete = function (/*request*/) {
             var self = this;
 
             self.debug.log("[BufferController]["+type+"] Stream is complete.");
@@ -721,7 +721,7 @@ Custom.dependencies.CustomBufferController = function () {
                 self.indexHandler.getNextSegmentRequestFromSN(currentRepresentation, currentSequenceNumber).then(onFragmentRequest.bind(self));
             } else {
                 self.debug.log("[BufferController]["+type+"] loadNextFragment for time: " + segmentTime);
-                self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));                
+                self.indexHandler.getSegmentRequestForTime(currentRepresentation, segmentTime).then(onFragmentRequest.bind(self));
             }
 
             //ORANGE : used to test Live chunk download failure
@@ -1296,10 +1296,10 @@ Custom.dependencies.CustomBufferController = function () {
                 htmlVideoState = this.BUFFERING;
                 this.debug.log("[BufferController]["+type+"] BUFFERING - " + this.videoModel.getCurrentTime());
                 this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
-                if (this.stallTime != null && this.ChunkMissingState === true) {
+                if (this.stallTime !== null && this.ChunkMissingState === true) {
                     if (isDynamic) {
                         this.stallTime = null;
-                        setTimeout(this.updateManifest.bind(this),currentRepresentation.segments[currentRepresentation.segments.length-1].duration*1000);                            
+                        setTimeout(this.updateManifest.bind(this),currentRepresentation.segments[currentRepresentation.segments.length-1].duration*1000);
                     }
                     else {
                         //the stall state comes from a chunk download failure
