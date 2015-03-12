@@ -1,10 +1,10 @@
 module.exports = {
 
-    all: ["app/js/*/**/*.js"],
+    all: ["../app/js/*/**/*.js"],
 
     options: {
-        jshintrc: ".jshintrc",
+        jshintrc: "../.jshintrc",
         reporter: require('jshint-stylish')
     }
-    
+
 };
