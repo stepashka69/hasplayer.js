@@ -1,8 +1,8 @@
 module.exports = function(grunt) {
 
-	grunt.config.set('path', '../dist');
+    grunt.config.set('path', '../dist');
 
-	grunt.registerTask('zip', [
-		'compress:main'
-		]);
+    grunt.registerTask('zip', [
+        'compress:main'
+    ]);
 };

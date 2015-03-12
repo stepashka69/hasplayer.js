@@ -1,41 +1,49 @@
+module.exports = function() {
 
+    var debugFuncs = [],
+        logLevels = ["error", "warn", "info", "debug", "log"];
+        
 
-module.exports = function(grunt) {
+    for (var i = 0; i < logLevels.length; i++) {
+        debugFuncs.push("self.debug." + logLevels[i]);
+        debugFuncs.push("this.debug." + logLevels[i]);
+        debugFuncs.push("rslt.debug." + logLevels[i]);
+    }
 
-	var log = grunt.option('log') || grunt.option('log4j') ||false,
-		dropConsole = !log,
-		logLevels = ["error", "warn", "info", "debug", "log"],
-		logOption = [];
+    return {
+        generated: {
+            options: {
+                beautify: true,
+                compress: false,
+                mangle: false,
+                banner: '//COPYRIGHT/* Last build : @@TIMESTAMP / git revision : @@REVISION */\n'
+            }
+        },
 
-	if (!log) {
-		for (var i = 0; i < logLevels.length; i++) {
-			logOption.push("self.debug." + logLevels[i]);
-			logOption.push("this.debug." + logLevels[i]);
-			logOption.push("rslt.debug." + logLevels[i]);
-		}
-	}
+        min: {
+            options: {
+                compress:{
+                    pure_funcs: debugFuncs,
+                    drop_console : true,
+                    drop_debugger: true,
+                    warnings: false
+                },
+                preserveComments: 'all'
+            },
+            files: {
+                '<%= path %>/hasplayer.min.js': ['<%= path %>/hasplayer.js']
+            }
+        },
 
-	return {
-		generated: {
-			options: {
-				compress:{
-					pure_funcs: logOption,
-					drop_console : dropConsole,
-					drop_debugger: true,
-					warnings: true
-				},
-				banner: '@@COPYRIGHTTOREPLACE/* Last build : @@TIMESTAMPTOREPLACE / git revision : @@REVISIONTOREPLACE */\n'
-			}
-		},
-		json: {
-			options: {
-				beautify : false,
-				mangle: false
-			},
-			files: {
-				'<%= path %>/json.js': ['<%= path %>/json.js']
-			}
-		}
-	};
+        json: {
+            options: {
+                beautify : false,
+                mangle: false
+            },
+            files: {
+                '<%= path %>/json.js': ['<%= path %>/json.js']
+            }
+        }
+    };
 
 };

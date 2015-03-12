@@ -1,9 +1,9 @@
 module.exports = {
 
-	generated: {
-		options: {
-			keepSpecialComments: 0
-		}
-	}
-	
+    generated: {
+        options: {
+            keepSpecialComments: 0
+        }
+    }
+    
 };

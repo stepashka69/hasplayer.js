@@ -1,9 +1,9 @@
 module.exports = {
 
-	options: {
-		property: 'meta.revision',
-		ref: 'HEAD',
-		short: true
-	}
+    options: {
+        property: 'meta.revision',
+        ref: 'HEAD',
+        short: true
+    }
 
 };

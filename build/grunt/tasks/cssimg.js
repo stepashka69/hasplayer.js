@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
 
-	grunt.registerTask('cssimg', [
-		'cssUrlEmbed'
-	]);
+    grunt.registerTask('cssimg', [
+        'cssUrlEmbed'
+    ]);
 };
