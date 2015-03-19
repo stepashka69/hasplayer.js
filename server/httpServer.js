@@ -3,6 +3,8 @@ var phantom = require('phantom');
 var bodyParser = require('body-parser');
 var csv = require('express-csv');
 var fs = require('fs');
+var exec = require('child_process').exec,
+    child;
 
 var app = express();
 
@@ -41,27 +43,31 @@ app.get('/export-csv', function(req, res) {
 	res.setHeader('Content-disposition', 'attachment; filename=sample.csv');
 
 
-	//Adding provenance for PlaySeries & Wanem & Bandwidth
+	//Adding provenance for PlaySeries & NetBalancer & Bandwidth
 	var i = 0,
 	csvData = null,
 	playSeriesName = 'Player',
 	playSeries = JSON.parse(JSON.stringify(database[req.query.id].requestSeries)),
 	playSeriesLength = playSeries.length,
 	y = 0,
-	wanemSeriesName = 'Wanem',
-	wanemSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence)),
-	wanemSeriesLength = wanemSeries.length,
+	netBalancerSeriesName = 'NetBalancer',
+	netBalancerSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence)),
+	netBalancerSeriesLength = netBalancerSeries.length,
 	z = 0,
 	calcBandwidthSeriesName = 'Bandwidth',
 	calcBandwidthSeries = JSON.parse(JSON.stringify(database[req.query.id].calcBandwidthSeries)),
 	calcBandwidthSeriesLength = calcBandwidthSeries.length;
 
 	for(i; i < playSeriesLength; i++) {
+		console.log(playSeries[i]);
+	}
+
+	for(i; i < playSeriesLength; i++) {
 		playSeries[i].unshift(playSeriesName);
 	}
 
-	for(y; y < wanemSeriesLength; y++) {
-		wanemSeries[y].unshift(wanemSeriesName);
+	for(y; y < netBalancerSeriesLength; y++) {
+		netBalancerSeries[y].unshift(netBalancerSeriesName);
 	}
 
 	for(z; z< calcBandwidthSeriesLength; z++) {
@@ -70,9 +76,9 @@ app.get('/export-csv', function(req, res) {
 	}
 
 	if(req.query.showBandwidth === 'true') {
-		csvData = playSeries.concat(wanemSeries, calcBandwidthSeries);
+		csvData = playSeries.concat(netBalancerSeries, calcBandwidthSeries);
 	} else {
-		csvData = playSeries.concat(wanemSeries);
+		csvData = playSeries.concat(netBalancerSeries);
 	}
 	
 	//Sorting all arrays of datas
@@ -160,3 +166,28 @@ app.post('/metricsDB', function(req, res){
 	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
 	fs.closeSync(fd);
 });
+
+app.post('/NetBalancerLimit', function(req, res){
+	res.send(200);
+	try {
+		var request = JSON.parse(JSON.stringify(req.body));
+	} catch (e) {
+		console.error("Parsing error:", e); 
+	}
+	changeDownloadLimit(request.NetBalancerLimit.activate === 1? 'true':'false', request.NetBalancerLimit.upLimit);
+});
+
+function changeDownloadLimit(activate, limit){
+		child = exec('"C:\\Program Files\\NetBalancer\\nbcmd.exe" settings traffic limit '+activate+' false '+limit+' 0',function (error, stdout, stderr) {
+			console.log('limit '+limit+' is activated');
+			if(stdout!==''){
+				console.log('---------stdout: ---------\n' + stdout);
+			}
+			if(stderr!==''){
+				console.log('---------stderr: ---------\n' + stderr);
+			}
+			if (error !== null) {
+				console.log('---------exec error: ---------\n[' + error+']');
+			}
+		});
+};
