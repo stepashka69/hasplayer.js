@@ -47,7 +47,7 @@ angular.module('HASPlayer').controller('PlayerController', function($scope) {
                 if(lastTrace && video.currentTime !== 0){
                     var metricsExt = $scope.data.player.getMetricsExt();
                     var bitrateValues = metricsExt.getBitratesForType("video");
-                    var time = video.currentTime;
+                    var time = new Date().getTime()/1000;
                     var bandwidth = lastTrace.b[0]*8/ (httpRequest.tfinish.getTime() - httpRequest.trequest.getTime());
                     if(bandwidth>10000){
                         bandwidth = 10000;
