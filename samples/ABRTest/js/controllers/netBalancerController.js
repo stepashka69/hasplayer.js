@@ -1,4 +1,4 @@
-angular.module('HASPlayer').controller('WanemController', function($scope, $timeout, $q, fluxService) {
+angular.module('HASPlayer').controller('NetBalancerController', function($scope, $timeout, $q, fluxService) {
 
 	fluxService.getSequence().then(function(sequence) {
 		
