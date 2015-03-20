@@ -15,6 +15,11 @@ var chartXaxisWindow = 30;
 // the number of plots
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
+var serviceNetBalancerEnabled = true;
+
+var streamSource;
+
+var context;
 
 var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
 playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
@@ -34,6 +39,31 @@ isMetricsOn = !hideMetricsAtStart,
 firstAccess = true,
 audioTracksSelectIsPresent = false;
 
+function checkInitBalancerService() {
+   sendNetBalancerLimit(7000);
+}
+
+function sendNetBalancerLimit(limit) {
+    var http = new XMLHttpRequest(),
+        data = {'NetBalancerLimit':{'upLimit':limit*125, 'activate':1 }};
+
+    http.open("POST", "http://localhost:8080/NetBalancerLimit", true);
+    http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    http.timeout = 2000;
+    var stringJson = JSON.stringify(data);
+    
+    http.onload = function () {
+        if (http.status < 200 || http.status > 299)
+        {
+            hideNetworkLimiter();
+            serviceNetBalancerEnabled = false;
+        }else {
+            document.getElementById('networkToToggle').style.visibility="visible";
+        }
+    };
+
+    http.send(stringJson);
+}
 
 function initChartAndSlider() {
     var metricsExt = player.getMetricsExt(),
@@ -102,6 +132,26 @@ function initChartAndSlider() {
         }
     });
 
+    $('#sliderNetworkBandwidth').labeledslider({
+        max: 5000,
+        min: 0,
+        orientation:'horizontal',
+        step: 1,
+        tweenLabels: false,
+        range: 'min',
+        value: 5000,
+        stop: function( event, ui ) {
+            console.log("slider Network value = "+ui.value);
+            $("#networkBandwidth").html(ui.value + " kb/s");
+
+            sendNetBalancerLimit(ui.value);
+        }
+    });
+
+    checkInitBalancerService();
+
+    $("#networkBandwidth").html(5000 + " kb/s");
+   
     var audioDatas = player.getAudioTracks();
     if (audioDatas && audioDatas.length > 1) {
         var selectOptions = "";
@@ -364,13 +414,18 @@ function hideMetrics() {
     setShowInfo(isMetricsOn);
 }
 
+function hideNetworkLimiter() {
+    if (serviceNetBalancerEnabled) {
+        $("#networkToToggle").toggle();
+    }
+}
+
 function updateSeekBar() {
     $("#seekBar").attr('value',video.currentTime);
     $(".current-time").text(setTimeWithSeconds(video.currentTime));
 }
 
 function initControlBar () {
-
     var controlBar = $('#controlBar');
     controlBar.hide();
     var i = null;
@@ -455,15 +510,32 @@ function initPlayer() {
             value = params[i].split('=')[1];
 
             if ((name === 'file') || (name === 'url')) {
-                player.attachSource(value + anchor);
-                update();
+                streamSource = value + anchor;
+            }
+
+            if (name === 'playerType') {
+                context = value;
             }
         }
     }
 }
 
 function onLoaded () {
-    player = new MediaPlayer(new Custom.di.CustomContext());
+    initPlayer();
+
+    if (context !== undefined) {
+        switch(context){
+            case 'HAS' :
+                player = new MediaPlayer(new Custom.di.CustomContext());
+                break;
+            case 'HASNoCustomRule' :
+                player = new MediaPlayer(new Custom.di.CustomContextNoRule());
+                break;
+        }
+    }else {
+        player = new MediaPlayer(new Custom.di.CustomContext());    
+    }
+
     video = document.querySelector("video");
 
     player.startup();
@@ -477,12 +549,14 @@ function onLoaded () {
         player.getDebug().setLogToBrowserConsole(false);
     }
 
-    initPlayer();
+    player.attachSource(streamSource);
+    update();
 
 	// catch ctrl+i key stoke    
     $(document).keydown(function(e) {
         if(e.keyCode == 73 && e.ctrlKey) {
             hideMetrics();
+            hideNetworkLimiter();
             return false;
         }
     });

@@ -168,26 +168,23 @@ app.post('/metricsDB', function(req, res){
 });
 
 app.post('/NetBalancerLimit', function(req, res){
-	res.send(200);
+
 	try {
 		var request = JSON.parse(JSON.stringify(req.body));
 	} catch (e) {
 		console.error("Parsing error:", e); 
 	}
-	changeDownloadLimit(request.NetBalancerLimit.activate === 1? 'true':'false', request.NetBalancerLimit.upLimit);
+	changeDownloadLimit(request.NetBalancerLimit.activate === 1? 'true':'false', request.NetBalancerLimit.upLimit,function (error, stdout, stderr) {
+		if (error !== null) {
+			console.log('---------exec error: ---------\n[' + error+']');
+			res.send(404);
+		}else{
+			console.log('limit '+request.NetBalancerLimit.upLimit+' is activated');
+			res.send(200);
+		}
+	});
 });
 
-function changeDownloadLimit(activate, limit){
-		child = exec('"C:\\Program Files\\NetBalancer\\nbcmd.exe" settings traffic limit '+activate+' false '+limit+' 0',function (error, stdout, stderr) {
-			console.log('limit '+limit+' is activated');
-			if(stdout!==''){
-				console.log('---------stdout: ---------\n' + stdout);
-			}
-			if(stderr!==''){
-				console.log('---------stderr: ---------\n' + stderr);
-			}
-			if (error !== null) {
-				console.log('---------exec error: ---------\n[' + error+']');
-			}
-		});
+function changeDownloadLimit(activate, limit, callback){
+		child = exec('"C:\\Program Files\\NetBalancer\\nbcmd.exe" settings traffic limit '+activate+' false '+limit+' 0',callback);
 };
