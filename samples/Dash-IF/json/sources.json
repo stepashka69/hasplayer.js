@@ -2,39 +2,21 @@
     "items": [
         {
             "type": "HLS",
-            "name": "VIMTV - D17",
-            "url": "http://vimtv2.orange-labs.fr/streaming/3.m3u8",
+            "name": "VIMTV - Live",
+            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "HLS",
-            "name": "VIMTV - iTélé",
-            "url": "http://vimtv2.orange-labs.fr/streaming/4.m3u8",
+            "name": "VIMTV2 - Live",
+            "url": "http://vimtv2.orange-labs.fr/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "HLS",
-            "name": "VIMTV - BFMTV",
-            "url": "http://vimtv2.orange-labs.fr/streaming/5.m3u8",
+            "name": "Envivio - Live",
+            "url": "http://iphone.envivio.tv/iphone/downLoads/ch1/index.m3u8",
             "browsers": "cdsbi"
-        },
-        {
-            "type": "HLS",
-            "name": "VIMTV - D8",
-            "url": "http://vimtv2.orange-labs.fr/streaming/6.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "HLS",
-            "name": "Envivo",
-            "url": "http://10.194.60.139/VIDEO/HLS/Envivio/index.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type":"HLS",
-            "name":"LIVE - HLS Arte",
-            "url":"http://apache1.rd.francetelecom.com/C4-52/index.m3u8",
-            "browsers":"cdsbi"
         },
         {
             "type": "MSS",
