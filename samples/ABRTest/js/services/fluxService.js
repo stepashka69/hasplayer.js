@@ -1,9 +1,8 @@
-angular.module('HASPlayer').service('fluxService', function($resource){
+angular.module('HASPlayer').service('fluxService', function($resource, $http){
 
 	var listService = $resource('js/data/flux-list.json', {}, {query: {method:'GET', isArray: true}}),
 		sequenceService = $resource('js/data/scenario.json', {}, {}),
-		versionService = $resource('js/data/version-list.json', {}, {}),
-		wanemAPI = $resource('http://192.168.1.2/TC/index.php?bw=:quality', {quality: '@quality'});
+		versionService = $resource('js/data/version-list.json', {}, {});
 
 	return {
 		getList: function() {
@@ -19,7 +18,15 @@ angular.module('HASPlayer').service('fluxService', function($resource){
 		},
 
 		setQuality: function(quality) {
-			return wanemAPI.get({quality: quality}).$promise;
+			//limit should be defined in bytes
+			var dataJson = {'NetBalancerLimit':{'upLimit':quality*125, 'activate':1 }};
+
+			return $http({
+	            url: 'http://localhost:8080/NetBalancerLimit',
+	            method: "POST",
+	            data: dataJson,
+	            headers: {'Content-Type': 'application/json'}
+	        });
 		}
 
 	};

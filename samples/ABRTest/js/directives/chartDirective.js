@@ -36,17 +36,17 @@ angular.module('HASPlayer').directive('chart', function(){
 
 				if(!$scope.started && bandwidth.playSeries[0] !== undefined) {
 
-					//génération des données de la représentation de la séquence Wanem
+					//génération des données de la représentation de la séquence NetBalancer
 					var i = 0,
 					len = data.sequence.length,
-					time = bandwidth.playSeries[0][0];
+					originTime = new Date().getTime()/1000;
+					time = originTime;
 
 					for(i; i<len; i++) {
 
 						$scope.bandwidth.dataSequence.push([time, data.sequence[i].bandwidth]);
 						var datatime = time+(data.sequence[i].duration/1000);
 						$scope.bandwidth.dataSequence.push([datatime - 0.001, data.sequence[i].bandwidth]);
-
 						time = datatime;
 					}
 
@@ -59,13 +59,22 @@ angular.module('HASPlayer').directive('chart', function(){
 							text: 'ABR'
 						},
 						xAxis: {
-							min: $scope.bandwidth.playSeries[0][0]
+							min: originTime
 						},
+						yAxis: {
+			            	title: {
+			                	text: 'Bandwidth'
+			            	},
+			            	labels: {
+                				format: '{value} kb/s'
+            				},
+            				max: 5000
+			        	},
 						series: [{
 							type: 'area',
 							name: 'Scenario',
 							color: '#16a085',
-							data: data.sequenceGraph,
+							data: $scope.bandwidth.dataSequence,
 							marker: {
 								enabled: false
 							},
@@ -86,7 +95,7 @@ angular.module('HASPlayer').directive('chart', function(){
 							}
 						},
 						{
-							type: 'line',
+							type: 'scatter',
 							name: 'Calculated Bandwidth',
 							color: 'red',
 							data: $scope.bandwidth.calcBandwidthSeries,
