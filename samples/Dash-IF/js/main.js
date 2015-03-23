@@ -899,7 +899,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             $scope.stopInChromecast();
         }
 
-        if ((typeof MetricsAgent == 'function') && ($scope.activateMetricsAgent)) {
+        if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
             metricsAgent.createSession();
         }
 
