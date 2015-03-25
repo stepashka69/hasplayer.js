@@ -3,6 +3,7 @@ var phantom = require('phantom');
 var bodyParser = require('body-parser');
 var csv = require('express-csv');
 var fs = require('fs');
+var requestify = require('requestify');
 var exec = require('child_process').exec,
     child;
 
@@ -148,6 +149,9 @@ app.post('/metrics', function(req, res){
 
 	res.send(204);
 
+	//send new metric to local node.js metrics Viewer
+	requestify.post('http://localhost:8082/setMetric', req.body);
+
 	// Append message to file
 	var fd = fs.openSync("metrics.json", 'a+');
 	fs.writeSync(fd, "### " + new Date().toString() + "\n");
@@ -166,25 +170,3 @@ app.post('/metricsDB', function(req, res){
 	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
 	fs.closeSync(fd);
 });
-
-app.post('/NetBalancerLimit', function(req, res){
-
-	try {
-		var request = JSON.parse(JSON.stringify(req.body));
-	} catch (e) {
-		console.error("Parsing error:", e); 
-	}
-	changeDownloadLimit(request.NetBalancerLimit.activate === 1? 'true':'false', request.NetBalancerLimit.upLimit,function (error, stdout, stderr) {
-		if (error !== null) {
-			console.log('---------exec error: ---------\n[' + error+']');
-			res.send(404);
-		}else{
-			console.log('limit '+request.NetBalancerLimit.upLimit+' is activated');
-			res.send(200);
-		}
-	});
-});
-
-function changeDownloadLimit(activate, limit, callback){
-		child = exec('"C:\\Program Files\\NetBalancer\\nbcmd.exe" settings traffic limit '+activate+' false '+limit+' 0',callback);
-};

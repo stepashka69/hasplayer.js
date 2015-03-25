@@ -52,7 +52,7 @@ function sendNetBalancerLimit(limit) {
     var http = new XMLHttpRequest(),
         data = {'NetBalancerLimit':{'upLimit':limit*125, 'activate':1 }};
 
-    http.open("POST", "http://localhost:8080/NetBalancerLimit", true);
+    http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
     http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     http.timeout = 2000;
     var stringJson = JSON.stringify(data);
@@ -75,10 +75,13 @@ function initNetBalancerSlider() {
         max: 5000,
         min: 0,
         orientation:'horizontal',
-        step: 1,
+        step: 500,
         tweenLabels: false,
         range: 'min',
         value: 5000,
+        slide: function( event, ui ) {
+            $("#networkBandwidth").html(ui.value + " kb/s");
+        },
         stop: function( event, ui ) {
             console.log("slider Network value = "+ui.value);
             $("#networkBandwidth").html(ui.value + " kb/s");
