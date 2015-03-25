@@ -21,6 +21,8 @@ var streamSource;
 
 var context;
 
+var startTime;
+
 var downloadRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
 playRepInfos = {quality:-1, bandwidth:0, width:0, height:0, codecs: ""},
 bufferLevel,
@@ -39,8 +41,11 @@ isMetricsOn = !hideMetricsAtStart,
 firstAccess = true,
 audioTracksSelectIsPresent = false;
 
-function checkInitBalancerService() {
-   sendNetBalancerLimit(7000);
+
+function hideNetworkLimiter() {
+    if (serviceNetBalancerEnabled) {
+        $("#networkToToggle").toggle();
+    }
 }
 
 function sendNetBalancerLimit(limit) {
@@ -51,18 +56,40 @@ function sendNetBalancerLimit(limit) {
     http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     http.timeout = 2000;
     var stringJson = JSON.stringify(data);
-    
+
     http.onload = function () {
-        if (http.status < 200 || http.status > 299)
-        {
+        if (http.status < 200 || http.status > 299) {
             hideNetworkLimiter();
             serviceNetBalancerEnabled = false;
-        }else {
+        } else {
             document.getElementById('networkToToggle').style.visibility="visible";
         }
     };
 
     http.send(stringJson);
+}
+
+function checkInitBalancerService() {
+   sendNetBalancerLimit(7000);
+}
+
+
+function setTimeWithSeconds(sec) {
+    var sec_num = parseInt(sec, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
+}
+
+function updateSeekBar() {
+    $("#seekBar").attr('value',video.currentTime);
+    $(".current-time").text(setTimeWithSeconds(video.currentTime));
 }
 
 function initChartAndSlider() {
@@ -175,19 +202,6 @@ function initChartAndSlider() {
     }
 }
 
-function setTimeWithSeconds(sec) {
-    var sec_num = parseInt(sec, 10); // don't forget the second param
-    var hours   = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    var time    = hours+':'+minutes+':'+seconds;
-    return time;
-}
-
 function update() {
     var httpRequests,
     httpRequest,
@@ -263,7 +277,7 @@ function update() {
             playRepInfos.bandwidth = downloadRepInfos.bandwidth;
             playRepInfos.width = downloadRepInfos.width;
             playRepInfos.height = downloadRepInfos.height;
-            playRepInfos.codecs = downloadRepInfos.codecs;            
+            playRepInfos.codecs = downloadRepInfos.codecs;
         }
 
     }
@@ -414,15 +428,12 @@ function hideMetrics() {
     setShowInfo(isMetricsOn);
 }
 
-function hideNetworkLimiter() {
-    if (serviceNetBalancerEnabled) {
-        $("#networkToToggle").toggle();
-    }
-}
+function appendText(message) {
+    var currentTime = new Date(),
+        elapsedTime = (currentTime - startTime) / 1000;
 
-function updateSeekBar() {
-    $("#seekBar").attr('value',video.currentTime);
-    $(".current-time").text(setTimeWithSeconds(video.currentTime));
+    $("#textarea").html($("#textarea").html() + "\n" + elapsedTime.toFixed(3) + ": " + message);
+    $("#textarea").scrollTop($("#textarea")[0].scrollHeight);
 }
 
 function initControlBar () {
@@ -469,6 +480,7 @@ function initControlBar () {
         isPlaying = false;
         setPlaying(false);
         clearTimeout(updateTimeout);
+        appendText("pause");
     });
 
     $("#videoPlayer").on("play", function() {
@@ -478,6 +490,7 @@ function initControlBar () {
             setVolumeOff(true);
         }
         update();
+        appendText("play");
     });
 
     $("#videoPlayer").on("volumechange", function() {
@@ -492,6 +505,42 @@ function initControlBar () {
         video.currentTime = event.offsetX * video.duration / $("#seekBar").width();
         updateSeekBar();
     });
+
+    $("#videoPlayer").on("loadstart", function() {
+        appendText("loadstart");
+    });
+
+    $("#videoPlayer").on("loadedmetadata", function () {
+        appendText("loadedmetadata");
+    });
+
+    $("#videoPlayer").on("loadeddata", function () {
+        appendText("loadeddata");
+    });
+
+    $("#videoPlayer").on("canplay", function () {
+        appendText("canplay");
+    });
+
+    $("#videoPlayer").on("playing", function () {
+        appendText("playing");
+    });
+
+    $("#videoPlayer").on("stalled", function () {
+        appendText("stalled");
+    });
+
+    $("#videoPlayer").on("durationchange", function () {
+        appendText("durationchange: " + video.duration);
+    });
+
+    $("#videoPlayer").on("progress", function () {
+        appendText("progress: " + video.currentTime);
+    });
+
+    $("#videoPlayer").on("timeupdate", function() {
+    });
+
 }
 
 //init player by attaching source stream
@@ -516,6 +565,10 @@ function initPlayer() {
             if (name === 'playerType') {
                 context = value;
             }
+
+            if ((name === 'debug') && (value !== 'false')) {
+                document.getElementById('debugInfos').style.visibility="visible";
+            }
         }
     }
 }
@@ -532,16 +585,24 @@ function onLoaded () {
                 player = new MediaPlayer(new Custom.di.CustomContextNoRule());
                 break;
         }
-    }else {
-        player = new MediaPlayer(new Custom.di.CustomContext());    
+    } else {
+        player = new MediaPlayer(new Custom.di.CustomContext());
     }
 
     video = document.querySelector("video");
+
+    startTime = new Date();
 
     player.startup();
     player.attachView(video);
     player.setAutoPlay(true);
     //player.addEventListener("metricAdded", update, false);
+
+    var config = {
+        "ABR.minQuality": 1,
+    };
+
+    player.setConfig(config);
 
     // Initialize receiver only if cast.receiver is available
     if (isCrKey) {
