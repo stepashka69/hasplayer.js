@@ -69,8 +69,27 @@ function sendNetBalancerLimit(limit) {
     http.send(stringJson);
 }
 
-function checkInitBalancerService() {
-   sendNetBalancerLimit(7000);
+function initNetBalancerSlider() {
+
+    $('#sliderNetworkBandwidth').labeledslider({
+        max: 5000,
+        min: 0,
+        orientation:'horizontal',
+        step: 1,
+        tweenLabels: false,
+        range: 'min',
+        value: 5000,
+        stop: function( event, ui ) {
+            console.log("slider Network value = "+ui.value);
+            $("#networkBandwidth").html(ui.value + " kb/s");
+            sendNetBalancerLimit(ui.value);
+        }
+    });
+
+    // Initialize a bandwidth limitation in order to check NetBalancer service availability
+    sendNetBalancerLimit(7000);
+
+    $("#networkBandwidth").html(5000 + " kb/s");
 }
 
 
@@ -107,6 +126,7 @@ function initChartAndSlider() {
         return;
     }
 
+    // Quality/bandwidth chart
     for (var idx in bitrateValues) {
         bdwM = bitrateValues[idx]/1000000;
         bdwK = bitrateValues[idx]/1000;
@@ -141,6 +161,7 @@ function initChartAndSlider() {
         labels.push(Math.round(bitrateValues[i] / 1000) + "k");
     }
 
+    // Manual quality limiter slider
     $('#sliderBitrate').labeledslider({
         max: (bitrateValues.length - 1),
         orientation:'vertical',
@@ -158,27 +179,9 @@ function initChartAndSlider() {
             });
         }
     });
+  
 
-    $('#sliderNetworkBandwidth').labeledslider({
-        max: 5000,
-        min: 0,
-        orientation:'horizontal',
-        step: 1,
-        tweenLabels: false,
-        range: 'min',
-        value: 5000,
-        stop: function( event, ui ) {
-            console.log("slider Network value = "+ui.value);
-            $("#networkBandwidth").html(ui.value + " kb/s");
-
-            sendNetBalancerLimit(ui.value);
-        }
-    });
-
-    checkInitBalancerService();
-
-    $("#networkBandwidth").html(5000 + " kb/s");
-   
+    // Audio tracks
     var audioDatas = player.getAudioTracks();
     if (audioDatas && audioDatas.length > 1) {
         var selectOptions = "";
@@ -246,11 +249,6 @@ function update() {
 
     // Check for download quality change
     if (repSwitch && httpRequest && (httpRequest.quality != downloadRepInfos.quality)) {
-
-        // CHECK !!
-        if (metricsExt.getIndexForRepresentation(repSwitch.to) !== httpRequest.quality) {
-            console.log("!!!!!! demoPlayer ERROR");
-        }
 
         // Store current downloading representation infos
         downloadRepInfos.quality = metricsExt.getIndexForRepresentation(repSwitch.to);
@@ -357,7 +355,7 @@ function update() {
     $("#playingResolution").html(playRepInfos.width + "x" +playRepInfos.height);
     $("#playingCodecs").html(playRepInfos.codecs);
     $("#bufferLevel").html(bufferLevel + " s</br>");
-    $("#bitrate").html(Math.round(bitrate/1000).toLocaleString() + " kb/s");
+    $("#bitrate").html("[" + httpRequest.quality + "] "+ Math.round(bitrate/1000).toLocaleString() + " kb/s");
 
     updateTimeout = setTimeout(update, updateIntervalLength);
 }
@@ -468,20 +466,16 @@ function initControlBar () {
         toggleFullScreen();
     });
 
-    $("#videoPlayer").dblclick(function() {
-        toggleFullScreen();
+    $("#seekBar").click(function(event) {
+        video.currentTime = event.offsetX * video.duration / $("#seekBar").width();
+        updateSeekBar();
     });
 
-    if (video.muted) {
-        setVolumeOff(true);
-    }
+}
 
-    $("#videoPlayer").on("pause", function() {
-        isPlaying = false;
-        setPlaying(false);
-        clearTimeout(updateTimeout);
-        appendText("pause");
-    });
+function initVideoController () {
+
+    video = document.querySelector("video");
 
     $("#videoPlayer").on("play", function() {
         isPlaying = true;
@@ -493,17 +487,27 @@ function initControlBar () {
         appendText("play");
     });
 
+    $("#videoPlayer").dblclick(function() {
+        toggleFullScreen();
+    });
+    
+    $("#videoPlayer").on("pause", function() {
+        isPlaying = false;
+        setPlaying(false);
+        clearTimeout(updateTimeout);
+        appendText("pause");
+    });
+
+    if (video.muted) {
+        setVolumeOff(true);
+    }
+
     $("#videoPlayer").on("volumechange", function() {
         if (video.muted) {
             setVolumeOff(true);
         } else {
             setVolumeOff(false);
         }
-    });
-
-    $("#seekBar").click(function(event) {
-        video.currentTime = event.offsetX * video.duration / $("#seekBar").width();
-        updateSeekBar();
     });
 
     $("#videoPlayer").on("loadstart", function() {
@@ -535,16 +539,15 @@ function initControlBar () {
     });
 
     $("#videoPlayer").on("progress", function () {
-        appendText("progress: " + video.currentTime);
+        //appendText("progress: " + video.currentTime);
     });
 
     $("#videoPlayer").on("timeupdate", function() {
     });
-
 }
 
 //init player by attaching source stream
-function initPlayer() {
+function parseUrlParams () {
     var query = window.location.search,
         anchor = window.location.hash,
         params,
@@ -573,8 +576,7 @@ function initPlayer() {
     }
 }
 
-function onLoaded () {
-    initPlayer();
+function initPlayer() {
 
     if (context !== undefined) {
         switch(context){
@@ -589,8 +591,6 @@ function onLoaded () {
         player = new MediaPlayer(new Custom.di.CustomContext());
     }
 
-    video = document.querySelector("video");
-
     startTime = new Date();
 
     player.startup();
@@ -598,12 +598,33 @@ function onLoaded () {
     player.setAutoPlay(true);
     //player.addEventListener("metricAdded", update, false);
 
-    // Initialize receiver only if cast.receiver is available
+    /*var config = {
+        "ABR.minQuality": 1,
+    };
+
+    player.setConfig(config);*/
+}
+
+function onLoaded () {
+
+    parseUrlParams();
+
+    initNetBalancerSlider();
+
+    initVideoController();
+
+    initPlayer();
+
+    //appendText(navigator.userAgent);
+
+    // Initialize chromecast receiver
     if (isCrKey) {
         var ccastReceiver = new HasCastReceiver(player);
         player.getDebug().setLogToBrowserConsole(false);
     }
 
+    // Open stream
+    appendText("attachSource");
     player.attachSource(streamSource);
     update();
 
