@@ -598,12 +598,6 @@ function onLoaded () {
     player.setAutoPlay(true);
     //player.addEventListener("metricAdded", update, false);
 
-    var config = {
-        "ABR.minQuality": 1,
-    };
-
-    player.setConfig(config);
-
     // Initialize receiver only if cast.receiver is available
     if (isCrKey) {
         var ccastReceiver = new HasCastReceiver(player);
