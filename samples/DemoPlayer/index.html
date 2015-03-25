@@ -118,7 +118,7 @@
         /* **********************  NETWORK MANAGEMENT ************** */
         /* ********************************************************* */
         .networkSliderContainer {
-            right: 200px;
+            left: 22px;
             top: 50px;
             z-index: 2;
         }
@@ -145,6 +145,16 @@
             position: absolute;
             padding: 12px;
         }
+
+        .debugContainer{
+            background-color:rgba(0,0,0,.5);
+            color:#FFF;
+            right:22px;
+            top:50px;
+            z-index:2;
+            resize:none;
+            border-width:0;
+            overflow:hidden}
 
         .chartContainer {
             left: 22px;
@@ -375,6 +385,10 @@
             <span id="networkBandwidth" class="downloadingInfos"></span>
         </div>
         <div id="sliderNetworkBandwidth"></div>
+    </div>
+
+    <div id="debugInfos" class="debugContainer container hidden">
+        <textarea id="textarea" name="textarea" rows="20" cols="50" class="debugContainer"></textarea>
     </div>
 
     <video id="videoPlayer"></video>
