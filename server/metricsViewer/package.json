@@ -1,0 +1,25 @@
+{
+  "scripts": {
+    "start": "nodewebkit"
+  },
+  "name": "metricsViewer",
+  "version": "1.0.0",
+  "description": "Tools to show metrics received by metric collector server",
+  "main": "index.html",
+  "window": {    
+        "toolbar": true,
+        "resizable": false,
+        "width": 800,
+        "height": 500,
+        "min_width": 400,
+        "min_height": 200,
+        "max_width": 800,
+        "max_height": 600
+  },
+  "dependencies": {
+    "nodewebkit": "^0.11.6"
+  },
+  "devDependencies": {},
+  "author": "Nicolas ANGOT",
+  "license": "ISC"
+}
