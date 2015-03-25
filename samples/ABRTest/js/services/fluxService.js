@@ -22,7 +22,7 @@ angular.module('HASPlayer').service('fluxService', function($resource, $http){
 			var dataJson = {'NetBalancerLimit':{'upLimit':quality*125, 'activate':1 }};
 
 			return $http({
-	            url: 'http://localhost:8080/NetBalancerLimit',
+	            url: 'http://localhost:8081/NetBalancerLimit',
 	            method: "POST",
 	            data: dataJson,
 	            headers: {'Content-Type': 'application/json'}
