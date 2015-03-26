@@ -50,7 +50,7 @@ function hideNetworkLimiter() {
 
 function sendNetBalancerLimit(limit) {
     var http = new XMLHttpRequest(),
-        data = {'NetBalancerLimit':{'upLimit':limit*125, 'activate':1 }};
+        data = {'NetBalancerLimit':{'upLimit':limit, 'activate':1 }};
 
     http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
     http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
@@ -70,12 +70,13 @@ function sendNetBalancerLimit(limit) {
 }
 
 function initNetBalancerSlider() {
+    var initBW = 5000;
 
     $('#sliderNetworkBandwidth').labeledslider({
         max: 5000,
         min: 0,
         orientation:'horizontal',
-        step: 500,
+        step: 100,
         tweenLabels: false,
         range: 'min',
         value: 5000,
@@ -85,14 +86,14 @@ function initNetBalancerSlider() {
         stop: function( event, ui ) {
             console.log("slider Network value = "+ui.value);
             $("#networkBandwidth").html(ui.value + " kb/s");
-            sendNetBalancerLimit(ui.value);
+            sendNetBalancerLimit(ui.value * 1000);
         }
     });
 
-    // Initialize a bandwidth limitation in order to check NetBalancer service availability
-    sendNetBalancerLimit(7000);
-
     $("#networkBandwidth").html(5000 + " kb/s");
+
+    // Initialize a bandwidth limitation in order to check NetBalancer service availability
+    sendNetBalancerLimit(initBW * 1000);
 }
 
 
