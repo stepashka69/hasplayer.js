@@ -11,6 +11,7 @@
     "phantom": "*",
     "quiche": "0.0.8",
     "request": "*",
+    "cors": "2.5.3",
     "tunnel": "*"
   }
 }

@@ -1077,6 +1077,11 @@ Custom.dependencies.CustomBufferController = function () {
 
             self.debug.log("[BufferController]["+type+"] Initialize");
 
+            // PATCH for Espial browser which implements SourceBuffer appending/removing synchronoulsy
+            if (navigator.userAgent.indexOf("Espial") !== -1) {
+                appendSync = true;
+            }
+
             isDynamic = self.manifestExt.getIsDynamic(manifest);
             self.setMediaSource(source);
             self.setVideoModel(videoModel);
