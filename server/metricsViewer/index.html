@@ -57,6 +57,8 @@
 				<td>Fps</td>
 				<td>Window Size</td>
 				<td>Message Number</td>
+				<td>Error code</td>
+				<td>Error message</td>
 			</tr>
 			<tr ng-repeat="metric in metrics" ng-class="{'message0': metric.type == 0, 'message1': metric.type == 1
 				,'message2': metric.type == 2,'message3': metric.type == 3,'message10': metric.type == 10}" >
@@ -70,6 +72,8 @@
 				<td>{{metric.fps}}</td>
 				<td>{{metric.wsize}}</td>
 				<td>{{metric.msgNbr}}</td>
+				<td>{{metric.errorCode}}</td>
+				<td>{{metric.errorMessage}}</td>
 			</tr>
 		</table>	
 	</div>

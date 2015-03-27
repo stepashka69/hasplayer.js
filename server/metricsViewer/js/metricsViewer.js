@@ -90,6 +90,10 @@ app.post('/metrics', function(req, res){
 				break;
 				//error message
 			case 10 : 	
+				metric.errorCode = request.error.code;
+				metric.errorMessage = request.error.message;
+				metric.currentPlayerState = request.state.current;	
+				metric.currentBandwidth = request.encoding.current;
 				break;
 		}
 		
