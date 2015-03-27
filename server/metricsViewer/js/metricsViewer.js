@@ -1,6 +1,7 @@
 var express = require('express');
 var http = require('http');
 var bodyParser = require('body-parser');
+var gui = require('nw.gui');
 
 var app = express();
 
@@ -9,7 +10,27 @@ app.use(app.router);
 
 app.listen(8082);
 
-app.post('/setMetric', function(req, res){
+var win = gui.Window.get();
+
+win.on('loaded', function() {
+  win.maximize();
+});
+
+//Testing MetricsAgent
+app.get('/config', function(req, res){
+	//console.log(req.query);
+	res.json({"active": true});
+
+	win.title += ' : collector connected';
+});
+
+app.post('/metricsDB', function(req, res){
+	//not used
+	
+	res.send(200);
+});
+
+app.post('/metrics', function(req, res){
 
 	try {
 		var request = JSON.parse(JSON.stringify(req.body));
@@ -18,20 +39,63 @@ app.post('/setMetric', function(req, res){
 	}
 	
 	angular.element(document.getElementById('metricsController')).scope().$apply(function(scope){
-        scope.sessionId = request.session.id;
-		if(request.session.uri) {
-			scope.url = request.session.uri;
+		var metric = {};
+		
+		scope.sessionId = request.session.id;
+		
+		if(!scope.firstMetricTime){
+			scope.firstMetricTime = (new Date().getTime()/1000).toFixed(3); //show secondes value
+			metric.timestamp = scope.firstMetricTime;
+		}else {
+			metric.timestamp = '+'+((new Date().getTime()/1000) - scope.firstMetricTime).toFixed(3)+' sec';
 		}
-		scope.currentBandwidth = request.encoding.current+' kb/s';
-		scope.fps = request.condition.fps;
-		scope.msgNumber = request.session.msgnbr;
-		if(request.session.playerid){
-			scope.playerId = request.session.playerid;
+		metric.type = request.type;
+		
+		switch(request.type) {
+			//recurring message
+			case 0 :
+				scope.playerId = request.session.playerid;
+				scope.url = request.session.uri;
+				metric.wsize = request.condition.wsize;
+				metric.fps = request.condition.fps;
+				metric.droppedFrames = request.condition.fdc;
+				scope.fullScreen = request.condition.full == 0? 'False': 'True';
+				metric.currentPlayerState = request.state.current;	
+				metric.currentBandwidth = request.encoding.current;
+				break;
+				//new state message
+			case 1 :
+				metric.currentPlayerState = request.state.current;
+				metric.currentBandwidth = request.encoding.current;
+				metric.wsize = request.condition.wsize;
+				metric.fps = request.condition.fps;
+				metric.droppedFrames = request.condition.fdc;
+				//playerId and sessionId only send with the first new state metric
+				scope.playerId = request.session.playerid != undefined ? request.session.playerid : scope.playerId;
+				scope.url = request.session.uri != undefined ? request.session.uri : scope.url;
+				scope.startupTime = request.startuptime+' sec.';
+				scope.fullScreen = request.condition.full == 0? 'False': 'True';
+				break;
+				//metadata message
+			case 2 : 	
+				scope.mediaType = request.metadata.contenttype;
+				scope.encodingFormat = request.metadata.encodingformat;
+				scope.encapsulation = request.metadata.encapsulation;
+				scope.contentDuration = request.metadata.contentduration != -1? request.metadata.contentduration+' sec.' : 'Infini';
+				break;
+				//change bitrate message
+			case 3 : 
+				metric.currentBandwidth	= request.encoding.current;
+				metric.currentPlayerState = request.state.current;
+				break;
+				//error message
+			case 10 : 	
+				break;
 		}
-		scope.currentPlayerState = request.state.current;
+		
+		metric.msgNbr = request.session.msgnbr;
+		scope.metrics.push(metric);
     });
 	
-	res.send(200);
-	//document.getElementById('metrics').innerHTML += 'client '+request.session.id +' is watching '+request.session.provider+request.session.uri+' current playing bandwidth = '+request.encoding.current+'</br>';
-		
+	res.send(200);	
 });

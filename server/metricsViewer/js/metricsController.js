@@ -1,10 +1,13 @@
-angular.module('metricsViewer', []).controller('metricsController', function($scope) {
-    $scope.sessionId = null;
-	$scope.url = null;
-	$scope.currentBandwidth = null;
-	$scope.fps = null;
-	$scope.msgNumber = 0;
+angular.module('metricsViewer', ['luegg.directives']).controller('metricsController', function($scope) {
 	$scope.playerId = null;
-	$scope.currentPlayerState = "Unknown";
-	$scope.previousPlayerState = "Unknown";
+	$scope.sessionId = null;
+	$scope.url = null;
+	$scope.fullScreen = null;
+	$scope.mediaType = null;
+	$scope.metrics = [];
+	$scope.encodingFormat = null;
+	$scope.encapsulation = null;
+	$scope.contentDuration = null;
+	$scope.startupTime = null;
+	$scope.firstMetricTime = null;
 });

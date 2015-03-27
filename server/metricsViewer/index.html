@@ -2,22 +2,76 @@
 <html>
 <head>
 	<head>
+	<link rel="stylesheet" href="css/viewer.css" type="text/css"/>	
 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+	<script src="https://cdn.rawgit.com/Luegg/angularjs-scroll-glue/v2.0.4/src/scrollglue.js"></script>
 	</head>
 	<title>Metrics Viewer</title>
 </head>
-<body>
+<body ng-app="metricsViewer" ng-controller="metricsController" scroll-glue>
 	<script src="js/metricsViewer.js"></script>
 	<script src="js/metricsController.js"></script>
-	<div id="metricsController" ng-app="metricsViewer" ng-controller="metricsController">
- 	<p>Session Id: <span ng-bind="sessionId"></span></p>
-	<p>Player Id: <span ng-bind="playerId"></span></p>
-	<p>Url : <span ng-bind="url"></span></p>
-	<p>Current bandwidth: <span ng-bind="currentBandwidth"></span></p>
-	<p>FPS: <span ng-bind="fps"></span></p>
-	<p>Message Number: <span ng-bind="msgNumber"></span></p>
-	<p>Previous Player State: <span ng-bind="previousPlayerState"></span></p>
-	<p>Current Player State: <span ng-bind="currentPlayerState"></span></p>
-</div>
+	<div>
+		<table class="constantMetricTable">
+			<tr>
+				<td>
+				  <UL TYPE="square">
+					<LI>PlayerID : <span ng-bind="playerId"></span></LI>
+					<LI>SessionID : <span ng-bind="sessionId"></span></LI>
+					<LI>Uri : <span ng-bind="url"></span></LI>
+				  </UL>
+				</td>
+				<td>
+					<UL TYPE="square">
+						<LI>Fullscreen : <span ng-bind="fullScreen"></span></LI>
+						<LI>MediaType : <span ng-bind="mediaType"></span></LI>
+						<LI>Encoding Format : <span ng-bind="encodingFormat"></span></LI>
+					</UL>
+				</td>
+				<td>
+					<UL TYPE="square">
+					<LI>Encapsulation : <span ng-bind="encapsulation"></span></LI>
+					<LI>Duration : <span ng-bind="contentDuration"></span></LI>
+					<LI>Startup time : <span ng-bind="startupTime"></span></LI>		
+					</UL>
+				</td>
+			</tr>
+		</table>
+		<table class="legendMetricTable">
+			<tr>
+				<td>Recurring message</td>
+				<td>New state message</td>
+				<td>Metadata message</td>
+				<td>Changing bitrate message</td>
+				<td>Error message</td>
+			</tr>
+		</table>
+	</div>
+	<div class="metricTable" id="metricsController">
+		<table>
+			<tr>
+				<td>Timestamp</td>
+				<td>Current Player State</td>
+				<td>Current Downloaded Bandwidth</td>
+				<td>Dropped frames</td>
+				<td>Fps</td>
+				<td>Window Size</td>
+				<td>Message Number</td>
+			</tr>
+			<tr ng-repeat="metric in metrics" ng-class="{'message0': metric.type == 0, 'message1': metric.type == 1
+				,'message2': metric.type == 2,'message3': metric.type == 3,'message10': metric.type == 10}" >
+				<td>{{metric.timestamp}}</td>
+				<td><span ng-class="{'playing': metric.currentPlayerState == 'Playing', 'stopped': metric.currentPlayerState == 'Stopped'
+				,'paused': metric.currentPlayerState == 'Paused','startup': metric.currentPlayerState == 'Startup',
+				'seeking': metric.currentPlayerState == 'Seeking','buffering': metric.currentPlayerState == 'Buffering'
+				}">{{metric.currentPlayerState}}<span></td>
+				<td>{{metric.currentBandwidth}}</td>
+				<td>{{metric.droppedFrames}}</td>
+				<td>{{metric.fps}}</td>
+				<td>{{metric.wsize}}</td>
+				<td>{{metric.msgNbr}}</td>
+			</tr>
+		</table>	
+	</div>
 </body>
 </html>
