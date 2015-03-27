@@ -15,24 +15,24 @@
 		<table class="constantMetricTable">
 			<tr>
 				<td>
-				  <UL TYPE="square">
+				  <UL>
 					<LI>PlayerID : <span ng-bind="playerId"></span></LI>
 					<LI>SessionID : <span ng-bind="sessionId"></span></LI>
 					<LI>Uri : <span ng-bind="url"></span></LI>
 				  </UL>
 				</td>
 				<td>
-					<UL TYPE="square">
-						<LI>Fullscreen : <span ng-bind="fullScreen"></span></LI>
+					<UL>
+						<LI>Encapsulation : <span ng-bind="encapsulation"></span></LI>
 						<LI>MediaType : <span ng-bind="mediaType"></span></LI>
 						<LI>Encoding Format : <span ng-bind="encodingFormat"></span></LI>
 					</UL>
 				</td>
 				<td>
-					<UL TYPE="square">
-					<LI>Encapsulation : <span ng-bind="encapsulation"></span></LI>
-					<LI>Duration : <span ng-bind="contentDuration"></span></LI>
+					<UL>
 					<LI>Startup time : <span ng-bind="startupTime"></span></LI>		
+					<LI ng-hide="contentDuration === 'Infini'">Duration : <span ng-bind="contentDuration"></span></LI>
+					<LI ng-hide="fullScreen === false"><span>Fullscreen</span></LI>
 					</UL>
 				</td>
 			</tr>

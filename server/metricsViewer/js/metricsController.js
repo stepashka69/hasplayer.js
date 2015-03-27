@@ -2,7 +2,7 @@ angular.module('metricsViewer', ['luegg.directives']).controller('metricsControl
 	$scope.playerId = null;
 	$scope.sessionId = null;
 	$scope.url = null;
-	$scope.fullScreen = null;
+	$scope.fullScreen = false;
 	$scope.mediaType = null;
 	$scope.metrics = [];
 	$scope.encodingFormat = null;

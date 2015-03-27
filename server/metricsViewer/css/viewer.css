@@ -11,8 +11,24 @@
 	color:green;
 }
 
-.constantMetricTable li {
+.constantMetricTable ul {
+    list-style: none;
+    line-height: 1em;
+}
+
+.constantMetricTable li{
 	padding-bottom:5px;
+}
+
+.constantMetricTable ul li:before {
+    content: "";
+    line-height: 1em;
+    width: .5em;
+    height: .5em;
+    background-color: orange;
+    float: left;
+    margin: .25em .25em 0;
+    border-radius: 50%;
 }
 
 .legendMetricTable{
