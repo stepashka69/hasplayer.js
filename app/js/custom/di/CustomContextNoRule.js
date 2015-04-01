@@ -39,7 +39,7 @@
             this.system.mapSingleton('metricsModel', Custom.models.CustomMetricsModel);
             this.system.mapSingleton('metricsExt', Custom.dependencies.CustomMetricsExtensions);
             this.system.mapClass('metrics', Custom.models.CustomMetricsList);
-            this.system.mapSingleton('abrController', Custom.dependencies.CustomAbrController);
+            this.system.mapSingleton('abrController', MediaPlayer.dependencies.AbrController);
             this.system.mapClass('bufferController', Custom.dependencies.CustomBufferController);
             this.system.mapSingleton('sourceBufferExt', Custom.dependencies.CustomSourceBufferExtensions);
             this.system.mapSingleton('debug', Custom.utils.CustomDebug);

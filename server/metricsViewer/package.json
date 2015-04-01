@@ -7,14 +7,14 @@
   "description": "Tools to show metrics received by metric collector server",
   "main": "index.html",
   "window": {    
-        "toolbar": true,
-        "resizable": false,
-        "width": 800,
+		"icon": "images/logo.png",
+		"frame": true,
+        "toolbar": false,
+        "resizable": true,
+        "width": 1000,
         "height": 500,
         "min_width": 400,
-        "min_height": 200,
-        "max_width": 800,
-        "max_height": 600
+        "min_height": 200
   },
   "dependencies": {
     "nodewebkit": "^0.11.6"

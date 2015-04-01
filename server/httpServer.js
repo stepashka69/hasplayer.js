@@ -3,7 +3,6 @@ var phantom = require('phantom');
 var bodyParser = require('body-parser');
 var csv = require('express-csv');
 var fs = require('fs');
-var requestify = require('requestify');
 var exec = require('child_process').exec,
     child;
 
@@ -148,9 +147,6 @@ app.post('/metrics', function(req, res){
 	//console.log(req.body);
 
 	res.send(204);
-
-	//send new metric to local node.js metrics Viewer
-	requestify.post('http://localhost:8082/setMetric', req.body);
 
 	// Append message to file
 	var fd = fs.openSync("metrics.json", 'a+');
