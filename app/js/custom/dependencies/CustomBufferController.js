@@ -364,6 +364,8 @@ Custom.dependencies.CustomBufferController = function () {
                                             debugBufferRange.call(self);
                                             deferred.resolve();
                                         }
+
+                                        self.system.notify("bufferUpdated");
                                     },
                                     function(result) {
                                         // ORANGE : add metric
