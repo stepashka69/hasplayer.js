@@ -41,14 +41,19 @@ app.post('/NetBalancerLimit', cors(), function(req, res) {
 	}
 
 	SetNetBalancerTrafficLimit(
-		request.NetBalancerLimit.activate === 1? 'true':'false',
+		request.NetBalancerLimit.activate,
 		request.NetBalancerLimit.upLimit,
 		function (error/*, stdout, stderr*/) {
 			if (error !== null) {
 				console.log('---------exec error: ---------\n[' + error+']');
 				res.send(404);
 			} else {
-				console.log('limit ' + (request.NetBalancerLimit.upLimit / 1000) + ' kb/s is activated');
+				if(request.NetBalancerLimit.activate)
+				{
+					console.log('limit ' + (request.NetBalancerLimit.upLimit / 1000) + ' kb/s is activated');
+				}else {
+					console.log('limit is disabled');
+				}
 				res.send(200);
 			}
 		}

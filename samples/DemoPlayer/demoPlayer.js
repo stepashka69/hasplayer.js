@@ -16,6 +16,8 @@ var chartXaxisWindow = 30;
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
 var serviceNetBalancerEnabled = true;
+var netBalancerLimitValue = 0;
+var netBalancerLimitSetted = true;
 
 var streamSource;
 
@@ -50,7 +52,8 @@ function hideNetworkLimiter() {
 
 function sendNetBalancerLimit(activate, limit) {
     var http = new XMLHttpRequest(),
-        data = {'NetBalancerLimit':{'activate':activate ? 1:0, 'upLimit':limit}};
+        data = {'NetBalancerLimit':{'activate':activate, 'upLimit':limit}};
+
 
     http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
     http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
@@ -86,7 +89,8 @@ function initNetBalancerSlider() {
         stop: function( event, ui ) {
             console.log("slider Network value = "+ui.value);
             $("#networkBandwidth").html(ui.value + " kb/s");
-            sendNetBalancerLimit(true, (ui.value * 1000));
+            netBalancerLimitValue = ui.value;
+            netBalancerLimitSetted = false;
         }
     });
 
@@ -580,6 +584,19 @@ function parseUrlParams () {
     }
 }
 
+function metricUpdated(e) {
+    var metric;
+
+    if (e.data.stream == "video" && e.data.metric == "HttpRequestTrace") {
+        metric = e.data.value;
+        if (metric.tfinish != null && !netBalancerLimitSetted) {
+            console.log("Set NetBalancer Limit"+netBalancerLimitValue);
+            sendNetBalancerLimit(true, (netBalancerLimitValue * 1000));
+            netBalancerLimitSetted = true;
+        }
+    }
+}
+
 function initPlayer() {
 
     if (context !== undefined) {
@@ -600,6 +617,7 @@ function initPlayer() {
     player.startup();
     player.attachView(video);
     player.setAutoPlay(true);
+    player.addEventListener("metricUpdated", metricUpdated.bind(this));
     //player.addEventListener("metricAdded", update, false);
 
     /*var config = {
