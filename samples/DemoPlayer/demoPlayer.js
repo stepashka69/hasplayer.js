@@ -37,6 +37,7 @@ plotIndex = 0,
 chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true, tickFormatter:function(){return "";}},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
 video,
 player,
+enableMetrics = false,
 metricsAgent = null,
 metricsAgentActive = false,
 currentIdToToggle = 0,
@@ -580,6 +581,10 @@ function parseUrlParams () {
                 context = value;
             }
 
+            if (name === 'metrics') {
+                enableMetrics = true;
+            }
+
             if ((name === 'debug') && (value !== 'false')) {
                 document.getElementById('debugInfos').style.visibility="visible";
             }
@@ -615,8 +620,6 @@ function initPlayer() {
         player = new MediaPlayer(new Custom.di.CustomContext());
     }
 
-    startTime = new Date();
-
     player.startup();
     player.attachView(video);
     player.setAutoPlay(true);
@@ -643,6 +646,8 @@ function launchPlayer() {
         metricsAgent.createSession();
     }
 
+    startTime = new Date();
+
     // Open stream
     appendText("attachSource");
     player.attachSource(streamSource);
@@ -653,8 +658,7 @@ function launchPlayer() {
 
 function initMetricsAgent() {
 
-    if (typeof MetricsAgent != 'function') {
-        console.log("Metrics agent not available!");
+    if (!enableMetrics || (typeof MetricsAgent != 'function')) {
         launchPlayer();
         return;
     }
