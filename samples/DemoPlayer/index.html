@@ -13,11 +13,11 @@
             width: 100%;
         }
 
-        * { 
+/*        * { 
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
             box-sizing: border-box; 
-        }
+        }*/
 
         body {
             margin: 0;
@@ -360,6 +360,53 @@
             color: #eee;
             padding: 3px;
         }
+
+        .bufferingDiv{
+            position: fixed;
+            z-index: 3;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
+            top: 50%;
+            margin-top: -30px;
+            width: 60px;
+            height: 60px;
+            list-style: none;
+            visibility:hidden;
+        }
+
+        @-webkit-keyframes 'loadbars' {
+            0%{
+                height: 10px;
+                margin-top: 25px;
+              }
+            50%{
+                height:50px;
+                margin-top: 0px;
+            }
+            100%{
+                height: 10px;
+                margin-top: 25px;
+            }
+        }
+
+        li{
+            background-color: #FFFFFF;
+            width: 10px;
+            height: 10px;
+            float: right;
+            margin-right: 5px;
+            box-shadow: 0px 100px 20px rgba(0,0,0,0.2);
+        }
+        li:first-child{
+            -webkit-animation: loadbars 0.6s cubic-bezier(0.645,0.045,0.355,1) infinite 0s;
+        }
+        li:nth-child(2){
+            -webkit-animation: loadbars 0.6s ease-in-out infinite -0.2s;
+        }
+        li:nth-child(3){
+            -webkit-animation: loadbars 0.6s ease-in-out infinite -0.4s;
+        }
     </style>
 
     <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
@@ -390,7 +437,11 @@
     <div id="debugInfos" class="debugContainer container hidden">
         <textarea id="textarea" name="textarea" rows="20" cols="50" class="debugContainer"></textarea>
     </div>
-
+    <ul id="bufferingDiv" class="bufferingDiv">
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
     <video id="videoPlayer"></video>
     <div id="controlBar" class="controlBar">
 

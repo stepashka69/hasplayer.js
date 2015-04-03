@@ -605,6 +605,22 @@ function metricUpdated(e) {
     }
 }
 
+function metricAdded(e) {
+
+  switch (e.data.metric) {
+        case  "State" :
+                if (e.data.stream === "video") {
+                    appendText("Video state = "+e.data.value.current);
+                    if (e.data.value.current === "buffering") {
+                         document.getElementById('bufferingDiv').style.visibility="visible";
+                    }else {
+                         document.getElementById('bufferingDiv').style.visibility="hidden";
+                    }
+                }
+                break;
+    }
+}
+
 function initPlayer() {
 
     if (context !== undefined) {
@@ -624,7 +640,7 @@ function initPlayer() {
     player.attachView(video);
     player.setAutoPlay(true);
     player.addEventListener("metricUpdated", metricUpdated.bind(this));
-    //player.addEventListener("metricAdded", update, false);
+    player.addEventListener("metricAdded", metricAdded.bind(this));
 
     /*var config = {
         "ABR.minQuality": 1,
