@@ -1,3 +1,26 @@
+.resetButton {
+	-moz-border-radius-bottomleft:9px;
+	-webkit-border-bottom-left-radius:9px;
+	border-bottom-left-radius:9px;
+	
+	-moz-border-radius-bottomright:9px;
+	-webkit-border-bottom-right-radius:9px;
+	border-bottom-right-radius:9px;
+	
+	-moz-border-radius-topright:9px;
+	-webkit-border-top-right-radius:9px;
+	border-top-right-radius:9px;
+	
+	-moz-border-radius-topleft:9px;
+	-webkit-border-top-left-radius:9px;
+	border-top-left-radius:9px;
+
+	text-align:justify;
+	font-size:18px;
+	font-family:Arial;
+	font-weight:bold;
+}
+
 .constantMetricTable {
 	width:100%;
 	text-align:justify;
@@ -97,7 +120,7 @@
 	border-top-left-radius:9px;
 }.metricTable table{
     border-collapse: collapse;
-        border-spacing: 0;
+    border-spacing: 0;
 	width:100%;
 	height:100%;
 	margin:0px;padding:0px;
