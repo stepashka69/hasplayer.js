@@ -37,6 +37,8 @@ plotIndex = 0,
 chartOptions = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: true, tickFormatter:function(){return "";}},lines: {steps: true,},grid: {markings: [],borderWidth: 0},legend: {show: false}},
 video,
 player,
+metricsAgent = null,
+metricsAgentActive = false,
 currentIdToToggle = 0,
 isPlaying = false,
 isMetricsOn = !hideMetricsAtStart,
@@ -252,7 +254,7 @@ function update() {
 
     if (httpRequest && httpRequest.tfinish) {
         bitrate = (httpRequest.bytesLength * 8000) / (httpRequest.tfinish - httpRequest.trequest);
-        //console.log(bitrate + "(" +httpRequests.length + ")");
+        //console.log("length: " + (httpRequest.bytesLength * 8000) + ", time:" + (httpRequest.tfinish - httpRequest.trequest) + ", bitrate: " + bitrate);
     }
 
     // Check for download quality change
@@ -359,6 +361,7 @@ function update() {
     //$("#downloadingInfos").html("<span class='downloadingTitle'>Downloading</span><br>" + Math.round(downloadRepInfos.bandwidth/1000) + " kbps<br>"+ downloadRepInfos.width +"x"+downloadRepInfos.height + "<br>"+ downloadRepInfos.codecs + "<br>"+ bufferLevel + "s");
     //$("#playingInfos").html("<span class='playingTitle'>Playing</span><br>"+ Math.round(playRepInfos.bandwidth/1000) + " kbps<br>"+ playRepInfos.width +"x"+playRepInfos.height + "<br>"+ playRepInfos.codecs + "<br>"+ bufferLevel + "s<br>");
 
+    $("#state").html("Playing");
     $("#playingBandwidth").html(Math.round(playRepInfos.bandwidth/1000).toLocaleString() + " kb/s");
     $("#playingResolution").html(playRepInfos.width + "x" +playRepInfos.height);
     $("#playingCodecs").html(playRepInfos.codecs);
@@ -625,9 +628,60 @@ function initPlayer() {
     };
 
     player.setConfig(config);*/
+
+    // Initialize chromecast receiver
+    if (isCrKey) {
+        var ccastReceiver = new HasCastReceiver(player);
+        player.getDebug().setLogToBrowserConsole(false);
+    }
 }
 
-function onLoaded () {
+function launchPlayer() {
+
+    // Create session on metrics agent
+    if (metricsAgent && metricsAgentActive) {
+        metricsAgent.createSession();
+    }
+
+    // Open stream
+    appendText("attachSource");
+    player.attachSource(streamSource);
+    update();
+
+    initControlBar();
+}
+
+function initMetricsAgent() {
+
+    if (typeof MetricsAgent != 'function') {
+        console.log("Metrics agent not available!");
+        launchPlayer();
+        return;
+    }
+
+    var req = new XMLHttpRequest();
+    req.onload = function () {
+        if (req.status === 200) {
+            var conf = JSON.parse(req.responseText);
+
+            metricsAgent = new MetricsAgent(player, video, conf.items[0], player.getDebug());
+            metricsAgent.init(function (activated) {
+                metricsAgentActive = activated;
+                console.log("Metrics agent state: ", activated);
+                launchPlayer();
+            });
+        } else {
+            launchPlayer();
+        }
+    };
+    req.open("GET", "./metricsagent_config.json", true);
+    req.setRequestHeader("Content-type", "application/json");
+    req.send();
+}
+
+function onLoad () {
+
+    //appendText(navigator.userAgent);
 
     parseUrlParams();
 
@@ -636,19 +690,6 @@ function onLoaded () {
     initVideoController();
 
     initPlayer();
-
-    //appendText(navigator.userAgent);
-
-    // Initialize chromecast receiver
-    if (isCrKey) {
-        var ccastReceiver = new HasCastReceiver(player);
-        player.getDebug().setLogToBrowserConsole(false);
-    }
-
-    // Open stream
-    appendText("attachSource");
-    player.attachSource(streamSource);
-    update();
 
 	// catch ctrl+i key stoke    
     $(document).keydown(function(e) {
@@ -659,13 +700,13 @@ function onLoaded () {
         }
     });
     
-    initControlBar();
-
     // force hide of all metrics  
     if (hideMetricsAtStart) {
 		//currentIdToToggle = idsToToggle.length;
 		hideMetrics();
     }
+
+    initMetricsAgent();
 }
 
 function onUnload () {
@@ -682,6 +723,6 @@ function onUnload () {
 $.widget("ui.labeledslider",$.ui.slider,{version:"@VERSION",options:{tickInterval:0,tweenLabels:true,tickLabels:null},uiSlider:null,tickInterval:0,tweenLabels:true,_create:function(){this._detectOrientation();this.uiSlider=this.element.wrap('<div class="ui-slider-wrapper ui-widget"></div>').before('<div class="ui-slider-labels">').parent().addClass(this.orientation).css("font-size",this.element.css("font-size"));this._super();this.element.removeClass("ui-widget");this._alignWithStep();if(this.orientation=="horizontal"){this.uiSlider.width(this.element.width())}else{this.uiSlider.height(this.element.height())}this._drawLabels()},_drawLabels:function(){var e=this.options.tickLabels||{},t=this.uiSlider.children(".ui-slider-labels"),n=this.orientation=="horizontal"?"left":"bottom",r=this.options.min,i=this.options.max,s=this.tickInterval,o=(i-r)/s,u=0;t.html("");for(;u<=o;u++){$("<div>").addClass("ui-slider-label-ticks").css(n,Math.round(u/o*1e4)/100+"%").html("<span>"+(e[u*s+r]?e[u*s+r]:this.options.tweenLabels?u*s+r:"")+"</span>").appendTo(t)}},_setOption:function(e,t){this._super(e,t);switch(e){case"tickInterval":case"tickLabels":case"min":case"max":case"step":this._alignWithStep();this._drawLabels();break;case"orientation":this.element.removeClass("horizontal vertical").addClass(this.orientation);this._drawLabels();break}},_alignWithStep:function(){if(this.options.tickInterval<this.options.step)this.tickInterval=this.options.step;else this.tickInterval=this.options.tickInterval},_destroy:function(){this._super();this.uiSlider.replaceWith(this.element)},widget:function(){return this.uiSlider}})
 
 // here we go !
-$( document ).ready(onLoaded);
+$( document ).ready(onLoad);
 
 $( window ).unload(onUnload);

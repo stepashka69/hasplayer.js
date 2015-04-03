@@ -368,7 +368,7 @@
 
     <div id="chartToToggle" class="chartContainer container"> 
         <div id="playingInfos" class="infos">
-            <span class='playingTitle'>Playing</span><br>
+            <span id="state" class='playingTitle'></span><br>
             <span id="playingBandwidth"></span><br>
             <span id="playingResolution"></span><br>
             <span id="playingCodecs"></span><br>
@@ -555,6 +555,17 @@
 
 <script src="../../app/js/custom/analytics.js"></script>
 <!-- /source -->
+
+<!-- metricsagent -->
+<script src="../../../metricsagent.js/src/MetricsAgent.js"></script>
+<script src="../../../metricsagent.js/src/MetricsDatabase.js"></script>
+<script src="../../../metricsagent.js/src/MetricsSender.js"></script>
+<script src="../../../metricsagent.js/src/MetricsVo.js"></script>
+<script src="../../../metricsagent.js/src/collectors/HasPlayerCollector.js"></script>
+<script src="../../../metricsagent.js/src/formatters/AbstractFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/CSQoEFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/PrismeFormatter.js"></script>
+<!-- /metricsagent -->
 
 <!-- build:js player.js-->
 <script src="HasCastReceiver.js"></script>
