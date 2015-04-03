@@ -1,5 +1,6 @@
 var express = require('express');
 var http = require('http');
+var cors = require('cors');
 var bodyParser = require('body-parser');
 var gui = require('nw.gui');
 
@@ -7,6 +8,8 @@ var app = express();
 
 app.use(bodyParser.json());
 app.use(app.router);
+app.use(express.static("."));
+app.use(cors);
 
 app.listen(8082);
 
@@ -16,9 +19,15 @@ win.on('loaded', function() {
   win.maximize();
 });
 
+// Enable CORS for all request
+app.all('/*', cors(), function(req, res, next) {
+  next();
+});
+
 //Testing MetricsAgent
 app.get('/config', function(req, res){
 	//console.log(req.query);
+	res.setHeader('Acces-Control-Allow-Origin', '*');
 	res.json({"active": true});
 
 	win.title += ' : collector connected';
@@ -26,6 +35,7 @@ app.get('/config', function(req, res){
 
 app.post('/metricsDB', function(req, res){
 	//not used
+	res.setHeader('Acces-Control-Allow-Origin', '*');
 	
 	res.send(200);
 });
@@ -37,6 +47,7 @@ app.post('/metrics', function(req, res){
 	} catch (e) {
 		console.error("Parsing error:", e); 
 	}
+	res.setHeader('Acces-Control-Allow-Origin', '*');
 	
 	angular.element(document.getElementById('metricsController')).scope().$apply(function(scope){
 		var metric = {};
