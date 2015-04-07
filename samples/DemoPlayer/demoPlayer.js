@@ -21,7 +21,7 @@ var netBalancerLimitSetted = true;
 
 var streamSource;
 
-var context;
+var context = 'hasplayer_custom';
 
 var startTime;
 
@@ -577,7 +577,7 @@ function parseUrlParams () {
                 streamSource = value + anchor;
             }
 
-            if (name === 'playerType') {
+            if (name === 'context') {
                 context = value;
             }
 
@@ -605,26 +605,42 @@ function metricUpdated(e) {
     }
 }
 
+function metricAdded(e) {
+
+  switch (e.data.metric) {
+        case  "State" :
+                if (e.data.stream === "video") {
+                    appendText("Video state = "+e.data.value.current);
+                    if (e.data.value.current === "buffering") {
+                         document.getElementById('bufferingDiv').style.visibility="visible";
+                    }else {
+                         document.getElementById('bufferingDiv').style.visibility="hidden";
+                    }
+                }
+                break;
+    }
+}
+
 function initPlayer() {
 
-    if (context !== undefined) {
-        switch(context){
-            case 'HAS' :
-                player = new MediaPlayer(new Custom.di.CustomContext());
-                break;
-            case 'HASNoCustomRule' :
-                player = new MediaPlayer(new Custom.di.CustomContextNoRule());
-                break;
-        }
-    } else {
-        player = new MediaPlayer(new Custom.di.CustomContext());
+    switch (context) {
+        case 'dash':
+            player = new MediaPlayer(new MediaPlayer.di.Context());
+            break;
+        case 'hasplayer_default':
+            player = new MediaPlayer(new Custom.di.CustomContextNoRule());
+            break;
+        case 'hasplayer_custom':
+        default:
+            player = new MediaPlayer(new Custom.di.CustomContext());
+            break;
     }
 
     player.startup();
     player.attachView(video);
     player.setAutoPlay(true);
     player.addEventListener("metricUpdated", metricUpdated.bind(this));
-    //player.addEventListener("metricAdded", update, false);
+    player.addEventListener("metricAdded", metricAdded.bind(this));
 
     /*var config = {
         "ABR.minQuality": 1,
