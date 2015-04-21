@@ -571,22 +571,18 @@ function parseUrlParams () {
         params = query.substring(1).split('&');
         for (i = 0; i < params.length; i++) {
             name = params[i].split('=')[0];
-            value = params[i].split('=')[1];
+            value = params[i].substr(name.length+1);
 
             if ((name === 'file') || (name === 'url')) {
                 streamSource = value + anchor;
-            }
-
-            if (name === 'context') {
+            } else  if (name === 'context') {
                 context = value;
-            }
-
-            if (name === 'metrics') {
+            } else if (name === 'metrics') {
                 enableMetrics = true;
-            }
-
-            if ((name === 'debug') && (value !== 'false')) {
+            } else if ((name === 'debug') && (value !== 'false')) {
                 document.getElementById('debugInfos').style.visibility="visible";
+            } else {
+                streamSource += '&' + params[i];
             }
         }
     }
