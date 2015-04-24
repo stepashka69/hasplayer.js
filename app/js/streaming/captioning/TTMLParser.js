@@ -162,7 +162,7 @@ MediaPlayer.utils.TTMLParser = function () {
                 nsttp,
                 nscue,
                 cssStyle,
-                i;
+                i, j;
 
             try {
                 ttml = converter.xml_str2json(data);
@@ -199,8 +199,8 @@ MediaPlayer.utils.TTMLParser = function () {
                     }
                     
                     if (ttml.tt.head.styling) {
-                         for (i = 0; i < ttml.tt.head.styling.style_asArray.length; i++) {
-                            var style = ttml.tt.head.styling.style_asArray[i];
+                         for (j = 0; j < ttml.tt.head.styling.style_asArray.length; j++) {
+                            var style = ttml.tt.head.styling.style_asArray[j];
                             if (style['xml:id'] === cue.style) {
                                 cssStyle = { backgroundColor: style['tts:backgroundColor'],
                                                  color: style['tts:color'],
@@ -212,8 +212,8 @@ MediaPlayer.utils.TTMLParser = function () {
                     }
 
                     if (ttml.tt.head.layout) {
-                        for (i = 0; i < ttml.tt.head.layout.region_asArray.length; i++) {
-                            var region = ttml.tt.head.layout.region_asArray[i];
+                        for (j = 0; j < ttml.tt.head.layout.region_asArray.length; j++) {
+                            var region = ttml.tt.head.layout.region_asArray[j];
                             if (region['xml:id'] === cue.region) {
                                 //line and position element have no effect on IE
                                 //For Chrome line = 11 is a workaround to reorder subtitles
@@ -229,7 +229,7 @@ MediaPlayer.utils.TTMLParser = function () {
                                 break;
                             }
                         }
-                    }else {
+                    } else {
                         captionArray.push({
                             start: startTime,
                             end: endTime,
