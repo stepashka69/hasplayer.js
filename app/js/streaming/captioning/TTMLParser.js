@@ -204,10 +204,16 @@ MediaPlayer.utils.TTMLParser = function () {
                 nsttp = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#parameter");
                 ttsPref = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#styling");
 
-                if (ttml.tt.hasOwnProperty(nsttp[0]+':' + "frameRate")) {
+                if (ttml.tt.hasOwnProperty(nsttp[0] === ""?"frameRate":nsttp[0]+':' + "frameRate")) {
                     ttml.tt.frameRate = parseInt(ttml.tt[nsttp[0]+':' + "frameRate"], 10);
                 }
 
+                if(!ttml.tt.body.div_asArray)
+                {
+                    errorMsg = "TTML document does not contain any div";
+                    return Q.reject(errorMsg);
+                }
+                
                 cues = ttml.tt.body.div_asArray[0].p_asArray;
 
                 if (!cues || cues.length === 0) {
