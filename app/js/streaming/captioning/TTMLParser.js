@@ -145,10 +145,37 @@ MediaPlayer.utils.TTMLParser = function () {
                 }).map(function(k){
                     return k.split(":")[1];
                 });
-            if (r.length != 1) {
-                return "";
+            if (r.length === 0) {
+               r[0] = "";
             }
-            return r[0]+':';
+
+            return r;
+        },
+
+        getRegionInfo = function (json, regionId) {
+            var j = 0;
+            if (json.head.layout) {
+                for (j = 0; j < json.head.layout.region_asArray.length; j++) {
+                    var region = json.head.layout.region_asArray[j];
+                    if (region['xml:id'] === regionId) {
+                        return region;
+                    }
+                }
+            }
+            return null;
+        },
+
+        getStyleInfo = function (json, styleId) {
+            var j = 0;
+            if (json.head.layout) {
+                for (j = 0; j < json.head.styling.style_asArray.length; j++) {
+                    var style = json.head.styling.style_asArray[j];
+                    if (style['xml:id'] === styleId) {
+                        return style;
+                    }
+                }
+            }
+            return null;
         },
 
         internalParse = function(data) {
@@ -162,6 +189,8 @@ MediaPlayer.utils.TTMLParser = function () {
                 nsttp,
                 nscue,
                 cssStyle,
+                ttsPref,
+                caption,
                 i, j;
 
             try {
@@ -173,9 +202,10 @@ MediaPlayer.utils.TTMLParser = function () {
                 }
 
                 nsttp = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#parameter");
+                ttsPref = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#styling");
 
-                if (ttml.tt.hasOwnProperty(nsttp + "frameRate")) {
-                    ttml.tt.frameRate = parseInt(ttml.tt[nsttp + "frameRate"], 10);
+                if (ttml.tt.hasOwnProperty(nsttp[0]+':' + "frameRate")) {
+                    ttml.tt.frameRate = parseInt(ttml.tt[nsttp[0]+':' + "frameRate"], 10);
                 }
 
                 cues = ttml.tt.body.div_asArray[0].p_asArray;
@@ -186,56 +216,55 @@ MediaPlayer.utils.TTMLParser = function () {
                 }
 
                 for (i = 0; i < cues.length; i += 1) {
+                    caption = null;
                     cue = cues[i];
 
                     nscue = getNamespacePrefix(cue,"http://www.w3.org/2006/10/ttaf1");
 
-                    startTime = parseTimings(cue[nscue+'begin']);
-                    endTime = parseTimings(cue[nscue+'end']);
+                    startTime = parseTimings(cue[nscue[0] === ""?'begin':nscue[0]+':'+'begin']);
+                    endTime = parseTimings(cue[nscue[0] === ""?'end':nscue[0]+':'+'end']);
 
                     if (isNaN(startTime) || isNaN(endTime)) {
                         errorMsg = "TTML document has incorrect timing value";
                         return Q.reject(errorMsg);
                     }
-                    
-                    if (ttml.tt.head.styling) {
-                         for (j = 0; j < ttml.tt.head.styling.style_asArray.length; j++) {
-                            var style = ttml.tt.head.styling.style_asArray[j];
-                            if (style['xml:id'] === cue.style) {
-                                cssStyle = { backgroundColor: style['tts:backgroundColor'],
-                                                 color: style['tts:color'],
-                                                 fontSize: style['tts:fontSize'],
-                                                 fontFamily: style['tts:fontFamily']};
-                                break;
-                            }
+
+                    if (cue.hasOwnProperty(nscue[0] === ""?"style":nscue[0]+':'+"style")) {
+                        var cueStyle = getStyleInfo(ttml.tt, cue[nscue[0] === ""?"style":nscue[0]+':'+"style"]);
+                        if (cueStyle) {
+                            cssStyle = { backgroundColor: cueStyle[ttsPref[0]+':'+'backgroundColor'],
+                                                 color: cueStyle[ttsPref[0]+':'+'color'],
+                                                 fontSize: cueStyle[ttsPref[0]+':'+'fontSize'],
+                                                 fontFamily: cueStyle[ttsPref[0]+':'+'fontFamily']};
                         }
                     }
 
-                    if (ttml.tt.head.layout) {
-                        for (j = 0; j < ttml.tt.head.layout.region_asArray.length; j++) {
-                            var region = ttml.tt.head.layout.region_asArray[j];
-                            if (region['xml:id'] === cue.region) {
-                                //line and position element have no effect on IE
-                                //For Chrome line = 11 is a workaround to reorder subtitles
-                                var origin_X = region['tts:origin'].split(' ')[0];
-                                captionArray.push({
+                    if (cue.hasOwnProperty(nscue[0] === ""?"region":nscue[0]+':' + "region")){
+                        var cueRegion = getRegionInfo(ttml.tt, cue[nscue[0] === ""?"region":nscue[0]+':' + "region"]);
+                        var prefix = getNamespacePrefix(cueRegion,"http://www.w3.org/2006/10/ttaf1");
+                        //line and position element have no effect on IE
+                        //For Chrome line = 11 is a workaround to reorder subtitles
+                        if (cueRegion) {
+                            if (cueRegion.hasOwnProperty(ttsPref[0]+':'+'origin')) {
+                            var origin_X = cueRegion[ttsPref[0]+':'+'origin'].split(' ')[0];
+                            caption = {
                                     start: startTime,
                                     end: endTime,
                                     data: cue.__text,
                                     position: parseInt(origin_X.substr(0, origin_X.length-1)),
                                     line:18,
-                                    style: cssStyle
-                                });
-                                break;
+                                    style: cssStyle};
                             }
                         }
-                    } else {
-                        captionArray.push({
-                            start: startTime,
-                            end: endTime,
-                            data: cue.__text
-                        });
                     }
+                    //style informations have not been found : add subtitles without it
+                    if (!caption) {
+                        caption = {
+                                    start: startTime,
+                                    end: endTime,
+                                    data: cue.__text};
+                    }
+                    captionArray.push(caption);
                 }
 
                 return Q.when(captionArray);
