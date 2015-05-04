@@ -24,6 +24,15 @@ MediaPlayer.utils.TTMLParser = function () {
 
     var SECONDS_IN_HOUR = 60 * 60,
         SECONDS_IN_MIN = 60,
+        TTAF_URI = "http://www.w3.org/2006/10/ttaf1",
+        TTAF_PARAMETER_URI = "http://www.w3.org/2006/10/ttaf1#parameter",
+        TTAF_STYLE_URI = "http://www.w3.org/2006/10/ttaf1#styling",
+        TTML_URI = "http://www.w3.org/ns/ttml",
+        TTML_PARAMETER_URI = "http://www.w3.org/ns/ttml#parameter",
+        TTML_STYLE_URI = "http://www.w3.org/ns/ttml#styling",
+        globalPrefTTNameSpace,
+        globalPrefStyleNameSpace,
+        globalPrefParameterNameSpace,
 
         // R0028 - A document must not contain a <timeExpression> value that does not conform to the subset of clock-time that
         // matches either of the following patterns: hh:mm:ss.mss or hh:mm:ss:ff, where hh denotes hours (00-23),
@@ -143,7 +152,14 @@ MediaPlayer.utils.TTMLParser = function () {
                 .filter(function(k){
                     return k.split(":")[0] === "xmlns" && json[k] === ns;
                 }).map(function(k){
-                    return k.split(":")[1];
+                    var splitValues = k.split(":");
+                    if (splitValues.length > 1) {
+                        return k.split(":")[1]+':';
+                    }
+                    else {
+                        //if namespace has been detected, without prefix value.
+                        return "";
+                    }
                 });
             if (r.length === 0) {
                r[0] = "";
@@ -152,30 +168,122 @@ MediaPlayer.utils.TTMLParser = function () {
             return r;
         },
 
-        getRegionInfo = function (json, regionId) {
+        getLocalNamespace = function(json, ns) {
+            var localNs = null;
+
+            switch(ns) {
+                case "ttml" :
+                    //define local namespace prefix for TTML
+                    localNs = getNamespacePrefix(json, TTAF_URI);
+
+                    if (localNs.length === 1 && localNs[0] === "") {
+                        localNs = getNamespacePrefix(json, TTML_URI);
+                    }
+                    break;
+                case "style"  :
+                    //define local namespace prefix for style
+                    localNs = getNamespacePrefix(json, TTAF_STYLE_URI);
+
+                    if (localNs.length === 1 && localNs[0] === "") {
+                        localNs = getNamespacePrefix(json, TTML_STYLE_URI);
+                    }
+                    break;
+                case "parameter" :
+                    localNs = getNamespacePrefix(json, TTML_PARAMETER_URI);
+                
+                    if (localNs.length === 1 && localNs[0] === "") {
+                        localNs = getNamespacePrefix(json, TTAF_PARAMETER_URI);
+                    }
+                    break;
+            }
+
+            return localNs;
+        },
+
+        getDataInfo = function (jsonLayout, jsonArrayName,infoName) {
             var j = 0;
-            if (json.head.layout) {
-                for (j = 0; j < json.head.layout.region_asArray.length; j++) {
-                    var region = json.head.layout.region_asArray[j];
-                    if (region['xml:id'] === regionId) {
-                        return region;
+            if (jsonLayout) {
+                for (j = 0; j < jsonLayout[jsonArrayName].length; j++) {
+                    var tab = jsonLayout[jsonArrayName][j];
+                    if (tab['xml:id'] === infoName) {
+                        return tab;
                     }
                 }
             }
             return null;
         },
 
-        getStyleInfo = function (json, styleId) {
+        getParameterValue = function (json, prefix, parameter) {
             var j = 0;
-            if (json.head.layout) {
-                for (j = 0; j < json.head.styling.style_asArray.length; j++) {
-                    var style = json.head.styling.style_asArray[j];
-                    if (style['xml:id'] === styleId) {
-                        return style;
-                    }
+
+            for (j = 0; j < prefix.length; j++) {
+                if (json.hasOwnProperty(prefix[j] === ""?parameter:prefix[j]+parameter)) {
+                    return json[prefix[j]+parameter];
                 }
             }
             return null;
+        },
+
+        findParameterInRegion = function (json, leaf, prefTT, prefStyle, parameter) {
+            var parameterValue = null,
+                localPrefTT = prefTT,
+                localPrefStyle = prefStyle,
+                leafStyle;
+
+            //find parameter in region referenced in the leaf
+            var cueRegion = getDataInfo(json.head.layout, 'region_asArray', getParameterValue(leaf, localPrefTT, 'region'));
+            if (cueRegion) {
+               
+                localPrefTT = getLocalNamespace(cueRegion,"ttml");
+                localPrefStyle = getLocalNamespace(cueRegion,"style");
+               
+                localPrefStyle = globalPrefStyleNameSpace.concat(localPrefStyle);
+                localPrefTT = globalPrefTTNameSpace.concat(localPrefTT);
+
+                parameterValue = getParameterValue(cueRegion, localPrefStyle, parameter);
+
+                if (!parameterValue) {
+                    //find parameter in style referenced in the region referenced in the leaf
+                    leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(cueRegion,localPrefTT,'style'));
+                    while(!parameterValue && leafStyle){                    
+                        parameterValue = getParameterValue(leafStyle,localPrefStyle,parameter);
+                        if (!parameterValue) {
+                            leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(leafStyle,localPrefTT,'style'));
+                            //is there another style referenced in this style?
+                            localPrefTT = getLocalNamespace(leafStyle,"ttml");
+                            localPrefStyle = getLocalNamespace(leafStyle,"style");
+               
+                            localPrefStyle = globalPrefStyleNameSpace.concat(localPrefStyle);
+                            localPrefTT = globalPrefTTNameSpace.concat(localPrefTT);
+                        }
+                    }
+                }
+            }
+
+            return parameterValue;
+        },
+
+        findParameter = function (json, leaf, prefTT, prefStyle, parameter) {
+            var parameterValue = null,
+                localPrefTT = prefTT,
+                localPrefStyle = prefStyle;
+
+            //find parameter in the leaf
+            parameterValue = getParameterValue(leaf,localPrefStyle,parameter);
+            if (!parameterValue) {
+                //find parameter in style referenced in the leaf
+                var leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(leaf,localPrefTT,'style'));
+                if (leafStyle) {
+                    parameterValue = getParameterValue(leafStyle,localPrefStyle,parameter);
+                    if (!parameterValue) {
+                        //find parameter in region referenced in the leaf
+                        parameterValue = findParameterInRegion(json, leaf, localPrefTT, localPrefStyle, parameter);
+                    }
+                }else{
+                   parameterValue = findParameterInRegion(json, leaf, localPrefTT, localPrefStyle, parameter);
+                }
+            }
+            return parameterValue;
         },
 
         internalParse = function(data) {
@@ -186,12 +294,18 @@ MediaPlayer.utils.TTMLParser = function () {
                 cue,
                 startTime,
                 endTime,
-                nsttp,
-                nscue,
-                cssStyle,
-                ttsPref,
+                cuePrefTTNameSpace,
+                cuePrefStyleNameSpace,
+                regionPrefTTNameSpace,
+                regionPrefStyleNameSpace,
+                cssStyle = {backgroundColor : null,
+                            color: null,
+                            fontSize: null,
+                            fontFamily: null
+                },
                 caption,
-                i, j;
+                i,
+                origin;
 
             try {
                 ttml = converter.xml_str2json(data);
@@ -201,11 +315,17 @@ MediaPlayer.utils.TTMLParser = function () {
                     return Q.reject(errorMsg);
                 }
 
-                nsttp = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#parameter");
-                ttsPref = getNamespacePrefix(ttml.tt, "http://www.w3.org/ns/ttml#styling");
+                //define global namespace prefix for TTML
+                globalPrefTTNameSpace = getLocalNamespace(ttml.tt,"ttml");
+                //define global namespace prefix for parameter
+                globalPrefParameterNameSpace =  getLocalNamespace(ttml.tt,"parameter");
+                //define global namespace prefix for style
+                globalPrefStyleNameSpace = getLocalNamespace(ttml.tt,"style");
 
-                if (ttml.tt.hasOwnProperty(nsttp[0] === ""?"frameRate":nsttp[0]+':' + "frameRate")) {
-                    ttml.tt.frameRate = parseInt(ttml.tt[nsttp[0]+':' + "frameRate"], 10);
+                var frameRate = getParameterValue(ttml.tt,globalPrefParameterNameSpace,"frameRate");
+
+                if (frameRate) {
+                    ttml.tt.frameRate = parseInt(frameRate, 10);
                 }
 
                 if(!ttml.tt.body.div_asArray)
@@ -224,52 +344,51 @@ MediaPlayer.utils.TTMLParser = function () {
                 for (i = 0; i < cues.length; i += 1) {
                     caption = null;
                     cue = cues[i];
+                    
+                    cuePrefTTNameSpace = getLocalNamespace(cue,"ttml");
+                    cuePrefStyleNameSpace = getLocalNamespace(cue,"style");
 
-                    nscue = getNamespacePrefix(cue,"http://www.w3.org/2006/10/ttaf1");
+                    //concate all known prefix parameters for TTML
+                    var prefTT = globalPrefTTNameSpace.concat(cuePrefTTNameSpace);
+                   
+                    startTime = parseTimings(getParameterValue(cue,prefTT,'begin'));
+                    endTime = parseTimings(getParameterValue(cue,prefTT,'end'));
 
-                    startTime = parseTimings(cue[nscue[0] === ""?'begin':nscue[0]+':'+'begin']);
-                    endTime = parseTimings(cue[nscue[0] === ""?'end':nscue[0]+':'+'end']);
-
+                    var prefStyle = globalPrefStyleNameSpace.concat(cuePrefStyleNameSpace);
+                    
                     if (isNaN(startTime) || isNaN(endTime)) {
                         errorMsg = "TTML document has incorrect timing value";
                         return Q.reject(errorMsg);
                     }
 
-                    if (cue.hasOwnProperty(nscue[0] === ""?"style":nscue[0]+':'+"style")) {
-                        var cueStyle = getStyleInfo(ttml.tt, cue[nscue[0] === ""?"style":nscue[0]+':'+"style"]);
-                        if (cueStyle) {
-                            cssStyle = { backgroundColor: cueStyle[ttsPref[0]+':'+'backgroundColor'],
-                                                 color: cueStyle[ttsPref[0]+':'+'color'],
-                                                 fontSize: cueStyle[ttsPref[0]+':'+'fontSize'],
-                                                 fontFamily: cueStyle[ttsPref[0]+':'+'fontFamily']};
-                        }
+                    /******************** Find style informations ***************************************
+                    *   1- in the cue
+                    *   2- in style element referenced in the cue
+                    *   3- in region
+                    *   4- in style referenced in the region referenced in the cue
+                    **************************************************************************************/
+                    cssStyle.backgroundColor = findParameter(ttml.tt, cue, prefTT, prefStyle, 'backgroundColor');
+                    cssStyle.color = findParameter(ttml.tt, cue, prefTT, prefStyle, 'color');
+                    cssStyle.fontSize = findParameter(ttml.tt, cue, prefTT, prefStyle, 'fontSize');
+                    cssStyle.fontFamily = findParameter(ttml.tt, cue, prefTT, prefStyle, 'fontFamily');
+                    origin = findParameter(ttml.tt, cue, prefTT, prefStyle, 'origin');
+
+                    //find X value
+                    if (origin) {
+                        origin = origin.split(' ')[0];
+                        origin = parseInt(origin.substr(0, origin.length-1))
                     }
 
-                    if (cue.hasOwnProperty(nscue[0] === ""?"region":nscue[0]+':' + "region")){
-                        var cueRegion = getRegionInfo(ttml.tt, cue[nscue[0] === ""?"region":nscue[0]+':' + "region"]);
-                        var prefix = getNamespacePrefix(cueRegion,"http://www.w3.org/2006/10/ttaf1");
-                        //line and position element have no effect on IE
-                        //For Chrome line = 11 is a workaround to reorder subtitles
-                        if (cueRegion) {
-                            if (cueRegion.hasOwnProperty(ttsPref[0]+':'+'origin')) {
-                            var origin_X = cueRegion[ttsPref[0]+':'+'origin'].split(' ')[0];
-                            caption = {
-                                    start: startTime,
-                                    end: endTime,
-                                    data: cue.__text,
-                                    position: parseInt(origin_X.substr(0, origin_X.length-1)),
-                                    line:18,
-                                    style: cssStyle};
-                            }
-                        }
-                    }
-                    //style informations have not been found : add subtitles without it
-                    if (!caption) {
-                        caption = {
-                                    start: startTime,
-                                    end: endTime,
-                                    data: cue.__text};
-                    }
+                    //line and position element have no effect on IE
+                    //For Chrome line = 18 is a workaround to reorder subtitles
+                    caption = {
+                                start: startTime,
+                                end: endTime,
+                                data: cue.__text,
+                                position: origin,
+                                line:18,
+                                style: cssStyle};
+
                     captionArray.push(caption);
                 }
 
