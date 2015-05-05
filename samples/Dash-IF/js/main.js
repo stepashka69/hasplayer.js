@@ -138,8 +138,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         previousPlayedQuality = 0,
         previousDownloadedQuality= 0,
         maxGraphPoints = 50,
-        initAudioTracks = true,
-        initTextTracks = true,
         metricsAgent = null,
         configMetrics = null;
 
@@ -349,6 +347,15 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 
+    function onload(e){
+        //init audio tracks
+        $scope.audioTracks = player.getAudioTracks();
+        $scope.audioData = $scope.audioTracks[0];
+        //init subtitles tracks
+        $scope.textTracks = player.getSubtitleTracks();
+        $scope.textData = $scope.textTracks[0];
+    }
+
     function onSubtitlesStyleChanged(style) {
         document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+style.data.fontSize+';font-family: '+style.data.fontFamily+'}';
     }
@@ -458,12 +465,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         metrics = getCribbedMetricsFor("audio");
         if (metrics) {
 
-            if (initAudioTracks) {
-                $scope.audioTracks = player.getAudioTracks();
-                $scope.audioData = $scope.audioTracks[0];
-                initAudioTracks = false;
-            }
-
             $scope.audioBitrate = metrics.bandwidthValue;
             $scope.audioIndex = metrics.bitrateIndexValue;
             $scope.audioPendingIndex = metrics.pendingIndex;
@@ -489,14 +490,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             if (audioSeries.length > maxGraphPoints) {
                 audioSeries.splice(0, 1);
             }
-        }
-    }
-
-    if (e.data.stream == "text") {
-        if (initTextTracks) {
-            $scope.textTracks = player.getSubtitleTracks();
-            $scope.textData = $scope.textTracks[0];
-            initTextTracks = false;
         }
     }
 
@@ -602,6 +595,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
+    video.addEventListener("loadeddata", onload.bind(this));
     player.attachView(video);
     player.setAutoPlay(true);
     player.getDebug().setLevel(4);
@@ -877,7 +871,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         });
     }
     function initPlayer() {
-        initAudioTracks = initTextTracks = true;
         
         function DRMParams() {
             this.backUrl = null;
