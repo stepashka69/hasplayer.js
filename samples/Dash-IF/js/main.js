@@ -139,7 +139,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         previousDownloadedQuality= 0,
         maxGraphPoints = 50,
         metricsAgent = null,
-        configMetrics = null;
+        configMetrics = null,
+        subtitlesCSSStyle = null;
 
     $scope.chromecast = {};
     $scope.chromecast.apiOk = false;
@@ -355,9 +356,27 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.textTracks = player.getSubtitleTracks();
         $scope.textData = $scope.textTracks[0];
     }
+    
+    //if video size change, player has to update subtitles size
+    function onFullScreenChange(){
+        setSubtitlesCSSStyle(subtitlesCSSStyle);
+    }
+
+
+    function setSubtitlesCSSStyle(style){
+        var fontSize = style.data.fontSize;
+
+        if (style.data.fontSize[style.data.fontSize.length-1] ==='%') {
+            fontSize  = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length-1))/100;
+        }
+
+        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+fontSize+'px;font-family: '+style.data.fontFamily+'}';
+    }
+
 
     function onSubtitlesStyleChanged(style) {
-        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+style.data.fontSize+';font-family: '+style.data.fontFamily+'}';
+        subtitlesCSSStyle = style;
+        setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
     function metricChanged(e) {
@@ -596,6 +615,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
     video.addEventListener("loadeddata", onload.bind(this));
+    video.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
+    video.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
+    video.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
     player.attachView(video);
     player.setAutoPlay(true);
     player.getDebug().setLevel(4);

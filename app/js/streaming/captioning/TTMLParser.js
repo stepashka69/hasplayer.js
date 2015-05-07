@@ -304,8 +304,7 @@ MediaPlayer.utils.TTMLParser = function () {
                             fontFamily: null
                 },
                 caption,
-                i,
-                origin;
+                i;
 
             try {
                 ttml = converter.xml_str2json(data);
@@ -371,22 +370,21 @@ MediaPlayer.utils.TTMLParser = function () {
                     cssStyle.color = findParameter(ttml.tt, cue, prefTT, prefStyle, 'color');
                     cssStyle.fontSize = findParameter(ttml.tt, cue, prefTT, prefStyle, 'fontSize');
                     cssStyle.fontFamily = findParameter(ttml.tt, cue, prefTT, prefStyle, 'fontFamily');
-                    origin = findParameter(ttml.tt, cue, prefTT, prefStyle, 'origin');
+                    var extent = findParameter(ttml.tt, cue, prefTT, prefStyle, 'extent');
 
-                    //find X value
-                    if (origin) {
-                        origin = origin.split(' ')[0];
-                        origin = parseInt(origin.substr(0, origin.length-1))
+                    if (cssStyle.fontSize[cssStyle.fontSize.length-1] ==='%' && extent) {
+                        extent = extent.split(' ')[1];
+                        extent = parseFloat(extent.substr(0, extent.length-1));
+                        cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length-1))*extent)/100+"%";
                     }
 
                     //line and position element have no effect on IE
-                    //For Chrome line = 18 is a workaround to reorder subtitles
+                    //For Chrome line = 80 is a percentage workaround to reorder subtitles
                     caption = {
                                 start: startTime,
                                 end: endTime,
                                 data: cue.__text,
-                                position: origin,
-                                line:18,
+                                line:80,
                                 style: cssStyle};
 
                     captionArray.push(caption);
