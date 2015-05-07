@@ -196,6 +196,7 @@ MediaPlayer = function (aContext) {
     system.injectInto(context);
 
     return {
+        notifier: undefined,
         debug: undefined,
         eventBus: undefined,
         capabilities: undefined,
