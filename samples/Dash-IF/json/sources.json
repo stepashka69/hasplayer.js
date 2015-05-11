@@ -34,9 +34,49 @@
             "type": "MSS",
             "name": "Smooth + PlayReady DRM + CustomData",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
-            "backUrl" : "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
-            "customData" : "B2C99B73-CA41-4003-84A3AA16CE92B304",
-            "browsers": "cdsbi"
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
+                    "customData": "B2C99B73-CA41-4003-84A3AA16CE92B304"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 1",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/0c6153f1MIB4_MSS/0c6153f1.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "7146A3D4-1AE8-4FA5-B209242420EAAF3F"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 2",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/046f5603MIB4_MSS/046f5603.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "A820A4C5-B7D6-4C76-9F722AF55CDBEA94"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 3",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/03094644MIB4_MSS/03094644.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "395E71B7-F659-4FE5-A60A64C4B2CDF6E0"
+                }
+            }
         },
         {
             "type": "MSS",
