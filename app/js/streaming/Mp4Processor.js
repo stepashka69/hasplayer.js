@@ -483,6 +483,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
                 case "avc1":
                     return createAVCVisualSampleEntry(track);
                 default:
+                    throw codec+" not supported";
                 break;
             }
         },
@@ -605,6 +606,7 @@ MediaPlayer.dependencies.Mp4Processor = function () {
             case "mp4a":
                 return createMP4AudioSampleEntry(track);
             default:
+                throw codec+" not supported";
                 break;
             }
 
