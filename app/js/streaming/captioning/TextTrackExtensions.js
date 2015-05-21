@@ -87,26 +87,7 @@ MediaPlayer.utils.TextTrackExtensions = function () {
             }
         },
 
-        removeCues: function(video, start, end) {
-            //when multiple tracks are supported - iterate through and delete all cues from all tracks.
-            if (video) {
-                var track = video.textTracks[0];
-                if (track) {
-                    var cues = track.cues;
-                    if (cues) {
-                        var lastIdx = cues.length - 1;
-
-                        for (var i = lastIdx; i >= 0 ; i -= 1) {
-                            if (cues[i].startTime >= start && cues[i].endTime <= end) {
-                                track.removeCue(cues[i]);
-                            }
-                        }
-                    }
-                }
-            }
-        },
-
-        deleteCues: function(video) {
+        deleteCues: function(video, disabled) {
             //when multiple tracks are supported - iterate through and delete all cues from all tracks.
             if (video) {
                 var track = video.textTracks[0];
@@ -121,7 +102,9 @@ MediaPlayer.utils.TextTrackExtensions = function () {
                     }
                     //noway to delete track, just disable it
                     //useful when player switchs between a stream with subtitles and an other one without.
-                    track.mode = "disabled";
+                    if (disabled) {
+                        track.mode = "disabled";
+                    }
                 }
             }
         }

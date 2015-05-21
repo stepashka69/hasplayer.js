@@ -101,7 +101,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
                 throw "INVALID_ACCESS_ERR";
             }
             
-            this.getTextTrackExtensions().removeCues(video, start, end);
+            this.getTextTrackExtensions().deleteCues(video, false);
             this.buffered.removeRange(start, end);
         },
 
@@ -194,7 +194,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
         },
 
         abort:function() {
-            this.getTextTrackExtensions().deleteCues(video);
+            this.getTextTrackExtensions().deleteCues(video, true);
         },
 
         getTextTrackExtensions:function() {
