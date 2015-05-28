@@ -80,6 +80,33 @@
         },
         {
             "type": "MSS",
+            "name": "TF1 Widevine (VOD)",
+            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN/TF1-WN.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=g+MuUfsOOFOm/ozQnpGBnw=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": ""
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine (Live)",
+            "url": "http://161.105.176.18/ss/ss/TF1-WN.isml/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": ""
+                }
+            }
+        },
+        {
+            "type": "MSS",
             "name": "VOD - SynchroAV 2 stream audio AAC+AACH",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3511/ATEME3511_clr_MSS_SynchroAV/Synchro_AV.ism/Manifest",
             "browsers": "cdsbi"
