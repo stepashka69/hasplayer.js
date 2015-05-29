@@ -31,8 +31,8 @@ module.exports = function(grunt) {
         'replace:copyright',        // Add the copyright
         'replace:noCopyright',      // Remove tag from files where no copyright is needed
         'replace:chromecastId',     // Change to Online APP_ID for chromecast
-        'clean:end',                 // Clean temp files
-		'jsdoc'
+		'jsdoc',					// Generate MediaPlayer JSDoc
+        'clean:end'                 // Clean temp files
     ]);
 
 };
