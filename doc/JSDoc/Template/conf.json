@@ -2,6 +2,9 @@
   "tags": {
     "allowUnknownTags": true
   },
+  "source": {
+        "include": ["../app/js/streaming/MediaPlayer.js"]
+  },
   "plugins": ["plugins/markdown"],
   "templates": {
     "cleverLinks": false,

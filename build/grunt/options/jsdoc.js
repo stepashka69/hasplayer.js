@@ -1,6 +1,5 @@
 module.exports = {
 	dist : {
-		src: ['../app/js/streaming/MediaPlayer.js'],
 		options:{
 			destination: '<%= path %>/doc/JSDoc/MediaPlayer/',
 			configure: '../doc/JSDoc/Template/conf.json',
