@@ -715,7 +715,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 metricsAgent.init(function (activated) {
                     $scope.metricsAgentActive = activated;
                     console.log("Metrics agent state: ", activated);
-                    $scope.$apply();
+                    setTimeout(function (){
+                        $scope.$apply();
+                    }, 500);
                     if (activated === false) {
                         alert("Metrics agent not available!");
                     }
