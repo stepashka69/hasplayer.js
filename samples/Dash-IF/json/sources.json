@@ -89,7 +89,7 @@
                 },
                 "com.widevine.alpha": {
                     "laURL": "http://widevine-proxy.appspot.com/proxy",
-                    "pssh": ""
+                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
                 }
             }
         },
@@ -101,7 +101,37 @@
             "protData": {
                 "com.widevine.alpha": {
                     "laURL": "http://widevine-proxy.appspot.com/proxy",
-                    "pssh": ""
+                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine Test (VOD)",
+            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN-test/TF1-WN-test.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=zsI+vcD1FB8Mq4/QpftMxg=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQh7LJSxP0WBaU0gg8/ekcrhoNd2lkZXZpbmVfdGVzdCIQMzMzMzMzMzMzMzMzMzMzMyoCU0QyAA=="
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine Test (Live)",
+            "url": "http://161.105.176.18/ss/ss/TF1-WN-test.isml/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=zsI+vcD1FB8Mq4/QpftMxg=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQh7LJSxP0WBaU0gg8/ekcrhoNd2lkZXZpbmVfdGVzdCIQMzMzMzMzMzMzMzMzMzMzMyoCU0QyAA=="
                 }
             }
         },
