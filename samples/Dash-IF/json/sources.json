@@ -34,9 +34,106 @@
             "type": "MSS",
             "name": "Smooth + PlayReady DRM + CustomData",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
-            "backUrl" : "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
-            "customData" : "B2C99B73-CA41-4003-84A3AA16CE92B304",
-            "browsers": "cdsbi"
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
+                    "customData": "B2C99B73-CA41-4003-84A3AA16CE92B304"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 1",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/0c6153f1MIB4_MSS/0c6153f1.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "7146A3D4-1AE8-4FA5-B209242420EAAF3F"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 2",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/046f5603MIB4_MSS/046f5603.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "A820A4C5-B7D6-4C76-9F722AF55CDBEA94"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "VODEW2.1 Test 3",
+            "url": "http://cmsew.ak.inter-cdnrd.orange-business.com/CMS/Smooth/03094644MIB4_MSS/03094644.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
+                    "customData": "395E71B7-F659-4FE5-A60A64C4B2CDF6E0"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine (VOD)",
+            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN/TF1-WN.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=g+MuUfsOOFOm/ozQnpGBnw=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine (Live)",
+            "url": "http://161.105.176.18/ss/ss/TF1-WN.isml/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine Test (VOD)",
+            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN-test/TF1-WN-test.ism/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=zsI+vcD1FB8Mq4/QpftMxg=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQh7LJSxP0WBaU0gg8/ekcrhoNd2lkZXZpbmVfdGVzdCIQMzMzMzMzMzMzMzMzMzMzMyoCU0QyAA=="
+                }
+            }
+        },
+        {
+            "type": "MSS",
+            "name": "TF1 Widevine Test (Live)",
+            "url": "http://161.105.176.18/ss/ss/TF1-WN-test.isml/Manifest",
+            "browsers": "cdsbi",
+            "protData": {
+                "com.microsoft.playready": {
+                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=zsI+vcD1FB8Mq4/QpftMxg=="
+                },
+                "com.widevine.alpha": {
+                    "laURL": "http://widevine-proxy.appspot.com/proxy",
+                    "pssh": "AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQh7LJSxP0WBaU0gg8/ekcrhoNd2lkZXZpbmVfdGVzdCIQMzMzMzMzMzMzMzMzMzMzMyoCU0QyAA=="
+                }
+            }
         },
         {
             "type": "MSS",
