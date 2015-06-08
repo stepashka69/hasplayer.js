@@ -32,8 +32,7 @@
             this.system.notify('setContext','MPD');
             parser = this.dashParser;
         } else {
-            console.error("manifest cannot be parse, type is unknown !");
-            return Q.when(null);
+            return Q.reject("manifest cannot be parse, type is unknown !")
         }
 
         return parser.parse(data,baseUrl);
