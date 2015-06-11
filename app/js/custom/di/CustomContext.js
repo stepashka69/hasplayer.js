@@ -25,15 +25,20 @@
 
             // erase the "parser" with CustomParser.
             this.system.mapClass('parser', Custom.dependencies.CustomParser);
+
             // Then, our parser will choose which parser call between Dash, Mss and Hls. To do that, it need references
             this.system.mapClass('dashParser', Dash.dependencies.DashParser);
+            // @if INCLUDE_MSS=true
             this.system.mapClass('mssParser', Mss.dependencies.MssParser);
+            // @endif
+            // @if INCLUDE_HLS=true
             this.system.mapClass('hlsParser', Hls.dependencies.HlsParser);
             this.system.mapClass('hlsDemux', Hls.dependencies.HlsDemux);
+            // @endif
 
             // creation of a context manager to plug some specific parts of the code
             this.system.mapSingleton('contextManager', Custom.modules.ContextManager);
-            
+
             // here replace dash or streaming modules by ours
             this.system.mapClass('fragmentLoader', Custom.dependencies.CustomFragmentLoader);
             this.system.mapSingleton('metricsModel', Custom.models.CustomMetricsModel);
