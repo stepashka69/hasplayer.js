@@ -745,7 +745,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                         alert("Metrics agent not available!");
                     }
                 });
-            } else {
+            } else if (metricsAgent) {
                 metricsAgent.stop();
             }
         }
