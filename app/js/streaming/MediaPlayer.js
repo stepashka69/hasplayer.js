@@ -41,656 +41,696 @@
  * @param aContext - context used by the MediaPlayer. For the hasplayer, CustomContext is used. The context class is used to
  * inject dijon dependances.
  */
-MediaPlayer = function (aContext) {
-    "use strict";
 
-/*
- *
- */
-    var VERSION = "1.2.0",
-        VERSION_HAS = "1.2.0_dev",
-        GIT_TAG = "@@REVISION",
-        BUILD_DATE = "@@TIMESTAMP",
-        context = aContext,
-        system,
-        element,
-        source,
-        protectionData = null,
-        streamController,
-        videoModel,
-        initialized = false,
-        playing = false,
-        autoPlay = true,
-        scheduleWhilePaused = false,
-        bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
+(function(){
 
-        /**
-         * is hasplayer ready to play the stream? element and source have been setted?
-         * @return true if ready, false otherwise.
-         * @access public
-         */
-        isReady = function () {
-            return (!!element && !!source);
-        },
+    var MediaPlayer = function (aContext) {
+        "use strict";
 
-        /**
-         * start to play the selected stream
-         * @access public
-         */
-        play = function () {
-            if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
-            }
+    /*
+     *
+     */
+        var VERSION = "1.2.0",
+            VERSION_HAS = "1.2.0_dev",
+            GIT_TAG = "@@REVISION",
+            BUILD_DATE = "@@TIMESTAMP",
+            context = aContext,
+            system,
+            element,
+            source,
+            protectionData = null,
+            streamController,
+            videoModel,
+            initialized = false,
+            playing = false,
+            autoPlay = true,
+            scheduleWhilePaused = false,
+            bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
 
-            if (!this.capabilities.supportsMediaSource()) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE);
-                return;
-            }
+            /**
+             * is hasplayer ready to play the stream? element and source have been setted?
+             * @return true if ready, false otherwise.
+             * @access public
+             */
+            isReady = function () {
+                return (!!element && !!source);
+            },
 
-            if (!element || !source) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "Missing view or source.");
-                return;
-            }
+            /**
+             * start to play the selected stream
+             * @access public
+             */
+            play = function () {
+                if (!initialized) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
+                    return;
+                }
 
-            playing = true;
+                if (!this.capabilities.supportsMediaSource()) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE);
+                    return;
+                }
 
-            //this.debug.log("Playback initiated!");
-            if (!streamController) {
-                streamController = system.getObject("streamController");
-                streamController.setVideoModel(videoModel);
-                streamController.setAutoPlay(autoPlay);
-            }
-            // ORANGE: add source stream parameters
-            streamController.load(source, protectionData);
-            system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
-            system.mapOutlet("scheduleWhilePaused", "stream");
-            system.mapOutlet("scheduleWhilePaused", "bufferController");
-            system.mapValue("bufferMax", bufferMax);
-            system.injectInto(this.bufferExt, "bufferMax");
-        },
+                if (!element || !source) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "Missing view or source.");
+                    return;
+                }
 
-        doAutoPlay = function () {
-            if (isReady()) {
-                play.call(this);
-            }
-        },
+                playing = true;
 
-        getDVRInfoMetric = function() {
-            var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
-            return this.metricsExt.getCurrentDVRInfo(metric);
-        },
+                //this.debug.log("Playback initiated!");
+                if (!streamController) {
+                    streamController = system.getObject("streamController");
+                    streamController.setVideoModel(videoModel);
+                    streamController.setAutoPlay(autoPlay);
+                }
+                // ORANGE: add source stream parameters
+                streamController.load(source, protectionData);
+                system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
+                system.mapOutlet("scheduleWhilePaused", "stream");
+                system.mapOutlet("scheduleWhilePaused", "bufferController");
+                system.mapValue("bufferMax", bufferMax);
+                system.injectInto(this.bufferExt, "bufferMax");
+            },
 
-        /**
-         * TBD
-         * @return DVR window size
-         * @access public
-         */
-        getDVRWindowSize = function() {
-            return getDVRInfoMetric.call(this).mpd.timeShiftBufferDepth;
-        },
+            doAutoPlay = function () {
+                if (isReady()) {
+                    play.call(this);
+                }
+            },
 
-        /**
-         * TBD
-         * @param  value
-         * @return DVR seek offset
-         * @access public
-         */
-        getDVRSeekOffset = function (value) {
-            var metric = getDVRInfoMetric.call(this),
-                val = metric.range.start + parseInt(value, 10);
+            getDVRInfoMetric = function() {
+                var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
+                return this.metricsExt.getCurrentDVRInfo(metric);
+            },
 
-            if (val > metric.range.end)
-            {
-                val = metric.range.end;
-            }
+            /**
+             * TBD
+             * @return DVR window size
+             * @access public
+             */
+            getDVRWindowSize = function() {
+                return getDVRInfoMetric.call(this).mpd.timeShiftBufferDepth;
+            },
 
-            return val;
-        },
+            /**
+             * TBD
+             * @param  value
+             * @return DVR seek offset
+             * @access public
+             */
+            getDVRSeekOffset = function (value) {
+                var metric = getDVRInfoMetric.call(this),
+                    val = metric.range.start + parseInt(value, 10);
 
-        /**
-         * seek to a special time (seconds) in the stream.
-         * html5 video currentTime parameter is better to use than this function.
-         * @access public
-         */
-        seek = function(value) {
+                if (val > metric.range.end)
+                {
+                    val = metric.range.end;
+                }
 
-            videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
-        },
+                return val;
+            },
 
-        /**
-         * TBD
-         * @access public
-         */
-        time = function () {
-            var metric = getDVRInfoMetric.call(this);
-            return (metric === null) ? 0 : Math.round(this.duration() - (metric.range.end - metric.time));
-        },
+            /**
+             * seek to a special time (seconds) in the stream.
+             * html5 video currentTime parameter is better to use than this function.
+             * @access public
+             */
+            seek = function(value) {
 
-        /**
-         * TBD
-         * @access public
-         */
-        duration  = function() {
-            var metric = getDVRInfoMetric.call(this),
-                range;
+                videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            },
 
-            if (metric === null){
-                return 0;
-            }
+            /**
+             * TBD
+             * @access public
+             */
+            time = function () {
+                var metric = getDVRInfoMetric.call(this);
+                return (metric === null) ? 0 : Math.round(this.duration() - (metric.range.end - metric.time));
+            },
 
-            range = metric.range.end - metric.range.start;
+            /**
+             * TBD
+             * @access public
+             */
+            duration  = function() {
+                var metric = getDVRInfoMetric.call(this),
+                    range;
 
-            return Math.round(range < metric.mpd.timeShiftBufferDepth ? range : metric.mpd.timeShiftBufferDepth);
-        },
+                if (metric === null){
+                    return 0;
+                }
 
-        /**
-         * TBD
-         * @access public
-         */
-        timeAsUTC = function () {
-            var metric = getDVRInfoMetric.call(this),
-                availabilityStartTime,
-                currentUTCTime;
+                range = metric.range.end - metric.range.start;
 
-            if (metric === null){
-                return 0;
-            }
+                return Math.round(range < metric.mpd.timeShiftBufferDepth ? range : metric.mpd.timeShiftBufferDepth);
+            },
 
-            availabilityStartTime = metric.mpd.availabilityStartTime.getTime() / 1000;
-            currentUTCTime = this.time() + (availabilityStartTime + metric.range.start);
+            /**
+             * TBD
+             * @access public
+             */
+            timeAsUTC = function () {
+                var metric = getDVRInfoMetric.call(this),
+                    availabilityStartTime,
+                    currentUTCTime;
 
-            return Math.round(currentUTCTime);
-        },
+                if (metric === null){
+                    return 0;
+                }
 
-        /**
-         * TBD
-         * @access public
-         */
-        durationAsUTC = function () {
-            var metric = getDVRInfoMetric.call(this),
-                availabilityStartTime,
-                currentUTCDuration;
+                availabilityStartTime = metric.mpd.availabilityStartTime.getTime() / 1000;
+                currentUTCTime = this.time() + (availabilityStartTime + metric.range.start);
 
-            if (metric === null){
-                return 0;
-            }
+                return Math.round(currentUTCTime);
+            },
 
-            availabilityStartTime = metric.mpd.availabilityStartTime.getTime() / 1000;
-            currentUTCDuration = (availabilityStartTime + metric.range.start) + this.duration();
+            /**
+             * TBD
+             * @access public
+             */
+            durationAsUTC = function () {
+                var metric = getDVRInfoMetric.call(this),
+                    availabilityStartTime,
+                    currentUTCDuration;
 
-            return Math.round(currentUTCDuration);
-        },
+                if (metric === null){
+                    return 0;
+                }
 
-        /**
-         * TBD
-         * @param  time - .
-         * @param  locales - .
-         * @param  hour12 - .
-         * @return formatted UTC time.
-         * @access public
-         */
-        formatUTC = function (time, locales, hour12) {
-            var dt = new Date(time*1000);
-            var d = dt.toLocaleDateString(locales);
-            var t = dt.toLocaleTimeString(locales, {hour12:hour12});
-            return t +' '+d;
-        },
+                availabilityStartTime = metric.mpd.availabilityStartTime.getTime() / 1000;
+                currentUTCDuration = (availabilityStartTime + metric.range.start) + this.duration();
 
-        /**
-         * TBD
-         * @param  value - .
-         * @return time code value
-         * @access public
-         */
-        convertToTimeCode = function (value) {
-            value = Math.max(value, 0);
+                return Math.round(currentUTCDuration);
+            },
 
-            var h = Math.floor(value/3600);
-            var m = Math.floor((value%3600)/60);
-            var s = Math.floor((value%3600)%60);
-            return (h === 0 ? "":(h<10 ? "0"+h.toString()+":" : h.toString()+":"))+(m<10 ? "0"+m.toString() : m.toString())+":"+(s<10 ? "0"+s.toString() : s.toString());
-        };
+            /**
+             * TBD
+             * @param  time - .
+             * @param  locales - .
+             * @param  hour12 - .
+             * @return formatted UTC time.
+             * @access public
+             */
+            formatUTC = function (time, locales, hour12) {
+                var dt = new Date(time*1000);
+                var d = dt.toLocaleDateString(locales);
+                var t = dt.toLocaleTimeString(locales, {hour12:hour12});
+                return t +' '+d;
+            },
 
+            /**
+             * TBD
+             * @param  value - .
+             * @return time code value
+             * @access public
+             */
+            convertToTimeCode = function (value) {
+                value = Math.max(value, 0);
 
+                var h = Math.floor(value/3600);
+                var m = Math.floor((value%3600)/60);
+                var s = Math.floor((value%3600)%60);
+                return (h === 0 ? "":(h<10 ? "0"+h.toString()+":" : h.toString()+":"))+(m<10 ? "0"+m.toString() : m.toString())+":"+(s<10 ? "0"+s.toString() : s.toString());
+            },
 
-    // Set up DI.
-    system = new dijon.System();
-    system.mapValue("system", system);
-    system.mapOutlet("system");
-    system.injectInto(context);
+            // UMD check for dijon
+            setupDI = function(){
+                var instanciateSystem  = function(di){
+                     system = new di.System();
+                    system.mapValue("system", system);
+                    system.mapOutlet("system");
+                    system.injectInto(context);
+                };
 
-    return {
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * debug object reference
-         */
-        notifier: undefined,
-        debug: undefined,
-        eventBus: undefined,
-        capabilities: undefined,
-        abrController: undefined,
-        metricsModel: undefined,
-        metricsExt: undefined,
-        bufferExt: undefined,
-        errHandler: undefined,
-        tokenAuthentication:undefined,
-        uriQueryFragModel:undefined,
-        // ORANGE: add config manager
-        config: undefined,
+                if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
+                  require("dijon", function(dijon){
+                       instanciateSystem(dijon);
+                  });
+                } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
+                   require("dijon", function(dijon){
+                       instanciateSystem(dijon);
+                  });
 
-        /**
-         * function used to register webapp function on hasplayer events
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  type - event type event type log, error, subtitlesStyleChanged, updateend, manifestLoaded, metricChanged, metricsChanged, metricAdded
-         *  and metricUpdated.
-         * @param  listener - function callback name.
-         * @param  useCapture - .
-         */
-        addEventListener: function (type, listener, useCapture) {
-            if (!initialized) {
-                //not used sendError....listener must be registered to use it.
-                throw "MediaPlayer not initialized!";
-            }
+                } else if (typeof window !== "undefined" && window !== null) {
+                    instanciateSystem(dijon);
+                }
 
-            this.eventBus.addEventListener(type, listener, useCapture);
-        },
+            };
 
-        /**
-         * function used to unregister webapp function on hasplayer events
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  type - event type : log, error, subtitlesStyleChanged, updateend, manifestLoaded, metricChanged, metricsChanged, metricAdded
-         *  and metricUpdated.
-         * @param  listener - function callback name.
-         * @param  useCapture - .
-         * @return TBD
-         */
-        removeEventListener: function (type, listener, useCapture) {
-            this.eventBus.removeEventListener(type, listener, useCapture);
-        },
+        // Set up DI.
+        setupDI();
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getVersion: function () {
-            return VERSION;
-        },
+        return {
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * debug object reference
+             */
+            notifier: undefined,
+            debug: undefined,
+            eventBus: undefined,
+            capabilities: undefined,
+            abrController: undefined,
+            metricsModel: undefined,
+            metricsExt: undefined,
+            bufferExt: undefined,
+            errHandler: undefined,
+            tokenAuthentication:undefined,
+            uriQueryFragModel:undefined,
+            // ORANGE: add config manager
+            config: undefined,
 
-        /**
-         * get the HAS version
-         * @access public
-         * @memberof MediaPlayer#
-         * @return hasplayer version
-         */
-        getVersionHAS: function () {
-            return VERSION_HAS;
-        },
+            /**
+             * function used to register webapp function on hasplayer events
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  type - event type event type log, error, subtitlesStyleChanged, updateend, manifestLoaded, metricChanged, metricsChanged, metricAdded
+             *  and metricUpdated.
+             * @param  listener - function callback name.
+             * @param  useCapture - .
+             */
+            addEventListener: function (type, listener, useCapture) {
+                if (!initialized) {
+                    //not used sendError....listener must be registered to use it.
+                    throw "MediaPlayer not initialized!";
+                }
 
-        /**
-         * get the full version (with git tag, only at build)
-         * @access public
-         * @memberof MediaPlayer#
-         * @return full hasplayer version
-         */
-        getVersionFull: function () {
-            if (GIT_TAG.indexOf("@@") === -1) {
-                return VERSION_HAS + '_' + GIT_TAG;
-            } else {
+                this.eventBus.addEventListener(type, listener, useCapture);
+            },
+
+            /**
+             * function used to unregister webapp function on hasplayer events
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  type - event type : log, error, subtitlesStyleChanged, updateend, manifestLoaded, metricChanged, metricsChanged, metricAdded
+             *  and metricUpdated.
+             * @param  listener - function callback name.
+             * @param  useCapture - .
+             * @return TBD
+             */
+            removeEventListener: function (type, listener, useCapture) {
+                this.eventBus.removeEventListener(type, listener, useCapture);
+            },
+
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getVersion: function () {
+                return VERSION;
+            },
+
+            /**
+             * get the HAS version
+             * @access public
+             * @memberof MediaPlayer#
+             * @return hasplayer version
+             */
+            getVersionHAS: function () {
                 return VERSION_HAS;
-            }
-        },
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return date when the hasplayer has been built.
-         */
-        getBuildDate: function() {
-            if (BUILD_DATE.indexOf("@@") === -1) {
-                return BUILD_DATE;
-            } else {
-                return 'Not a builded version';
-            }
-        },
+            /**
+             * get the full version (with git tag, only at build)
+             * @access public
+             * @memberof MediaPlayer#
+             * @return full hasplayer version
+             */
+            getVersionFull: function () {
+                if (GIT_TAG.indexOf("@@") === -1) {
+                    return VERSION_HAS + '_' + GIT_TAG;
+                } else {
+                    return VERSION_HAS;
+                }
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         */
-        startup: function () {
-            if (!initialized) {
-                system.injectInto(this);
-                initialized = true;
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return date when the hasplayer has been built.
+             */
+            getBuildDate: function() {
+                if (BUILD_DATE.indexOf("@@") === -1) {
+                    return BUILD_DATE;
+                } else {
+                    return 'Not a builded version';
+                }
+            },
 
-                this.debug.log("[MediaPlayer] Version: " + this.getVersionFull() + " - " + this.getBuildDate());
-                this.debug.log("[MediaPlayer] user-agent: " + navigator.userAgent);
-            }
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             */
+            startup: function () {
+                if (!initialized) {
+                    system.injectInto(this);
+                    initialized = true;
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getDebug: function () {
-            return this.debug;
-        },
+                    this.debug.log("[MediaPlayer] Version: " + this.getVersionFull() + " - " + this.getBuildDate());
+                    this.debug.log("[MediaPlayer] user-agent: " + navigator.userAgent);
+                }
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getVideoModel: function () {
-            return videoModel;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getDebug: function () {
+                return this.debug;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @param value - .
-         */
-        setAutoPlay: function (value) {
-            autoPlay = value;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getVideoModel: function () {
+                return videoModel;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getAutoPlay: function () {
-            return autoPlay;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @param value - .
+             */
+            setAutoPlay: function (value) {
+                autoPlay = value;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @param value - .
-         */
-        setScheduleWhilePaused: function(value) {
-            scheduleWhilePaused = value;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getAutoPlay: function () {
+                return autoPlay;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getScheduleWhilePaused: function() {
-            return scheduleWhilePaused;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @param value - .
+             */
+            setScheduleWhilePaused: function(value) {
+                scheduleWhilePaused = value;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @param name - .
-         * @param type - .
-         */
-        setTokenAuthentication:function(name, type) {
-            this.tokenAuthentication.setTokenAuthentication({name:name, type:type});
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getScheduleWhilePaused: function() {
+                return scheduleWhilePaused;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @param value - .
-         */
-        setBufferMax: function(value) {
-            bufferMax = value;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @param name - .
+             * @param type - .
+             */
+            setTokenAuthentication:function(name, type) {
+                this.tokenAuthentication.setTokenAuthentication({name:name, type:type});
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getBufferMax: function() {
-            return bufferMax;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @param value - .
+             */
+            setBufferMax: function(value) {
+                bufferMax = value;
+            },
 
-        /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @return TBD
-         */
-        getMetricsExt: function () {
-            return this.metricsExt;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getBufferMax: function() {
+                return bufferMax;
+            },
 
-        /**
-         * get metrics for stream type
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  type - stream type, video or audio.
-         * @return metrics array for the selected type
-         */
-        getMetricsFor: function (type) {
-            var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
-            return metrics;
-        },
+            /**
+             * @access public
+             * @memberof MediaPlayer#
+             * @return TBD
+             */
+            getMetricsExt: function () {
+                return this.metricsExt;
+            },
 
-        /**
-         * get current quality for a stream
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  type - stream type, video or audio.
-         * @return current quality for the selected type.
-         */
-        getQualityFor: function (type) {
-            return this.abrController.getQualityFor(type);
-        },
+            /**
+             * get metrics for stream type
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  type - stream type, video or audio.
+             * @return metrics array for the selected type
+             */
+            getMetricsFor: function (type) {
+                var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
+                return metrics;
+            },
 
-        /**
-         * select quality level for audio or video stream.
-         * If you want to set limit up and down for video for instance, you have to use setConfig function.
-         * @access public
-         * @memberof MediaPlayer#
-         * @param type - audio or video stream type.
-         * @param value - selected quality level, id of the quality not bitrate.
-         */
-        setQualityFor: function (type, value) {
-            this.abrController.setPlaybackQuality(type, value);
-        },
+            /**
+             * get current quality for a stream
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  type - stream type, video or audio.
+             * @return current quality for the selected type.
+             */
+            getQualityFor: function (type) {
+                return this.abrController.getQualityFor(type);
+            },
 
-        /**
-         * function to get auto switch quality status.
-         * @access public
-         * @memberof MediaPlayer#
-         * @return auto switch quality, true or false.
-         */
-        getAutoSwitchQuality : function () {
-            return this.abrController.getAutoSwitchBitrate();
-        },
+            /**
+             * select quality level for audio or video stream.
+             * If you want to set limit up and down for video for instance, you have to use setConfig function.
+             * @access public
+             * @memberof MediaPlayer#
+             * @param type - audio or video stream type.
+             * @param value - selected quality level, id of the quality not bitrate.
+             */
+            setQualityFor: function (type, value) {
+                this.abrController.setPlaybackQuality(type, value);
+            },
 
-        /**
-         * function to enable or disable auto switch quality by ABR controller.
-         * @access public
-         * @memberof MediaPlayer#
-         * @param value - true or false auto switch quality
-         */
-        setAutoSwitchQuality : function (value) {
-            this.abrController.setAutoSwitchBitrate(value);
-        },
+            /**
+             * function to get auto switch quality status.
+             * @access public
+             * @memberof MediaPlayer#
+             * @return auto switch quality, true or false.
+             */
+            getAutoSwitchQuality : function () {
+                return this.abrController.getAutoSwitchBitrate();
+            },
 
-        /**
-         * function to set some player configuration parameters
-         * @access public
-         * @memberof MediaPlayer#
-         * @param params - configuration parameters
-         * @see {@link http://localhost:8080/OrangeHasPlayer/samples/Dash-IF/hasplayer_config.json}
-         *
-         */
-        setConfig: function (params) {
-            if (this.config && params) {
-                this.debug.log("[MediaPlayer] set config: " + JSON.stringify(params, null, '\t'));
-                this.config.setParams(params);
-                this.debug.setLevel(this.config.getParam("Debug.level", "number", this.debug.ALL));
-            }
-        },
+            /**
+             * function to enable or disable auto switch quality by ABR controller.
+             * @access public
+             * @memberof MediaPlayer#
+             * @param value - true or false auto switch quality
+             */
+            setAutoSwitchQuality : function (value) {
+                this.abrController.setAutoSwitchBitrate(value);
+            },
 
-        /**
-         * function to switch audioTracks for a media
-         * @access public
-         * @memberof MediaPlayer#
-         * @param audioTrack - The selected audio track.
-         */
-        setAudioTrack: function(audioTrack){
-            streamController.setAudioTrack(audioTrack);
-        },
+            /**
+             * function to set some player configuration parameters
+             * @access public
+             * @memberof MediaPlayer#
+             * @param params - configuration parameters
+             * @see {@link http://localhost:8080/OrangeHasPlayer/samples/Dash-IF/hasplayer_config.json}
+             *
+             */
+            setConfig: function (params) {
+                if (this.config && params) {
+                    this.debug.log("[MediaPlayer] set config: " + JSON.stringify(params, null, '\t'));
+                    this.config.setParams(params);
+                    this.debug.setLevel(this.config.getParam("Debug.level", "number", this.debug.ALL));
+                }
+            },
 
-        /**
-         * get the audio track list
-         * @access public
-         * @memberof MediaPlayer#
-         * @return audio tracks array.
-         */
-        getAudioTracks: function(){
-            return streamController.getAudioTracks();
-        },
+            /**
+             * function to switch audioTracks for a media
+             * @access public
+             * @memberof MediaPlayer#
+             * @param audioTrack - The selected audio track.
+             */
+            setAudioTrack: function(audioTrack){
+                streamController.setAudioTrack(audioTrack);
+            },
 
-        /**
-         * add function to switch subtitleTracks for a media
-         * @access public
-         * @memberof MediaPlayer#
-         * @param subtitleTrack - The selected subtitle track.
-         */
-        setSubtitleTrack: function(subtitleTrack){
-            streamController.setSubtitleTrack(subtitleTrack);
-        },
+            /**
+             * get the audio track list
+             * @access public
+             * @memberof MediaPlayer#
+             * @return audio tracks array.
+             */
+            getAudioTracks: function(){
+                return streamController.getAudioTracks();
+            },
 
-        /**
-         * get the subtitle track list
-         * @access public
-         * @memberof MediaPlayer#
-         * @return subtitle tracks array.
-         */
-        getSubtitleTracks: function(){
-            return streamController.getSubtitleTracks();
-        },
+            /**
+             * add function to switch subtitleTracks for a media
+             * @access public
+             * @memberof MediaPlayer#
+             * @param subtitleTrack - The selected subtitle track.
+             */
+            setSubtitleTrack: function(subtitleTrack){
+                streamController.setSubtitleTrack(subtitleTrack);
+            },
 
-        /**
-         * set the video element in the hasplayer.js
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  view - html5 video element
-         */
-        attachView: function (view) {
-            if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
-            }
+            /**
+             * get the subtitle track list
+             * @access public
+             * @memberof MediaPlayer#
+             * @return subtitle tracks array.
+             */
+            getSubtitleTracks: function(){
+                return streamController.getSubtitleTracks();
+            },
 
-            element = view;
+            /**
+             * set the video element in the hasplayer.js
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  view - html5 video element
+             */
+            attachView: function (view) {
+                if (!initialized) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
+                    return;
+                }
 
-            videoModel = null;
-            if (element) {
-                videoModel = system.getObject("videoModel");
-                videoModel.setElement(element);
-            }
+                element = view;
 
-            // TODO : update
-            if (playing && streamController) {
-                streamController.reset();
-                playing = false;
-            }
+                videoModel = null;
+                if (element) {
+                    videoModel = system.getObject("videoModel");
+                    videoModel.setElement(element);
+                }
 
-            if (isReady.call(this)) {
-                doAutoPlay.call(this);
-            }
-        },
+                // TODO : update
+                if (playing && streamController) {
+                    streamController.reset();
+                    playing = false;
+                }
 
-        /**
-         * add source stream parameters (ex: DRM custom data)
-         * @function
-         * @access public
-         * @memberof MediaPlayer#
-         * @param  url - video stream url to play, it could be dash, smooth or hls.
-         * @param  params - datas like back Url licenser and custom datas
-         */
-        attachSource: function (url, protData) {
-            var loop,
-                videoModel;
+                if (isReady.call(this)) {
+                    doAutoPlay.call(this);
+                }
+            },
 
-            if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
-            }          
-                        
-            videoModel = this.getVideoModel();
+            /**
+             * add source stream parameters (ex: DRM custom data)
+             * @function
+             * @access public
+             * @memberof MediaPlayer#
+             * @param  url - video stream url to play, it could be dash, smooth or hls.
+             * @param  params - datas like back Url licenser and custom datas
+             */
+            attachSource: function (url, protData) {
+                var loop,
+                    videoModel;
 
-            if (!videoModel) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "videoModel not initialized");
-                return;
-            }
+                if (!initialized) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
+                    return;
+                }          
+                            
+                videoModel = this.getVideoModel();
 
-            // ORANGE : add metric
-            loop = videoModel.getElement().loop;
-            this.metricsModel.addSession(null, url, loop, null,"HasPlayer.js_"+this.getVersionHAS());
+                if (!videoModel) {
+                    this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "videoModel not initialized");
+                    return;
+                }
 
-            this.uriQueryFragModel.reset();
-            if (url) {
-                source = this.uriQueryFragModel.parseURI(url);
-            } else {
-                source = null;
-            }
+                // ORANGE : add metric
+                loop = videoModel.getElement().loop;
+                this.metricsModel.addSession(null, url, loop, null,"HasPlayer.js_"+this.getVersionHAS());
 
-            protectionData = protData;
+                this.uriQueryFragModel.reset();
+                if (url) {
+                    source = this.uriQueryFragModel.parseURI(url);
+                } else {
+                    source = null;
+                }
 
-            if (playing && streamController) {
-                streamController.reset();
-                playing = false;
-            }
+                protectionData = protData;
 
-            if (isReady.call(this)) {
-                doAutoPlay.call(this);
-            }
-        },
+                if (playing && streamController) {
+                    streamController.reset();
+                    playing = false;
+                }
 
-        /**
-         * function used to stop video player, set source value to null and reset stream controller.
-         * @access public
-         * @memberof MediaPlayer#
-         */
-        reset: function() {
-            this.attachSource(null);
-            protectionData = null;
-        },
+                if (isReady.call(this)) {
+                    doAutoPlay.call(this);
+                }
+            },
 
-        play: play,
-        isReady: isReady,
-        seek : seek,
-        time : time,
-        duration : duration,
-        timeAsUTC : timeAsUTC,
-        durationAsUTC : durationAsUTC,
-        getDVRWindowSize : getDVRWindowSize,
-        getDVRSeekOffset : getDVRSeekOffset,
-        formatUTC : formatUTC,
-        convertToTimeCode : convertToTimeCode
+            /**
+             * function used to stop video player, set source value to null and reset stream controller.
+             * @access public
+             * @memberof MediaPlayer#
+             */
+            reset: function() {
+                this.attachSource(null);
+                protectionData = null;
+            },
 
+            play: play,
+            isReady: isReady,
+            seek : seek,
+            time : time,
+            duration : duration,
+            timeAsUTC : timeAsUTC,
+            durationAsUTC : durationAsUTC,
+            getDVRWindowSize : getDVRWindowSize,
+            getDVRSeekOffset : getDVRSeekOffset,
+            formatUTC : formatUTC,
+            convertToTimeCode : convertToTimeCode
+
+        };
     };
-};
 
-/**
- * @class
- * @classdesc MediaPlayer is the object used by the webapp to instanciante and control hasplayer.
- */
-MediaPlayer.prototype = {
-    constructor: MediaPlayer
-};
+    /**
+     * @class
+     * @classdesc MediaPlayer is the object used by the webapp to instanciante and control hasplayer.
+     */
+    MediaPlayer.prototype = {
+        constructor: MediaPlayer
+    };
 
-MediaPlayer.dependencies = {};
-MediaPlayer.dependencies.protection = {};
-MediaPlayer.utils = {};
-MediaPlayer.models = {};
-MediaPlayer.vo = {};
-MediaPlayer.vo.metrics = {};
-MediaPlayer.vo.protection = {};
-MediaPlayer.rules = {};
-MediaPlayer.di = {};
+    MediaPlayer.dependencies = {};
+    MediaPlayer.dependencies.protection = {};
+    MediaPlayer.utils = {};
+    MediaPlayer.models = {};
+    MediaPlayer.vo = {};
+    MediaPlayer.vo.metrics = {};
+    MediaPlayer.vo.protection = {};
+    MediaPlayer.rules = {};
+    MediaPlayer.di = {};
+
+
+
+     /**
+     * Wrap UMD definition for MediaPlayer
+     */
+    if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
+       define(function() {
+           return MediaPlayer;
+       });
+    } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
+       module.exports = MediaPlayer;
+    } else if (typeof window !== "undefined" && window !== null) {
+       if (window.MediaPlayer == null) {
+           window.MediaPlayer = MediaPlayer;
+       }
+    }
+}).call(this);
