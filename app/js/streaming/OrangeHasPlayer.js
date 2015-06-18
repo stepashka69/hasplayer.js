@@ -229,6 +229,10 @@ OrangeHasPlayer = function (videoElement) {
      };
 };
 
+/**
+ * @class
+ * @classdesc OrangeHasPlayer is the object used by the webapp to instanciante and control hasplayer.
+ */
 OrangeHasPlayer.prototype = {
     constructor: OrangeHasPlayer
 };
