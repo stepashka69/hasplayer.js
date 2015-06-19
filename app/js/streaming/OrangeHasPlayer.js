@@ -333,11 +333,9 @@
     } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
        module.exports = OrangeHasPlayer;
     } else if (typeof window !== "undefined" && window !== null) {
-       if (window.OrangeHasPlayer === null) {
+       if (window.OrangeHasPlayer == null) {
            window.OrangeHasPlayer = OrangeHasPlayer;
        }
     }
 
 }).call(this);
-
-
