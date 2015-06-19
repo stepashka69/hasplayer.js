@@ -614,7 +614,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         if (reqConfig.status === 200) {
             config = JSON.parse(reqConfig.responseText);
             if (player) {
-                player.setConfig(config);
+                player.setParams(config);
             }
         }
     };
@@ -629,27 +629,28 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     ////////////////////////////////////////
 
     video = document.querySelector(".dash-video-player video");
-    context = new Custom.di.CustomContext();
-    player = new MediaPlayer(context);
+    player = new OrangeHasPlayer(video);
+    //context = new Custom.di.CustomContext();
+    //player = new MediaPlayer(context);
     
     $scope.version = player.getVersion();
     $scope.versionHAS = player.getVersionHAS();
     $scope.versionFull = player.getVersionFull();
     $scope.buildDate = player.getBuildDate();
 
-    player.startup();
+    player.init();
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
-    video.addEventListener("loadeddata", onload.bind(this));
-    video.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
-    video.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
-    video.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
-    player.attachView(video);
+    player.addEventListener("loadeddata", onload.bind(this));
+    player.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
+    player.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
+    player.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
+    //player.attachView(video);
     player.setAutoPlay(true);
-    player.getDebug().setLevel(4);
+    //player.getDebug().setLevel(4);
     if (config) {
-        player.setConfig(config);
+        player.setParams(config);
     }
     $scope.player = player;
     $scope.videojsIsOn = false;
@@ -912,7 +913,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             orientation: 'vertical',
             range: true,
             stop: function(evt, ui) {
-                player.setConfig({
+                player.setParam({
                     "video": {
                         "ABR.minQuality": ui.values[0],
                         "ABR.maxQuality": ui.values[1]
@@ -935,11 +936,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.textData = null;
 
         // ORANGE: reset ABR controller
-        player.setQualityFor("video", 0);
-        player.setQualityFor("audio", 0);
+        //player.setQualityFor("video", 0);
+        //player.setQualityFor("audio", 0);
 
         $scope.playbackRate = "x1";
-        player.attachSource($scope.selectedItem.url, $scope.selectedItem.protData);
+        player.load($scope.selectedItem.url, $scope.selectedItem.protData);
     }
 
     $scope.doLoad = function () {

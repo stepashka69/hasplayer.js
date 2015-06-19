@@ -1,4 +1,4 @@
-/*
+/**
  * The copyright in this software module is being made available under the BSD License, included below. This software module may be subject to other third party and/or contributor rights, including patent rights, and no such rights are granted under this license.
  * The whole software resulting from the execution of this software module together with its external dependent software modules from dash.js project may be subject to Orange and/or other third party rights, including patent rights, and no such rights are granted under this license.
  * 
@@ -43,7 +43,7 @@
              * @param protData - informations about protection (back url and custom data are stored in a json object).
              */
             load: function(url, protData){
-
+                mediaPlayer.attachSource(url, protData);
             },
 
             /**
@@ -123,7 +123,19 @@
              * @param listener - callback name.
              */
             addEventListener: function(type, listener){
-
+                switch (type){
+                    case "error" :
+                    case "metricChanged" :
+                    case "subtitlesStyleChanged" :
+                        mediaPlayer.addEventListener(type, listener);
+                        break;
+                    case "loadeddata" :
+                    case "fullscreenchange" : 
+                    case "mozfullscreenchange" :
+                    case "webkitfullscreenchange" :
+                        video.addEventListener(type, listener);
+                        break;
+                }
             },
 
             /**
@@ -144,7 +156,7 @@
              * @return audio tracks array
              */
             getAudioTracks: function(){
-
+                return mediaPlayer.getAudioTracks();
             },
 
             /**
@@ -174,7 +186,7 @@
              * @return subtitle tracks array
              */
             getSubtitleTracks: function(){
-
+                return mediaPlayer.getSubtitleTracks();
             },
 
             /**
@@ -228,6 +240,75 @@
              */
             fullscreenChanged: function(value){
 
+            },
+             /**
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return player version
+             */
+            getVersion: function () {
+                return mediaPlayer.getVersion();
+            },
+
+            /**
+             * get the HAS version
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return hasplayer version
+             */
+            getVersionHAS: function () {
+                return mediaPlayer.getVersionHAS();
+            },
+
+            /**
+             * get the full version (with git tag, only at build)
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return full hasplayer version
+             */
+            getVersionFull: function () {
+                return mediaPlayer.getVersionFull();
+            },
+
+            /**
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return date when the hasplayer has been built.
+             */
+            getBuildDate: function() {
+                return mediaPlayer.getBuildDate();
+            },
+
+            /**
+             * get metrics for stream type
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param  type - stream type, video or audio.
+             * @return metrics array for the selected type
+             */
+            getMetricsFor: function(type){
+                return mediaPlayer.getMetricsFor(type);
+            },
+
+            /**
+             * get metrics extension reference
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return metrics extension reference
+             */
+            getMetricsExt: function(){
+                return mediaPlayer.getMetricsExt();
+            },
+
+            /**
+             * get current quality for a stream
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param  type - stream type, video or audio.
+             * @return current quality for the selected type.
+             */
+            getQualityFor: function (type) {
+                return mediaPlayer.getQualityFor(type);
             }
          };
     };
@@ -239,7 +320,6 @@
     OrangeHasPlayer.prototype = {
         constructor: OrangeHasPlayer
     };
-
 
     /**
      * Wrap UMD definition for OrangeHasPlayer
@@ -253,10 +333,9 @@
     } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
        module.exports = OrangeHasPlayer;
     } else if (typeof window !== "undefined" && window !== null) {
-       if (window.OrangeHasPlayer === null) {
+       if (window.OrangeHasPlayer == null) {
            window.OrangeHasPlayer = OrangeHasPlayer;
        }
     }
 
 }).call(this);
-
