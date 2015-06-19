@@ -1,9 +1,36 @@
 /**
  * @author <a href="http://www.creynders.be">Camille Reynders</a>
  */
-( function ( scope ) {
+(function( root,
+           factory ){
+    /*
+     AMD/CommonJS compatibility largely stolen from https://github.com/kriskowal/q/blob/master/q.js
+     */
+    // Turn off strict mode for this function so we can assign to global.dijon
+    /*jshint strict: false, -W117*/
+
+    // This file will function properly as a <script> tag, or a module
+    // using CommonJS and NodeJS or RequireJS module formats.  In
+    // Common/Node/RequireJS, the module exports the dijon API and when
+    // executed as a simple <script>, it creates a dijon global instead.
+
+    // CommonJS
+    if( typeof exports === "object" ){
+        module.exports = factory();
+
+        // RequireJS
+    }else if( typeof define === "function" && define.amd ){
+        define( factory );
+
+        // <script>
+    }else{
+        root.dijon = factory();
+    }
+})( this, function(){
 
     "use strict";
+
+    var NO_MAPPING_FOUND = 'no mapping found for this key';
 
     /**
      * @namespace
@@ -11,12 +38,10 @@
     var dijon = {
         /**
          * framework version number
-         * @constant
          * @type String
          */
-        VERSION:'0.5.3'
+        version : '0.6.2'
     };//dijon
-
 
     //======================================//
     // dijon.System
@@ -26,15 +51,15 @@
      * @class dijon.System
      * @constructor
      */
-    dijon.System = function () {
+    dijon.System = function(){
         /** @private */
-        this._mappings = {};
+        this._mappings = { };
 
         /** @private */
-        this._outlets = {};
+        this._outlets = { };
 
         /** @private */
-        this._handlers = {};
+        this._handlers = { };
 
         /**
          * When <code>true</code> injections are made only if an object has a property with the mapped outlet name.<br/>
@@ -90,7 +115,8 @@
          * @private
          * @param {Class} clazz
          */
-        _createAndSetupInstance:function ( key, Clazz ) {
+        _createAndSetupInstance : function( key,
+                                            Clazz ){
             var instance = new Clazz();
             this.injectInto( instance, key );
             return instance;
@@ -102,32 +128,32 @@
          * @param {Boolean} overrideRules
          * @return {Object}
          */
-        _retrieveFromCacheOrCreate:function ( key, overrideRules ) {
-            if ( typeof overrideRules === 'undefined' ) {
+        _retrieveFromCacheOrCreate : function( key,
+                                               overrideRules ){
+            if( typeof overrideRules === 'undefined' ){
                 overrideRules = false;
             }
             var output;
-            if ( this._mappings.hasOwnProperty( key ) ) {
+            if( this._mappings.hasOwnProperty( key ) ){
                 var config = this._mappings[ key ];
-                if ( !overrideRules && config.isSingleton ) {
-                    if ( config.object == null ) {
+                if( !overrideRules && config.isSingleton ){
+                    if( config.object === null ){
                         config.object = this._createAndSetupInstance( key, config.clazz );
                     }
                     output = config.object;
-                } else {
-                    if ( config.clazz ) {
+                }else{
+                    if( config.clazz ){
                         output = this._createAndSetupInstance( key, config.clazz );
-                    } else {
+                    }else{
                         //TODO shouldn't this be null
                         output = config.object;
                     }
                 }
-            } else {
-                throw new Error( 1000 );
+            }else{
+                throw NO_MAPPING_FOUND;
             }
             return output;
         },
-
 
         /**
          * defines <code>outletName</code> as an injection point in <code>targetKey</code>for the object mapped to <code>sourceKey</code>
@@ -170,15 +196,14 @@
          * @return {dijon.System}
          * @see dijon.System#unmapOutlet
          */
-        mapOutlet:function ( sourceKey, targetKey, outletName ) {
-            if ( typeof sourceKey === 'undefined' ) {
-                throw new Error( 1010 );
-            }
+        mapOutlet : function( sourceKey,
+                              targetKey,
+                              outletName ){
             targetKey = targetKey || "global";
             outletName = outletName || sourceKey;
 
-            if ( !this._outlets.hasOwnProperty( targetKey ) ) {
-                this._outlets[ targetKey ] = {};
+            if( !this._outlets.hasOwnProperty( targetKey ) ){
+                this._outlets[ targetKey ] = { };
             }
             this._outlets[ targetKey ][ outletName ] = sourceKey;
 
@@ -193,10 +218,7 @@
          * @param {Object} key
          * @return {Object}
          */
-        getObject:function ( key ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1020 );
-            }
+        getObject : function( key ){
             return this._retrieveFromCacheOrCreate( key );
         },
 
@@ -209,19 +231,17 @@
          * @param {Object} useValue
          * @return {dijon.System}
          */
-        mapValue:function ( key, useValue ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1030 );
-            }
+        mapValue : function( key,
+                             useValue ){
             this._mappings[ key ] = {
-                clazz:null,
-                object:useValue,
-                isSingleton:true
+                clazz       : null,
+                object      : useValue,
+                isSingleton : true
             };
-            if ( this.autoMapOutlets ) {
+            if( this.autoMapOutlets ){
                 this.mapOutlet( key );
             }
-            if ( this.hasMapping( key )) {
+            if( this.hasMapping( key ) ){
                 this.injectInto( useValue, key );
             }
             return this;
@@ -235,10 +255,7 @@
          * @param {String} key
          * @return {Boolean}
          */
-        hasMapping:function ( key ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1040 );
-            }
+        hasMapping : function( key ){
             return this._mappings.hasOwnProperty( key );
         },
 
@@ -258,19 +275,14 @@
          * @param {Function} clazz
          * @return {dijon.System}
          */
-        mapClass:function ( key, clazz ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1050 );
-            }
-            if ( typeof clazz === 'undefined' ) {
-                throw new Error( 1051 );
-            }
+        mapClass : function( key,
+                             clazz ){
             this._mappings[ key ] = {
-                clazz:clazz,
-                object:null,
-                isSingleton:false
+                clazz       : clazz,
+                object      : null,
+                isSingleton : false
             };
-            if ( this.autoMapOutlets ) {
+            if( this.autoMapOutlets ){
                 this.mapOutlet( key );
             }
             return this;
@@ -292,19 +304,14 @@
          * @param {Function} clazz
          * @return {dijon.System}
          */
-        mapSingleton:function ( key, clazz ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1060 );
-            }
-            if ( typeof clazz === 'undefined' ) {
-                throw new Error( 1061 );
-            }
+        mapSingleton : function( key,
+                                 clazz ){
             this._mappings[ key ] = {
-                clazz:clazz,
-                object:null,
-                isSingleton:true
+                clazz       : clazz,
+                object      : null,
+                isSingleton : true
             };
-            if ( this.autoMapOutlets ) {
+            if( this.autoMapOutlets ){
                 this.mapOutlet( key );
             }
             return this;
@@ -326,10 +333,7 @@
          * @param {String} key
          * @return {Object}
          */
-        instantiate:function ( key ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1070 );
-            }
+        instantiate : function( key ){
             return this._retrieveFromCacheOrCreate( key, true );
         },
 
@@ -357,32 +361,30 @@
          * mapped outlets will be used.
          * @return {dijon.System}
          */
-        injectInto:function ( instance, key ) {
-            if ( typeof instance === 'undefined' ) {
-                throw new Error( 1080 );
+        injectInto : function( instance,
+                               key ){
+            if( ( typeof instance === 'object' ) ){
+                var o = [];
+                if( this._outlets.hasOwnProperty( 'global' ) ){
+                    o.push( this._outlets[ 'global' ] );
+                }
+                if( typeof key !== 'undefined' && this._outlets.hasOwnProperty( key ) ){
+                    o.push( this._outlets[ key ] );
+                }
+                for( var i in o ){
+                    var l = o [ i ];
+                    for( var outlet in l ){
+                        var source = l[ outlet ];
+                        //must be "in" [!]
+                        if( !this.strictInjections || outlet in instance ){
+                            instance[ outlet ] = this.getObject( source );
+                        }
+                    }
+                }
+                if( this.postInjectionHook in instance ){
+                    instance[ this.postInjectionHook ].call( instance );
+                }
             }
-			if( ( typeof instance === 'object' ) ){
-				var o = [];
-				if ( this._outlets.hasOwnProperty( 'global' ) ) {
-					o.push( this._outlets[ 'global' ] );
-				}
-				if ( typeof key !== 'undefined' && this._outlets.hasOwnProperty( key ) ) {
-					o.push( this._outlets[ key ] );
-				}
-				for ( var i in o ) {
-					var l = o [ i ];
-					for ( var outlet in l ) {
-						var source = l[ outlet ];
-						//must be "in" [!]
-						if ( !this.strictInjections || outlet in instance ) {
-							instance[ outlet ] = this.getObject( source );
-						}
-					}
-				}
-				if ( "setup" in instance ) {
-					instance.setup.call( instance );
-				}
-			}
             return this;
         },
 
@@ -391,10 +393,7 @@
          * @param {String} key
          * @return {dijon.System}
          */
-        unmap:function ( key ) {
-            if ( typeof key === 'undefined' ) {
-                throw new Error( 1090 );
-            }
+        unmap : function( key ){
             delete this._mappings[ key ];
 
             return this;
@@ -407,13 +406,8 @@
          * @return {dijon.System}
          * @see dijon.System#addOutlet
          */
-        unmapOutlet:function ( target, outlet ) {
-            if ( typeof target === 'undefined' ) {
-                throw new Error( 1100 );
-            }
-            if ( typeof outlet === 'undefined' ) {
-                throw new Error( 1101 );
-            }
+        unmapOutlet : function( target,
+                                outlet ){
             delete this._outlets[ target ][ outlet ];
 
             return this;
@@ -499,29 +493,30 @@
          * @see dijon.System#notify
          * @see dijon.System#unmapHandler
          */
-        mapHandler:function ( eventName, key, handler, oneShot, passEvent ) {
-            if ( typeof eventName === 'undefined' ) {
-                throw new Error( 1110 );
-            }
+        mapHandler : function( eventName,
+                               key,
+                               handler,
+                               oneShot,
+                               passEvent ){
             key = key || 'global';
             handler = handler || eventName;
 
-            if ( typeof oneShot === 'undefined' ) {
+            if( typeof oneShot === 'undefined' ){
                 oneShot = false;
             }
-            if ( typeof passEvent === 'undefined' ) {
+            if( typeof passEvent === 'undefined' ){
                 passEvent = false;
             }
-            if ( !this._handlers.hasOwnProperty( eventName ) ) {
-                this._handlers[ eventName ] = {};
+            if( !this._handlers.hasOwnProperty( eventName ) ){
+                this._handlers[ eventName ] = { };
             }
-            if ( !this._handlers[eventName].hasOwnProperty( key ) ) {
+            if( !this._handlers[eventName].hasOwnProperty( key ) ){
                 this._handlers[eventName][key] = [];
             }
             this._handlers[ eventName ][ key ].push( {
-                handler:handler,
-                oneShot:oneShot,
-                passEvent:passEvent
+                handler   : handler,
+                oneShot   : oneShot,
+                passEvent : passEvent
             } );
 
             return this;
@@ -537,18 +532,17 @@
          * @return {dijon.System}
          * @see dijon.System#mapHandler
          */
-        unmapHandler:function ( eventName, key, handler ) {
-            if ( typeof eventName === 'undefined' ) {
-                throw new Error( 1120 );
-            }
+        unmapHandler : function( eventName,
+                                 key,
+                                 handler ){
             key = key || 'global';
-            //handler = handler || eventName;
+            handler = handler || eventName;
 
-            if ( this._handlers.hasOwnProperty( eventName ) && this._handlers[ eventName ].hasOwnProperty( key ) ) {
+            if( this._handlers.hasOwnProperty( eventName ) && this._handlers[ eventName ].hasOwnProperty( key ) ){
                 var handlers = this._handlers[ eventName ][ key ];
-                for ( var i in handlers ) {
+                for( var i in handlers ){
                     var config = handlers[ i ];
-                    if ( (!handler) || (config.handler === handler) ) {
+                    if( config.handler === handler ){
                         handlers.splice( i, 1 );
                         break;
                     }
@@ -563,39 +557,36 @@
          * @return {dijon.System}
          * @see dijon.System#mapHandler
          */
-        notify:function ( eventName ) {
-            if ( typeof eventName === 'undefined' ) {
-                throw new Error( 1130 );
-            }
+        notify : function( eventName ){
             var argsWithEvent = Array.prototype.slice.call( arguments );
             var argsClean = argsWithEvent.slice( 1 );
-            if ( this._handlers.hasOwnProperty( eventName ) ) {
+            if( this._handlers.hasOwnProperty( eventName ) ){
                 var handlers = this._handlers[ eventName ];
-                for ( var key in handlers ) {
+                for( var key in handlers ){
                     var configs = handlers[ key ];
                     var instance;
-                    if ( key !== 'global' ) {
+                    if( key !== 'global' ){
                         instance = this.getObject( key );
                     }
                     var toBeDeleted = [];
                     var i, n;
-                    for ( i = 0, n = configs.length ; i < n ; i++ ) {
+                    for( i = 0, n = configs.length; i < n; i++ ){
                         var handler;
                         var config = configs[ i ];
-                        if ( instance && typeof config.handler === "string" ) {
+                        if( instance && typeof config.handler === "string" ){
                             handler = instance[ config.handler ];
-                        } else {
+                        }else{
                             handler = config.handler;
                         }
 
                         //see deletion below
-                        if ( config.oneShot ) {
+                        if( config.oneShot ){
                             toBeDeleted.unshift( i );
                         }
 
-                        if ( config.passEvent ) {
+                        if( config.passEvent ){
                             handler.apply( instance, argsWithEvent );
-                        } else {
+                        }else{
                             handler.apply( instance, argsClean );
                         }
                     }
@@ -603,7 +594,7 @@
                     //items should be deleted in reverse order
                     //either use push above and decrement here
                     //or use unshift above and increment here
-                    for ( i = 0, n = toBeDeleted.length ; i < n ; i++ ) {
+                    for( i = 0, n = toBeDeleted.length; i < n; i++ ){
                         configs.splice( toBeDeleted[ i ], 1 );
                     }
                 }
@@ -614,7 +605,6 @@
 
     };//dijon.System.prototype
 
-    scope.dijon = dijon;
-}( this ));
-
+    return dijon;
+} );
 
