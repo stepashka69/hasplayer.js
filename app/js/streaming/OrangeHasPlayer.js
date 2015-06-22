@@ -257,26 +257,14 @@
         };
 
         /**
-         * set global parameters on HasPlayer
+         * set parameters on HasPlayer
          * @access public
          * @memberof OrangeHasPlayer#
          * @param config - json config to set.
          */
         exports.setParams = function(config){
-
-        };
-
-        /**
-         * set a specific parameter on hasplayer,
-         * if a global config has been set, this call override global one.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param param - parameter name.
-         * @param value - value to set for this parameter (json object).
-         */
-        exports.setParam = function(param, value){
-
-        };
+            mediaPlayer.setConfig(config);
+        };     
 
         /**
          * get video bitrates array from adaptive manifest
