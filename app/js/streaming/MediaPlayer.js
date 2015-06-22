@@ -306,6 +306,10 @@
                 return this.capabilities.supportsMediaSource();
             },
 
+            hasMediaKeysExtension : function() {
+                return this.capabilities.supportsMediaKeys();
+            },
+
             /**
              * function used to register webapp function on hasplayer events
              * @access public

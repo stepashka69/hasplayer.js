@@ -363,6 +363,10 @@
         exports.hasMediaSourceExtension = function() {
             return mediaPlayer.hasMediaSourceExtension();
         };
+
+        exports.hasMediaKeysExtension = function() {
+            return mediaPlayer.hasMediaKeysExtension();
+        };
     /**
      * Wrap UMD definition for OrangeHasPlayer
      */
