@@ -52,7 +52,7 @@ app.directive('chart', function() {
         link: function (scope, elem, attrs) {
             var chartBuffer = null,
             optionsBuffer = {series: {shadowSize: 0},yaxis: {min: 0},xaxis: {show: false}};
-            
+
 
             // If the data changes somehow, update it in the chart
             scope.$watch('bufferData', function(v) {
@@ -356,7 +356,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.textTracks = player.getSubtitleTracks();
         $scope.textData = $scope.textTracks[0];
     }
-    
+
     //if video size change, player has to update subtitles size
     function onFullScreenChange(){
         setSubtitlesCSSStyle(subtitlesCSSStyle);
@@ -433,7 +433,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 });
                 previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
             }
-            
+
             for (var p in qualityChangements) {
                 var currentQualityChangement = qualityChangements[p];
                 //time of downloaded quality change
@@ -452,7 +452,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             dlSeries.push(dlPoint);
             var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
             playSeries.push(playPoint);
-            
+
             videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
 
             if (videoSeries.length > maxGraphPoints) {
@@ -529,7 +529,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             case "DOWNLOAD_ERR_MANIFEST" :
             case "DOWNLOAD_ERR_SIDX" :
             case "DOWNLOAD_ERR_CONTENT" :
-            case "DOWNLOAD_ERR_INIT" :  
+            case "DOWNLOAD_ERR_INIT" :
                  console.error(" url :\""+e.event.data.url+"\" and request response :\""+ e.event.data.request.responseXML+"\"");
                  break;
             case "MANIFEST_ERR_CODEC" :
@@ -537,7 +537,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             case "MANIFEST_ERR_NOSTREAM" :
                  console.error("Manifest URL was "+e.event.data.mpdUrl+" with message :\""+e.event.message+"\"");
                  break;
-            case "CC_ERR_PARSE" : 
+            case "CC_ERR_PARSE" :
                  console.error("message :\""+e.event.message+"\" for content = "+e.event.data);
                  break;
             default :
@@ -629,9 +629,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     ////////////////////////////////////////
 
     video = document.querySelector(".dash-video-player video");
-    context = new Custom.di.CustomContext();
+    context = new MediaPlayer.di.Context();
     player = new MediaPlayer(context);
-    
+
     $scope.version = player.getVersion();
     $scope.versionHAS = player.getVersionHAS();
     $scope.versionFull = player.getVersionFull();
@@ -653,7 +653,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     }
     $scope.player = player;
     $scope.videojsIsOn = false;
-    
+
     $scope.activateVideoJS = function() {
         if(!$scope.videojsIsOn) {
             videojs(video, { "controls": true, "autoplay": true, "preload": "auto" });
@@ -922,14 +922,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         });
     }
     function initPlayer() {
-        
+
         function DRMParams() {
             this.backUrl = null;
             this.customData = null;
         }
-        
+
         resetBitratesSlider();
-        
+
         //ORANGE : reset subtitles data.
         $scope.textTracks = null;
         $scope.textData = null;
@@ -956,7 +956,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.loadInPlayer = function(url) {
         var demoPlayer;
-        
+
         if(window.jsonData === undefined) {
             demoPlayer = '../DemoPlayer/index.html?url=';
         } else {
@@ -996,6 +996,3 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 }]);
-
-
-
