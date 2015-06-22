@@ -225,8 +225,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     };
 
     function getCribbedMetricsFor(type) {
-        var metrics = player.getMetricsFor(type),
-        metricsExt = player.getMetricsExt(),
+        var metrics = OrangeHasPlayer.getMetricsFor(type),
+        metricsExt = OrangeHasPlayer.getMetricsExt(),
         repSwitch,
         bufferLevel,
         httpRequests,
@@ -328,7 +328,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 bufferLengthValue = 0;
             }
 
-            pendingValue = player.getQualityFor(type);
+            pendingValue = OrangeHasPlayer.getQualityFor(type);
             return {
                 bandwidthValue: bandwidthValue,
                 bitrateIndexValue: bitrateIndexValue + 1,
@@ -350,10 +350,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     function onload(e){
         //init audio tracks
-        $scope.audioTracks = player.getAudioTracks();
+        $scope.audioTracks = OrangeHasPlayer.getAudioTracks();
         $scope.audioData = $scope.audioTracks[0];
         //init subtitles tracks
-        $scope.textTracks = player.getSubtitleTracks();
+        $scope.textTracks = OrangeHasPlayer.getSubtitleTracks();
         $scope.textData = $scope.textTracks[0];
     }
     
@@ -549,7 +549,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
         if (e.event.code != "HASPLAYER_INIT_ERROR") {
             //stop
-            player.reset();
+            OrangeHasPlayer.reset();
         }
     }
 
@@ -629,28 +629,30 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     ////////////////////////////////////////
 
     video = document.querySelector(".dash-video-player video");
-    player = new OrangeHasPlayer(video);
+    //player = new OrangeHasPlayer();
     //context = new Custom.di.CustomContext();
     //player = new MediaPlayer(context);
     
-    $scope.version = player.getVersion();
-    $scope.versionHAS = player.getVersionHAS();
-    $scope.versionFull = player.getVersionFull();
-    $scope.buildDate = player.getBuildDate();
+    OrangeHasPlayer.init(video);
 
-    player.init();
-    player.addEventListener("error", onError.bind(this));
-    player.addEventListener("metricChanged", metricChanged.bind(this));
-    player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
-    player.addEventListener("loadeddata", onload.bind(this));
-    player.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
-    player.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
-    player.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
-    //player.attachView(video);
-    player.setAutoPlay(true);
+    $scope.version = OrangeHasPlayer.getVersion();
+    $scope.versionHAS = OrangeHasPlayer.getVersionHAS();
+    $scope.versionFull = OrangeHasPlayer.getVersionFull();
+    $scope.buildDate = OrangeHasPlayer.getBuildDate();
+
+
+    OrangeHasPlayer.addEventListener("error", onError.bind(this));
+    OrangeHasPlayer.addEventListener("metricChanged", metricChanged.bind(this));
+    OrangeHasPlayer.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
+    OrangeHasPlayer.addEventListener("loadeddata", onload.bind(this));
+    OrangeHasPlayer.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
+    OrangeHasPlayer.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
+    OrangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
+    //OrangeHasPlayer.attachView(video);
+    OrangeHasPlayer.setAutoPlay(true);
     //player.getDebug().setLevel(4);
     if (config) {
-        player.setParams(config);
+        OrangeHasPlayer.setParams(config);
     }
     $scope.player = player;
     $scope.videojsIsOn = false;
@@ -672,28 +674,28 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.setAbrEnabled = function (enabled) {
         $scope.abrEnabled = enabled;
-        player.setAutoSwitchQuality(enabled);
+        OrangeHasPlayer.setAutoSwitchQuality(enabled);
     };
 
     $scope.abrUp = function (type) {
         var newQuality,
-        metricsExt = player.getMetricsExt(),
+        metricsExt = OrangeHasPlayer.getMetricsExt(),
         max = metricsExt.getMaxIndexForBufferType(type);
 
-        newQuality = player.getQualityFor(type) + 1;
+        newQuality = OrangeHasPlayer.getQualityFor(type) + 1;
         // zero based
         if (newQuality >= max) {
             newQuality = max - 1;
         }
-        player.setQualityFor(type, newQuality);
+        OrangeHasPlayer.setQualityFor(type, newQuality);
     };
 
     $scope.abrDown = function (type) {
-        var newQuality = player.getQualityFor(type) - 1;
+        var newQuality = OrangeHasPlayer.getQualityFor(type) - 1;
         if (newQuality < 0) {
             newQuality = 0;
         }
-        player.setQualityFor(type, newQuality);
+        OrangeHasPlayer.setQualityFor(type, newQuality);
     };
 
     $scope.playbackRateUp = function () {
@@ -704,8 +706,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
         video.playbackRate = video.playbackRate * 2;
         $scope.playbackRate = "x" + video.playbackRate;
-        player.setAutoSwitchQuality(false);
-        player.setQualityFor('video', 0);
+        OrangeHasPlayer.setAutoSwitchQuality(false);
+        OrangeHasPlayer.setQualityFor('video', 0);
     };
 
     $scope.playbackRateDown = function () {
@@ -718,7 +720,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.playbackRate = "x" + video.playbackRate;
 
         if (video.playbackRate === 1.0) {
-            player.setAutoSwitchQuality(true);
+            OrangeHasPlayer.setAutoSwitchQuality(true);
         }
     };
 
@@ -736,7 +738,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.metricsAgentActive = value;
         if (typeof MetricsAgent == 'function') {
             if ($scope.metricsAgentActive) {
-                metricsAgent = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
+                metricsAgent = new MetricsAgent(OrangeHasPlayer, video, $scope.selected_metric_option, OrangeHasPlayer.getDebug());
                 $scope.metricsAgentVersion = metricsAgent.getVersion();
                 metricsAgent.init(function (activated) {
                     $scope.metricsAgentActive = activated;
@@ -913,7 +915,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             orientation: 'vertical',
             range: true,
             stop: function(evt, ui) {
-                player.setParam({
+                OrangeHasPlayer.setParam({
                     "video": {
                         "ABR.minQuality": ui.values[0],
                         "ABR.maxQuality": ui.values[1]
@@ -940,8 +942,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         //player.setQualityFor("audio", 0);
 
         $scope.playbackRate = "x1";
-        player.load($scope.selectedItem.url, $scope.selectedItem.protData);
-    }
+        OrangeHasPlayer.load($scope.selectedItem.url, $scope.selectedItem.protData);
+    };
 
     $scope.doLoad = function () {
         if ($scope.chromecast.playing){
@@ -953,6 +955,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
 
         initPlayer();
+    };
+
+    $scope.doStop = function(){
+        OrangeHasPlayer.stop();
+    };
+
+    $scope.doPlay = function(){
+        OrangeHasPlayer.play();
     };
 
     $scope.loadInPlayer = function(url) {
