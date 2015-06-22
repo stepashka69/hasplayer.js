@@ -61,11 +61,21 @@
          * @memberof OrangeHasPlayer#
          */
         exports.init = function(videoElement){
+            if (videoElement == undefined) {
+                throw new Error('OrangeHasPlayer.init(): Invalid Argument');
+            }
+
+            if (state !== 'UNINITIALIZED') {
+                throw new Error('OrangeHasPlayer.init(): Must be in UNINITIALIZED state');
+            }
+
             context = new Custom.di.CustomContext(),
             mediaPlayer = new MediaPlayer(context),
             video = videoElement;
             mediaPlayer.startup();
             mediaPlayer.attachView(video);
+
+            state = 'PLAYER_CREATED';
         };
         
         /**
@@ -77,6 +87,9 @@
          */
         exports.load = function(url, protData){
             mediaPlayer.attachSource(url, protData);
+            if (mediaPlayer.getAutoPlay()) {
+                state = 'PLAYER_RUNNING';
+            }
         };
 
         /**
@@ -85,7 +98,13 @@
          * @memberof OrangeHasPlayer#
          */
         exports.play = function(){
-            mediaPlayer.play();
+            if (state === "PLAYER_STOPPED") {
+                video.play();
+            }else{
+                mediaPlayer.play();
+            }
+
+            state = 'PLAYER_RUNNING';            
         };
 
         /**
@@ -106,6 +125,7 @@
          * @memberof OrangeHasPlayer#
          */
         exports.pause = function(){
+            state = "PLAYER_PAUSED";
             video.pause();
         };
 
@@ -136,10 +156,9 @@
          * @memberof OrangeHasPlayer#
          */
         exports.stop = function(){
+            state = "PLAYER_STOPPED";
             video.pause();
-            if (video.duration !==  Number.POSITIVE_INFINITY) {
-                video.currentTime = 0;
-            }
+            video.currentTime = 0;
         };
 
         /**
@@ -361,10 +380,18 @@
         };
 
         exports.hasMediaSourceExtension = function() {
+            if (state === 'UNINITIALIZED') {
+                throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
+            }
+
             return mediaPlayer.hasMediaSourceExtension();
         };
 
         exports.hasMediaKeysExtension = function() {
+            if (state === 'UNINITIALIZED') {
+                throw new Error('OrangeHasPlayer.hasMediaKeysExtension(): Must not be in UNINITIALIZED state');
+            }
+
             return mediaPlayer.hasMediaKeysExtension();
         };
     /**
