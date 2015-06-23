@@ -50,381 +50,378 @@
     //                     +----------------------+                              
     //                                                        
     "use strict";
-    var context,
-        mediaPlayer,
-        video,
-        state = 'UNINITIALIZED';
+    var OrangeHasPlayer;
 
-        function _isPlayerInitialized(){
-            if (state === 'UNINITIALIZED') {
-                throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
-            }
-        };
 
-        /**
-         * Init video player to be ready to play video.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         */
-        exports.init = function(videoElement){
-            if (videoElement == undefined) {
+        OrangeHasPlayer = function(videoElement){
+            var context,
+                mediaPlayer,
+                video,
+                state= 'UNINITIALIZED';
+
+            if(!videoElement){
                 throw new Error('OrangeHasPlayer.init(): Invalid Argument');
             }
 
-            if (state !== 'UNINITIALIZED') {
-                throw new Error('OrangeHasPlayer.init(): Must be in UNINITIALIZED state');
-            }
-
-            context = new MediaPlayer.di.Context(),
-            mediaPlayer = new MediaPlayer(context),
+            context = new MediaPlayer.di.Context();
+            mediaPlayer = new MediaPlayer(context);
             video = videoElement;
             mediaPlayer.startup();
             mediaPlayer.attachView(video);
-
             state = 'PLAYER_CREATED';
-        };
-        
-        /**
-         * load a video stream with stream url and protection datas.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param url - manifest video url(Dash, Smooth or Hls manifest).
-         * @param protData - informations about protection (back url and custom data are stored in a json object).
-         */
-        exports.load = function(url, protData){
-            mediaPlayer.attachSource(url, protData);
-            if (mediaPlayer.getAutoPlay()) {
-                state = 'PLAYER_RUNNING';
-            }
-        };
 
-        /**
-         * play the current content. If auto play value equals to true, this call isn't necessary after the load command.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         */
-        exports.play = function(){
-            if (state === "PLAYER_STOPPED") {
-                video.play();
-            }else{
-                mediaPlayer.play();
-            }
-
-            state = 'PLAYER_RUNNING';            
-        };
-
-        /**
-         * Seek the content to the specify value. In VOD, this function have to test
-         * if the value is between 0 and content duration.
-         * In LIVE, this function will be used to move in the DVR window.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param time - time value in seconds.
-         */
-        exports.seek = function(time){
-
-        };
-
-        /**
-         * Call the pause command on video element.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         */
-        exports.pause = function(){
-            state = "PLAYER_PAUSED";
-            video.pause();
-        };
-
-        /**
-         * set the HasPlayer auto play to value.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param value - auto play value.
-         */
-        exports.setAutoPlay = function(value){
-            mediaPlayer.setAutoPlay(value);
-        };
-
-        /**
-         * get if the HasPlayer has enabled the auto play. Default value is true
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return auto play value
-         */
-        exports.getAutoPlay = function () {
-            return mediaPlayer.getAutoPlay();
-        };
-        
-        /**
-         * used to stop streaming and seek to 0. After this call, a play command, without changing url, restarts
-         * streaming from the beginning.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         */
-        exports.stop = function(){
-            state = "PLAYER_STOPPED";
-            video.pause();
-            video.currentTime = 0;
-        };
-
-        /**
-         * Reset HasPlayer data : stop downloading chunks elements, current url and protection data values set to null.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         */
-        exports.reset = function(){
-            mediaPlayer.reset();
-        };
-
-        /**
-         * register events on either video or MediaPlayer element
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param type - event type.
-         * @param listener - callback name.
-         */
-        exports.addEventListener = function(type, listener){
-            switch (type){
-                case "error" :
-                case "metricChanged" :
-                case "subtitlesStyleChanged" :
-                    mediaPlayer.addEventListener(type, listener);
-                    break;
-                case "loadeddata" :
-                case "fullscreenchange" : 
-                case "mozfullscreenchange" :
-                case "webkitfullscreenchange" :
-                    video.addEventListener(type, listener);
-                    break;
-            }
-        };
-
-        /**
-         * unregister events on either video or MediaPlayer element
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param type - event type.
-         * @param listener - callback name.
-         */
-        exports.removeEventListener = function(type, listener){
-            switch (type){
-                case "error" :
-                case "metricChanged" :
-                case "subtitlesStyleChanged" :
-                    mediaPlayer.removeEventListener(type, listener);
-                    break;
-                case "loadeddata" :
-                case "fullscreenchange" : 
-                case "mozfullscreenchange" :
-                case "webkitfullscreenchange" :
-                    video.removeEventListener(type, listener);
-                    break;
-            }
-        };
-
-        /**
-         * get audio tracks array from adaptive manifest
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return audio tracks array
-         */
-        exports.getAudioTracks = function(){
-            return mediaPlayer.getAudioTracks();
-        };
-
-        /**
-         * set current audio track
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param audioTrack - current audio track.
-         */
-        exports.setAudioTrack = function(audioTrack){
-            mediaPlayer.setAudioTrack(audioTrack);
-        };
-        
-        /**
-         * set current subtitle track
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param subtitleTrack - current subtitle track.
-         */
-        exports.setSubtitleTrack = function(subtitleTrack){
-            mediaPlayer.setSubtitleTrack(subtitleTrack);
-        };
-
-        /**
-         * get subtitle tracks array from adaptive manifest
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return subtitle tracks array
-         */
-        exports.getSubtitleTracks = function(){
-            return mediaPlayer.getSubtitleTracks();
-        };
-
-        /**
-         * set parameters on HasPlayer
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param config - json config to set.
-         */
-        exports.setParams = function(config){
-            mediaPlayer.setConfig(config);
-        };     
-
-        /**
-         * get video bitrates array from adaptive manifest
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return video bitrates array
-         */
-        exports.getVideoBitrates = function(){
-            var videoBitrates;
-            return videoBitrates;
-        };
-
-        /**
-         * get current media duration
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return media duration in seconds, infinity for live content
-         */
-        exports.getDuration = function(){
-
-        };
-
-        /**
-         * used by webapp to notify HasPlayer that size of the main div has changed.
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param value - the new fullscreen value 
-         */
-        exports.fullscreenChanged = function(value){
-
-        };
-
-         /**
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return player version
-         */
-        exports.getVersion = function () {
-            _isPlayerInitialized();
-            return mediaPlayer.getVersion();
-        };
-
-        /**
-         * get the HAS version
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return hasplayer version
-         */
-        exports.getVersionHAS = function () {
-            _isPlayerInitialized();
-            return mediaPlayer.getVersionHAS();
-        };
-
-        /**
-         * get the full version (with git tag, only at build)
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return full hasplayer version
-         */
-        exports.getVersionFull = function () {
-            _isPlayerInitialized();
-            return mediaPlayer.getVersionFull();
-        };
-
-        /**
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return date when the hasplayer has been built.
-         */
-        exports.getBuildDate = function() {
-            _isPlayerInitialized();
-            return mediaPlayer.getBuildDate();
-        };
-
-        /**
-         * get metrics for stream type
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param  type - stream type, video or audio.
-         * @return metrics array for the selected type
-         */
-        exports.getMetricsFor = function(type){
-            _isPlayerInitialized();
-            return mediaPlayer.getMetricsFor(type);
-        };
-
-        /**
-         * get metrics extension reference
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @return metrics extension reference
-         */
-        exports.getMetricsExt = function(){
-            _isPlayerInitialized();
-            return mediaPlayer.getMetricsExt();
-        };
-
-        /**
-         * get current quality for a stream
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param  type - stream type, video or audio.
-         * @return current quality for the selected type.
-         */
-        exports.getQualityFor = function (type) {
-           _isPlayerInitialized();
-            return mediaPlayer.getQualityFor(type);
-        };
-
-        /**
-         * [hasMediaSourceExtension description]
-         * @return {Boolean} [description]
-         */
-        exports.hasMediaSourceExtension = function() {
-           _isPlayerInitialized();
-            return mediaPlayer.hasMediaSourceExtension();
-        };
-
-        /**
-         * [hasMediaKeysExtension description]
-         * @return {Boolean} [description]
-         */
-        exports.hasMediaKeysExtension = function() {
-           _isPlayerInitialized();
-            return mediaPlayer.hasMediaKeysExtension();
-        };
-
-        /**
-         * [setMute description]
-         * @param {[type]} state [description]
-         */
-        exports.setMute = function (state) {
-            if (typeof state !== 'boolean') {
-                throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
-            }
-            videoElement.muted = state;
-        };
 
         
+
+            var _isPlayerInitialized = function(){
+                if (state === 'UNINITIALIZED') {
+                    throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
+                }
+            };
+
+            
+            
+            /**
+             * load a video stream with stream url and protection datas.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param url - manifest video url(Dash, Smooth or Hls manifest).
+             * @param protData - informations about protection (back url and custom data are stored in a json object).
+             */
+            this.load = function(url, protData){
+                mediaPlayer.attachSource(url, protData);
+                if (mediaPlayer.getAutoPlay()) {
+                    state = 'PLAYER_RUNNING';
+                }
+            };
+
+            /**
+             * play the current content. If auto play value equals to true, this call isn't necessary after the load command.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             */
+            this.play = function(){
+                if (state === "PLAYER_STOPPED") {
+                    video.play();
+                }else{
+                    mediaPlayer.play();
+                }
+
+                state = 'PLAYER_RUNNING';            
+            };
+
+            /**
+             * Seek the content to the specify value. In VOD, this function have to test
+             * if the value is between 0 and content duration.
+             * In LIVE, this function will be used to move in the DVR window.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param time - time value in seconds.
+             */
+            this.seek = function(time){
+
+            };
+
+            /**
+             * Call the pause command on video element.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             */
+            this.pause = function(){
+                state = "PLAYER_PAUSED";
+                video.pause();
+            };
+
+            /**
+             * set the HasPlayer auto play to value.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param value - auto play value.
+             */
+            this.setAutoPlay = function(value){
+                mediaPlayer.setAutoPlay(value);
+            };
+
+            /**
+             * get if the HasPlayer has enabled the auto play. Default value is true
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return auto play value
+             */
+            this.getAutoPlay = function () {
+                return mediaPlayer.getAutoPlay();
+            };
+            
+            /**
+             * used to stop streaming and seek to 0. After this call, a play command, without changing url, restarts
+             * streaming from the beginning.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             */
+            this.stop = function(){
+                state = "PLAYER_STOPPED";
+                video.pause();
+                video.currentTime = 0;
+            };
+
+            /**
+             * Reset HasPlayer data : stop downloading chunks elements, current url and protection data values set to null.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             */
+            this.reset = function(){
+                mediaPlayer.reset();
+            };
+
+            /**
+             * register events on either video or MediaPlayer element
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param type - event type.
+             * @param listener - callback name.
+             */
+            this.addEventListener = function(type, listener){
+                switch (type){
+                    case "error" :
+                    case "metricChanged" :
+                    case "subtitlesStyleChanged" :
+                        mediaPlayer.addEventListener(type, listener);
+                        break;
+                    case "loadeddata" :
+                    case "fullscreenchange" : 
+                    case "mozfullscreenchange" :
+                    case "webkitfullscreenchange" :
+                        video.addEventListener(type, listener);
+                        break;
+                }
+            };
+
+            /**
+             * unregister events on either video or MediaPlayer element
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param type - event type.
+             * @param listener - callback name.
+             */
+            this.removeEventListener = function(type, listener){
+                switch (type){
+                    case "error" :
+                    case "metricChanged" :
+                    case "subtitlesStyleChanged" :
+                        mediaPlayer.removeEventListener(type, listener);
+                        break;
+                    case "loadeddata" :
+                    case "fullscreenchange" : 
+                    case "mozfullscreenchange" :
+                    case "webkitfullscreenchange" :
+                        video.removeEventListener(type, listener);
+                        break;
+                }
+            };
+
+            /**
+             * get audio tracks array from adaptive manifest
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return audio tracks array
+             */
+            this.getAudioTracks = function(){
+                return mediaPlayer.getAudioTracks();
+            };
+
+            /**
+             * set current audio track
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param audioTrack - current audio track.
+             */
+            this.setAudioTrack = function(audioTrack){
+                mediaPlayer.setAudioTrack(audioTrack);
+            };
+            
+            /**
+             * set current subtitle track
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param subtitleTrack - current subtitle track.
+             */
+            this.setSubtitleTrack = function(subtitleTrack){
+                mediaPlayer.setSubtitleTrack(subtitleTrack);
+            };
+
+            /**
+             * get subtitle tracks array from adaptive manifest
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return subtitle tracks array
+             */
+            this.getSubtitleTracks = function(){
+                return mediaPlayer.getSubtitleTracks();
+            };
+
+            /**
+             * set parameters on HasPlayer
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param config - json config to set.
+             */
+            this.setParams = function(config){
+                mediaPlayer.setConfig(config);
+            };     
+
+            /**
+             * get video bitrates array from adaptive manifest
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return video bitrates array
+             */
+            this.getVideoBitrates = function(){
+                var videoBitrates;
+                return videoBitrates;
+            };
+
+            /**
+             * get current media duration
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return media duration in seconds, infinity for live content
+             */
+            this.getDuration = function(){
+
+            };
+
+            /**
+             * used by webapp to notify HasPlayer that size of the main div has changed.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param value - the new fullscreen value 
+             */
+            this.fullscreenChanged = function(value){
+
+            };
+
+             /**
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return player version
+             */
+            this.getVersion = function () {
+                _isPlayerInitialized();
+                return mediaPlayer.getVersion();
+            };
+
+            /**
+             * get the HAS version
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return hasplayer version
+             */
+            this.getVersionHAS = function () {
+                _isPlayerInitialized();
+                return mediaPlayer.getVersionHAS();
+            };
+
+            /**
+             * get the full version (with git tag, only at build)
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return full hasplayer version
+             */
+            this.getVersionFull = function () {
+                _isPlayerInitialized();
+                return mediaPlayer.getVersionFull();
+            };
+
+            /**
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return date when the hasplayer has been built.
+             */
+            this.getBuildDate = function() {
+                _isPlayerInitialized();
+                return mediaPlayer.getBuildDate();
+            };
+
+            /**
+             * get metrics for stream type
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param  type - stream type, video or audio.
+             * @return metrics array for the selected type
+             */
+            this.getMetricsFor = function(type){
+                _isPlayerInitialized();
+                return mediaPlayer.getMetricsFor(type);
+            };
+
+            /**
+             * get metrics extension reference
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return metrics extension reference
+             */
+            this.getMetricsExt = function(){
+                _isPlayerInitialized();
+                return mediaPlayer.getMetricsExt();
+            };
+
+            /**
+             * get current quality for a stream
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param  type - stream type, video or audio.
+             * @return current quality for the selected type.
+             */
+            this.getQualityFor = function (type) {
+               _isPlayerInitialized();
+                return mediaPlayer.getQualityFor(type);
+            };
+
+            /**
+             * [hasMediaSourceExtension description]
+             * @return {Boolean} [description]
+             */
+            this.hasMediaSourceExtension = function() {
+               _isPlayerInitialized();
+                return mediaPlayer.hasMediaSourceExtension();
+            };
+
+            /**
+             * [hasMediaKeysExtension description]
+             * @return {Boolean} [description]
+             */
+            this.hasMediaKeysExtension = function() {
+               _isPlayerInitialized();
+                return mediaPlayer.hasMediaKeysExtension();
+            };
+
+            /**
+             * [setMute description]
+             * @param {[type]} state [description]
+             */
+            this.setMute = function (state) {
+                if (typeof state !== 'boolean') {
+                    throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
+                }
+                video.muted = state;
+            };
+
+        };
         /**
          * Wrap UMD definition for OrangeHasPlayer
          */
 
 
- /*   if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
-       define(function() {
-           return OrangeHasPlayer;
-       });
-    } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
-       module.exports = OrangeHasPlayer;
-    } else if (typeof window !== "undefined" && window !== null) {
-       if (window.OrangeHasPlayer == null) {
-           window.OrangeHasPlayer = OrangeHasPlayer;
-       }
-    }*/
+        if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
+           define(function() {
+               return OrangeHasPlayer;
+           });
+        } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
+           module.exports = OrangeHasPlayer;
+        } else if (typeof exports !== "undefined" && exports !== null) {
+           if (exports.OrangeHasPlayer == null) {
+               exports.OrangeHasPlayer = OrangeHasPlayer;
+           }
+        }
 
-}(this.OrangeHasPlayer = {}));
+}(this));
