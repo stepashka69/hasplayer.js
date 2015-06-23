@@ -404,6 +404,15 @@
             };
 
             /**
+             * [getMute description]
+             * @return {[type]} [description]
+             */
+            this.getMute = function () {
+                _isPlayerInitialized();
+                return video.muted;
+            };
+
+            /**
              * [setMute description]
              * @param {[type]} state [description]
              */
