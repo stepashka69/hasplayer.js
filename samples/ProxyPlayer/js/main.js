@@ -650,6 +650,13 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setAutoSwitchQuality(enabled);
     };
 
+    $scope.muteEnabled = true;
+
+    $scope.setMuteEnabled = function (enabled) {
+        $scope.muteEnabled = enabled;
+        orangeHasPlayer.setMute(enabled);
+    };
+
     $scope.abrUp = function (type) {
         var newQuality,
         metricsExt = player.getMetricsExt(),

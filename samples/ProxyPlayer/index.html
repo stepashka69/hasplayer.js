@@ -442,6 +442,22 @@
                             <button type="button" class="btn btn-default" ng-click="playbackRateUp()"><span class="glyphicon glyphicon-plus"></span></button>
                         </div>
                     </div>
+                    <div class="panel">
+                    <div class="panel-heading panel-top">
+                        <span class="panel-title">Mute</span>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" ng-class="{active:muteEnabled == false}" ng-click="setMuteEnabled(false)"><span>Off</span></button>
+                            <button type="button" class="btn btn-default" ng-class="{active:muteEnabled == true}" ng-click="setMuteEnabled(true)"><span>On</span></button>
+                        </div>
+                    </div>
+                    <div class="panel-heading panel-top">
+                        <span class="panel-title">Playback Rate: </span>
+                        <span class="text-warning">{{playbackRate}}</span>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" ng-click="playbackRateDown()"><span class="glyphicon glyphicon-minus"></span></button>
+                            <button type="button" class="btn btn-default" ng-click="playbackRateUp()"><span class="glyphicon glyphicon-plus"></span></button>
+                        </div>
+                    </div>                    
                 </div>
                 <div class="panel">
                     <div class="panel-heading panel-top">
