@@ -55,6 +55,12 @@
         video,
         state = 'UNINITIALIZED';
 
+        function _isPlayerInitialized(){
+            if (state === 'UNINITIALIZED') {
+                throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
+            }
+        };
+
         /**
          * Init video player to be ready to play video.
          * @access public
@@ -303,6 +309,7 @@
          * @return player version
          */
         exports.getVersion = function () {
+            _isPlayerInitialized();
             return mediaPlayer.getVersion();
         };
 
@@ -313,6 +320,7 @@
          * @return hasplayer version
          */
         exports.getVersionHAS = function () {
+            _isPlayerInitialized();
             return mediaPlayer.getVersionHAS();
         };
 
@@ -323,6 +331,7 @@
          * @return full hasplayer version
          */
         exports.getVersionFull = function () {
+            _isPlayerInitialized();
             return mediaPlayer.getVersionFull();
         };
 
@@ -332,6 +341,7 @@
          * @return date when the hasplayer has been built.
          */
         exports.getBuildDate = function() {
+          _isPlayerInitialized();
             return mediaPlayer.getBuildDate();
         };
 
@@ -343,6 +353,7 @@
          * @return metrics array for the selected type
          */
         exports.getMetricsFor = function(type){
+           _isPlayerInitialized();
             return mediaPlayer.getMetricsFor(type);
         };
 
@@ -353,6 +364,7 @@
          * @return metrics extension reference
          */
         exports.getMetricsExt = function(){
+            _isPlayerInitialized();
             return mediaPlayer.getMetricsExt();
         };
 
@@ -364,22 +376,17 @@
          * @return current quality for the selected type.
          */
         exports.getQualityFor = function (type) {
+           _isPlayerInitialized();
             return mediaPlayer.getQualityFor(type);
         };
 
         exports.hasMediaSourceExtension = function() {
-            if (state === 'UNINITIALIZED') {
-                throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
-            }
-
+           _isPlayerInitialized();
             return mediaPlayer.hasMediaSourceExtension();
         };
 
         exports.hasMediaKeysExtension = function() {
-            if (state === 'UNINITIALIZED') {
-                throw new Error('OrangeHasPlayer.hasMediaKeysExtension(): Must not be in UNINITIALIZED state');
-            }
-
+           _isPlayerInitialized();
             return mediaPlayer.hasMediaKeysExtension();
         };
     /**
