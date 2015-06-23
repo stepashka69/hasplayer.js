@@ -16,39 +16,7 @@
  * @param videoElement - an HTML5 video element used to decode and show media data.
  */
 
-(function(exports){
- // the 'state' variable contains the state value of the state machine described below
-    //                                                                           
-    //                     +----------------------+                              
-    //                     |                      |                              
-    //                     |    UNINITIALIZED     |                              
-    //                     |                      |                              
-    //                     +----------------------+                              
-    //                                |                                          
-    //                                | init()                                 
-    //                                |                                          
-    //                     +----------v-----------+                              
-    //                     |                      |
-    //                +---->     PLAYER_CREATED   |
-    //                |    |                      |
-    //                |    +----------------------+                              
-    //                |               |                                          
-    //                |               | initHASPlayer()                          
-    //                |               |                                          
-    //                |    +----------v-----------+                              
-    //                |    |                      |                              
-    //        reset() |    |  HAS_PLAYER_CREATED  |                              
-    //                |    |                      |                              
-    //                |    +----------------------+                              
-    //                |               |                                          
-    //                |               | playChannel()                            
-    //                |               |                                          
-    //                |    +----------v-----------+                              
-    //                |    |                      +----+                         
-    //                +----+    PLAYER_RUNNING    |    | playChannel()           
-    //                     |                      <----+                         
-    //                     +----------------------+                              
-    //                                                        
+(function(exports){                                                     
     "use strict";
     var OrangeHasPlayer;
 
@@ -381,7 +349,7 @@
              * @return current quality for the selected type.
              */
             this.getQualityFor = function (type) {
-               _isPlayerInitialized();
+                _isPlayerInitialized();
                 return mediaPlayer.getQualityFor(type);
             };
 
@@ -390,7 +358,7 @@
              * @return {Boolean} [description]
              */
             this.hasMediaSourceExtension = function() {
-               _isPlayerInitialized();
+                _isPlayerInitialized();
                 return mediaPlayer.hasMediaSourceExtension();
             };
 
@@ -399,7 +367,7 @@
              * @return {Boolean} [description]
              */
             this.hasMediaKeysExtension = function() {
-               _isPlayerInitialized();
+                _isPlayerInitialized();
                 return mediaPlayer.hasMediaKeysExtension();
             };
 
@@ -436,7 +404,7 @@
 
                 video.volume = volume;
             };
-            
+
             /**
              * [getVolume description]
              * @return {[type]} [description]
