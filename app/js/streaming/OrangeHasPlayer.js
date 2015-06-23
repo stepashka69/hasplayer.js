@@ -413,6 +413,15 @@
                 _isPlayerInitialized();
                 return video.volume;
             };
+
+            /**
+             * [isLive description]
+             * @return {Boolean} [description]
+             */
+            this.isLive = function(){
+                _isPlayerInitialized();
+                return  video.duration !== Number.POSITIVE_INFINITY? false : true;
+            };
         };
         /**
          * Wrap UMD definition for OrangeHasPlayer
