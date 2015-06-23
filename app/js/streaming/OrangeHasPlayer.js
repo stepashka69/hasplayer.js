@@ -139,6 +139,7 @@
              * @param value - auto play value.
              */
             this.setAutoPlay = function(value){
+                _isPlayerInitialized();
                 mediaPlayer.setAutoPlay(value);
             };
 
@@ -149,6 +150,7 @@
              * @return auto play value
              */
             this.getAutoPlay = function () {
+                _isPlayerInitialized();
                 return mediaPlayer.getAutoPlay();
             };
             
@@ -170,6 +172,7 @@
              * @memberof OrangeHasPlayer#
              */
             this.reset = function(){
+                _isPlayerInitialized();
                 mediaPlayer.reset();
             };
 
@@ -226,6 +229,7 @@
              * @return audio tracks array
              */
             this.getAudioTracks = function(){
+                _isPlayerInitialized();
                 return mediaPlayer.getAudioTracks();
             };
 
@@ -236,6 +240,7 @@
              * @param audioTrack - current audio track.
              */
             this.setAudioTrack = function(audioTrack){
+                _isPlayerInitialized();
                 mediaPlayer.setAudioTrack(audioTrack);
             };
             
@@ -246,6 +251,7 @@
              * @param subtitleTrack - current subtitle track.
              */
             this.setSubtitleTrack = function(subtitleTrack){
+                _isPlayerInitialized();
                 mediaPlayer.setSubtitleTrack(subtitleTrack);
             };
 
@@ -256,6 +262,7 @@
              * @return subtitle tracks array
              */
             this.getSubtitleTracks = function(){
+                _isPlayerInitialized();
                 return mediaPlayer.getSubtitleTracks();
             };
 
@@ -266,6 +273,7 @@
              * @param config - json config to set.
              */
             this.setParams = function(config){
+                _isPlayerInitialized();
                 mediaPlayer.setConfig(config);
             };     
 
@@ -400,6 +408,7 @@
              * @param {[type]} state [description]
              */
             this.setMute = function (state) {
+                _isPlayerInitialized();
                 if (typeof state !== 'boolean') {
                     throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
                 }
