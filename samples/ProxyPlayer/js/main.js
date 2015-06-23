@@ -947,6 +947,16 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         initPlayer();
     };
 
+    $scope.doStop = function(){
+        orangeHasPlayer.stop();
+    };
+
+    $scope.doPlay = function(){
+        orangeHasPlayer.play();
+    };
+
+
+
     $scope.hasLogo = function (item) {
         return (item.hasOwnProperty("logo") && item.logo !== null && item.logo !== undefined && item.logo !== "");
     };
