@@ -588,22 +588,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     }
     ];
 
-    $scope.showCharts = false;
-    $scope.setCharts = function (show) {
-        $scope.showCharts = show;
-    };
-
-    $scope.switchCharts = false;
-    $scope.setSwitchCharts = function (firstOrSecond) {
-        $scope.setCharts(true);
-        $scope.switchCharts = firstOrSecond;
-    };
-
-    $scope.showDebug = false;
-    $scope.setDebug = function (show) {
-        $scope.showDebug = show;
-    };
-
     ////////////////////////////////////////
     //
     // Configuration file
@@ -652,14 +636,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     }
 
     $scope.player = player;
-    $scope.videojsIsOn = false;
-
-    $scope.activateVideoJS = function() {
-        if(!$scope.videojsIsOn) {
-            videojs(video, { "controls": true, "autoplay": true, "preload": "auto" });
-        }
-        $scope.videojsIsOn = true;
-    };
 
     ////////////////////////////////////////
     //
@@ -752,13 +728,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             }
         }
     };
-
-    /*$scope.metricsAgentAvailable = function () {
-        if (typeof MetricsAgent == 'function') {
-            return true;
-        }
-        return false;
-    };*/
 
 
     ////////////////////////////////////////
