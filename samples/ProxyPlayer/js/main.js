@@ -642,6 +642,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     // Player Methods
     //
     ////////////////////////////////////////
+    
+    resetVolumeSlider();
 
     $scope.abrEnabled = true;
 
@@ -650,7 +652,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         player.setAutoSwitchQuality(enabled);
     };
 
-    $scope.muteEnabled = true;
+    $scope.muteEnabled = orangeHasPlayer.getMute();
 
     $scope.setMuteEnabled = function (enabled) {
         $scope.muteEnabled = enabled;
@@ -897,6 +899,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             }
         });
     }
+
+    function resetVolumeSlider () {
+        $('#sliderVolume').labeledslider({
+            min: 0,
+            max: 100,
+            step: 10,
+            value: (orangeHasPlayer.getVolume()*100) ,
+            orientation: 'horizontal',
+            range: 'min',
+            stop: function(evt, ui) {
+                orangeHasPlayer.setVolume(ui.value/100);
+            }
+        });
+    }
+
     function initPlayer() {
 
         function DRMParams() {
