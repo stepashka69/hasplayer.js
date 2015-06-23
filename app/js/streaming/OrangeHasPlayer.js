@@ -263,7 +263,8 @@
              * @return media duration in seconds, infinity for live content
              */
             this.getDuration = function(){
-
+                _isPlayerInitialized();
+                return video.duration;
             };
 
             /**
