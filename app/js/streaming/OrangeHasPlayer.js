@@ -133,7 +133,7 @@
                 video.pause();
                 //test if player is in VOD mode
                 if (!this.isLive()) {
-                video.currentTime = 0;
+                    video.currentTime = 0;
                 }
             };
 
@@ -425,6 +425,18 @@
             this.isLive = function(){
                 _isPlayerInitialized();
                 return  video.duration !== Number.POSITIVE_INFINITY? false : true;
+            };
+
+            /**
+             * [setDebug description]
+             * @param {[type]} value [description]
+             */
+            this.setDebug = function(value){
+                _isPlayerInitialized();
+                if (typeof value !== 'boolean') {
+                     throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
+                }
+                value == true? mediaPlayer.getDebug().setLevel(4) : mediaPlayer.getDebug().setLevel(0);
             };
         };
         /**
