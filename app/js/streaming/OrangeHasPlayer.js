@@ -341,7 +341,7 @@
          * @return date when the hasplayer has been built.
          */
         exports.getBuildDate = function() {
-          _isPlayerInitialized();
+            _isPlayerInitialized();
             return mediaPlayer.getBuildDate();
         };
 
@@ -353,7 +353,7 @@
          * @return metrics array for the selected type
          */
         exports.getMetricsFor = function(type){
-           _isPlayerInitialized();
+            _isPlayerInitialized();
             return mediaPlayer.getMetricsFor(type);
         };
 
@@ -380,11 +380,19 @@
             return mediaPlayer.getQualityFor(type);
         };
 
+        /**
+         * [hasMediaSourceExtension description]
+         * @return {Boolean} [description]
+         */
         exports.hasMediaSourceExtension = function() {
            _isPlayerInitialized();
             return mediaPlayer.hasMediaSourceExtension();
         };
 
+        /**
+         * [hasMediaKeysExtension description]
+         * @return {Boolean} [description]
+         */
         exports.hasMediaKeysExtension = function() {
            _isPlayerInitialized();
             return mediaPlayer.hasMediaKeysExtension();
@@ -402,9 +410,9 @@
         };
 
         
-    /**
-     * Wrap UMD definition for OrangeHasPlayer
-     */
+        /**
+         * Wrap UMD definition for OrangeHasPlayer
+         */
 
 
  /*   if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
