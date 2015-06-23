@@ -630,7 +630,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     orangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
     
     orangeHasPlayer.setAutoPlay(true);
-    //player.getDebug().setLevel(4);
+    orangeHasPlayer.setDebug(false);
+    
     if (config) {
         orangeHasPlayer.setParams(config);
     }
