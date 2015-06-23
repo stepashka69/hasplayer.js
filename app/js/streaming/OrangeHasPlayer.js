@@ -406,6 +406,27 @@
                 video.muted = state;
             };
 
+            /**
+             * [setVolume description]
+             * @param {[type]} volume [description]
+             */
+            this.setVolume = function (volume) {
+                _isPlayerInitialized();
+                if ((typeof volume !== 'number')|| (volume < 0 && volume > 1)) {
+                    throw new Error('OrangeHasPlayer.setVolume(): Invalid Arguments');
+                }   
+
+                video.volume = volume;
+            };
+            
+            /**
+             * [getVolume description]
+             * @return {[type]} [description]
+             */
+            this.getVolume = function(){
+                _isPlayerInitialized();
+                return video.volume;
+            };
         };
         /**
          * Wrap UMD definition for OrangeHasPlayer
