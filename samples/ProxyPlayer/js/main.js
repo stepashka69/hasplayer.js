@@ -196,14 +196,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.textTracks  = [];
 
     $scope.getVideoTreeMetrics = function () {
-        var metrics = OrangeHasPlayer.getMetricsFor("video");
-        var metricsExt = OrangeHasPlayer.getMetricsExt();
+        var metrics = orangeHasPlayer.getMetricsFor("video");
+        var metricsExt = orangeHasPlayer.getMetricsExt();
         $scope.videoMetrics = converter.toTreeViewDataSource(metrics,metricsExt);
     };
 
     $scope.getAudioTreeMetrics = function () {
-        var metrics = OrangeHasPlayer.getMetricsFor("audio");
-        var metricsExt = OrangeHasPlayer.getMetricsExt();
+        var metrics = orangeHasPlayer.getMetricsFor("audio");
+        var metricsExt = orangeHasPlayer.getMetricsExt();
         $scope.audioMetrics = converter.toTreeViewDataSource(metrics,metricsExt);
     };
 
@@ -217,16 +217,16 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     };
 
     $scope.selectAudioTrack = function(track){
-        OrangeHasPlayer.setAudioTrack(track);
+        orangeHasPlayer.setAudioTrack(track);
     };
 
     $scope.selectTextTrack = function(track){
-        OrangeHasPlayer.setSubtitleTrack(track);
+        orangeHasPlayer.setSubtitleTrack(track);
     };
 
     function getCribbedMetricsFor(type) {
-        var metrics = OrangeHasPlayer.getMetricsFor(type),
-        metricsExt = OrangeHasPlayer.getMetricsExt(),
+        var metrics = orangeHasPlayer.getMetricsFor(type),
+        metricsExt = orangeHasPlayer.getMetricsExt(),
         repSwitch,
         bufferLevel,
         httpRequests,
@@ -328,7 +328,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 bufferLengthValue = 0;
             }
 
-            pendingValue = OrangeHasPlayer.getQualityFor(type);
+            pendingValue = orangeHasPlayer.getQualityFor(type);
             return {
                 bandwidthValue: bandwidthValue,
                 bitrateIndexValue: bitrateIndexValue + 1,
@@ -350,10 +350,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     function onload(e){
         //init audio tracks
-        $scope.audioTracks = OrangeHasPlayer.getAudioTracks();
+        $scope.audioTracks = orangeHasPlayer.getAudioTracks();
         $scope.audioData = $scope.audioTracks[0];
         //init subtitles tracks
-        $scope.textTracks = OrangeHasPlayer.getSubtitleTracks();
+        $scope.textTracks = orangeHasPlayer.getSubtitleTracks();
         $scope.textData = $scope.textTracks[0];
     }
 
@@ -414,7 +414,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
                     $('#sliderBitrate').labeledslider({ max: (metrics.numBitratesValue - 1), step: 1, values: [ 0, (metrics.numBitratesValue - 1 )], tickLabels: labels});
                     $('#sliderBitrate').labeledslider({stop: function( event, ui ) {
-                        OrangeHasPlayer.setParams( {
+                        orangeHasPlayer.setParams( {
                             "video": {
                                 "ABR.minQuality": ui.values[0],
                                 "ABR.maxQuality": ui.values[1]
@@ -549,7 +549,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
         if (e.event.code != "HASPLAYER_INIT_ERROR") {
             //stop
-            OrangeHasPlayer.reset();
+            orangeHasPlayer.reset();
         }
     }
 
@@ -630,25 +630,25 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     video = document.querySelector(".dash-video-player video");
 
-    OrangeHasPlayer.init(video);
+    var orangeHasPlayer = new OrangeHasPlayer(video);
 
-    $scope.version = OrangeHasPlayer.getVersion();
-    $scope.versionHAS = OrangeHasPlayer.getVersionHAS();
-    $scope.versionFull = OrangeHasPlayer.getVersionFull();
-    $scope.buildDate = OrangeHasPlayer.getBuildDate();
+    $scope.version = orangeHasPlayer.getVersion();
+    $scope.versionHAS = orangeHasPlayer.getVersionHAS();
+    $scope.versionFull = orangeHasPlayer.getVersionFull();
+    $scope.buildDate = orangeHasPlayer.getBuildDate();
 
-    OrangeHasPlayer.addEventListener("error", onError.bind(this));
-    OrangeHasPlayer.addEventListener("metricChanged", metricChanged.bind(this));
-    OrangeHasPlayer.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
-    OrangeHasPlayer.addEventListener("loadeddata", onload.bind(this));
-    OrangeHasPlayer.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
-    OrangeHasPlayer.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
-    OrangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
+    orangeHasPlayer.addEventListener("error", onError.bind(this));
+    orangeHasPlayer.addEventListener("metricChanged", metricChanged.bind(this));
+    orangeHasPlayer.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
+    orangeHasPlayer.addEventListener("loadeddata", onload.bind(this));
+    orangeHasPlayer.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
+    orangeHasPlayer.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
+    orangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
     
-    OrangeHasPlayer.setAutoPlay(true);
+    orangeHasPlayer.setAutoPlay(true);
     //player.getDebug().setLevel(4);
     if (config) {
-        OrangeHasPlayer.setParams(config);
+        orangeHasPlayer.setParams(config);
     }
 
     $scope.player = player;
@@ -935,11 +935,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.textData = null;
 
         // ORANGE: reset ABR controller
-        //OrangeHasPlayer.setQualityFor("video", 0);
-        //OrangeHasPlayer.setQualityFor("audio", 0);
+        //orangeHasPlayer.setQualityFor("video", 0);
+        //orangeHasPlayer.setQualityFor("audio", 0);
 
         $scope.playbackRate = "x1";
-        OrangeHasPlayer.load($scope.selectedItem.url, $scope.selectedItem.protData);
+        orangeHasPlayer.load($scope.selectedItem.url, $scope.selectedItem.protData);
     }
 
     $scope.doLoad = function () {
