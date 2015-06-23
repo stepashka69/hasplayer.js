@@ -389,6 +389,19 @@
            _isPlayerInitialized();
             return mediaPlayer.hasMediaKeysExtension();
         };
+
+        /**
+         * [setMute description]
+         * @param {[type]} state [description]
+         */
+        exports.setMute = function (state) {
+            if (typeof state !== 'boolean') {
+                throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
+            }
+            videoElement.muted = state;
+        };
+
+        
     /**
      * Wrap UMD definition for OrangeHasPlayer
      */
