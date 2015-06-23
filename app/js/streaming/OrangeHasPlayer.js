@@ -131,7 +131,10 @@
             this.stop = function(){
                 state = "PLAYER_STOPPED";
                 video.pause();
+                //test if player is in VOD mode
+                if (!this.isLive()) {
                 video.currentTime = 0;
+                }
             };
 
             /**
