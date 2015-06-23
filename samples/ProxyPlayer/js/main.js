@@ -364,6 +364,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
 
     function setSubtitlesCSSStyle(style){
+        if (style) {
         var fontSize = style.data.fontSize;
 
         if (style.data.fontSize[style.data.fontSize.length-1] ==='%') {
@@ -371,6 +372,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
 
         document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+fontSize+'px;font-family: '+style.data.fontFamily+'}';
+    }
     }
 
 
