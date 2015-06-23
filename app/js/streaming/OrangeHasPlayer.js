@@ -69,7 +69,7 @@
                 throw new Error('OrangeHasPlayer.init(): Must be in UNINITIALIZED state');
             }
 
-            context = new Custom.di.CustomContext(),
+            context = new MediaPlayer.di.Context(),
             mediaPlayer = new MediaPlayer(context),
             video = videoElement;
             mediaPlayer.startup();
