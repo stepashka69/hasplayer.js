@@ -46,83 +46,6 @@ var app = angular.module('DashPlayer', [
     'angularTreeview'
     ]);
 
-app.directive('chart', function() {
-    return {
-        restrict: 'E',
-        link: function (scope, elem, attrs) {
-            var chartBuffer = null,
-            optionsBuffer = {series: {shadowSize: 0},yaxis: {min: 0},xaxis: {show: false}};
-
-
-            // If the data changes somehow, update it in the chart
-            scope.$watch('bufferData', function(v) {
-                if (v === null || v === undefined) {
-                    return;
-                }
-
-                if (!chartBuffer) {
-                    chartBuffer = $.plot(elem, v , optionsBuffer);
-                    elem.show();
-                }
-                else {
-                    chartBuffer.setData(v);
-                    chartBuffer.setupGrid();
-                    chartBuffer.draw();
-                }
-            });
-
-            scope.$watch('invalidateChartDisplay', function(v) {
-                if (v && chartBuffer) {
-                    var data = scope[attrs.ngModel];
-                    chartBuffer.setData(data);
-                    chartBuffer.setupGrid();
-                    chartBuffer.draw();
-
-                    scope.invalidateDisplay(false);
-                }
-            });
-        }
-    };
-});
-
-app.directive('chart2', function() {
-    return {
-        restrict: 'E',
-        link: function (scope, elem, attrs) {
-         var chartBandwidth =  null,
-         optionsBandwidth = {series: {shadowSize: 0},yaxis: {ticks: [],color:"#FFF"},xaxis: {show: false},lines: {steps: true,},grid: {markings: [],borderWidth: 0}};
-
-
-            // If the data changes somehow, update it in the chart
-            scope.$watch('bandwidthData', function(v) {
-                if (v === null || v === undefined) {
-                    return;
-                }
-                if (!chartBandwidth && scope.optionsBandwidthGrid) {
-                    // must do a mixin between optionsBandwidth and scope.optionsBandwidthGrid
-                    optionsBandwidth = angular.extend(optionsBandwidth,  scope.optionsBandwidthGrid);
-                    chartBandwidth = $.plot(elem, v , optionsBandwidth);
-                    elem.show();
-                } else if (chartBandwidth) {
-                    chartBandwidth.setData(v);
-                    chartBandwidth.setupGrid();
-                    chartBandwidth.draw();
-                }
-            });
-
-            scope.$watch('invalidateChartDisplay', function(v) {
-                if (v && chartBandwidth) {
-                    var data = scope[attrs.ngModel];
-                    chartBandwidth.setData(data);
-                    chartBandwidth.setupGrid();
-                    chartBandwidth.draw();
-                    scope.invalidateDisplay(false);
-                }
-            });
-        }
-    };
-});
-
 app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
     function($scope, $window, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
 
@@ -130,10 +53,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         video,
         context,
         config = null,
-        qualityChangements = [],
         previousPlayedQuality = 0,
         previousDownloadedQuality= 0,
-        maxGraphPoints = 50,
         metricsAgent = null,
         configMetrics = null,
         subtitlesCSSStyle = null;
@@ -417,27 +338,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
                 // case of downloaded quality change
                 if ((metrics.httpRequest !== null)  && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality)) {
-                // save quality change for later when video currentTime = mediaStartTime
-                qualityChangements.push({
-                    mediaStartTime : metrics.httpRequest.startTime,
-                    switchedQuality : metrics.bitrateValues[metrics.httpRequest.quality],
-                    downloadStartTime : metrics.httpRequest.trequest
-                });
-                previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
-            }
-
-            for (var p in qualityChangements) {
-                var currentQualityChangement = qualityChangements[p];
-                //time of downloaded quality change
-                if (currentQualityChangement.downloadStartTime <= video.currentTime) {
-                    previousDownloadedQuality = currentQualityChangement.switchedQuality;
-                }
-
-                // time of played quality change !
-                if (currentQualityChangement.mediaStartTime <= video.currentTime) {
-                    previousPlayedQuality = currentQualityChangement.switchedQuality;
-                    qualityChangements.splice(p,1);
-                }
+                    previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
             }
 
             //initialisation of bandwidth chart
