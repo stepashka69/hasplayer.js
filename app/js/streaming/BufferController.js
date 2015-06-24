@@ -1376,7 +1376,10 @@ MediaPlayer.dependencies.BufferController = function () {
             cancel(deferredStreamComplete);
             deferredStreamComplete = Q.defer();
 
-            self.clearMetrics();
+            if (self.config.getParam("Metrics.clearMetrics", "boolean", false)) {
+                self.clearMetrics();
+            }
+
             self.fragmentController.abortRequestsForModel(fragmentModel);
             self.fragmentController.detachBufferController(fragmentModel);
             fragmentModel = null;
