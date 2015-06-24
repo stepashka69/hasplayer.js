@@ -38,8 +38,6 @@
             mediaPlayer.startup();
             mediaPlayer.attachView(video);
             state = 'PLAYER_CREATED';
-
-
         
 
             var _isPlayerInitialized = function(){
@@ -47,8 +45,7 @@
                     throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
                 }
             };
-
-            
+          
             
             /**
              * load a video stream with stream url and protection datas.
@@ -166,6 +163,7 @@
                     case "fullscreenchange" : 
                     case "mozfullscreenchange" :
                     case "webkitfullscreenchange" :
+                    case "volumechange" :
                         video.addEventListener(type, listener);
                         break;
                 }
@@ -189,6 +187,7 @@
                     case "fullscreenchange" : 
                     case "mozfullscreenchange" :
                     case "webkitfullscreenchange" :
+                    case "volumechange" :
                         video.removeEventListener(type, listener);
                         break;
                 }
