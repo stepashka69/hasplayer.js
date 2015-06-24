@@ -25,6 +25,7 @@
             var context,
                 mediaPlayer,
                 video,
+                isFullScreen = false,
                 state= 'UNINITIALIZED';
 
             if(!videoElement){
@@ -277,7 +278,7 @@
              * @param value - the new fullscreen value 
              */
             this.fullscreenChanged = function(value){
-
+                isFullScreen = !isFullScreen;
             };
 
              /**
