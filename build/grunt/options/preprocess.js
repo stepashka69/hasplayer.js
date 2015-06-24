@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 
     var protocols  = grunt.option('protocol'),
         protection = grunt.option('protection'),
+		proxy = grunt.option('proxy'),
         includeHls = true,
         includeMss = true;
 
@@ -25,6 +26,10 @@ module.exports = function(grunt) {
     if (typeof(protection) !== 'boolean') {
         protection = true;
     }
+	
+	if (typeof(proxy) !== 'boolean') {
+        proxy = false;
+    }
 
     var sendError = function(params) {
         return  'this.errHandler.sendError(' + params[0] + ', ' + params[1] + ');';
@@ -40,6 +45,7 @@ module.exports = function(grunt) {
                 INCLUDE_HLS: includeHls,
                 INCLUDE_MSS: includeMss,
                 PROTECTION: protection,
+				PROXY: proxy,
                 sendError: sendError,
                 reject: reject
             }
