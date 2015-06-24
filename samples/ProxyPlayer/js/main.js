@@ -359,20 +359,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     //if video size change, player has to update subtitles size
     function onFullScreenChange(){
+        orangeHasPlayer.fullscreenChanged();
         setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
 
     function setSubtitlesCSSStyle(style){
         if (style) {
-        var fontSize = style.data.fontSize;
+            var fontSize = style.data.fontSize;
 
-        if (style.data.fontSize[style.data.fontSize.length-1] ==='%') {
-            fontSize  = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length-1))/100;
+            if (style.data.fontSize[style.data.fontSize.length-1] ==='%') {
+                fontSize  = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length-1))/100;
+            }
+
+            document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+fontSize+'px;font-family: '+style.data.fontFamily+'}';
         }
-
-        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+fontSize+'px;font-family: '+style.data.fontFamily+'}';
-    }
     }
 
 
