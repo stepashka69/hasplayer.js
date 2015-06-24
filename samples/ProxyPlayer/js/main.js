@@ -49,18 +49,14 @@ var app = angular.module('DashPlayer', [
 app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
     function($scope, $window, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
 
-    var player,
+    var orangeHasPlayer,
         video,
-        context,
         config = null,
         previousPlayedQuality = 0,
         previousDownloadedQuality= 0,
         metricsAgent = null,
         configMetrics = null,
         subtitlesCSSStyle = null;
-
-    $scope.chromecast = {};
-    $scope.chromecast.apiOk = false;
 
     ////////////////////////////////////////
     //
@@ -384,9 +380,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 
-    $scope.invalidateDisplay(true);
     $scope.safeApply();
-}
+    }
 
     ////////////////////////////////////////
     //
@@ -427,18 +422,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     ////////////////////////////////////////
     //
-    // Debugging
-    //
-    ////////////////////////////////////////
-
-    $scope.invalidateChartDisplay = false;
-
-    $scope.invalidateDisplay = function (value) {
-        $scope.invalidateChartDisplay = value;
-    };
-
-    ////////////////////////////////////////
-    //
     // Configuration file
     //
     ////////////////////////////////////////
@@ -446,8 +429,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     reqConfig.onload = function() {
         if (reqConfig.status === 200) {
             config = JSON.parse(reqConfig.responseText);
-            if (player) {
-                player.setConfig(config);
+            if (orangeHasPlayer) {
+                orangeHasPlayer.setParams(config);
             }
         }
     };
@@ -463,7 +446,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     video = document.querySelector(".dash-video-player video");
 
-    var orangeHasPlayer = new OrangeHasPlayer(video);
+    orangeHasPlayer = new OrangeHasPlayer(video);
 
     $scope.version = orangeHasPlayer.getVersion();
     $scope.versionHAS = orangeHasPlayer.getVersionHAS();
@@ -484,8 +467,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     if (config) {
         orangeHasPlayer.setParams(config);
     }
-
-    $scope.player = player;
 
     ////////////////////////////////////////
     //
@@ -511,23 +492,23 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.abrUp = function (type) {
         var newQuality,
-        metricsExt = player.getMetricsExt(),
+        metricsExt = orangeHasPlayer.getMetricsExt(),
         max = metricsExt.getMaxIndexForBufferType(type);
 
-        newQuality = player.getQualityFor(type) + 1;
+        newQuality = orangeHasPlayer.getQualityFor(type) + 1;
         // zero based
         if (newQuality >= max) {
             newQuality = max - 1;
         }
-        player.setQualityFor(type, newQuality);
+        orangeHasPlayer.setQualityFor(type, newQuality);
     };
 
     $scope.abrDown = function (type) {
-        var newQuality = player.getQualityFor(type) - 1;
+        var newQuality = orangeHasPlayer.getQualityFor(type) - 1;
         if (newQuality < 0) {
             newQuality = 0;
         }
-        player.setQualityFor(type, newQuality);
+        orangeHasPlayer.setQualityFor(type, newQuality);
     };
 
     $scope.playbackRateUp = function () {
@@ -538,8 +519,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
         video.playbackRate = video.playbackRate * 2;
         $scope.playbackRate = "x" + video.playbackRate;
-        player.setAutoSwitchQuality(false);
-        player.setQualityFor('video', 0);
+        orangeHasPlayer.setAutoSwitchQuality(false);
+        orangeHasPlayer.setQualityFor('video', 0);
     };
 
     $scope.playbackRateDown = function () {
@@ -552,7 +533,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         $scope.playbackRate = "x" + video.playbackRate;
 
         if (video.playbackRate === 1.0) {
-            player.setAutoSwitchQuality(true);
+            orangeHasPlayer.setAutoSwitchQuality(true);
         }
     };
 
@@ -564,7 +545,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.metricsAgentAvailable = (typeof MetricsAgent == 'function') ? true : false;
     $scope.metricsAgentActive = false;
-
 
     $scope.setMetricsAgent = function (value) {
         $scope.metricsAgentActive = value;
@@ -740,7 +720,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             orientation: 'vertical',
             range: true,
             stop: function(evt, ui) {
-                player.setConfig({
+                orangeHasPlayer.setConfig({
                     "video": {
                         "ABR.minQuality": ui.values[0],
                         "ABR.maxQuality": ui.values[1]
@@ -786,10 +766,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     }
 
     $scope.doLoad = function () {
-        if ($scope.chromecast.playing){
-            $scope.stopInChromecast();
-        }
-
         if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
             metricsAgent.createSession();
         }
@@ -804,8 +780,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.doPlay = function(){
         orangeHasPlayer.play();
     };
-
-
 
     $scope.hasLogo = function (item) {
         return (item.hasOwnProperty("logo") && item.logo !== null && item.logo !== undefined && item.logo !== "");
