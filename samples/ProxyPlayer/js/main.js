@@ -269,6 +269,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
+    function onVolumeChange(){
+        if ($scope.muteEnabled != orangeHasPlayer.getMute()) {
+           $scope.muteEnabled = orangeHasPlayer.getMute();
+        }else{
+            $('#sliderVolume').labeledslider({value: (orangeHasPlayer.getVolume()*100)});
+        }
+    }
+
 
     function setSubtitlesCSSStyle(style){
         if (style) {
@@ -460,6 +468,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     orangeHasPlayer.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
     orangeHasPlayer.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
     orangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
+    orangeHasPlayer.addEventListener("volumechange", onVolumeChange.bind(this));
     
     orangeHasPlayer.setAutoPlay(true);
     orangeHasPlayer.setDebug(false);
