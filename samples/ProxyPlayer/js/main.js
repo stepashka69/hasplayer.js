@@ -130,10 +130,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         video,
         context,
         config = null,
-        videoSeries = [],
-        dlSeries = [],
-        playSeries = [],
-        audioSeries = [],
         qualityChangements = [],
         previousPlayedQuality = 0,
         previousDownloadedQuality= 0,
@@ -181,13 +177,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         range:false,
         tickLabels: [],
     });
-
-    // reinit charts
-    // assign an empty array is not working... why ? reference in bufferData ?
-    videoSeries.splice(0, videoSeries.length);
-    audioSeries.splice(0, audioSeries.length);
-    dlSeries.splice(0, dlSeries.length);
-    playSeries.splice(0, playSeries.length);
 
     var converter = new MetricsTreeConverter();
     $scope.videoMetrics = null;
@@ -451,22 +440,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 }
             }
 
-            var dlPoint = [video.currentTime, Math.round(previousDownloadedQuality/1000)];
-            dlSeries.push(dlPoint);
-            var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
-            playSeries.push(playPoint);
-
-            videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
-
-            if (videoSeries.length > maxGraphPoints) {
-                videoSeries.splice(0, 1);
-            }
-
-            if (dlSeries.length > maxGraphPoints) {
-                dlSeries.splice(0, 1);
-                playSeries.splice(0, 1);
-            }
-
             //initialisation of bandwidth chart
             if (!$scope.optionsBandwidthGrid) {
                 // $scope.optionsBandwidth.xaxis.min = video.currentTime;
@@ -507,11 +480,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             }
 
             point = [parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))];
-            audioSeries.push(point);
-
-            if (audioSeries.length > maxGraphPoints) {
-                audioSeries.splice(0, 1);
-            }
         }
     }
 
@@ -567,29 +535,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.invalidateDisplay = function (value) {
         $scope.invalidateChartDisplay = value;
     };
-
-    $scope.bandwidthData = [{
-        data: dlSeries,
-        label: "download",
-        color: "#2980B9"
-    }, {
-        data: playSeries,
-        label: "playing",
-        color: "#E74C3C"
-    }];
-
-    $scope.bufferData = [
-    {
-        data:videoSeries,
-        label: "Taille du buffer Vidéo",
-        color: "#2980B9"
-    },
-    {
-        data: audioSeries,
-        label: "Taille du buffer Audio",
-        color: "#E74C3C"
-    }
-    ];
 
     ////////////////////////////////////////
     //
