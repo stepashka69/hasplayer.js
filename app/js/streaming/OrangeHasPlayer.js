@@ -26,6 +26,7 @@
                 mediaPlayer,
                 video,
                 isFullScreen = false,
+                isSubtitleVisible = true,
                 state= 'UNINITIALIZED';
 
             if(!videoElement){
@@ -39,13 +40,17 @@
             mediaPlayer.attachView(video);
             state = 'PLAYER_CREATED';
         
-
             var _isPlayerInitialized = function(){
                 if (state === 'UNINITIALIZED') {
                     throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
                 }
             };
           
+            var _onloaded = function(e){
+                if (video.textTracks.length > 0) {
+                    isSubtitleVisible === true ? video.textTracks[0].mode = 'showing' : video.textTracks[0].mode = 'hidden';
+                }
+            };
             
             /**
              * load a video stream with stream url and protection datas.
@@ -168,6 +173,8 @@
                         break;
                 }
             };
+
+            this.addEventListener("loadeddata", _onloaded);
 
             /**
              * unregister events on either video or MediaPlayer element
@@ -437,6 +444,39 @@
                      throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
                 }
                 value == true? mediaPlayer.getDebug().setLevel(4) : mediaPlayer.getDebug().setLevel(0);
+            };
+
+            /**
+             * Change Subtitles visibility
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @param  value - true to set textTraks mode to showing, false to set textTraks mode to hidden.
+             */
+            this.setSubtitleVisibility = function(value){
+                _isPlayerInitialized();
+                if (typeof value !== 'boolean') {
+                     throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
+                }
+                
+                isSubtitleVisible = value;
+
+                if (video.textTracks.length === 0) {
+                    return;
+                }
+
+                value === true ? video.textTracks[0].mode = 'showing' : video.textTracks[0].mode = 'hidden';
+            };
+
+            /**
+             * get Subtitles visibility.
+             * @access public
+             * @memberof OrangeHasPlayer#
+             * @return visibility - true if subtitles are showing, false otherwise.
+             */
+            this.getSubtitleVisibility = function(){
+                _isPlayerInitialized();
+               
+                return isSubtitleVisible;
             };
         };
         /**
