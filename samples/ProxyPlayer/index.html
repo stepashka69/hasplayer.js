@@ -463,6 +463,13 @@
                         <div ng-show="textData">
                             <select id="textTracksSelect" ng-model="textData" ng-options="track.lang +' - ' + track.id for track in textTracks" required="true" ng-change="selectTextTrack(textData)"></select>
                         </div>
+                        <div class="panel-heading panel-top">
+                        <span class="panel-title">Visibility</span>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" ng-class="{active:subtitleEnabled == false}" ng-click="setSubtitleEnabled(false)"><span>Off</span></button>
+                            <button type="button" class="btn btn-default" ng-class="{active:subtitleEnabled == true}" ng-click="setSubtitleEnabled(true)"><span>On</span></button>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

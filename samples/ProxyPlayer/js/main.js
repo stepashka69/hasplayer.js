@@ -259,6 +259,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         //init subtitles tracks
         $scope.textTracks = orangeHasPlayer.getSubtitleTracks();
         $scope.textData = $scope.textTracks[0];
+        //get subtitle visibility info
+        $scope.subtitleEnabled = orangeHasPlayer.getSubtitleVisibility();
     }
 
     //if video size change, player has to update subtitles size
@@ -476,6 +478,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.setMuteEnabled = function (enabled) {
         $scope.muteEnabled = enabled;
         orangeHasPlayer.setMute(enabled);
+    };
+
+    $scope.setSubtitleEnabled = function (enabled) {
+        $scope.subtitleEnabled = enabled;
+        orangeHasPlayer.setSubtitleVisibility(enabled);
     };
 
     $scope.abrUp = function (type) {
