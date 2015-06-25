@@ -27,6 +27,8 @@
                 video,
                 isFullScreen = false,
                 isSubtitleVisible = true,
+                audiotracks = [],
+                subtitletracks = [],
                 state= 'UNINITIALIZED';
 
             if(!videoElement){
@@ -60,6 +62,8 @@
              * @param protData - informations about protection (back url and custom data are stored in a json object).
              */
             this.load = function(url, protData){
+                audiotracks = [];
+                subtitletracks = [];
                 mediaPlayer.attachSource(url, protData);
                 if (mediaPlayer.getAutoPlay()) {
                     state = 'PLAYER_RUNNING';
@@ -208,7 +212,11 @@
              */
             this.getAudioTracks = function(){
                 _isPlayerInitialized();
-                return mediaPlayer.getAudioTracks();
+                var mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
+                for(var i=0; i<mediaPlayerAudioTracks.length;i++){
+                    audiotracks.push({id : mediaPlayerAudioTracks[i].id, lang : mediaPlayerAudioTracks[i].lang});
+                }
+                return audiotracks;
             };
 
             /**
@@ -219,7 +227,16 @@
              */
             this.setAudioTrack = function(audioTrack){
                 _isPlayerInitialized();
-                mediaPlayer.setAudioTrack(audioTrack);
+                var mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
+                for(var i=0; i<mediaPlayerAudioTracks.length;i++){
+                    if((audioTrack.id === mediaPlayerAudioTracks[i].id) &&
+                       (audioTrack.lang === mediaPlayerAudioTracks[i].lang)){
+                        mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
+                        return;
+                    }
+                }
+
+                throw new Error('OrangeHasPlayer.setAudioTrack():'+ audioTrack.lang +'is unknown');
             };
             
             /**
@@ -230,7 +247,16 @@
              */
             this.setSubtitleTrack = function(subtitleTrack){
                 _isPlayerInitialized();
-                mediaPlayer.setSubtitleTrack(subtitleTrack);
+                var mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
+                for(var i=0; i<mediaPlayerSubtitleTracks.length;i++){
+                    if((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) &&
+                       (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)){
+                        mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
+                        return;
+                    }
+                }
+
+                throw new Error('OrangeHasPlayer.setSubtitleTrack():'+ subtitleTrack.lang +'is unknown');
             };
 
             /**
@@ -241,7 +267,11 @@
              */
             this.getSubtitleTracks = function(){
                 _isPlayerInitialized();
-                return mediaPlayer.getSubtitleTracks();
+                var mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
+                for(var i=0; i<mediaPlayerSubtitleTracks.length;i++){
+                    subtitletracks.push({id : mediaPlayerSubtitleTracks[i].id, lang : mediaPlayerSubtitleTracks[i].lang});
+                }
+                return subtitletracks;
             };
 
             /**
