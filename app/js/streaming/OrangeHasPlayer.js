@@ -39,19 +39,19 @@
             mediaPlayer.startup();
             mediaPlayer.attachView(video);
             state = 'PLAYER_CREATED';
-        
+
             var _isPlayerInitialized = function(){
                 if (state === 'UNINITIALIZED') {
                     throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
                 }
             };
-          
+
             var _onloaded = function(e){
                 if (video.textTracks.length > 0) {
                     isSubtitleVisible === true ? video.textTracks[0].mode = 'showing' : video.textTracks[0].mode = 'hidden';
                 }
             };
-            
+                    
             /**
              * load a video stream with stream url and protection datas.
              * @access public
@@ -275,6 +275,14 @@
             this.getDuration = function(){
                 _isPlayerInitialized();
                 return video.duration;
+            };
+
+            /**
+             * [getPosition description]
+             * @return {[type]} [description]
+             */
+            this.getPosition = function(){
+
             };
 
             /**
