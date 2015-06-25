@@ -435,7 +435,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     video = document.querySelector(".dash-video-player video");
 
-    orangeHasPlayer = new OrangeHasPlayer(video);
+    orangeHasPlayer = new OrangeHasPlayer();
+
+    orangeHasPlayer.init(video);
 
     $scope.version = orangeHasPlayer.getVersion();
     $scope.versionHAS = orangeHasPlayer.getVersionHAS();
