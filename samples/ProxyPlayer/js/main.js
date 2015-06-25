@@ -74,14 +74,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.videoHeight = 0;
     $scope.videoCodecs = "-";
 
-    $scope.audioBitrate = 0;
-    $scope.audioIndex = 0;
-    $scope.audioPendingIndex = "";
-    $scope.audioMaxIndex = 0;
-    $scope.audioBufferLength = 0;
-    $scope.audioDroppedFrames = 0;
-    $scope.audioCodecs = "-";
-
     $scope.streamTypes = ["HLS", "MSS", "DASH"];
     $scope.streamType = "MSS";
 
@@ -340,31 +332,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 // case of downloaded quality change
                 if ((metrics.httpRequest !== null)  && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality)) {
                     previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
-            }
-        }
-    }
-
-    if (e.data.stream == "audio") {
-        metrics = getCribbedMetricsFor("audio");
-        if (metrics) {
-
-            $scope.audioBitrate = metrics.bandwidthValue;
-            $scope.audioIndex = metrics.bitrateIndexValue;
-            $scope.audioPendingIndex = metrics.pendingIndex;
-            $scope.audioMaxIndex = metrics.numBitratesValue;
-            $scope.audioBufferLength = metrics.bufferLengthValue;
-            $scope.audioDroppedFrames = metrics.droppedFramesValue;
-            if (metrics.movingLatency['audio']) {
-                $scope.audioLatencyCount = metrics.movingLatency['audio'].count;
-                $scope.audioLatency = metrics.movingLatency['audio'].low.toFixed(3) + " < " + metrics.movingLatency['audio'].average.toFixed(3) + " < " + metrics.movingLatency['audio'].high.toFixed(3);
-            }
-            if (metrics.movingDownload['audio']) {
-                $scope.audioDownloadCount = metrics.movingDownload['audio'].count;
-                $scope.audioDownload = metrics.movingDownload["audio"].low.toFixed(3) + " < " + metrics.movingDownload['audio'].average.toFixed(3) + " < " + metrics.movingDownload['audio'].high.toFixed(3);
-            }
-            if (metrics.movingRatio['audio']) {
-                $scope.audioRatioCount = metrics.movingRatio['audio'].count;
-                $scope.audioRatio = metrics.movingRatio['audio'].low.toFixed(3) + " < " + metrics.movingRatio['audio'].average.toFixed(3) + " < " + metrics.movingRatio['audio'].high.toFixed(3);
             }
         }
     }
