@@ -21,7 +21,7 @@
     var OrangeHasPlayer;
 
 
-        OrangeHasPlayer = function(videoElement){
+        OrangeHasPlayer = function(){
             var context,
                 mediaPlayer,
                 video,
@@ -30,17 +30,6 @@
                 audiotracks = [],
                 subtitletracks = [],
                 state= 'UNINITIALIZED';
-
-            if(!videoElement){
-                throw new Error('OrangeHasPlayer.init(): Invalid Argument');
-            }
-
-            context = new MediaPlayer.di.Context();
-            mediaPlayer = new MediaPlayer(context);
-            video = videoElement;
-            mediaPlayer.startup();
-            mediaPlayer.attachView(video);
-            state = 'PLAYER_CREATED';
 
             var _isPlayerInitialized = function(){
                 if (state === 'UNINITIALIZED') {
@@ -53,7 +42,22 @@
                     isSubtitleVisible === true ? video.textTracks[0].mode = 'showing' : video.textTracks[0].mode = 'hidden';
                 }
             };
-                    
+            
+            this.init = function(videoElement){
+                if(!videoElement){
+                    throw new Error('OrangeHasPlayer.init(): Invalid Argument');
+                }
+
+                context = new MediaPlayer.di.Context();
+                mediaPlayer = new MediaPlayer(context);
+                video = videoElement;
+                mediaPlayer.startup();
+                mediaPlayer.attachView(video);
+                state = 'PLAYER_CREATED';
+
+                this.addEventListener("loadeddata", _onloaded);
+            };
+
             /**
              * load a video stream with stream url and protection datas.
              * @access public
@@ -177,8 +181,6 @@
                         break;
                 }
             };
-
-            this.addEventListener("loadeddata", _onloaded);
 
             /**
              * unregister events on either video or MediaPlayer element
