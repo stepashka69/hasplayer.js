@@ -407,8 +407,10 @@
              * @return {Boolean} [description]
              */
             this.hasMediaSourceExtension = function() {
-                _isPlayerInitialized();
-                return mediaPlayer.hasMediaSourceExtension();
+                var hasWebKit = ("WebKitMediaSource" in window),
+                hasMediaSource = ("MediaSource" in window);
+
+                return (hasWebKit || hasMediaSource);
             };
 
             /**
@@ -416,8 +418,11 @@
              * @return {Boolean} [description]
              */
             this.hasMediaKeysExtension = function() {
-                _isPlayerInitialized();
-                return mediaPlayer.hasMediaKeysExtension();
+                var hasWebKit = ("WebKitMediaKeys" in window),
+                    hasMs = ("MSMediaKeys" in window),
+                    hasMediaSource = ("MediaKeys" in window);
+
+                return (hasWebKit || hasMs || hasMediaSource);
             };
 
             /**
