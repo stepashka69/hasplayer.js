@@ -82,8 +82,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.audioDroppedFrames = 0;
     $scope.audioCodecs = "-";
 
-    $scope.optionsBandwidthGrid = null;
-
     $scope.streamTypes = ["HLS", "MSS", "DASH"];
     $scope.streamType = "MSS";
 
@@ -277,7 +275,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 
-
     function setSubtitlesCSSStyle(style){
         if (style) {
             var fontSize = style.data.fontSize;
@@ -290,15 +287,13 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         }
     }
 
-
     function onSubtitlesStyleChanged(style) {
         subtitlesCSSStyle = style;
         setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
     function metricChanged(e) {
-        var metrics,
-        point;
+        var metrics;
 
         if (e.data.stream == "video") {
             metrics = getCribbedMetricsFor("video");
@@ -344,20 +339,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 if ((metrics.httpRequest !== null)  && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality)) {
                     previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
             }
-
-            //initialisation of bandwidth chart
-            if (!$scope.optionsBandwidthGrid) {
-                // $scope.optionsBandwidth.xaxis.min = video.currentTime;
-                $scope.optionsBandwidthGrid = {};
-                $scope.optionsBandwidthGrid.grid = {markings:[]};
-                $scope.optionsBandwidthGrid.yaxis = {ticks: []};
-                for (var idx in metrics.bitrateValues) {
-                    $scope.optionsBandwidthGrid.grid.markings.push({yaxis: { from: metrics.bitrateValues[idx]/1000, to: metrics.bitrateValues[idx]/1000 },color:"#b0b0b0"});
-                    $scope.optionsBandwidthGrid.yaxis.ticks.push([metrics.bitrateValues[idx]/1000, ""+metrics.bitrateValues[idx]/1000+"k"]);
-                }
-                $scope.optionsBandwidthGrid.yaxis.min = Math.min.apply(null,metrics.bitrateValues)/1000;
-                $scope.optionsBandwidthGrid.yaxis.max = Math.max.apply(null,metrics.bitrateValues)/1000;
-            }
         }
     }
 
@@ -383,8 +364,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
                 $scope.audioRatioCount = metrics.movingRatio['audio'].count;
                 $scope.audioRatio = metrics.movingRatio['audio'].low.toFixed(3) + " < " + metrics.movingRatio['audio'].average.toFixed(3) + " < " + metrics.movingRatio['audio'].high.toFixed(3);
             }
-
-            point = [parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))];
         }
     }
 
