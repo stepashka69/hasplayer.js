@@ -32,6 +32,7 @@
             videoQualityChanged = [],
             videoBitrates = null,
             downloadedBdthValue = undefined,
+            defaultAudioLang = 'und',
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -591,6 +592,17 @@
             _isPlayerInitialized();
 
             return isSubtitleVisible;
+        };
+
+        /**
+         * [setDefaultAudioLang description]
+         * @param {[type]} value [description]
+         */
+        this.setDefaultAudioLang = function(value) {
+            if (typeof value !== 'string') {
+                throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
+            }
+            defaultAudioLang = value;
         };
     };
     /**

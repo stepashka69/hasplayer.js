@@ -266,7 +266,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         orangeHasPlayer = new OrangeHasPlayer();
 
         orangeHasPlayer.init(video);
-
+        orangeHasPlayer.setDefaultAudioLang('eng');
         $scope.version = orangeHasPlayer.getVersion();
         $scope.versionHAS = orangeHasPlayer.getVersionHAS();
         $scope.versionFull = orangeHasPlayer.getVersionFull();
