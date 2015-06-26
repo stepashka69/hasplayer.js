@@ -209,7 +209,6 @@
         this.addEventListener = function(type, listener) {
             switch (type) {
                 case "error":
-                case "metricChanged":
                 case "subtitlesStyleChanged":
                     mediaPlayer.addEventListener(type, listener);
                     break;
@@ -218,8 +217,13 @@
                 case "mozfullscreenchange":
                 case "webkitfullscreenchange":
                 case "volumechange":
+                case "play_bitrate":
+                case "download_bitrate":
                     video.addEventListener(type, listener);
                     break;
+                default :
+                    throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');
+
             }
         };
 
@@ -233,7 +237,6 @@
         this.removeEventListener = function(type, listener) {
             switch (type) {
                 case "error":
-                case "metricChanged":
                 case "subtitlesStyleChanged":
                     mediaPlayer.removeEventListener(type, listener);
                     break;
@@ -242,8 +245,12 @@
                 case "mozfullscreenchange":
                 case "webkitfullscreenchange":
                 case "volumechange":
+                case "play_bitrate":
+                case "download_bitrate":
                     video.removeEventListener(type, listener);
                     break;
+                default :
+                    throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');                    
             }
         };
 
