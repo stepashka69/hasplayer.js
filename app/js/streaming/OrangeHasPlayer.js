@@ -29,7 +29,9 @@
             isSubtitleVisible = true,
             audiotracks = [],
             subtitletracks = [],
+            videoQualityChanged = [],
             videoBitrates = null,
+            downloadedBdthValue = undefined,
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -44,12 +46,40 @@
             }
         };
 
+        var _dispatchBitrateEvent = function(type, value) {
+            var event = new CustomEvent(
+                type, {
+                    detail: {
+                        bitrate: value
+                    },
+                    bubbles: true,
+                    cancelable: true
+                });
+            video.dispatchEvent(event);
+        };
+
+        var _onUpdate = function() {
+            var currentTime = video.currentTime,
+                currentSwitch = null,
+                i = 0;
+
+            // Check for playing quality change
+            for (i = 0; i < videoQualityChanged.length; i += 1) {
+                currentSwitch = videoQualityChanged[i];
+                if (currentTime >= currentSwitch.mediaStartTime) {
+                    _dispatchBitrateEvent('play_bitrate', currentSwitch.switchedQuality);
+                    // And remove when it's played
+                    videoQualityChanged.splice(0, 1);
+                    break;
+                }
+            }
+        };
+
         var _metricChanged = function(e) {
             var metricsExt,
                 repSwitch,
-                bitrateIndexValue,
-                bandwidthValue,
-                numBitratesValue,
+                httpRequests,
+                httpRequest,
                 metrics;
 
             _isPlayerInitialized();
@@ -59,25 +89,20 @@
                 metrics = mediaPlayer.getMetricsFor("video");
                 if (metrics && metricsExt) {
                     repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
-                        
-                    if (repSwitch !== null) {
-                        bitrateIndexValue = metricsExt.getIndexForRepresentation(repSwitch.to);
-                        bandwidthValue = metricsExt.getBandwidthForRepresentation(repSwitch.to);
-                    }
+                    httpRequests = metricsExt.getHttpRequests(metrics);
+                    httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
 
-                    numBitratesValue = metricsExt.getMaxIndexForBufferType("video");
                     videoBitrates = metricsExt.getBitratesForType("video");
 
-                    if (isNaN(bandwidthValue) || bandwidthValue === undefined) {
-                        bandwidthValue = 0;
-                    }
-
-                    if (isNaN(bitrateIndexValue) || bitrateIndexValue === undefined) {
-                        bitrateIndexValue = 0;
-                    }
-
-                    if (isNaN(numBitratesValue) || numBitratesValue === undefined) {
-                        numBitratesValue = 0;
+                    // case of downloaded quality change
+                    if ((httpRequest !== null) && (videoBitrates[httpRequest.quality] != downloadedBdthValue)) {
+                        downloadedBdthValue = videoBitrates[httpRequest.quality];
+                        videoQualityChanged.push({
+                            mediaStartTime: httpRequest.startTime,
+                            switchedQuality: videoBitrates[httpRequest.quality],
+                            downloadStartTime: httpRequest.trequest
+                        });
+                        _dispatchBitrateEvent('download_bitrate', downloadedBdthValue);
                     }
                 }
             }
@@ -96,7 +121,8 @@
             state = 'PLAYER_CREATED';
 
             this.addEventListener("loadeddata", _onloaded);
-            this.addEventListener("metricChanged", _metricChanged);
+            mediaPlayer.addEventListener("metricChanged", _metricChanged);
+            video.addEventListener("timeupdate", _onUpdate);
         };
 
         /**
