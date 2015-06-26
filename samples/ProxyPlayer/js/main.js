@@ -89,12 +89,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         //
         ////////////////////////////////////////
 
-        $scope.videoBitrate = 0;
-        $scope.videoIndex = 0;
-        $scope.videoWidth = 0;
-        $scope.videoHeight = 0;
-        $scope.videoCodecs = "-";
-
         $scope.streamTypes = ["HLS", "MSS", "DASH"];
         $scope.streamType = "MSS";
 
@@ -125,6 +119,16 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         $scope.selectTextTrack = function(track) {
             orangeHasPlayer.setSubtitleTrack(track);
         };
+
+        function onPlayBitrateChanged(e) {
+            $scope.playVideoBitrate = e.detail.bitrate/1000;
+            $scope.safeApply();
+        }
+
+        function onDownloadBitrateChanged(e) {
+            $scope.downloadVideoBitrate = e.detail.bitrate/1000;
+            $scope.safeApply();
+        }
 
         function onload(e) {
             //init audio tracks
@@ -271,6 +275,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         orangeHasPlayer.addEventListener("error", onError.bind(this));
         orangeHasPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged.bind(this));
         orangeHasPlayer.addEventListener("loadeddata", onload.bind(this));
+        orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged.bind(this));
+        orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged.bind(this));
         orangeHasPlayer.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
         orangeHasPlayer.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
         orangeHasPlayer.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
