@@ -264,9 +264,12 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         video = document.querySelector(".dash-video-player video");
 
         orangeHasPlayer = new OrangeHasPlayer();
-
+        
         orangeHasPlayer.init(video);
-        orangeHasPlayer.setDefaultAudioLang('eng');
+
+        orangeHasPlayer.setDefaultAudioLang('deu');
+        orangeHasPlayer.setDefaultSubtitleLang('fre');
+
         $scope.version = orangeHasPlayer.getVersion();
         $scope.versionHAS = orangeHasPlayer.getVersionHAS();
         $scope.versionFull = orangeHasPlayer.getVersionFull();
