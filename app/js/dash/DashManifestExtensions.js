@@ -320,7 +320,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
         return deferred.promise;
     },
-
+    
     getSpecificAudioData: function (manifest, periodIndex, language) {
         "use strict";
         var i,
@@ -425,6 +425,35 @@ Dash.dependencies.DashManifestExtensions.prototype = {
                 );
             }
         );
+
+        return deferred.promise;
+    },
+
+    getSpecificTextData: function (manifest, periodIndex, language) {
+        "use strict";
+        var i,
+            len,
+            deferred = Q.defer(),
+            found = false,
+            self = this;
+
+        this.getTextDatas(manifest, periodIndex).then(
+            function (datas) {
+                if (!datas || datas.length === 0) {
+                    deferred.resolve(null);
+                }
+
+                for (i = 0, len = datas.length; i < len && found !== true; i += 1) {
+                    if (datas[i].lang === language) {
+                        found = true;
+                        deferred.resolve(self.processAdaptation(datas[i]));
+                    }
+                }
+        
+                if (!found) {
+                    deferred.resolve(datas[0]);
+                }
+            });
 
         return deferred.promise;
     },

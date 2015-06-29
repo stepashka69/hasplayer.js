@@ -67,6 +67,7 @@
         scheduleWhilePaused = false,
         bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
         defaultAudioLang = 'und',
+        defaultSubtitleLang = 'und',
 
         /**
          * is hasplayer ready to play the stream? element and source have been setted?
@@ -105,6 +106,7 @@
                 streamController.setVideoModel(videoModel);
                 streamController.setAutoPlay(autoPlay);
                 streamController.setDefaultAudioLang(defaultAudioLang);
+                streamController.setDefaultSubtitleLang(defaultSubtitleLang);
             }
             // ORANGE: add source stream parameters
             streamController.load(source, protectionData);
@@ -689,6 +691,11 @@
         setDefaultAudioLang: function(language) {
             defaultAudioLang = language;
         },
+
+        setDefaultSubtitleLang: function(language) {
+            defaultSubtitleLang = language;
+        },
+        
 
         play: play,
         isReady: isReady,

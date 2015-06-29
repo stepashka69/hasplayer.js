@@ -36,6 +36,7 @@
         subtitleTracks,
         protectionData,
         defaultAudioLang = 'und',
+        defaultSubtitleLang = 'und',
 
         play = function () {
             activeStream.play();
@@ -324,6 +325,7 @@
                                     stream.initProtection(self.protectionData);
                                     stream.setAutoPlay(autoPlay);
                                     stream.setDefaultAudioLang(defaultAudioLang);
+                                    stream.setDefaultSubtitleLang(defaultSubtitleLang);
                                     stream.load(manifest, period);
                                     streams.push(stream);
                                 }
@@ -525,6 +527,10 @@
 
         setDefaultAudioLang: function(language) {
             defaultAudioLang = language;
+        },
+
+        setDefaultSubtitleLang: function(language) {
+            defaultSubtitleLang = language;
         },
 
         play: play,

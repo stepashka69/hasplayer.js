@@ -33,6 +33,7 @@
             videoBitrates = null,
             downloadedBdthValue = undefined,
             defaultAudioLang = 'und',
+            defaultSubtitleLang = 'und',
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -138,6 +139,8 @@
             subtitletracks = [];
             //init default audio language
             mediaPlayer.setDefaultAudioLang(defaultAudioLang);
+            //init default subtitle language
+            mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
             mediaPlayer.attachSource(url, protData);
             if (mediaPlayer.getAutoPlay()) {
                 state = 'PLAYER_RUNNING';
@@ -340,7 +343,7 @@
             _isPlayerInitialized();
             mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
             for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
-                if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) &&
+                if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
                     return;
@@ -605,6 +608,17 @@
                 throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
             }
             defaultAudioLang = value;
+        };
+
+        /**
+         * [setDefaultSubtitleLang description]
+         * @param {[type]} value [description]
+         */
+        this.setDefaultSubtitleLang = function(value) {
+            if (typeof value !== 'string') {
+                throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
+            }
+            defaultSubtitleLang = value;
         };
     };
     /**
