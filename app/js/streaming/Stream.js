@@ -49,6 +49,7 @@ MediaPlayer.dependencies.Stream = function () {
         playingListener,
         loadstartListener,
         waitingListener,
+        defaultAudioLang = 'und',
 
         periodInfo = null,
         //ORANGE : detect when a paused command occurs whitout a seek one

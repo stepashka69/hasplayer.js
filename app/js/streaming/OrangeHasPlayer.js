@@ -121,7 +121,7 @@
             mediaPlayer.attachView(video);
             state = 'PLAYER_CREATED';
 
-            this.addEventListener("loadeddata", _onloaded);
+            this.addEventListener("loadeddata", _onloaded.bind(this));
             mediaPlayer.addEventListener("metricChanged", _metricChanged);
             video.addEventListener("timeupdate", _onUpdate);
         };
@@ -136,6 +136,8 @@
         this.load = function(url, protData) {
             audiotracks = [];
             subtitletracks = [];
+            //init default audio language
+            mediaPlayer.setDefaultAudioLang(defaultAudioLang);
             mediaPlayer.attachSource(url, protData);
             if (mediaPlayer.getAutoPlay()) {
                 state = 'PLAYER_RUNNING';
@@ -315,7 +317,7 @@
             _isPlayerInitialized();
             mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
             for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
-                if ((audioTrack.id === mediaPlayerAudioTracks[i].id) &&
+                if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
                     return;
