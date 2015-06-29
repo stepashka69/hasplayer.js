@@ -807,8 +807,6 @@ MediaPlayer.dependencies.Stream = function() {
         updateData = function(updatedPeriodInfo) {
             var self = this,
                 videoData,
-                audioData,
-                textData,
                 deferredVideoData,
                 deferredAudioData,
                 deferredTextData,
@@ -845,14 +843,7 @@ MediaPlayer.dependencies.Stream = function() {
             }
 
             if (audioController) {
-                audioData = audioController.getData();
-
-                // ORANGE: refer only the audio track index to get new audio data (switch audio use case)
-                //if (!!audioData && audioData.hasOwnProperty("id")) {
-                //    deferredAudioData = self.manifestExt.getDataForId(audioData.id, manifest, periodInfo.index);
-                //} else {
                 deferredAudioData = self.manifestExt.getDataForIndex(audioTrackIndex, manifest, periodInfo.index);
-                //}
 
                 deferredAudioData.then(
                     function(data) {
@@ -868,14 +859,7 @@ MediaPlayer.dependencies.Stream = function() {
             }
 
             if (textController) {
-                textData = textController.getData();
-
-                // ORANGE: refer only the text track index to get new text data (switch text use case)
-                //if (!!textData && textData.hasOwnProperty("id")) {
-                //    deferredTextData = self.manifestExt.getDataForId(textData.id, manifest, periodInfo.index);
-                //} else {
                 deferredTextData = self.manifestExt.getDataForIndex(textTrackIndex, manifest, periodInfo.index);
-                //}
 
                 deferredTextData.then(
                     function(data) {
@@ -1036,6 +1020,17 @@ MediaPlayer.dependencies.Stream = function() {
             }
 
             return deferredAudioUpdate.promise;
+        },
+
+        getSelectedAudioTrack: function() {
+            var self = this,
+                manifest = self.manifestModel.getValue();
+
+            if (audioController) {
+                return self.manifestExt.getDataForIndex_(audioTrackIndex, manifest, periodInfo.index);
+            }
+
+            return undefined;
         },
 
         // ORANGE: add the capability to set subtitle track

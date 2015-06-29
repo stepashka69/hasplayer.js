@@ -455,6 +455,15 @@
             return audioTracks;
         },
 
+        getSelectedAudioTrack: function() {
+
+            if (activeStream) {
+                return activeStream.getSelectedAudioTrack();
+            }
+
+            return null;
+        },
+
         // ORANGE: audioTrack Management
         setAudioTrack:function(audioTrack){
             if(activeStream){

@@ -34,6 +34,7 @@
             downloadedBdthValue = undefined,
             defaultAudioLang = 'und',
             defaultSubtitleLang = 'und',
+            selectedAudioTrack = null,
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -620,6 +621,30 @@
             }
             defaultSubtitleLang = value;
         };
+
+        /**
+         * [getSelectedAudioTrack description]
+         * @return {[type]} [description]
+         */
+        this.getSelectedAudioTrack = function() {
+            var i = 0,
+                selectedTrack;
+
+            _isPlayerInitialized();
+
+            selectedTrack = mediaPlayer.getSelectedAudioTrack();
+
+            for (i = 0; i < audiotracks.length; i++) {
+                if (audiotracks[i].id === selectedTrack.id ||
+                    audiotracks[i].lang === selectedTrack.lang) {
+                    selectedAudioTrack = audiotracks[i];
+                    return selectedAudioTrack;
+                };
+                
+            }
+            return null;
+        };
+
     };
     /**
      * Wrap UMD definition for OrangeHasPlayer

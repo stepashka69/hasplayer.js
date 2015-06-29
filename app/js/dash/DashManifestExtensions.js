@@ -206,6 +206,13 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(adaptations[index]);
     },
 
+    getDataForIndex_: function (index, manifest, periodIndex) {
+        "use strict";
+        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+
+        return adaptations[index];
+    },
+
     getDataIndex: function (data, manifest, periodIndex) {
         "use strict";
 
