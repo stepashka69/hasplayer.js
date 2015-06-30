@@ -413,8 +413,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [getPosition description]
-     * @return {[type]} [description]
+     * get position for the current media
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return position in seconds
      */
     this.getPosition = function() {
 
@@ -485,8 +487,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [getMute description]
-     * @return {[type]} [description]
+     * get mute status.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return true if player is mute, false otherwise
      */
     this.getMute = function() {
         _isPlayerInitialized();
@@ -494,8 +498,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [setMute description]
-     * @param {[type]} state [description]
+     * change the mute property of the player.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param state - new mute state, true or false.
      */
     this.setMute = function(state) {
         _isPlayerInitialized();
@@ -506,8 +512,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [setVolume description]
-     * @param {[type]} volume [description]
+     * change volume level.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param volume - volume level, value is between 0 and 1.
      */
     this.setVolume = function(volume) {
         _isPlayerInitialized();
@@ -519,8 +527,11 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [getVolume description]
-     * @return {[type]} [description]
+     * get volume level
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return current volume level between 0 and 1. Volume and mute are two differents attributes, volume level could be
+     * 0,5 and mute property setted to true.
      */
     this.getVolume = function() {
         _isPlayerInitialized();
@@ -528,8 +539,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [isLive description]
-     * @return {Boolean} [description]
+     * give information to web app, to know if current stream is a live stream or not.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return true if current stream is a live stream, false otherwise.
      */
     this.isLive = function() {
         _isPlayerInitialized();
@@ -537,8 +550,10 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [setDebug description]
-     * @param {[type]} value [description]
+     * enable or disable debug informations.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param value - true, if debug has to be enabled, false otherwise.
      */
     this.setDebug = function(value) {
         _isPlayerInitialized();
@@ -586,8 +601,11 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [setDefaultAudioLang description]
-     * @param {[type]} value [description]
+     * set the default audio language. If the current language is available in the stream,
+     * the audio track will be activated. By default, the first audio track is selected.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param value - language value is based on ISO 3166-2, for instance 'eng'.
      */
     this.setDefaultAudioLang = function(value) {
         if (typeof value !== 'string') {
@@ -597,8 +615,11 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [setDefaultSubtitleLang description]
-     * @param {[type]} value [description]
+     * set the default subtitle language. If the current language is available in the stream,
+     * the subtitle track will be activated. By default, the first subtitle track is selected.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param value - language value is based on ISO 3166-2, for instance 'eng'.
      */
     this.setDefaultSubtitleLang = function(value) {
         if (typeof value !== 'string') {
@@ -608,8 +629,11 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [getSelectedAudioTrack description]
-     * @return {[type]} [description]
+     * get the current selected audio track. It's useful if the default language has not been detected
+     * in the manifest stream.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return current selected audio track
      */
     this.getSelectedAudioTrack = function() {
         var i = 0,
@@ -630,8 +654,11 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [getSelectedSubtitleTrack description]
-     * @return {[type]} [description]
+     * get the current selected subtitle track. It's useful if the default language has not been detected
+     * in the manifest stream.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return current selected subtitle track
      */
     this.getSelectedSubtitleTrack = function() {
         var i = 0,
@@ -653,9 +680,18 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * [loadMetricsAgent description]
-     * @param  {[type]} parameters [description]
-     * @return {[type]}            [description]
+     * load metrics Agent with the parameters values.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param  parameters - for instance, it's JSON object
+     *                      {"name": "csQoE (local)",
+     *                       "activationUrl":"http://localhost:8082/config",
+     *                       "serverUrl":"http://localhost:8082/metrics",
+     *                       "dbServerUrl":"http://localhost:8082/metricsDB",
+     *                       "collector":"HasPlayerCollector",
+     *                       "formatter":"CSQoE",
+     *                       "sendingTime": 10000
+     *                     },
      */
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
@@ -670,16 +706,22 @@ OrangeHasPlayer = function() {
 };
 
 /**
- * [hasMediaSourceExtension description]
- * @return {Boolean} [description]
+ * give the current browser status on MSE support.
+ * @access public
+ * @static
+ * @memberof OrangeHasPlayer#
+ * @return true if MSE is supported, false otherwise.
  */
 OrangeHasPlayer.hasMediaSourceExtension = function() {
     return new MediaPlayer.utils.Capabilities().supportsMediaSource();
 };
 
 /**
- * [hasMediaKeysExtension description]
- * @return {Boolean} [description]
+ * give the current browser status on EME support.
+ * @access public
+ * @static
+ * @memberof OrangeHasPlayer#
+ * @return true if EME is supported, false otherwise.
  */
 OrangeHasPlayer.hasMediaKeysExtension = function() {
     return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
