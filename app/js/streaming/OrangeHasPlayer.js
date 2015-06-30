@@ -36,6 +36,7 @@
             defaultSubtitleLang = 'und',
             selectedAudioTrack = null,
             selectedSubtitleTrack = null,
+            metricsAgent = undefined,
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -139,6 +140,13 @@
         this.load = function(url, protData) {
             audiotracks = [];
             subtitletracks = [];
+            
+            _isPlayerInitialized();
+            
+            if (metricsAgent) {
+                metricsAgent.createSession();
+            }
+
             //init default audio language
             mediaPlayer.setDefaultAudioLang(defaultAudioLang);
             //init default subtitle language
@@ -643,29 +651,22 @@
         };
 
         /**
-         * [loadHasPlayerConfig description]
-         * @param  {[type]} fileUrl [description]
+         * [loadMetricsAgent description]
+         * @param  {[type]} parameters [description]
          * @return {[type]}         [description]
          */
-        this.loadHasPlayerConfig = function(fileUrl) {
-            var reqConfig = new XMLHttpRequest(),
-                config;
-
+        this.loadMetricsAgent = function(parameters) {
             _isPlayerInitialized();
 
-            function reqListener() {
-                if (reqConfig.status === 200) {
-                    config = JSON.parse(reqConfig.responseText);
-                    if (config) {
-                        this.setParams(config);
-                    }
-                }
+            metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
+            
+            metricsAgent.init(function(activated) {
+                console.log("Metrics agent state: ", activated);
+            });
+        };
+            
             };
                 
-            reqConfig.onload = reqListener.bind(this);
-            reqConfig.open("GET", fileUrl, true);
-            reqConfig.setRequestHeader("Content-type", "application/json");
-            reqConfig.send();
     /**
      * [hasMediaSourceExtension description]
      * @return {Boolean} [description]
