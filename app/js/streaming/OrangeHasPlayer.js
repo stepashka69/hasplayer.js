@@ -664,6 +664,33 @@
             }
             return null;
         };
+
+        /**
+         * [loadHasPlayerConfig description]
+         * @param  {[type]} fileUrl [description]
+         * @return {[type]}         [description]
+         */
+        this.loadHasPlayerConfig = function(fileUrl) {
+            var reqConfig = new XMLHttpRequest(),
+                config;
+
+            _isPlayerInitialized();
+
+            function reqListener() {
+                if (reqConfig.status === 200) {
+                    debugger;
+                    config = JSON.parse(reqConfig.responseText);
+                    if (config) {
+                        this.setParams(config);
+                    }
+                }
+            };
+                
+            reqConfig.onload = reqListener.bind(this);
+            reqConfig.open("GET", fileUrl, true);
+            reqConfig.setRequestHeader("Content-type", "application/json");
+            reqConfig.send();
+        };
     };
     /**
      * Wrap UMD definition for OrangeHasPlayer
