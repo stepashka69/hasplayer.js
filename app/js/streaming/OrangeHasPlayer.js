@@ -678,7 +678,6 @@
 
             function reqListener() {
                 if (reqConfig.status === 200) {
-                    debugger;
                     config = JSON.parse(reqConfig.responseText);
                     if (config) {
                         this.setParams(config);

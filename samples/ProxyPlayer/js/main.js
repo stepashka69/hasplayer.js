@@ -76,7 +76,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         var orangeHasPlayer,
             video,
-            config = null,
             previousPlayedQuality = 0,
             previousDownloadedQuality = 0,
             metricsAgent = null,
@@ -562,12 +561,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
             resetBitratesSlider();
 
             //ORANGE : reset subtitles data.
-            $scope.textTracks = null;
-            $scope.textData = null;
-
-            // ORANGE: reset ABR controller
-            //orangeHasPlayer.setQualityFor("video", 0);
-            //orangeHasPlayer.setQualityFor("audio", 0);
+           // $scope.textTracks = null;
+           // $scope.textData = null;
 
             $scope.playbackRate = "x1";
             orangeHasPlayer.load($scope.selectedItem.url, $scope.selectedItem.protData);
