@@ -625,12 +625,15 @@
                     audiotracks[i].lang === selectedTrack.lang) {
                     selectedAudioTrack = audiotracks[i];
                     return selectedAudioTrack;
-                };
-
+                }
             }
             return null;
         };
 
+        /**
+         * [getSelectedSubtitleTrack description]
+         * @return {[type]} [description]
+         */
         this.getSelectedSubtitleTrack = function() {
             var i = 0,
                 selectedTrack;
