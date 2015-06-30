@@ -20,6 +20,7 @@ module.exports = function(grunt) {
         'useminPrepare',            // Get files in blocks tags
         'concat:generated',         // Merge all the files in one for each blocks
         'cssmin:generated',         // Minify the CSS in blocks (none)
+        'umd:all',                  // package in universal module definition
         'uglify:generated',         // Uglify the JS in blocks
         'uglify:min',               // Minify the hasplayer.js into hasplayer.min.js
         'json',                     // Get the json files into a json.js
