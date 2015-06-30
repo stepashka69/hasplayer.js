@@ -133,10 +133,12 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         function onload(e) {
             //init audio tracks
             $scope.audioTracks = orangeHasPlayer.getAudioTracks();
-            $scope.audioData = $scope.audioTracks[0];
+            $scope.audioData = orangeHasPlayer.getSelectedAudioTrack();
+
             //init subtitles tracks
             $scope.textTracks = orangeHasPlayer.getSubtitleTracks();
-            $scope.textData = $scope.textTracks[0];
+            $scope.textData = orangeHasPlayer.getSelectedSubtitleTrack();
+
             //get subtitle visibility info
             $scope.subtitleEnabled = orangeHasPlayer.getSubtitleVisibility();
 
