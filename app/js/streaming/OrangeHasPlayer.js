@@ -689,7 +689,20 @@
             reqConfig.open("GET", fileUrl, true);
             reqConfig.setRequestHeader("Content-type", "application/json");
             reqConfig.send();
+    /**
+     * [hasMediaSourceExtension description]
+     * @return {Boolean} [description]
+     */
+    OrangeHasPlayer.hasMediaSourceExtension = function() {
+        return new MediaPlayer.utils.Capabilities().supportsMediaSource();
         };
+
+    /**
+     * [hasMediaKeysExtension description]
+     * @return {Boolean} [description]
+     */
+    OrangeHasPlayer.hasMediaKeysExtension = function() {
+        return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
     };
     /**
      * Wrap UMD definition for OrangeHasPlayer
