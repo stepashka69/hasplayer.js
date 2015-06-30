@@ -683,15 +683,14 @@ OrangeHasPlayer = function() {
      * load metrics Agent with the parameters values.
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param  parameters - for instance, it's JSON object
-     *                      {"name": "csQoE (local)",
-     *                       "activationUrl":"http://localhost:8082/config",
-     *                       "serverUrl":"http://localhost:8082/metrics",
-     *                       "dbServerUrl":"http://localhost:8082/metricsDB",
-     *                       "collector":"HasPlayerCollector",
-     *                       "formatter":"CSQoE",
-     *                       "sendingTime": 10000
-     *                     },
+     * @param  parameters -  {json} parameters The parameters.
+     *                       @param {String} parameters.name 
+     *                       @param {String} parameters.activationUrl 
+     *                       @param {String} parameters.serverUrl
+     *                       @param {String} parameters.dbServerUrl
+     *                       @param {String} parameters.collector
+     *                       @param {String} parameters.formatter
+     *                       @param {Integer} parameters.sendingTime
      */
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
