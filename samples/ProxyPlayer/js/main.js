@@ -241,24 +241,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         ////////////////////////////////////////
         //
-        // Configuration file
-        //
-        ////////////////////////////////////////
-        var reqConfig = new XMLHttpRequest();
-        reqConfig.onload = function() {
-            if (reqConfig.status === 200) {
-                config = JSON.parse(reqConfig.responseText);
-                if (orangeHasPlayer) {
-                    orangeHasPlayer.setParams(config);
-                }
-            }
-        };
-        reqConfig.open("GET", "hasplayer_config.json", true);
-        reqConfig.setRequestHeader("Content-type", "application/json");
-        reqConfig.send();
-
-        ////////////////////////////////////////
-        //
         // Player Setup
         //
         ////////////////////////////////////////
@@ -271,6 +253,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         orangeHasPlayer.setDefaultAudioLang('deu');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
+        orangeHasPlayer.loadHasPlayerConfig('hasplayer_config.json');
 
         $scope.version = orangeHasPlayer.getVersion();
         $scope.versionHAS = orangeHasPlayer.getVersionHAS();
@@ -289,10 +272,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         orangeHasPlayer.setAutoPlay(true);
         orangeHasPlayer.setDebug(false);
-
-        if (config) {
-            orangeHasPlayer.setParams(config);
-        }
 
         ////////////////////////////////////////
         //
