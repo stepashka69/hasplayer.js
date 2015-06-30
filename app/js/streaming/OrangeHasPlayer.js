@@ -35,6 +35,7 @@
             defaultAudioLang = 'und',
             defaultSubtitleLang = 'und',
             selectedAudioTrack = null,
+            selectedSubtitleTrack = null,
             state = 'UNINITIALIZED';
 
         var _isPlayerInitialized = function() {
@@ -254,7 +255,7 @@
                 case "download_bitrate":
                     video.addEventListener(type, listener);
                     break;
-                default :
+                default:
                     throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');
 
             }
@@ -282,8 +283,8 @@
                 case "download_bitrate":
                     video.removeEventListener(type, listener);
                     break;
-                default :
-                    throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');                    
+                default:
+                    throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');
             }
         };
 
@@ -617,7 +618,7 @@
          */
         this.setDefaultSubtitleLang = function(value) {
             if (typeof value !== 'string') {
-                throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
+                throw new Error('OrangeHasPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
             defaultSubtitleLang = value;
         };
@@ -640,11 +641,29 @@
                     selectedAudioTrack = audiotracks[i];
                     return selectedAudioTrack;
                 };
-                
+
             }
             return null;
         };
 
+        this.getSelectedSubtitleTrack = function() {
+            var i = 0,
+                selectedTrack;
+
+            _isPlayerInitialized();
+
+            selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
+
+            for (i = 0; i < subtitletracks.length; i++) {
+                if (subtitletracks[i].id === selectedTrack.id ||
+                    subtitletracks[i].lang === selectedTrack.lang) {
+                    selectedSubtitleTrack = subtitletracks[i];
+                    return selectedSubtitleTrack;
+                };
+                
+            }
+            return null;
+        };
     };
     /**
      * Wrap UMD definition for OrangeHasPlayer

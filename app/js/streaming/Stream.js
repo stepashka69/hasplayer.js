@@ -1071,6 +1071,17 @@ MediaPlayer.dependencies.Stream = function() {
             return deferredSubtitleUpdate.promise;
         },
 
+        getSelectedSubtitleTrack: function() {
+            var self = this,
+                manifest = self.manifestModel.getValue();
+
+            if (textController) {
+                return self.manifestExt.getDataForIndex_(textTrackIndex, manifest, periodInfo.index);
+            }
+
+            return undefined;
+        },
+
         initProtection: function(protectionData) {
             if (this.capabilities.supportsEncryptedMedia()) {
                 if (!this.protectionController) {

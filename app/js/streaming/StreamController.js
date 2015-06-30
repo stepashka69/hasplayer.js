@@ -461,7 +461,7 @@
                 return activeStream.getSelectedAudioTrack();
             }
 
-            return null;
+            return undefined;
         },
 
         // ORANGE: audioTrack Management
@@ -480,6 +480,15 @@
             if(activeStream){
                 activeStream.setSubtitleTrack(subtitleTrack);
             }
+        },
+
+        getSelectedSubtitleTrack: function() {
+            
+            if(activeStream){
+                return activeStream.getSelectedSubtitleTrack();
+            }
+
+            return undefined;
         },
         
         // ORANGE: add source stream parameters

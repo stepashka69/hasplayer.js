@@ -578,6 +578,10 @@
                 return streamController.getSelectedAudioTrack();
             },
 
+            getSelectedSubtitleTrack: function() {
+                return streamController.getSelectedSubtitleTrack();
+            },
+
             /**
              * get the audio track list
              * @access public
