@@ -482,29 +482,6 @@
         };
 
         /**
-         * [hasMediaSourceExtension description]
-         * @return {Boolean} [description]
-         */
-        this.hasMediaSourceExtension = function() {
-            var hasWebKit = ("WebKitMediaSource" in window),
-                hasMediaSource = ("MediaSource" in window);
-
-            return (hasWebKit || hasMediaSource);
-        };
-
-        /**
-         * [hasMediaKeysExtension description]
-         * @return {Boolean} [description]
-         */
-        this.hasMediaKeysExtension = function() {
-            var hasWebKit = ("WebKitMediaKeys" in window),
-                hasMs = ("MSMediaKeys" in window),
-                hasMediaSource = ("MediaKeys" in window);
-
-            return (hasWebKit || hasMs || hasMediaSource);
-        };
-
-        /**
          * [getMute description]
          * @return {[type]} [description]
          */
