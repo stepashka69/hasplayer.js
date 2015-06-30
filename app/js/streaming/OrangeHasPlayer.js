@@ -656,7 +656,7 @@
         /**
          * [loadMetricsAgent description]
          * @param  {[type]} parameters [description]
-         * @return {[type]}         [description]
+         * @return {[type]}            [description]
          */
         this.loadMetricsAgent = function(parameters) {
             _isPlayerInitialized();
@@ -668,15 +668,15 @@
             });
         };
             
-            };
-                
+    };
+
     /**
      * [hasMediaSourceExtension description]
      * @return {Boolean} [description]
      */
     OrangeHasPlayer.hasMediaSourceExtension = function() {
         return new MediaPlayer.utils.Capabilities().supportsMediaSource();
-        };
+    };
 
     /**
      * [hasMediaKeysExtension description]

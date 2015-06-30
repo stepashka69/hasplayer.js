@@ -78,8 +78,16 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
             video,
             previousPlayedQuality = 0,
             previousDownloadedQuality = 0,
-            metricsAgent = null,
-            configMetrics = null,
+            config,
+            configMetrics = {
+                "name": "csQoE (local)",
+                "activationUrl": "http://localhost:8080/config",
+                "serverUrl": "http://localhost:8080/metrics",
+                "dbServerUrl": "http://localhost:8080/metricsDB",
+                "collector": "HasPlayerCollector",
+                "formatter": "CSQoE",
+                "sendingTime": 10000
+            },
             subtitlesCSSStyle = null;
 
         ////////////////////////////////////////
@@ -246,13 +254,24 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         video = document.querySelector(".dash-video-player video");
 
+        if (!OrangeHasPlayer.hasMediaSourceExtension()) {
+            alert("MSE not supported!");
+        }
+
+        if (!OrangeHasPlayer.hasMediaKeysExtension()) {
+            alert("EME not supported!");
+        }
+
         orangeHasPlayer = new OrangeHasPlayer();
-        
+       
         orangeHasPlayer.init(video);
+
+        //loadMetricsConfig("./metricsagent_config.json");
+        loadHasPlayerConfig('hasplayer_config.json');
+        orangeHasPlayer.loadMetricsAgent(configMetrics);
 
         orangeHasPlayer.setDefaultAudioLang('deu');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
-        orangeHasPlayer.loadHasPlayerConfig('hasplayer_config.json');
 
         $scope.version = orangeHasPlayer.getVersion();
         $scope.versionHAS = orangeHasPlayer.getVersionHAS();
@@ -346,72 +365,38 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
             }
         };
 
-        ////////////////////////////////////////
-        //
-        // Metrics Agent Setup
-        //
-        ////////////////////////////////////////
-
-        $scope.metricsAgentAvailable = (typeof MetricsAgent == 'function') ? true : false;
-        $scope.metricsAgentActive = false;
-
-        $scope.setMetricsAgent = function(value) {
-            $scope.metricsAgentActive = value;
-            if (typeof MetricsAgent == 'function') {
-                if ($scope.metricsAgentActive) {
-                    metricsAgent = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-                    $scope.metricsAgentVersion = metricsAgent.getVersion();
-                    metricsAgent.init(function(activated) {
-                        $scope.metricsAgentActive = activated;
-                        console.log("Metrics agent state: ", activated);
-                        setTimeout(function() {
-                            $scope.$apply();
-                        }, 500);
-                        if (activated === false) {
-                            alert("Metrics agent not available!");
-                        }
-                    });
-                } else if (metricsAgent) {
-                    metricsAgent.stop();
+        function loadHasPlayerConfig(fileUrl) {
+            var reqConfig = new XMLHttpRequest();
+              
+            reqConfig.onload = function() {
+                if (reqConfig.status === 200) {
+                    config = JSON.parse(reqConfig.responseText);
+                    if (orangeHasPlayer && config) {
+                        orangeHasPlayer.setParams(config);
+                    }
                 }
-            }
+            };
+
+            reqConfig.open("GET", fileUrl, true);
+            reqConfig.setRequestHeader("Content-type", "application/json");
+            reqConfig.send();
         };
 
 
-        ////////////////////////////////////////
-        //
-        // Metrics Agent Configuration
-        //
-        ////////////////////////////////////////
-        if ($scope.metricsAgentAvailable) {
-            configMetrics = [{
-                "name": "csQoE (local)",
-                "activationUrl": "http://localhost:8080/config",
-                "serverUrl": "http://localhost:8080/metrics",
-                "dbServerUrl": "http://localhost:8080/metricsDB",
-                "collector": "HasPlayerCollector",
-                "formatter": "CSQoE",
-                "sendingTime": 10000
-            }];
-            $scope.configMetrics = configMetrics;
-            $scope.selected_metric_option = $scope.configMetrics[0];
-
+        function loadMetricsConfig(metricsConfigUrl) {
             var reqMA = new XMLHttpRequest();
-            reqMA.onload = function() {
+
+            reqMA.onload = function (){
                 if (reqMA.status === 200) {
                     configMetrics = JSON.parse(reqMA.responseText);
-                    $scope.configMetrics = configMetrics.items;
-                    $scope.selected_metric_option = $scope.configMetrics[0];
+                    if (orangeHasPlayer && configMetrics) {
+                        orangeHasPlayer.loadMetricsAgent(configMetrics);
+                    };
                 }
-            };
-            reqMA.open("GET", "./metricsagent_config.json", true);
+            }; 
+            reqMA.open("GET", metricsConfigUrl, true);
             reqMA.setRequestHeader("Content-type", "application/json");
             reqMA.send();
-        }
-
-        $scope.setMetricOption = function(metricOption) {
-            $scope.selected_metric_option = metricOption;
-            console.log($scope.selected_metric_option.name);
         };
 
 
@@ -560,19 +545,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
             resetBitratesSlider();
 
-            //ORANGE : reset subtitles data.
-           // $scope.textTracks = null;
-           // $scope.textData = null;
-
             $scope.playbackRate = "x1";
             orangeHasPlayer.load($scope.selectedItem.url, $scope.selectedItem.protData);
         }
 
         $scope.doLoad = function() {
-            if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
-                metricsAgent.createSession();
-            }
-
             initPlayer();
         };
 
