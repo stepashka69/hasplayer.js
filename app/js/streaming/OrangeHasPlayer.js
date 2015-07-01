@@ -265,18 +265,12 @@ OrangeHasPlayer = function() {
             case "subtitlesStyleChanged":
                 mediaPlayer.addEventListener(type, listener);
                 break;
-            case "loadeddata":
-            case "fullscreenchange":
-            case "mozfullscreenchange":
-            case "webkitfullscreenchange":
-            case "volumechange":
             case "play_bitrate":
             case "download_bitrate":
                 video.addEventListener(type, listener);
                 break;
             default:
-                throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');
-
+                video.addEventListener(type, listener);
         }
     };
 
@@ -294,17 +288,12 @@ OrangeHasPlayer = function() {
             case "subtitlesStyleChanged":
                 mediaPlayer.removeEventListener(type, listener);
                 break;
-            case "loadeddata":
-            case "fullscreenchange":
-            case "mozfullscreenchange":
-            case "webkitfullscreenchange":
-            case "volumechange":
             case "play_bitrate":
             case "download_bitrate":
                 video.removeEventListener(type, listener);
                 break;
             default:
-                throw new Error('OrangeHasPlayer.addEventListener(): Unknown Event');
+                video.removeEventListener(type, listener);
         }
     };
 
