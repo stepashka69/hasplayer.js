@@ -307,6 +307,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
         resetVolumeSlider();
 
         $scope.abrEnabled = true;
+        $scope.seekValue;
 
         $scope.setAbrEnabled = function(enabled) {
             $scope.abrEnabled = enabled;
@@ -558,6 +559,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
 
         $scope.doLoad = function() {
             initPlayer();
+        };
+
+        $scope.doSeek = function() {
+            orangeHasPlayer.seek($scope.seekValue);
         };
 
         $scope.doStop = function() {

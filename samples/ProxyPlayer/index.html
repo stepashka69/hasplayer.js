@@ -370,6 +370,13 @@
                 </div>
                 <div class="panel">
                     <div class="panel-heading panel-top">
+                        <span class="panel-title">Seek</span>
+                           <input type="number" class="form-control" ng-model="seekValue" />
+                           <button class="btn btn-primary" type="button" ng-click="doSeek()" style="margin-top: 3px;border-radius: 0;">Seek</button>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-heading panel-top">
                         <span class="panel-title">ABR</span>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default" ng-class="{active:abrEnabled == false}" ng-click="setAbrEnabled(false)"><span>Off</span></button>
