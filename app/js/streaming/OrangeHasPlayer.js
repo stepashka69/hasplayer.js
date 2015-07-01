@@ -13,7 +13,7 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @constructs OrangeHasPlayer
- * @param videoElement - an HTML5 video element used to decode and show media data.
+ *
  */
  /*jshint -W020 */
 OrangeHasPlayer = function() {
@@ -108,6 +108,13 @@ OrangeHasPlayer = function() {
         }
     };
 
+    /**
+     * load a video stream with stream url and protection datas.
+     * @method init
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param videoElement - an HTML5 video element used to decode and show media data.
+     */
     this.init = function(videoElement) {
         if (!videoElement) {
             throw new Error('OrangeHasPlayer.init(): Invalid Argument');
@@ -127,6 +134,7 @@ OrangeHasPlayer = function() {
 
     /**
      * load a video stream with stream url and protection datas.
+     * @method load
      * @access public
      * @memberof OrangeHasPlayer#
      * @param url - manifest video url(Dash, Smooth or Hls manifest).
@@ -154,6 +162,7 @@ OrangeHasPlayer = function() {
 
     /**
      * play the current content. If auto play value equals to true, this call isn't necessary after the load command.
+     * @method play
      * @access public
      * @memberof OrangeHasPlayer#
      */
@@ -171,6 +180,7 @@ OrangeHasPlayer = function() {
      * Seek the content to the specify value. In VOD, this function have to test
      * if the value is between 0 and content duration.
      * In LIVE, this function will be used to move in the DVR window.
+     * @method seek
      * @access public
      * @memberof OrangeHasPlayer#
      * @param time - time value in seconds.
@@ -181,6 +191,7 @@ OrangeHasPlayer = function() {
 
     /**
      * Call the pause command on video element.
+     * @method pause     
      * @access public
      * @memberof OrangeHasPlayer#
      */
@@ -191,6 +202,7 @@ OrangeHasPlayer = function() {
 
     /**
      * set the HasPlayer auto play to value.
+     * @method setAutoPlay
      * @access public
      * @memberof OrangeHasPlayer#
      * @param value - auto play value.
@@ -202,6 +214,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get if the HasPlayer has enabled the auto play. Default value is true
+     * @method getAutoPlay
      * @access public
      * @memberof OrangeHasPlayer#
      * @return auto play value
@@ -214,6 +227,7 @@ OrangeHasPlayer = function() {
     /**
      * used to stop streaming and seek to 0. After this call, a play command, without changing url, restarts
      * streaming from the beginning.
+     * @method stop
      * @access public
      * @memberof OrangeHasPlayer#
      */
@@ -228,6 +242,7 @@ OrangeHasPlayer = function() {
 
     /**
      * Reset HasPlayer data : stop downloading chunks elements, current url and protection data values set to null.
+     * @method reset
      * @access public
      * @memberof OrangeHasPlayer#
      */
@@ -238,6 +253,7 @@ OrangeHasPlayer = function() {
 
     /**
      * register events on either video or MediaPlayer element
+     * @method addEventListener
      * @access public
      * @memberof OrangeHasPlayer#
      * @param type - event type.
@@ -266,6 +282,7 @@ OrangeHasPlayer = function() {
 
     /**
      * unregister events on either video or MediaPlayer element
+     * @method removeEventListener
      * @access public
      * @memberof OrangeHasPlayer#
      * @param type - event type.
@@ -293,6 +310,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get audio tracks array from adaptive manifest
+     * @method getAudioTracks
      * @access public
      * @memberof OrangeHasPlayer#
      * @return audio tracks array
@@ -314,6 +332,7 @@ OrangeHasPlayer = function() {
 
     /**
      * set current audio track
+     * @method setAudioTrack
      * @access public
      * @memberof OrangeHasPlayer#
      * @param audioTrack - current audio track.
@@ -337,6 +356,7 @@ OrangeHasPlayer = function() {
 
     /**
      * set current subtitle track
+     * @method setSubtitleTrack
      * @access public
      * @memberof OrangeHasPlayer#
      * @param subtitleTrack - current subtitle track.
@@ -360,6 +380,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get subtitle tracks array from adaptive manifest
+     * @method getSubtitleTracks
      * @access public
      * @memberof OrangeHasPlayer#
      * @return subtitle tracks array
@@ -381,6 +402,7 @@ OrangeHasPlayer = function() {
 
     /**
      * set parameters on HasPlayer
+     * @method setParams
      * @access public
      * @memberof OrangeHasPlayer#
      * @param config - json config to set.
@@ -392,6 +414,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get video bitrates array from adaptive manifest
+     * @method getVideoBitrates
      * @access public
      * @memberof OrangeHasPlayer#
      * @return video bitrates array
@@ -403,6 +426,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get current media duration
+     * @method getDuration
      * @access public
      * @memberof OrangeHasPlayer#
      * @return media duration in seconds, infinity for live content
@@ -414,6 +438,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get position for the current media
+     * @method getPosition
      * @access public
      * @memberof OrangeHasPlayer#
      * @return position in seconds
@@ -424,6 +449,7 @@ OrangeHasPlayer = function() {
 
     /**
      * used by webapp to notify HasPlayer that size of the main div has changed.
+     * @method fullscreenChanged
      * @access public
      * @memberof OrangeHasPlayer#
      * @param value - the new fullscreen value
@@ -433,6 +459,7 @@ OrangeHasPlayer = function() {
     };
 
     /**
+     * @method getVersion
      * @access public
      * @memberof OrangeHasPlayer#
      * @return player version
@@ -444,6 +471,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get the HAS version
+     * @method getVersionHAS
      * @access public
      * @memberof OrangeHasPlayer#
      * @return hasplayer version
@@ -455,6 +483,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get the full version (with git tag, only at build)
+     * @method getVersionFull
      * @access public
      * @memberof OrangeHasPlayer#
      * @return full hasplayer version
@@ -465,6 +494,7 @@ OrangeHasPlayer = function() {
     };
 
     /**
+     * @method getBuildDate
      * @access public
      * @memberof OrangeHasPlayer#
      * @return date when the hasplayer has been built.
@@ -476,6 +506,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get current quality for a stream
+     * @method getQualityFor
      * @access public
      * @memberof OrangeHasPlayer#
      * @param  type - stream type, video or audio.
@@ -488,6 +519,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get mute status.
+     * @method getMute
      * @access public
      * @memberof OrangeHasPlayer#
      * @return true if player is mute, false otherwise
@@ -499,6 +531,7 @@ OrangeHasPlayer = function() {
 
     /**
      * change the mute property of the player.
+     * @method setMute
      * @access public
      * @memberof OrangeHasPlayer#
      * @param state - new mute state, true or false.
@@ -513,6 +546,7 @@ OrangeHasPlayer = function() {
 
     /**
      * change volume level.
+     * @method setVolume 
      * @access public
      * @memberof OrangeHasPlayer#
      * @param volume - volume level, value is between 0 and 1.
@@ -528,6 +562,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get volume level
+     * @method getVolume
      * @access public
      * @memberof OrangeHasPlayer#
      * @return current volume level between 0 and 1. Volume and mute are two differents attributes, volume level could be
@@ -540,6 +575,7 @@ OrangeHasPlayer = function() {
 
     /**
      * give information to web app, to know if current stream is a live stream or not.
+     * @method isLive
      * @access public
      * @memberof OrangeHasPlayer#
      * @return true if current stream is a live stream, false otherwise.
@@ -551,6 +587,7 @@ OrangeHasPlayer = function() {
 
     /**
      * enable or disable debug informations.
+     * @method setDebug
      * @access public
      * @memberof OrangeHasPlayer#
      * @param value - true, if debug has to be enabled, false otherwise.
@@ -569,6 +606,7 @@ OrangeHasPlayer = function() {
 
     /**
      * Change Subtitles visibility
+     * @method setSubtitleVisibility
      * @access public
      * @memberof OrangeHasPlayer#
      * @param  value - true to set textTraks mode to showing, false to set textTraks mode to hidden.
@@ -590,6 +628,7 @@ OrangeHasPlayer = function() {
 
     /**
      * get Subtitles visibility.
+     * @method getSubtitleVisibility
      * @access public
      * @memberof OrangeHasPlayer#
      * @return visibility - true if subtitles are showing, false otherwise.
@@ -603,6 +642,7 @@ OrangeHasPlayer = function() {
     /**
      * set the default audio language. If the current language is available in the stream,
      * the audio track will be activated. By default, the first audio track is selected.
+     * @method
      * @access public
      * @memberof OrangeHasPlayer#
      * @param value - language value is based on ISO 3166-2, for instance 'eng'.
@@ -617,6 +657,7 @@ OrangeHasPlayer = function() {
     /**
      * set the default subtitle language. If the current language is available in the stream,
      * the subtitle track will be activated. By default, the first subtitle track is selected.
+     * @method setDefaultSubtitleLang
      * @access public
      * @memberof OrangeHasPlayer#
      * @param value - language value is based on ISO 3166-2, for instance 'eng'.
@@ -631,6 +672,7 @@ OrangeHasPlayer = function() {
     /**
      * get the current selected audio track. It's useful if the default language has not been detected
      * in the manifest stream.
+     * @method getSelectedAudioTrack
      * @access public
      * @memberof OrangeHasPlayer#
      * @return current selected audio track
@@ -656,6 +698,7 @@ OrangeHasPlayer = function() {
     /**
      * get the current selected subtitle track. It's useful if the default language has not been detected
      * in the manifest stream.
+     * @method getSelectedSubtitleTrack
      * @access public
      * @memberof OrangeHasPlayer#
      * @return current selected subtitle track
@@ -681,6 +724,7 @@ OrangeHasPlayer = function() {
 
     /**
      * load metrics Agent with the parameters values.
+     * @method loadMetricsAgent
      * @access public
      * @memberof OrangeHasPlayer#
      * @param  parameters -  {json} parameters The parameters.
