@@ -272,7 +272,8 @@ OrangeHasPlayer = function() {
      * @method addEventListener
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param type - event type.
+     * @param type - event type, current video events and play_bitrate, download_bitrate events. On MediaPlayer class,
+     * there is also error and subtitlesStyleChanged events.
      * @param listener - callback name.
      */
     this.addEventListener = function(type, listener) {
@@ -295,7 +296,8 @@ OrangeHasPlayer = function() {
      * @method removeEventListener
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param type - event type.
+     * @param type - event type, current video events and play_bitrate, download_bitrate events. On MediaPlayer class,
+     * there is also error and subtitlesStyleChanged events.
      * @param listener - callback name.
      */
     this.removeEventListener = function(type, listener) {
