@@ -15,7 +15,7 @@
  * @constructs OrangeHasPlayer
  *
  */
- /*jshint -W020 */
+/*jshint -W020 */
 OrangeHasPlayer = function() {
     var context,
         mediaPlayer,
@@ -167,7 +167,9 @@ OrangeHasPlayer = function() {
      * @memberof OrangeHasPlayer#
      */
     this.play = function() {
-        if (state === "PLAYER_STOPPED") {
+        _isPlayerInitialized();
+        
+        if (state === "PLAYER_STOPPED" || state === "PLAYER_PAUSED") {
             video.play();
         } else {
             mediaPlayer.play();
@@ -192,7 +194,7 @@ OrangeHasPlayer = function() {
             throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
         }
 
-        if (!this.isLive() && time>= 0 && time<=video.duration) {
+        if (!this.isLive() && time >= 0 && time <= video.duration) {
             video.currentTime = time;
         }
 
@@ -200,20 +202,25 @@ OrangeHasPlayer = function() {
             throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
         }
 
-        if (time< 0 || time > video.duration) {
+        if (time < 0 || time > video.duration) {
             throw new Error('OrangeHasPlayer.seek(): seek value not correct');
         }
     };
 
     /**
      * Call the pause command on video element.
-     * @method pause     
+     * @method pause
      * @access public
      * @memberof OrangeHasPlayer#
      */
     this.pause = function() {
-        state = "PLAYER_PAUSED";
-        video.pause();
+        _isPlayerInitialized();
+        if (!this.isLive()) {
+            state = "PLAYER_PAUSED";
+            video.pause();
+        }else {
+            throw new Error('OrangeHasPlayer.pause(): pause is impossible on live stream');
+        }
     };
 
     /**
@@ -248,6 +255,7 @@ OrangeHasPlayer = function() {
      * @memberof OrangeHasPlayer#
      */
     this.stop = function() {
+        _isPlayerInitialized();
         state = "PLAYER_STOPPED";
         video.pause();
         //test if player is in VOD mode
@@ -454,7 +462,7 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
         if (!this.isLive()) {
             return video.currentTime;
-        }else{
+        } else {
             return undefined;
         }
     };
@@ -558,7 +566,7 @@ OrangeHasPlayer = function() {
 
     /**
      * change volume level.
-     * @method setVolume 
+     * @method setVolume
      * @access public
      * @memberof OrangeHasPlayer#
      * @param volume - volume level, value is between 0 and 1.
@@ -740,8 +748,8 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @param  parameters -  {json} parameters The parameters.
-     *                       @param {String} parameters.name 
-     *                       @param {String} parameters.activationUrl 
+     *                       @param {String} parameters.name
+     *                       @param {String} parameters.activationUrl
      *                       @param {String} parameters.serverUrl
      *                       @param {String} parameters.dbServerUrl
      *                       @param {String} parameters.collector
