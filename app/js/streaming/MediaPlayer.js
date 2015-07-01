@@ -53,7 +53,6 @@ MediaPlayer = function(aContext) {
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
-        system,
         element,
         source,
         protectionData = null,
@@ -258,32 +257,12 @@ MediaPlayer = function(aContext) {
             return (h === 0 ? "" : (h < 10 ? "0" + h.toString() + ":" : h.toString() + ":")) + (m < 10 ? "0" + m.toString() : m.toString()) + ":" + (s < 10 ? "0" + s.toString() : s.toString());
         },
 
-        // UMD check for dijon
-        setupDI = function() {
-            var instanciateSystem = function(di) {
-                system = new di.System();
-                system.mapValue("system", system);
-                system.mapOutlet("system");
-                system.injectInto(context);
-            };
 
-            if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
-                require("dijon", function(dijon) {
-                    instanciateSystem(dijon);
-                });
-            } else if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
-                require("dijon", function(dijon) {
-                    instanciateSystem(dijon);
-                });
-
-            } else if (typeof window !== "undefined" && window !== null) {
-                instanciateSystem(dijon);
-            }
-
-        };
-
-    // Set up DI.
-    setupDI();
+    system = new dijon.System();
+    system.mapValue("system", system);
+    system.mapOutlet("system");
+    system.injectInto(context);
+   
 
     return {
         /**
