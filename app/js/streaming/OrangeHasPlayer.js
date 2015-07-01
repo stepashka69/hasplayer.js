@@ -701,7 +701,6 @@ OrangeHasPlayer = function() {
             console.log("Metrics agent state: ", activated);
         });
     };
-
 };
 
 /**
