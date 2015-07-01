@@ -168,7 +168,7 @@ OrangeHasPlayer = function() {
      */
     this.play = function() {
         _isPlayerInitialized();
-        
+
         if (state === "PLAYER_STOPPED" || state === "PLAYER_PAUSED") {
             video.play();
         } else {
