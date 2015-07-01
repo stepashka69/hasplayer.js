@@ -18,6 +18,7 @@ MediaPlayer.models.ManifestModel = function () {
 
     return {
         system: undefined,
+        eventBus: undefined,
 
         getValue:  function () {
             return manifest;
@@ -26,6 +27,13 @@ MediaPlayer.models.ManifestModel = function () {
         setValue: function (value) {
             manifest = value;
             this.system.notify("manifestUpdated");
+
+            if (manifest !== null) {
+                this.eventBus.dispatchEvent({
+                    type: "manifestLoaded",
+                    data: value
+                });
+            }
         }
     };
 };
@@ -33,3 +41,7 @@ MediaPlayer.models.ManifestModel = function () {
 MediaPlayer.models.ManifestModel.prototype = {
     constructor: MediaPlayer.models.ManifestModel
 };
+
+
+
+

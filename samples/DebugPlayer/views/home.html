@@ -1,0 +1,33 @@
+<div class="content">
+
+	<div class="header">
+		<img src="img/if.png">
+	</div>
+
+	<div ng-repeat="flux in data.fluxList">
+		<a ng-href="{{call.getPageLink(flux.link)}}" class="flux">
+			<span class="flux-information">
+				<i class="icon fa-video-camera" ng-show="flux.live" title="Live"></i>
+				<i class="icon fa-film" ng-show="!flux.live" title="VOD"></i>
+
+				<i class="icon fa-volume-up" ng-show="flux.audioChoice" title="Plusieurs pistes"></i>
+				<i class="icon fa-volume-down" ng-show="!flux.audioChoice" title="Une seule piste"></i>
+
+				<i class="icon fa-lock" ng-show="flux.DRM" title="DRM"></i>
+				<i class="icon fa-unlock" ng-show="!flux.DRM" title="Aucune DRM"></i>
+			</span>
+
+			<span class="flux-type">{{flux.type}}</span>
+			<span class="flux-name">{{ flux.name }}</span>
+			
+		</a>
+	</div>
+
+	<button ng-click="call.debugToggle()" ng-show="option.debug" class="btn-valid pull-right">
+		<span>DEBUG ON</span>
+	</button>
+
+	<button ng-click="call.debugToggle()" ng-show="!option.debug" class="btn-cancel pull-right">
+		<span>DEBUG OFF</span>
+	</button>
+</div>

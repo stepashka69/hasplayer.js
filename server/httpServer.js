@@ -2,13 +2,16 @@ var express = require('express');
 var phantom = require('phantom');
 var bodyParser = require('body-parser');
 var csv = require('express-csv');
+var fs = require('fs');
+var exec = require('child_process').exec,
+    child;
 
 var app = express();
 
 // var port =  process.env.PORT || 3000;
 
 // set path to the parent folder 
-var dirname = __dirname.replace('server','');
+var dirname = __dirname.replace('server','..');
 
 app.set('views', __dirname + '/export-pdf');
 app.engine('html', require('hogan-express'));
@@ -40,27 +43,31 @@ app.get('/export-csv', function(req, res) {
 	res.setHeader('Content-disposition', 'attachment; filename=sample.csv');
 
 
-	//Adding provenance for PlaySeries & Wanem & Bandwidth
+	//Adding provenance for PlaySeries & NetBalancer & Bandwidth
 	var i = 0,
 	csvData = null,
 	playSeriesName = 'Player',
 	playSeries = JSON.parse(JSON.stringify(database[req.query.id].requestSeries)),
 	playSeriesLength = playSeries.length,
 	y = 0,
-	wanemSeriesName = 'Wanem',
-	wanemSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence)),
-	wanemSeriesLength = wanemSeries.length,
+	netBalancerSeriesName = 'NetBalancer',
+	netBalancerSeries = JSON.parse(JSON.stringify(database[req.query.id].dataSequence)),
+	netBalancerSeriesLength = netBalancerSeries.length,
 	z = 0,
 	calcBandwidthSeriesName = 'Bandwidth',
 	calcBandwidthSeries = JSON.parse(JSON.stringify(database[req.query.id].calcBandwidthSeries)),
 	calcBandwidthSeriesLength = calcBandwidthSeries.length;
 
 	for(i; i < playSeriesLength; i++) {
+		console.log(playSeries[i]);
+	}
+
+	for(i; i < playSeriesLength; i++) {
 		playSeries[i].unshift(playSeriesName);
 	}
 
-	for(y; y < wanemSeriesLength; y++) {
-		wanemSeries[y].unshift(wanemSeriesName);
+	for(y; y < netBalancerSeriesLength; y++) {
+		netBalancerSeries[y].unshift(netBalancerSeriesName);
 	}
 
 	for(z; z< calcBandwidthSeriesLength; z++) {
@@ -69,9 +76,9 @@ app.get('/export-csv', function(req, res) {
 	}
 
 	if(req.query.showBandwidth === 'true') {
-		csvData = playSeries.concat(wanemSeries, calcBandwidthSeries);
+		csvData = playSeries.concat(netBalancerSeries, calcBandwidthSeries);
 	} else {
-		csvData = playSeries.concat(wanemSeries);
+		csvData = playSeries.concat(netBalancerSeries);
 	}
 	
 	//Sorting all arrays of datas
@@ -120,4 +127,42 @@ app.post('/chart-db', function(req, res){
 	database[id] = req.body;
 
 	res.json({"id": id});
+});
+
+
+
+//Testing MetricsAgent
+app.get('/config', function(req, res){
+	//console.log(req.query);
+	res.json({"active": true});
+
+	// Create a file for new session
+	fs.writeFileSync("metrics.json", "### " + new Date().toString() + "\n");
+
+	// Create a file for new session
+	fs.writeFileSync("metricsDB.json", "### " + new Date().toString() + "\n");
+});
+
+app.post('/metrics', function(req, res){
+	//console.log(req.body);
+
+	res.send(204);
+
+	// Append message to file
+	var fd = fs.openSync("metrics.json", 'a+');
+	fs.writeSync(fd, "### " + new Date().toString() + "\n");
+	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
+	fs.closeSync(fd);
+});
+
+app.post('/metricsDB', function(req, res){
+	//console.log(req.body);
+
+	res.send(204);
+
+	// Append message to file
+	var fd = fs.openSync("metricsDB.json", 'a+');
+	fs.writeSync(fd, "### " + new Date().toString() + "\n");
+	fs.writeSync(fd, JSON.stringify(req.body, null, '\t') + "\n");
+	fs.closeSync(fd);
 });

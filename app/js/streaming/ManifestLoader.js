@@ -14,13 +14,19 @@
 MediaPlayer.dependencies.ManifestLoader = function () {
     "use strict";
 
+
     var RETRY_ATTEMPTS = 3,
         RETRY_INTERVAL = 500,
         deferred = null,
+
+
         parseBaseUrl = function (url) {
             var base = null;
 
             if (url.indexOf("/") !== -1) {
+                if (url.indexOf("?") !== -1) {
+                    url = url.substring(0, url.indexOf("?"));
+                }
                 base = url.substring(0, url.lastIndexOf("/") + 1);
             }
 
@@ -33,20 +39,28 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 requestTime = new Date(),
                 mpdLoadedTime = null,
                 needFailureReport = true,
+                onload = null,
+                report = null,
                 self = this;
 
-            this.debug.log("Start loading manifest: " + url);
 
-            request.open("GET", url, true);
-
-            request.onload = function () {
-                if (request.status < 200 || request.status > 299)
-                {
+            onload = function () {
+                if (request.status < 200 || request.status > 299) {
                   return;
                 }
+
+                self.debug.log("[ManifestLoader] Manifest downloaded");
+                
+                //ORANGE : Get the redirection URL and use it as base URL
+                if (request.responseURL) {
+                  self.debug.log("[ManifestLoader] Redirect URL: " + request.responseURL);
+                  baseUrl = parseBaseUrl(request.responseURL);
+                }
+
                 needFailureReport = false;
                 mpdLoadedTime = new Date();
 
+                self.tokenAuthentication.checkRequestHeaderForToken(request);
                 self.metricsModel.addHttpRequest("stream",
                                                  null,
                                                  "MPD",
@@ -63,15 +77,20 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                     function (manifest) {
                         manifest.mpdUrl = url;
                         manifest.mpdLoadedTime = mpdLoadedTime;
+                        self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
                         deferred.resolve(manifest);
                     },
-                    function () {
+                    function (error) {
+                        self.debug.error("[ManifestLoader] Manifest parsing error.");
+                        var data = {};
+                        data.mpdUrl = url;
+                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : "+error, data);
                         deferred.reject(request);
                     }
                 );
             };
 
-            request.onloadend = request.onerror = function () {
+            report = function () {
                 if (!needFailureReport)
                 {
                   return;
@@ -96,13 +115,28 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                         doLoad.call(self, url, remainingAttempts);
                     }, RETRY_INTERVAL);
                 } else {
-                    self.debug.log("Failed loading manifest: " + url + " no retry attempts left");
-                    self.errHandler.downloadError("manifest", url, request);
+                    var data = {},
+                        msgError = "Failed loading manifest: " + url + " no retry attempts left";
+
+                    self.debug.log(msgError);
+                    
+                    data.url = url;
+                    data.request = request;
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, msgError, data);
                     deferred.reject(request);
                 }
             };
 
-            request.send();
+            try {
+                //this.debug.log("Start loading manifest: " + url);
+                request.onload = onload;
+                request.onloadend = report;
+                request.onerror = report;
+                request.open("GET", url, true);
+                request.send();
+            } catch(e) {
+                request.onerror();
+            }
         };
 
     return {
@@ -110,6 +144,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
         parser: undefined,
         errHandler: undefined,
         metricsModel: undefined,
+        tokenAuthentication:undefined,
         load: function(url) {
             deferred = Q.defer();
             doLoad.call(this, url, RETRY_ATTEMPTS);

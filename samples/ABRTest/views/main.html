@@ -1,0 +1,41 @@
+<div ng-controller="UIController" class="selection-bar">
+
+	<div class="select-wrap">
+		<select ng-class="{'disable-option': noValidStream()}" class="select flux-choice" ng-model="data.stream" ng-change="updateUrl(data.stream)" ng-options="stream as stream.name for stream in data.fluxList">
+			<option value="" disabled class="hidden">Select a stream</option>
+		</select>
+	</div>
+
+	<input type="text" class="select" ng-class="current ? 'flux-url-current' :'flux-url'" ng-model="data.selectedItem.link" ng-change="updateUrl()" placeholder="Type in the manifest url">
+
+	<select ng-if="!current" class="select version-choice" ng-model="data.selectedVersion" ng-options="version as version.name for version in data.versionList">
+	</select>
+
+	<button ng-disabled="noValidUrl()" ng-click="startFlux()" class="select start-button">Start</button>
+</div>
+
+<div ng-if="playing" ng-controller="PlayerController">
+	<!-- <video controls="true" class="video-player video-js vjs-default-skin" width="900" height="370"></video> -->
+	<video controls="true" class="video-player"></video>
+</div>
+
+<div ng-if="playing">
+
+	<div ng-controller="NetBalancerController">
+
+		<ul class="wanem-actions">
+			<li ng-repeat="action in sequence" ng-class="{'sequence-action-valid': action.valid, 'sequence-action-invalid': action.valid === false, 'sequence-action-current': action.ongoing }">
+				Passage à <strong>{{ action.bandwidth }}k</strong> pendant <strong>{{ action.duration/1000 }} secondes</strong>
+			</li>
+		</ul>
+
+	</div>
+
+	<chart bandwidth="bandwidthData"></chart>
+
+</div>
+
+
+
+
+

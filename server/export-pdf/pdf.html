@@ -32,7 +32,7 @@
 				enableMouseTracking: false
 			}, {
 				type: 'scatter',
-				name: 'Calls',
+				name: 'Requests',
 				color: '#2c3e50',
 				data: bandwidth.requestSeries,
 				marker: {
@@ -41,8 +41,8 @@
 				}
 			},
 			{
-				type: 'scatter',
-				name: 'Bande passante réelle',
+				type: 'line',
+				name: 'Calculated Bandwidth',
 				color: 'red',
 				data: bandwidth.calcBandwidthSeries,
 				marker: {

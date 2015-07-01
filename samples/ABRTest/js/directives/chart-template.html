@@ -1,0 +1,20 @@
+
+<highchart config="chartConfig"></highchart>
+
+<button ng-click="getChart()">Exporter</button>
+
+
+<div class="spinner" ng-show="exportOngoing">
+	<div class="rect1"></div>
+	<div class="rect2"></div>
+	<div class="rect3"></div>
+	<div class="rect4"></div>
+	<div class="rect5"></div>
+</div>
+
+<div ng-show="success" class="success">
+	Afficher la bande passante réelle <input type="checkbox" ng-model="showBandwidth">
+	Export effectué : 
+	<a ng-href="/export-csv?id={{dbId}}&showBandwidth={{showBandwidth}}">Ouvrir les données CSV</a>
+	<a ng-href="/export-pdf?id={{dbId}}&showBandwidth={{showBandwidth}}" target="_blank">Ouvrir le PDF</a>
+</div>

@@ -87,6 +87,11 @@ MediaPlayer.models.VideoModel = function () {
             return element.paused;
         },
 
+        //ORANGE : add isSeeking function
+        isSeeking: function() {
+            return element.seeking;
+        },
+
         getPlaybackRate:  function () {
             return element.playbackRate;
         },
@@ -115,6 +120,15 @@ MediaPlayer.models.VideoModel = function () {
 
         unlisten: function (type, callback) {
             element.removeEventListener(type, callback, false);
+        },
+
+        // ORANGE : register listener on video element parent
+        listenOnParent: function (type, callback) {
+            element.parentElement.addEventListener(type, callback, false);
+        },
+
+        unlistenOnParent: function (type, callback) {
+            element.parentElement.removeEventListener(type, callback, false);
         },
 
         getElement: function () {
