@@ -186,7 +186,23 @@ OrangeHasPlayer = function() {
      * @param time - time value in seconds.
      */
     this.seek = function(time) {
+        _isPlayerInitialized();
 
+        if (typeof time !== 'number') {
+            throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
+        }
+
+        if (!this.isLive() && time>= 0 && time<=video.duration) {
+            video.currentTime = time;
+        }
+
+        if (this.isLive()) {
+            throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
+        }
+
+        if (time< 0 || time > video.duration) {
+            throw new Error('OrangeHasPlayer.seek(): seek value not correct');
+        }
     };
 
     /**
