@@ -749,9 +749,8 @@ OrangeHasPlayer = function() {
 
 /**
  * give the current browser status on MSE support.
- * @access public
+ * @method hasMediaSourceExtension
  * @static
- * @memberof OrangeHasPlayer#
  * @return true if MSE is supported, false otherwise.
  */
 OrangeHasPlayer.hasMediaSourceExtension = function() {
@@ -760,9 +759,8 @@ OrangeHasPlayer.hasMediaSourceExtension = function() {
 
 /**
  * give the current browser status on EME support.
- * @access public
+ * @method hasMediaKeysExtension
  * @static
- * @memberof OrangeHasPlayer#
  * @return true if EME is supported, false otherwise.
  */
 OrangeHasPlayer.hasMediaKeysExtension = function() {
