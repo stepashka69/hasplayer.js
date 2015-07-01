@@ -444,7 +444,12 @@ OrangeHasPlayer = function() {
      * @return position in seconds
      */
     this.getPosition = function() {
-
+        _isPlayerInitialized();
+        if (!this.isLive()) {
+            return video.currentTime;
+        }else{
+            return undefined;
+        }
     };
 
     /**
