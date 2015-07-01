@@ -175,9 +175,16 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes', 'Cont
             }
             $scope.safeApply();
         }
+        
+        function formatSeconds(seconds) {
+            var date = new Date(1970,0,1);
+            date.setSeconds(seconds);
+            return date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+        }
 
         //if video size change, player has to update subtitles size
         function onFullScreenChange() {
+            console.log("Video Position = "+formatSeconds(orangeHasPlayer.getPosition()));
             orangeHasPlayer.fullscreenChanged();
             setSubtitlesCSSStyle(subtitlesCSSStyle);
         }
