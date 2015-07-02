@@ -417,6 +417,7 @@
         startTime : undefined,
         startPlayingTime : undefined,
         currentURL: undefined,
+        config: undefined,
 
         setup: function() {
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
@@ -481,7 +482,7 @@
                 activeStream.setSubtitleTrack(subtitleTrack);
             }
         },
-
+        
         getSelectedSubtitleTrack: function() {
             
             if(activeStream){
@@ -537,7 +538,9 @@
             streams = [];
             this.manifestUpdater.stop();
             this.manifestModel.setValue(null);
-            this.metricsModel.clearAllCurrentMetrics();
+            if (this.config.getParam("Metrics.clearMetrics", "boolean", false)) {
+               this.metricsModel.clearAllCurrentMetrics();
+            }
             isPeriodSwitchingInProgress = false;
             activeStream = null;
             protectionData = null;
