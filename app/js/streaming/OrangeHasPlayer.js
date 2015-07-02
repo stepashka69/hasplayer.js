@@ -273,6 +273,9 @@ OrangeHasPlayer = function() {
     this.reset = function() {
         _isPlayerInitialized();
         mediaPlayer.reset();
+        if (metricsAgent) {
+            metricsAgent.stop();
+        }
     };
 
     /**
