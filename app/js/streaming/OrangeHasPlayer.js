@@ -146,7 +146,7 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (metricsAgent) {
+        if (metricsAgent && url) {
             metricsAgent.createSession();
         }
 
