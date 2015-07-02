@@ -34,7 +34,7 @@ MediaPlayer.utils.Config = function () {
             "ABR.switchDownBufferTime": -1,
             "ABR.switchDownBufferRatio": -1,
             // Metrics parameters
-            "Metrics.clearMetrics": false,
+            "Metrics.clearMetrics": true,
             // Video parameters
             "video": {
             },
