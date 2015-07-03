@@ -14,7 +14,34 @@ var orangeHasPlayer = null,
     durationText = null,
     currentTimeText = null,
     videoDuration = null,
-    subtitlesCSSStyle = null;
+    downloadedBitrate = [],
+    playedBitrate = [],
+    subtitlesCSSStyle = null,
+    legendChart = null,
+    lineChartData = {
+        labels : [],
+        datasets : [
+        {
+            label: "Downloaded Bitrate",
+            fillColor : "rgba(220,220,220,0.2)",
+            strokeColor : "rgba(220,220,220,1)",
+            pointColor : "rgba(220,220,220,1)",
+            pointStrokeColor : "#fff",
+            pointHighlightFill : "#fff",
+            pointHighlightStroke : "rgba(220,220,220,1)",
+            data : []
+        },
+        {
+            label: "Played Bitrate",
+            fillColor : "rgba(151,187,205,0.2)",
+            strokeColor : "rgba(151,187,205,1)",
+            pointColor : "rgba(151,187,205,1)",
+            pointStrokeColor : "#fff",
+            pointHighlightFill : "#fff",
+            pointHighlightStroke : "rgba(151,187,205,1)",
+            data : []
+        }]
+    };
 
 window.onload = function() {
     var xhr = new XMLHttpRequest();
@@ -212,6 +239,53 @@ var handleSubtitleStyleChange = function(style){
 
 var handlePlayState = function(state) {
     setPlaying(state);
+var handleDownloadedBitrate = function(bitrate, time) {
+    downloadedBitrate.push(bitrate);
+    handleGraphUpdate();
+}
+
+var handlePlayBitrate = function(bitrate, time) {
+    playedBitrate.push(bitrate);
+    handleGraphUpdate();
+}
+
+var handleGraphUpdate = function(){
+    if (window.myLine !== undefined) {
+        if(window.myLine.datasets[0].points.length >20){
+            window.myLine.removeData();
+        }
+
+        if (playedBitrate.length === 0) {
+            playedBitrate.push(downloadedBitrate[0]);
+        }
+        window.myLine.addData([downloadedBitrate[downloadedBitrate.length-1],playedBitrate[playedBitrate.length-1]],"");
+        window.myLine.update();
+    }
+}
+
+var handleBitrates = function(bitrates){
+    var ctx = document.getElementById("canvas").getContext("2d");
+    
+    window.myLine = new Chart(ctx).Line(lineChartData, {
+            responsive: true,
+            bezierCurve : false,
+            animation: false,
+            scaleBeginAtZero: false,
+            // Boolean - If we want to override with a hard coded scale
+            scaleOverride: true,
+            // ** Required if scaleOverride is true **
+            // Number - The number of steps in a hard coded scale
+            scaleSteps: bitrates.length,
+            // Number - The value jump in the hard coded scale
+            scaleStepWidth: bitrates[bitrates.length-1]/bitrates.length,
+            // Number - The scale starting value
+            scaleStartValue: bitrates[0]
+    });
+
+    if (legendChart === null) {
+        legendChart = window.myLine.generateLegend();
+        document.getElementById('chartLegend').innerHTML = "<span style='background-color:rgba(220,220,220,1)'>Downloaded Bitrate</span><br/><br/><span style='background-color:rgba(151,187,205,1)'>Played Bitrate</span>";
+    }
 }
 
 var setSubtitlesCSSStyle = function(style) {

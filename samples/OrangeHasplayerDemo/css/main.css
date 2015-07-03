@@ -157,7 +157,7 @@ h1 {
     max-width:100%;
 }
 
-#metrics-container {
+#bitrate-graph-container {
     float:bottom;
     max-width:80%;
     height: 25vh;

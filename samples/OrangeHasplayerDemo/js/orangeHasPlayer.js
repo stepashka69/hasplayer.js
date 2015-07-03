@@ -48,6 +48,8 @@
         handleSubtitleDatas(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
         //init duration value for VOD content
         handleDuration(orangeHasPlayer.getDuration());
+        //init bitrates graph
+        handleBitrates(orangeHasPlayer.getVideoBitrates());
     };
 
     function onSubtitlesStyleChanged(style) {
@@ -58,12 +60,13 @@
         handleError(e);
     };
 
-    function onPlayBitrateChanged(){
-
+    function onPlayBitrateChanged(e) {
+        //$scope.playVideoBitrate = e.detail.bitrate/1000;
+        handlePlayBitrate(e.detail.bitrate, e.detail.time);
     };
 
-    function onDownloadBitrateChanged() {
-
+    function onDownloadBitrateChanged(e){
+        handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
     };
 
     function onVolumeChange() {
@@ -101,6 +104,7 @@
         reqConfig.open("GET", fileUrl, true);
         reqConfig.setRequestHeader("Content-type", "application/json");
         reqConfig.send();
+        handleGraphUpdate(video.currentTime);
     };
 
     function loadStream(streamInfos) {

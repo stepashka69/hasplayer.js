@@ -49,7 +49,8 @@ OrangeHasPlayer = function() {
     var _dispatchBitrateEvent = function(type, value) {
         var event = document.createEvent("CustomEvent");
         event.initCustomEvent(type, false, false, {
-            bitrate: value
+            bitrate: value,
+            time : video.currentTime
         });
         video.dispatchEvent(event);
     };

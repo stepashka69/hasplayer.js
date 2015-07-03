@@ -191,6 +191,8 @@
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/orangeHasPlayer.js"></script>
     <script type="text/javascript" src="js/string.min.js"></script>
+<script type="text/javascript" src="js/Chart.js"></script>
+
     <style id="cueStyle" type="text/css"></style>
     </head>
     <body>
@@ -226,8 +228,9 @@
                     <select name="subtitleCombo" id="subtitleCombo"></select>
                 </div>
             </div>
-            <div id="metrics-container">
-                metrics-container
+            <div id="bitrate-graph-container">
+                <div id="chartLegend"></div>
+                <canvas id="canvas" height="50"></canvas>
             </div>
             <div id="protection-data-container">
                 protection-data-container
