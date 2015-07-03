@@ -6,6 +6,7 @@ module.exports = function(grunt) {
     grunt.config.set('app4Ever',        '../samples/4Ever');
     grunt.config.set('appDashif',       '../samples/Dash-IF');
     grunt.config.set('appABRTest',      '../samples/ABRTest/');
+	grunt.config.set('appOrangeHasplayerDemo',      '../samples/OrangeHasplayerDemo');
 
     grunt.registerTask('source', [
         'replace:source'

@@ -31,7 +31,8 @@ module.exports = {
             {expand: true, flatten: true, src: ['<%= appDemoPlayer %>/index.html'], dest: '<%= appDemoPlayer %>'},
             {expand: true, flatten: true, src: ['<%= app4Ever %>/index.html'], dest: '<%= app4Ever %>'},
             {expand: true, flatten: true, src: ['<%= appDashif %>/index.html'], dest: '<%= appDashif %>'},
-            {expand: true, flatten: true, src: ['<%= appABRTest %>/current.html'], dest: '<%= appABRTest %>'}
+            {expand: true, flatten: true, src: ['<%= appABRTest %>/current.html'], dest: '<%= appABRTest %>'},
+			{expand: true, flatten: true, src: ['<%= appOrangeHasplayerDemo %>/index.html'], dest: '<%= appOrangeHasplayerDemo %>'}
         ]
     },
 

@@ -1,5 +1,5 @@
 html{
-    min-height:100%;/* make sure it is at least as tall as the viewport */
+    min-height:100%;
     position: relative;
 }
 
@@ -10,10 +10,26 @@ body {
     font-family: "Arial";
 }
 
+h1 {
+    text-align: center;
+    width:100%;
+    font-size:22px;
+    height: 30px;
+    padding-top:10px
+}
+
+#orange-logo {
+    float: left;
+    position:relative;
+    top: 5px;
+    left:5px;
+    box-shadow: 1px 1px 1px 1px #000;
+}
+
 #streams-container {
     width: 20%;
     min-width: 200px;
-    background: #408080;
+    background: #ff8000;
     border-right: 2px solid #004040;
     float: left;
     height:100vh;
@@ -48,7 +64,7 @@ body {
 }
 
 #streams-container tr:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 #main-container {
@@ -84,7 +100,7 @@ body {
     border: 2px dashed grey;
     border-radius: 5px;
     margin:auto;
-    margin-bottom: 5vh;
+    margin-bottom: 3vh;
     text-align: center;
 }
 
