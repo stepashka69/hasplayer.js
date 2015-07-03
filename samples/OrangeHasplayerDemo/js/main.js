@@ -47,7 +47,20 @@ var createStreamEntry = function(stream) {
     streamItemType.appendChild(streamItemTypeIcon);
     streamItemName.innerHTML = stream.name;
     streamItemProtocol.innerHTML = stream.protocol;
-    streamItemProtection = "";
+
+    var protections = [];
+    if (stream.protData) {
+        var protectionsNames  = Object.getOwnPropertyNames(stream.protData);
+        for (var i = 0, len = protectionsNames.length; i < len; i++) {
+            if (protectionsNames[i].contains('playready')) {
+                protections.push("PR");
+            } else if (protectionsNames[i].contains('widevine')) {
+                protections.push("WV");
+            }
+        }
+    }
+
+    streamItemProtection.innerHTML = protections.join(',');
 
     streamItem.setAttribute('class', 'stream-item');
 
