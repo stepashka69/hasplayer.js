@@ -47,14 +47,10 @@ OrangeHasPlayer = function() {
     };
 
     var _dispatchBitrateEvent = function(type, value) {
-        var event = new CustomEvent(
-            type, {
-                detail: {
-                    bitrate: value
-                },
-                bubbles: true,
-                cancelable: true
-            });
+        var event = document.createEvent("CustomEvent");
+        event.initCustomEvent(type, false, false, {
+            bitrate: value
+        });
         video.dispatchEvent(event);
     };
 
@@ -218,7 +214,7 @@ OrangeHasPlayer = function() {
         if (!this.isLive()) {
             state = "PLAYER_PAUSED";
             video.pause();
-        }else {
+        } else {
             throw new Error('OrangeHasPlayer.pause(): pause is impossible on live stream');
         }
     };
