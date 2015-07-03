@@ -1,0 +1,99 @@
+html{
+    min-height:100%;/* make sure it is at least as tall as the viewport */
+    position: relative;
+}
+
+body {
+    background:black;
+    margin:0;
+    height: 100%;
+    font-family: "Arial";
+}
+
+#streams-container {
+    width: 20%;
+    min-width: 200px;
+    background: #408080;
+    border-right: 2px solid #004040;
+    float: left;
+    height:100vh;
+    overflow: auto;
+}
+
+#streams-container table {
+    border-collapse: collapse;
+}
+
+#streams-container tr {
+    padding: 0px;
+    margin:0;
+}
+
+#streams-container td {
+    padding: 2px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 15px;
+    color: white;
+    vertical-align: middle;
+}
+
+#streams-container td:first-child img{
+   width: 25px;
+   margin:0;
+   padding:0;
+   margin-right: 5px;
+   vertical-align: middle;
+}
+
+#streams-container tr:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#main-container {
+    background: #c0c0c0;
+    height:100vh;
+    max-width: 100%;
+    margin-left: 20%;
+    text-align: center;
+    overflow: auto;
+}
+
+#player-container {
+    top: 3vh;
+    max-width: 50%;
+    text-align: center;
+    margin:auto;
+    margin-bottom: 5vh;
+    position: relative;
+    min-width: 300px;
+}
+
+#player {
+    width: 100vh;
+    max-width: 100%;
+    min-width: 300px;
+    min-height: 150px;
+}
+
+#metrics-container {
+    max-width:80%;
+    height: 25vh;
+    min-height: 100px;
+    border: 2px dashed grey;
+    border-radius: 5px;
+    margin:auto;
+    margin-bottom: 5vh;
+    text-align: center;
+}
+
+#protection-data-container {
+    max-width: 80%;
+    height: 25vh;
+    min-height: 100px;
+    margin:auto;
+    border: 2px dashed grey;
+    border-radius: 5px;
+    text-align: center;
+}
