@@ -65,9 +65,9 @@ window.onload = function() {
         if (stream.protData) {
             var protectionsNames  = Object.getOwnPropertyNames(stream.protData);
             for (var i = 0, len = protectionsNames.length; i < len; i++) {
-                if (protectionsNames[i].contains('playready')) {
+                if (S(protectionsNames[i]).contains('playready')) {
                     protections.push("PR");
-                } else if (protectionsNames[i].contains('widevine')) {
+                } else if (S(protectionsNames[i]).contains('widevine')) {
                     protections.push("WV");
                 }
             }
