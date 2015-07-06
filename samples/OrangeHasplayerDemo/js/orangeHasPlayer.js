@@ -23,6 +23,8 @@ var PlayerLoader = function() {
     orangeHasPlayer.setDefaultAudioLang('deu');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
 
+    
+
     function loadHasPlayerConfig(fileUrl) {
         var reqConfig = new XMLHttpRequest();
 

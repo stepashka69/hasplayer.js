@@ -3,7 +3,8 @@ window.onload = function() {
 
     xhr.open('GET', document.location + '/../json/sources.json');
     xhr.onreadystatechange = function() {
-        if (xhr.readyState === 3) {
+        //if (xhr.readyState === 3) {
+        if (xhr.readyState==4 && xhr.status==200) {
             buildStreamsList(xhr.responseText);
         }
     }
@@ -13,7 +14,8 @@ window.onload = function() {
 
     var buildStreamsList = function (jsonList) {
         // Prepare stream table
-        var tableNode = document.getElementById('streams-table');
+        var tableNode = document.getElementById('streams-table'),
+            i;
 
         if (tableNode) {
             while(tableNode.firstChild) {
@@ -28,7 +30,7 @@ window.onload = function() {
         var streamsList = JSON.parse(jsonList);
 
         // Add stream elements
-        for (var i = 0, len = streamsList.items.length; i < len; i++) {
+        for (i = 0, len = streamsList.items.length; i < len; i++) {
             var stream = streamsList.items[i];
 
             if (stream.protocol) {
