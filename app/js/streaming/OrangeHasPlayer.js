@@ -282,19 +282,20 @@ OrangeHasPlayer = function() {
      * @param type - event type, current video events and play_bitrate, download_bitrate events. On MediaPlayer class,
      * there is also error and subtitlesStyleChanged events.
      * @param listener - callback name.
+     * @param useCapture - .
      */
-    this.addEventListener = function(type, listener) {
+    this.addEventListener = function(type, listener, useCapture) {
         switch (type) {
             case "error":
             case "subtitlesStyleChanged":
-                mediaPlayer.addEventListener(type, listener);
+                mediaPlayer.addEventListener(type, listener, useCapture);
                 break;
             case "play_bitrate":
             case "download_bitrate":
-                video.addEventListener(type, listener);
+                video.addEventListener(type, listener, useCapture);
                 break;
             default:
-                video.addEventListener(type, listener);
+                video.addEventListener(type, listener, useCapture);
         }
     };
 
