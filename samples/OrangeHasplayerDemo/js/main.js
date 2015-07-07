@@ -1,3 +1,5 @@
+var playerLoader = null;
+
 window.onload = function() {
     var xhr = new XMLHttpRequest();
 
@@ -10,7 +12,7 @@ window.onload = function() {
     }
     xhr.send();
 
-    var playerLoader = new PlayerLoader();
+    playerLoader = new PlayerLoader();
 
     var buildStreamsList = function (jsonList) {
         // Prepare stream table
@@ -89,4 +91,12 @@ window.onload = function() {
 
         return streamItem;
     }
+}
+
+var audioChanged = function() {
+    playerLoader.changeAudio();
+}
+
+var subtitleChanged = function() {
+    playerLoader.changeSubtitle();
 }

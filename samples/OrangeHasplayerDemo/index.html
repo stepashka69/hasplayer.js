@@ -200,11 +200,16 @@
             <h1>HasPlayer</h1>
         </div>
         <div id="main-container">
-            <div id="audio-container">
-                audio-container
-            </div>
             <div id="player-container">
-                <video id="player" controls></video>
+                <div id="playerVideo-container" > 
+                    <video id="player" controls></video>
+                </div>
+                <div id="audio-container">audio : 
+                    <select style='visibility:hidden;' name="audioCombo" id="audioCombo" onchange="audioChanged()"></select>
+                </div>
+                <div id="subtitle-container">subtitle : 
+                    <select style='visibility:hidden;' name="subtitleCombo" id="subtitleCombo" onchange="subtitleChanged()"></select>
+                </div>
             </div>
             <div id="metrics-container">
                 metrics-container
