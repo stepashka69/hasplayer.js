@@ -8,6 +8,7 @@ var orangeHasPlayer = null,
     currentaudioTrack = null,
     subtitleTracks = [],
     currentsubtitleTrack = null;
+    subtitlesCSSStyle = null;
 
 window.onload = function() {
     var xhr = new XMLHttpRequest();
@@ -144,6 +145,23 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
     selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
 }
 
+var handleSubtitleStyleChange = function(style){
+    subtitlesCSSStyle = style;
+    setSubtitlesCSSStyle(subtitlesCSSStyle);
+}
+
+var setSubtitlesCSSStyle = function(style) {
+    if (style) {
+        var fontSize = style.data.fontSize;
+
+        if (style.data.fontSize[style.data.fontSize.length - 1] === '%') {
+            fontSize = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length - 1)) / 100;
+        }
+
+        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
+    }
+}
+
 var handleError = function(e){
 
 }
@@ -225,6 +243,7 @@ var onFullScreenClicked = function() {
             document.webkitExitFullscreen();
         }
     }
+    setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
 
 var setVolumeOff = function(value) {

@@ -57,6 +57,10 @@
 
     };
 
+    function onSubtitlesStyleChanged(style) {
+        handleSubtitleStyleChange(style);
+    };
+
     function onError(e) {
         handleError(e);
     };
