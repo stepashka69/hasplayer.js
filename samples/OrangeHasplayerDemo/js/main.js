@@ -10,6 +10,10 @@ var orangeHasPlayer = null,
     subtitleTracks = [],
     currentsubtitleTrack = null,
     playPauseButton = null,
+    seekbar = null,
+    durationText = null,
+    currentTimeText = null,
+    videoDuration = null,
     subtitlesCSSStyle = null;
 
 window.onload = function() {
@@ -117,6 +121,9 @@ var getDOMElements = function() {
     audioListInPlayer = document.getElementById('audio-tracks');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
+    seekbar = document.getElementById('seekBar');
+    durationText = document.getElementById('duration');
+    currentTimeText = document.getElementById('current-time');
 }
 
 var registerGUIEvents = function() {
@@ -127,6 +134,13 @@ var registerGUIEvents = function() {
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked); 
+    seekbar.addEventListener('click', onSeekClicked); 
+}
+
+var onSeekClicked = function(e) {
+    if (videoDuration) {
+        setSeekValue(e.offsetX * videoDuration / seekbar.clientWidth);
+    }
 }
 
 var onPlayPauseClicked = function(e) {
@@ -162,6 +176,23 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
         audioListInPlayer.style.visibility = 'visible';
         audioListInPlayer.selectedIndex = audioList.selectedIndex;
     }
+}
+
+var handleDuration = function(duration) {
+    if (duration !== Infinity) {
+        seekBar.max = duration;
+        durationText.textContent = setTimeWithSeconds(duration);
+        videoDuration = duration;
+    } else {
+        seekBar.max = 0;
+        durationText.textContent = null;
+        videoDuration = null;
+    }
+}
+
+var handleTimeUpdate = function(time) {
+      seekBar.value = time;
+      currentTimeText.textContent = setTimeWithSeconds(time);
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
@@ -296,4 +327,17 @@ var setPlaying = function(value) {
     } else {
         playPauseButton.className = "fa fa-play button button-playpause left";
     }
+}
+
+var setTimeWithSeconds = function(sec) {
+    var sec_num = parseInt(sec, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
 }

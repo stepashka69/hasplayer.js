@@ -30,6 +30,7 @@
         orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
         orangeHasPlayer.addEventListener("play", onPlay);
         orangeHasPlayer.addEventListener("pause", onPause);
+        orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
     };
 
     /********************************************************************************************************************
@@ -45,6 +46,8 @@
         handleAudioDatas(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
         //init subtitle tracks
         handleSubtitleDatas(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
+        //init duration value for VOD content
+        handleDuration(orangeHasPlayer.getDuration());
     };
 
     function onSubtitlesStyleChanged(style) {
@@ -73,6 +76,13 @@
 
     function onPause() {
         handlePlayState(false);
+    };
+
+    function onTimeUpdate(){
+        //update progress bar in GUI.
+        if (!orangeHasPlayer.isLive()) {
+            handleTimeUpdate(video.currentTime);
+        }
     };
     /***************************************************************************************************************************/
     
@@ -116,4 +126,8 @@
         else{
             orangeHasPlayer.pause();
         }
+    };
+
+    function setSeekValue(seekTime) {
+        orangeHasPlayer.seek(seekTime);
     };

@@ -196,18 +196,11 @@ h1 {
 
 .seekbar-container {
     overflow:hidden;
-    display: none;
-    border: 1px solid #283332;
+    display: block;
     width: auto;
     position: relative;
     padding: 8px 110px 8px 4px;
     height: 21px;
-    background-image: -ms-linear-gradient(top, #060C0C 70%, #152524 100%);
-    background-image: -moz-linear-gradient(top, #060C0C 70%, #152524 100%);
-    background-image: -o-linear-gradient(top, #060C0C 70%, #152524 100%);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.7, #060C0C), color-stop(1, #152524));
-    background-image: -webkit-linear-gradient(top, #060C0C 70%, #152524 100%);
-    background-image: linear-gradient(to bottom, #060C0C 70%, #152524 100%);
 }
 
 .seekBar {
