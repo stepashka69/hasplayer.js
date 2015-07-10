@@ -160,19 +160,6 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
         audioListInPlayer.innerHTML = selectOptions;
         audioListInPlayer.style.visibility = 'visible';
         audioListInPlayer.selectedIndex = audioList.selectedIndex;
-
-
-       /* $(".audio-tracks").change(function(track) {
-            var currentTrackId = $("select option:selected")[0].value;
-            for (i = 0 ; i < audioDatas.length; i++) {
-                if (audioDatas[i].id == currentTrackId) {
-                    player.setAudioTrack(audioDatas[i]);
-                }
-            }
-        });
-    } else {
-        $(".audio-tracks").hide();
-    }*/
     }
 }
 
@@ -301,6 +288,7 @@ var setVolumeOff = function(value) {
         volumeButton.className = "fa fa-volume-up button button-volume left";
     }
 }
+
 var setPlaying = function(value) {
     if(value) {
         playPauseButton.className = "fa fa-pause button button-playpause left";
