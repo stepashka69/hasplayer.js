@@ -187,6 +187,7 @@ var handleDuration = function(duration) {
         seekBar.max = 0;
         durationText.textContent = null;
         videoDuration = null;
+        currentTimeText.textContent  = null;
     }
 }
 
