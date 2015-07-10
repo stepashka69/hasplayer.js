@@ -126,6 +126,7 @@ var registerGUIEvents = function() {
     audioList.addEventListener('change', audioChanged);
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
+    video.addEventListener('dblclick', onFullScreenClicked); 
 }
 
 var onPlayPauseClicked = function(e) {
