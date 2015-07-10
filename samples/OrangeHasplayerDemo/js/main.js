@@ -8,7 +8,8 @@ var orangeHasPlayer = null,
     audioTracks = [],
     currentaudioTrack = null,
     subtitleTracks = [],
-    currentsubtitleTrack = null;
+    currentsubtitleTrack = null,
+    playPauseButton = null,
     subtitlesCSSStyle = null;
 
 window.onload = function() {
@@ -115,6 +116,7 @@ var getDOMElements = function() {
     audioList = document.getElementById('audioCombo');
     audioListInPlayer = document.getElementById('audio-tracks');
     subtitleList = document.getElementById('subtitleCombo');
+    playPauseButton = document.getElementById('button-playpause');
 }
 
 var registerGUIEvents = function() {
@@ -123,6 +125,11 @@ var registerGUIEvents = function() {
     audioListInPlayer.addEventListener('change', audioChanged);
     audioList.addEventListener('change', audioChanged);
     subtitleList.addEventListener('change', subtitleChanged);
+    playPauseButton.addEventListener('click', onPlayPauseClicked);
+}
+
+var onPlayPauseClicked = function(e) {
+    changePlayerState();
 }
 
 var audioChanged = function(e) {
@@ -181,6 +188,10 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
 var handleSubtitleStyleChange = function(style){
     subtitlesCSSStyle = style;
     setSubtitlesCSSStyle(subtitlesCSSStyle);
+}
+
+var handlePlayState = function(state) {
+    setPlaying(state);
 }
 
 var setSubtitlesCSSStyle = function(style) {
@@ -288,5 +299,12 @@ var setVolumeOff = function(value) {
         volumeButton.className = "fa fa-volume-off button button-volume left";
     } else {
         volumeButton.className = "fa fa-volume-up button button-volume left";
+    }
+}
+var setPlaying = function(value) {
+    if(value) {
+        playPauseButton.className = "fa fa-pause button button-playpause left";
+    } else {
+        playPauseButton.className = "fa fa-play button button-playpause left";
     }
 }

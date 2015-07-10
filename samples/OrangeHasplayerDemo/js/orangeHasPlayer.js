@@ -28,6 +28,8 @@
         orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
         orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
         orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
+        orangeHasPlayer.addEventListener("play", onPlay);
+        orangeHasPlayer.addEventListener("pause", onPause);
     };
 
     /********************************************************************************************************************
@@ -64,6 +66,14 @@
     function onVolumeChange() {
 
     };
+
+    function onPlay() {
+        handlePlayState(true);
+    };
+
+    function onPause() {
+        handlePlayState(false);
+    };
     /***************************************************************************************************************************/
     
     function loadHasPlayerConfig(fileUrl) {
@@ -97,4 +107,13 @@
 
     function setPlayerMute() {
         orangeHasPlayer.setMute(!orangeHasPlayer.getMute());
+    };
+
+    function changePlayerState() {
+        if (video.paused) {
+            orangeHasPlayer.play();
+        }
+        else{
+            orangeHasPlayer.pause();
+        }
     };
