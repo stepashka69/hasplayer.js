@@ -45,18 +45,6 @@
         handleSubtitleDatas(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
     };
 
-    function onVolumeChange(){
-
-    };
-
-    function onFullScreenChange(){
-
-    };
-
-    function onSubtitlesStyleChanged() {
-
-    };
-
     function onSubtitlesStyleChanged(style) {
         handleSubtitleStyleChange(style);
     };
@@ -99,8 +87,8 @@
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     };
 
-    function changeAudio() {
-        orangeHasPlayer.setAudioTrack(audioTracks[audioList.selectedIndex]);
+    function changeAudio(index) {
+        orangeHasPlayer.setAudioTrack(audioTracks[index]);
     };
 
     function changeSubtitle() {

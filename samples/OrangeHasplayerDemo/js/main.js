@@ -3,6 +3,7 @@ var orangeHasPlayer = null,
     volumeButton = null,
     fullscreenButton = null,
     audioList = null,
+    audioListInPlayer = null,
     subtitleList = null,
     audioTracks = [],
     currentaudioTrack = null,
@@ -112,20 +113,29 @@ var getDOMElements = function() {
     volumeButton = document.getElementById('button-volume');
     fullscreenButton = document.getElementById('button-fullscreen');
     audioList = document.getElementById('audioCombo');
+    audioListInPlayer = document.getElementById('audio-tracks');
     subtitleList = document.getElementById('subtitleCombo');
 }
 
 var registerGUIEvents = function() {
     volumeButton.addEventListener('click', onMuteClicked)
     fullscreenButton.addEventListener('click', onFullScreenClicked);
+    audioListInPlayer.addEventListener('change', audioChanged);
+    audioList.addEventListener('change', audioChanged);
+    subtitleList.addEventListener('change', subtitleChanged);
 }
 
-var audioChanged = function() {
-    changeAudio();
+var audioChanged = function(e) {
+    changeAudio(e.target.selectedIndex);
+    if (e.target === audioList) {
+        audioListInPlayer.selectedIndex = audioList.selectedIndex;
+    }else{
+        audioList.selectedIndex = audioListInPlayer.selectedIndex;
+    }
 }
 
-var subtitleChanged = function() {
-    changeSubtitle();
+var subtitleChanged = function(e) {
+    changeSubtitle(e.target.selectedIndex);
 }
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
@@ -134,6 +144,29 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
 
     addCombo(audioTracks, audioList);
     selectCombo(audioTracks, audioList, currentaudioTrack);
+
+    if (audioTracks && audioTracks.length > 1) {
+        var selectOptions = "";
+        for (i = 0 ; i < audioTracks.length; i++) {
+            selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id+'</option>';
+        }
+        audioListInPlayer.innerHTML = selectOptions;
+        audioListInPlayer.style.visibility = 'visible';
+        audioListInPlayer.selectedIndex = audioList.selectedIndex;
+
+
+       /* $(".audio-tracks").change(function(track) {
+            var currentTrackId = $("select option:selected")[0].value;
+            for (i = 0 ; i < audioDatas.length; i++) {
+                if (audioDatas[i].id == currentTrackId) {
+                    player.setAudioTrack(audioDatas[i]);
+                }
+            }
+        });
+    } else {
+        $(".audio-tracks").hide();
+    }*/
+    }
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
@@ -163,7 +196,7 @@ var setSubtitlesCSSStyle = function(style) {
 }
 
 var handleError = function(e){
-
+    //manage GUI to show errors
 }
 
 var addCombo = function(tracks, combo) {
@@ -210,6 +243,10 @@ var resetCombo = function(tracks, combo) {
 var reset = function() {
     resetCombo(audioTracks, audioList);
     resetCombo(subtitleTracks, subtitleList);
+
+    for (i = audioTracks.length - 1; i >= 0; i--) {
+        audioListInPlayer.options.remove(i);
+    }
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;

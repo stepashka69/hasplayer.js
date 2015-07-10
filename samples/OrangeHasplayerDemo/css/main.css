@@ -278,8 +278,10 @@ progress:hover {
     vertical-align: top;
     color: #fff;
     font: 11px Arial;
-    padding: 0 4px;
-    background: #060C0C;
+    padding: 0px 4px;
+    margin-top: 4px;
+    margin-right: 4px;
+    background: transparent;
     outline: none;
 }
 

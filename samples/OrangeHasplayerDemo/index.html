@@ -206,7 +206,7 @@
                         <i class="fa fa-pause button button-playpause left"></i>
                         <i id="button-volume" class="fa fa-volume-up button button-volume left" ></i>
 
-                        <select class="select audio-tracks right"></select>
+                        <select id='audio-tracks' class="select audio-tracks right"></select>
                         <i id="button-fullscreen" class="fa fa-expand button button-fullscreen right"></i>
                         <i class="fa fa-info button button-informations right"></i>
 
@@ -220,10 +220,10 @@
                     </div>
                 </div>
                 <div id="audio-container">audio : 
-                    <select name="audioCombo" id="audioCombo" onchange="audioChanged()"></select>
+                    <select name="audioCombo" id="audioCombo"></select>
                 </div>
                 <div id="subtitle-container">subtitle : 
-                    <select name="subtitleCombo" id="subtitleCombo" onchange="subtitleChanged()"></select>
+                    <select name="subtitleCombo" id="subtitleCombo"></select>
                 </div>
             </div>
             <div id="metrics-container">
