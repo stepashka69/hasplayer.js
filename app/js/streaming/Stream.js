@@ -18,6 +18,7 @@ MediaPlayer.dependencies.Stream = function() {
         mediaSource,
         videoCodec = null,
         audioCodec = null,
+        currentTimeToSet = 0,
         contentProtection = null,
         videoController = null,
         videoTrackIndex = -1,
@@ -136,15 +137,19 @@ MediaPlayer.dependencies.Stream = function() {
 
             if (!!videoController) {
                 videoController.reset(errored);
+                videoController = undefined;
             }
             if (!!audioController) {
                 audioController.reset(errored);
+                audioController = undefined;
             }
             if (!!textController) {
                 textController.reset(errored);
+                textController = undefined;
             }
             if (!!eventController) {
                 eventController.reset();
+                eventController = undefined;
             }
 
             if (!!mediaSource) {
@@ -440,7 +445,6 @@ MediaPlayer.dependencies.Stream = function() {
 
             initialSeekTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
             this.debug.info("[Stream] Starting playback at offset: " + initialSeekTime);
-
             // ORANGE: performs a programmatical seek only if initial seek time is different
             // from current time (live use case)
             if (initialSeekTime !== this.videoModel.getCurrentTime()) {
@@ -453,8 +457,8 @@ MediaPlayer.dependencies.Stream = function() {
             }
         },
 
-        onCanPlay = function() {
-            this.debug.info("<video> canplay event");
+        onCanPlay = function(e) {
+            this.debug.info("<video> "+e.type+" event");
             this.debug.log("[Stream] Got canplay event.");
         },
 
@@ -475,6 +479,11 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("<video> play event");
             this.debug.log("[Stream] Got play event.");
 
+            // set the currentTime here to be sure that videoTag is ready to accept the seek (cause IE fail on set currentTime on BufferUpdate)
+            if(currentTimeToSet !==0 && this.videoModel.getCurrentTime() === 0){
+                this.videoModel.setCurrentTime(currentTimeToSet);
+                currentTimeToSet = 0;
+            }
             //if a pause command was detected just before this onPlay event, startBuffering again
             //if it was a pause, follow by a seek (in reality just a seek command), don't startBuffering, it's done in onSeeking event
             // we can't, each time, startBuffering in onPlay event (for seek and pause commands) because onPlay event is not fired on IE after a seek command. :-(
@@ -798,7 +807,8 @@ MediaPlayer.dependencies.Stream = function() {
 
             // Set current time
             self.system.notify("setCurrentTime");
-            self.videoModel.setCurrentTime(startTime);
+            currentTimeToSet = startTime;
+            //it's now called on play event cause IE  bug // self.videoModel.setCurrentTime(startTime);
 
             // Resolve load promise in order to start playing (see doLoad)
             load.resolve(null);
@@ -1147,6 +1157,13 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.unlistenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("webkitfullscreenchange", fullScreenListener);
 
+
+            this.system.unmapHandler("bufferUpdated");
+            this.system.unmapHandler("liveEdgeFound");
+            this.system.unmapHandler("setCurrentTime");
+            this.system.unmapHandler("bufferingCompleted");
+            this.system.unmapHandler("segmentLoadingFailed");
+
             tearDownMediaSource.call(this);
             if (this.protectionController) {
                 this.protectionController.unsubscribe(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, this);
@@ -1155,8 +1172,6 @@ MediaPlayer.dependencies.Stream = function() {
             this.protectionController = undefined;
             this.fragmentController = undefined;
             this.requestScheduler = undefined;
-
-            this.system.unmapHandler("bufferUpdated");
 
             // streamcontroller expects this to be valid
             //this.videoModel = null;

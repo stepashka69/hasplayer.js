@@ -533,6 +533,7 @@
                 if (stream !== activeStream) {
                     removeVideoElement(stream.getVideoModel().getElement());
                 }
+                delete streams[i];
             }
 
             streams = [];
