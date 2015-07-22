@@ -480,7 +480,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.log("[Stream] Got play event.");
 
             // set the currentTime here to be sure that videoTag is ready to accept the seek (cause IE fail on set currentTime on BufferUpdate)
-            if(currentTimeToSet !==0 && this.videoModel.getCurrentTime() === 0){
+            if ((currentTimeToSet !== 0) && (this.videoModel.getCurrentTime() === 0)) {
+                this.system.notify("setCurrentTime");
                 this.videoModel.setCurrentTime(currentTimeToSet);
                 currentTimeToSet = 0;
             }
@@ -805,10 +806,14 @@ MediaPlayer.dependencies.Stream = function() {
             // Unmap "bufferUpdated" handler
             self.system.unmapHandler("bufferUpdated");
 
-            // Set current time
-            self.system.notify("setCurrentTime");
-            currentTimeToSet = startTime;
-            //it's now called on play event cause IE  bug // self.videoModel.setCurrentTime(startTime);
+            // Set current time on video if 'play' event has already been raised.
+            // If 'play' event has not yet been raised, the the current time will be set afterwards
+            if (isPaused === false) {
+                self.system.notify("setCurrentTime");
+                self.videoModel.setCurrentTime(startTime);
+            } else {
+                currentTimeToSet = startTime;
+            }
 
             // Resolve load promise in order to start playing (see doLoad)
             load.resolve(null);
