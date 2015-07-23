@@ -640,6 +640,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
     $scope.versionFull = player.getVersionFull();
     $scope.buildDate = player.getBuildDate();
 
+    $scope.laURL = "";
+    $scope.customData = "";
+
     player.startup();
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
@@ -904,6 +907,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.setStream = function (item) {
         $scope.selectedItem = item;
+        $scope.laURL = (item.protData && item.protData['com.microsoft.playready']) ? item.protData['com.microsoft.playready'].laURL : "";
+        $scope.customData = (item.protData && item.protData['com.microsoft.playready']) ? item.protData['com.microsoft.playready'].customData : "";
     };
 
     function resetBitratesSlider () {
@@ -929,6 +934,18 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         function DRMParams() {
             this.backUrl = null;
             this.customData = null;
+        }
+
+        // Update PR protection data
+        if (($scope.laURL.length > 0) || (($scope.customData.length > 0))) {
+            if (!$scope.selectedItem.protData) {
+                $scope.selectedItem.protData = {};
+            }
+            if (!$scope.selectedItem.protData['com.microsoft.playready']) {
+                $scope.selectedItem.protData['com.microsoft.playready'] = {};
+            }
+            $scope.selectedItem.protData['com.microsoft.playready'].laURL = $scope.laURL;
+            $scope.selectedItem.protData['com.microsoft.playready'].customData = $scope.customData;
         }
 
         resetBitratesSlider();
