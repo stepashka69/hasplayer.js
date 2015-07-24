@@ -33,8 +33,6 @@ MediaPlayer.utils.Config = function () {
             "ABR.latencyInBandwidth": true,
             "ABR.switchDownBufferTime": -1,
             "ABR.switchDownBufferRatio": -1,
-            // Metrics parameters
-            "Metrics.clearMetrics": true,
             // Video parameters
             "video": {
             },

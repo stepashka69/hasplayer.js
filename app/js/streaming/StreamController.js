@@ -417,7 +417,6 @@
         startTime : undefined,
         startPlayingTime : undefined,
         currentURL: undefined,
-        config: undefined,
 
         setup: function() {
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
@@ -539,9 +538,7 @@
             streams = [];
             this.manifestUpdater.stop();
             this.manifestModel.setValue(null);
-            if (this.config.getParam("Metrics.clearMetrics", "boolean", false)) {
-               this.metricsModel.clearAllCurrentMetrics();
-            }
+            this.metricsModel.clearAllCurrentMetrics();
             isPeriodSwitchingInProgress = false;
             activeStream = null;
             protectionData = null;
