@@ -299,6 +299,7 @@ var onFullScreenClicked = function() {
             document.getElementById("playerVideo-container").mozRequestFullScreen();
         } else if (document.getElementById("playerVideo-container").webkitRequestFullscreen) {
             document.getElementById("playerVideo-container").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            video.className = "playerfullscreen";
         }
     } else {
         if (document.exitFullscreen) {
@@ -310,6 +311,7 @@ var onFullScreenClicked = function() {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
+        video.className = "player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
