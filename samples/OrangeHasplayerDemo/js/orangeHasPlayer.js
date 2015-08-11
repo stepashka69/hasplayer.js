@@ -1,6 +1,4 @@
-    var previousPlayedQuality = 0,
-        previousDownloadedQuality = 0,
-        config,
+    var config,
         configMetrics = {
             "name": "csQoE (local)",
             "activationUrl": "http://localhost:8080/config",
@@ -10,6 +8,13 @@
             "formatter": "CSQoE",
             "sendingTime": 10000
         };
+    /********************************************************************************************************************
+    *
+    *
+    *                  Init functions
+    *
+    *
+    **********************************************************************************************************************/
 
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
@@ -19,6 +24,8 @@
 
         orangeHasPlayer.setDefaultAudioLang('deu');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
+
+        registerHasPlayerEvents();
     };
 
     function registerHasPlayerEvents() {
@@ -31,6 +38,23 @@
         orangeHasPlayer.addEventListener("play", onPlay);
         orangeHasPlayer.addEventListener("pause", onPause);
         orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
+    };
+
+    function loadHasPlayerConfig(fileUrl) {
+        var reqConfig = new XMLHttpRequest();
+
+        reqConfig.onload = function() {
+            if (reqConfig.status === 200) {
+                config = JSON.parse(reqConfig.responseText);
+                if (orangeHasPlayer && config) {
+                    orangeHasPlayer.setParams(config);
+                }
+            }
+        };
+
+        reqConfig.open("GET", fileUrl, true);
+        reqConfig.setRequestHeader("Content-type", "application/json");
+        reqConfig.send();
     };
 
     /********************************************************************************************************************
@@ -86,27 +110,17 @@
         if (!orangeHasPlayer.isLive()) {
             handleTimeUpdate(video.currentTime);
         }
-    };
-    /***************************************************************************************************************************/
-    
-    function loadHasPlayerConfig(fileUrl) {
-        var reqConfig = new XMLHttpRequest();
 
-        reqConfig.onload = function() {
-            if (reqConfig.status === 200) {
-                config = JSON.parse(reqConfig.responseText);
-                if (orangeHasPlayer && config) {
-                    orangeHasPlayer.setParams(config);
-                }
-            }
-        };
-
-        reqConfig.open("GET", fileUrl, true);
-        reqConfig.setRequestHeader("Content-type", "application/json");
-        reqConfig.send();
         handleGraphUpdate(video.currentTime);
     };
-
+    
+    /********************************************************************************************************************
+    *
+    *
+    *                   OrangeHasPlayer function calls
+    *
+    *
+    **********************************************************************************************************************/
     function loadStream(streamInfos) {
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     };
@@ -135,3 +149,4 @@
     function setSeekValue(seekTime) {
         orangeHasPlayer.seek(seekTime);
     };
+    /**********************************************************************************************************************/

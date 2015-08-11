@@ -178,19 +178,19 @@
 <script src="../../app/js/utils/analytics.js"></script>
 <!-- /source -->
 
-    <!-- metricsagent -->
-    <script src="../../../metricsagent.js/src/MetricsAgent.js"></script>
-    <script src="../../../metricsagent.js/src/MetricsDatabase.js"></script>
-    <script src="../../../metricsagent.js/src/MetricsSender.js"></script>
-    <script src="../../../metricsagent.js/src/MetricsVo.js"></script>
-    <script src="../../../metricsagent.js/src/collectors/HasPlayerCollector.js"></script>
-    <script src="../../../metricsagent.js/src/formatters/AbstractFormatter.js"></script>
-    <script src="../../../metricsagent.js/src/formatters/CSQoEFormatter.js"></script>
-    <script src="../../../metricsagent.js/src/formatters/PrismeFormatter.js"></script>
-    <!-- /metricsagent -->
-    <script type="text/javascript" src="js/main.js"></script>
-    <script type="text/javascript" src="js/orangeHasPlayer.js"></script>
-    <script type="text/javascript" src="js/string.min.js"></script>
+<!-- metricsagent -->
+<script src="../../../metricsagent.js/src/MetricsAgent.js"></script>
+<script src="../../../metricsagent.js/src/MetricsDatabase.js"></script>
+<script src="../../../metricsagent.js/src/MetricsSender.js"></script>
+<script src="../../../metricsagent.js/src/MetricsVo.js"></script>
+<script src="../../../metricsagent.js/src/collectors/HasPlayerCollector.js"></script>
+<script src="../../../metricsagent.js/src/formatters/AbstractFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/CSQoEFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/PrismeFormatter.js"></script>
+<!-- /metricsagent -->
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/orangeHasPlayer.js"></script>
+<script type="text/javascript" src="js/string.min.js"></script>
 <script type="text/javascript" src="js/Chart.js"></script>
 
     <style id="cueStyle" type="text/css"></style>
@@ -202,8 +202,12 @@
         </div>
         <div id="main-container">
             <div id="player-container">
-                <div id="playerVideo-container"> 
-                    <video id="player"></video>
+                <div id="playerVideo-container">
+                    <ul id="bufferingDiv" class="bufferingDiv">
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
                     <video id="player" class="player"></video>
                     <div id="controlBar" class="controlBar">
                         <i id="button-playpause" class="fa fa-play button button-playpause left"></i>

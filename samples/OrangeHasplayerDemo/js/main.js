@@ -57,7 +57,6 @@ window.onload = function() {
 
     getDOMElements();
     createHasPlayer();
-    registerHasPlayerEvents();
     registerGUIEvents();
 
     var buildStreamsList = function(jsonList) {
@@ -164,6 +163,13 @@ var registerGUIEvents = function() {
     seekbar.addEventListener('click', onSeekClicked); 
 }
 
+/********************************************************************************************************************
+*
+*
+*                  GUI events
+*
+*
+**********************************************************************************************************************/
 var onSeekClicked = function(e) {
     if (videoDuration) {
         setSeekValue(e.offsetX * videoDuration / seekbar.clientWidth);
@@ -186,6 +192,47 @@ var audioChanged = function(e) {
 var subtitleChanged = function(e) {
     changeSubtitle(e.target.selectedIndex);
 }
+
+var onMuteClicked = function() {
+    setPlayerMute();
+    setVolumeOff(orangeHasPlayer.getMute());
+}
+
+var onFullScreenClicked = function() {
+    if (!document.fullscreenElement && // alternative standard method
+        !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
+        if (document.getElementById("playerVideo-container").requestFullscreen) {
+            document.getElementById("playerVideo-container").requestFullscreen();
+        } else if (document.getElementById("playerVideo-container").msRequestFullscreen) {
+            document.getElementById("playerVideo-container").msRequestFullscreen();
+        } else if (document.getElementById("playerVideo-container").mozRequestFullScreen) {
+            document.getElementById("playerVideo-container").mozRequestFullScreen();
+        } else if (document.getElementById("playerVideo-container").webkitRequestFullscreen) {
+            document.getElementById("playerVideo-container").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            video.className = "playerfullscreen";
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+        video.className = "player";
+    }
+    setSubtitlesCSSStyle(subtitlesCSSStyle);
+}
+
+/********************************************************************************************************************
+*
+*
+*                  functions called by OrangeHasPlayer to update GUI
+*
+*
+**********************************************************************************************************************/
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
     audioTracks = _audioTracks;
@@ -219,8 +266,8 @@ var handleDuration = function(duration) {
 }
 
 var handleTimeUpdate = function(time) {
-      seekBar.value = time;
-      currentTimeText.textContent = setTimeWithSeconds(time);
+    seekBar.value = time;
+    currentTimeText.textContent = setTimeWithSeconds(time);
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
@@ -239,6 +286,11 @@ var handleSubtitleStyleChange = function(style){
 
 var handlePlayState = function(state) {
     setPlaying(state);
+    if (state === true) {
+        document.getElementById('bufferingDiv').style.visibility="hidden";
+    }
+}
+
 var handleDownloadedBitrate = function(bitrate, time) {
     downloadedBitrate.push(bitrate);
     handleGraphUpdate();
@@ -288,6 +340,12 @@ var handleBitrates = function(bitrates){
     }
 }
 
+var handleError = function(e){
+    //manage GUI to show errors
+}
+
+/**********************************************************************************************************************/
+
 var setSubtitlesCSSStyle = function(style) {
     if (style) {
         var fontSize = style.data.fontSize;
@@ -298,10 +356,6 @@ var setSubtitlesCSSStyle = function(style) {
 
         document.getElementById("cueStyle").innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
     }
-}
-
-var handleError = function(e){
-    //manage GUI to show errors
 }
 
 var addCombo = function(tracks, combo) {
@@ -355,39 +409,16 @@ var reset = function() {
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
-}
+    downloadedBitrate = [];
+    playedBitrate = [];
 
-var onMuteClicked = function() {
-    setPlayerMute();
-    setVolumeOff(orangeHasPlayer.getMute());
-}
-
-var onFullScreenClicked = function() {
-    if (!document.fullscreenElement && // alternative standard method
-        !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
-        if (document.getElementById("playerVideo-container").requestFullscreen) {
-            document.getElementById("playerVideo-container").requestFullscreen();
-        } else if (document.getElementById("playerVideo-container").msRequestFullscreen) {
-            document.getElementById("playerVideo-container").msRequestFullscreen();
-        } else if (document.getElementById("playerVideo-container").mozRequestFullScreen) {
-            document.getElementById("playerVideo-container").mozRequestFullScreen();
-        } else if (document.getElementById("playerVideo-container").webkitRequestFullscreen) {
-            document.getElementById("playerVideo-container").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            video.className = "playerfullscreen";
-        }
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
-        video.className = "player";
+    if (window.myLine !== undefined) {
+        window.myLine.clear();
+        window.myLine.destroy();
+        lineChartData.labels = [];
+        lineChartData.datasets[0].data = [];
+        lineChartData.datasets[1].data = [];
     }
-    setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
 
 var setVolumeOff = function(value) {
