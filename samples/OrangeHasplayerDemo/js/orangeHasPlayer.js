@@ -85,7 +85,6 @@
     };
 
     function onPlayBitrateChanged(e) {
-        //$scope.playVideoBitrate = e.detail.bitrate/1000;
         handlePlayBitrate(e.detail.bitrate, e.detail.time);
     };
 
