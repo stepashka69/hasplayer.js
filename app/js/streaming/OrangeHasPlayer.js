@@ -49,8 +49,10 @@ OrangeHasPlayer = function() {
     var _dispatchBitrateEvent = function(type, value) {
         var event = document.createEvent("CustomEvent");
         event.initCustomEvent(type, false, false, {
-            bitrate: value,
-            time : video.currentTime
+            bitrate: value.switchedQuality,
+            time : video.currentTime,
+            width : value.width,
+            height: value.height
         });
         video.dispatchEvent(event);
     };
@@ -64,7 +66,7 @@ OrangeHasPlayer = function() {
         for (i = 0; i < videoQualityChanged.length; i += 1) {
             currentSwitch = videoQualityChanged[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
-                _dispatchBitrateEvent('play_bitrate', currentSwitch.switchedQuality);
+                _dispatchBitrateEvent('play_bitrate', currentSwitch);
                 // And remove when it's played
                 videoQualityChanged.splice(0, 1);
                 break;
@@ -97,9 +99,11 @@ OrangeHasPlayer = function() {
                     videoQualityChanged.push({
                         mediaStartTime: httpRequest.startTime,
                         switchedQuality: videoBitrates[httpRequest.quality],
-                        downloadStartTime: httpRequest.trequest
+                        downloadStartTime: httpRequest.trequest,
+                        width: metricsExt.getVideoWidthForRepresentation(repSwitch.to),
+                        height: metricsExt.getVideoHeightForRepresentation(repSwitch.to)
                     });
-                    _dispatchBitrateEvent('download_bitrate', downloadedBdthValue);
+                    _dispatchBitrateEvent('download_bitrate', videoQualityChanged[videoQualityChanged.length-1]);
                 }
             }
         }
