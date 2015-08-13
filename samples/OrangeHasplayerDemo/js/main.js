@@ -1,6 +1,12 @@
 var orangeHasPlayer = null,
     video = null,
     volumeButton = null,
+    volumeOnSvg = null,
+    volumeOffSvg = null,
+    panelVolume = null,
+    sliderVolume = null,
+    volumeLabel = null;
+    volumeTimer = null,
     fullscreenButton = null,
     audioList = null,
     audioListInPlayer = null,
@@ -142,25 +148,34 @@ window.onload = function() {
 var getDOMElements = function() {
     video = document.getElementById('player');
     volumeButton = document.getElementById('button-volume');
+    panelVolume = document.getElementById('panel-volume');
+    sliderVolume = document.getElementById('slider-volume');
+    volumeOnSvg = document.getElementById('volumeOn');
+    volumeOffSvg = document.getElementById('volumeOff');
+    volumeLabel = document.getElementById('volumeLabel');
     fullscreenButton = document.getElementById('button-fullscreen');
     audioList = document.getElementById('audioCombo');
-    audioListInPlayer = document.getElementById('audio-tracks');
+    //audioListInPlayer = document.getElementById('audio-tracks');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
-    seekbar = document.getElementById('seekBar');
-    durationText = document.getElementById('duration');
-    currentTimeText = document.getElementById('current-time');
+    //seekbar = document.getElementById('seekBar');
+    //durationText = document.getElementById('duration');
+    //currentTimeText = document.getElementById('current-time');
 }
 
 var registerGUIEvents = function() {
-    volumeButton.addEventListener('click', onMuteClicked)
+    volumeButton.addEventListener('click', onMuteClicked);
+    volumeButton.addEventListener('mouseover', onMuteEnter);
+    panelVolume.addEventListener('mouseover', onPanelVolumeEnter);
+    panelVolume.addEventListener('mouseout', onPanelVolumeOut);
     fullscreenButton.addEventListener('click', onFullScreenClicked);
-    audioListInPlayer.addEventListener('change', audioChanged);
+    sliderVolume.addEventListener('change', onSliderVolumeChange);
+    /*audioListInPlayer.addEventListener('change', audioChanged);*/
     audioList.addEventListener('change', audioChanged);
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked); 
-    seekbar.addEventListener('click', onSeekClicked); 
+    /*seekbar.addEventListener('click', onSeekClicked); */
 }
 
 /********************************************************************************************************************
@@ -183,7 +198,7 @@ var onPlayPauseClicked = function(e) {
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
     if (e.target === audioList) {
-        audioListInPlayer.selectedIndex = audioList.selectedIndex;
+       // audioListInPlayer.selectedIndex = audioList.selectedIndex;
     }else{
         audioList.selectedIndex = audioListInPlayer.selectedIndex;
     }
@@ -198,18 +213,65 @@ var onMuteClicked = function() {
     setVolumeOff(orangeHasPlayer.getMute());
 }
 
+var onMuteEnter = function() {
+    showVolumePanel();
+    restartVolumeTimer();
+}
+
+var onPanelVolumeEnter = function() {
+    stopVolumeTimer();
+}
+
+var onSliderVolumeChange = function() {
+    setPlayerVolume(sliderVolume.value/100);
+    volumeLabel.innerHTML = sliderVolume.value;
+    if (sliderVolume.value === 0) {
+        sliderVolume.className = "op-volume";
+    }else if (sliderVolume.value > 0 &&  sliderVolume.value <= 8) {
+        sliderVolume.className = "op-volume op-range8";
+    }else if(sliderVolume.value > 8 &&  sliderVolume.value <= 16) {
+        sliderVolume.className = "op-volume op-range16";
+    }else if(sliderVolume.value >= 16 &&  sliderVolume.value <= 24) {
+        sliderVolume.className = "op-volume op-range24";
+    }else if(sliderVolume.value >= 24 &&  sliderVolume.value <= 32) {
+        sliderVolume.className = "op-volume op-range32";
+    }else if(sliderVolume.value >= 32 &&  sliderVolume.value <= 40) {
+        sliderVolume.className = "op-volume op-range40";
+    }else if(sliderVolume.value >= 40 &&  sliderVolume.value <= 48) {
+        sliderVolume.className = "op-volume op-range48";
+    }else if(sliderVolume.value >= 48 &&  sliderVolume.value <= 56) {
+        sliderVolume.className = "op-volume op-range56";
+    }else if(sliderVolume.value >= 56 &&  sliderVolume.value <= 64) {
+        sliderVolume.className = "op-volume op-range64";
+    }else if(sliderVolume.value >= 64 &&  sliderVolume.value <= 72) {
+        sliderVolume.className = "op-volume op-range72";
+    }else if(sliderVolume.value >= 72 &&  sliderVolume.value <= 80) {
+        sliderVolume.className = "op-volume op-range80";
+    }else if(sliderVolume.value >= 80 &&  sliderVolume.value <= 88) {
+        sliderVolume.className = "op-volume op-range88";
+    }else if(sliderVolume.value >= 88 &&  sliderVolume.value <= 96) {
+        sliderVolume.className = "op-volume op-range96";
+    }else if(sliderVolume.value >= 96) {
+        sliderVolume.className = "op-volume op-range100";
+    }
+}
+
+var onPanelVolumeOut = function() {
+    restartVolumeTimer();
+}
+
 var onFullScreenClicked = function() {
     if (!document.fullscreenElement && // alternative standard method
         !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
-        if (document.getElementById("playerVideo-container").requestFullscreen) {
-            document.getElementById("playerVideo-container").requestFullscreen();
-        } else if (document.getElementById("playerVideo-container").msRequestFullscreen) {
-            document.getElementById("playerVideo-container").msRequestFullscreen();
-        } else if (document.getElementById("playerVideo-container").mozRequestFullScreen) {
-            document.getElementById("playerVideo-container").mozRequestFullScreen();
-        } else if (document.getElementById("playerVideo-container").webkitRequestFullscreen) {
-            document.getElementById("playerVideo-container").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-            video.className = "playerfullscreen";
+        if (document.getElementById("player-container").requestFullscreen) {
+            document.getElementById("player-container").requestFullscreen();
+        } else if (document.getElementById("player-container").msRequestFullscreen) {
+            document.getElementById("player-container").msRequestFullscreen();
+        } else if (document.getElementById("player-container").mozRequestFullScreen) {
+            document.getElementById("player-container").mozRequestFullScreen();
+        } else if (document.getElementById("player-container").webkitRequestFullscreen) {
+            document.getElementById("player-container").webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            document.getElementById("player-container-demo-3").className = "demo-player.fullscreen";
         }
     } else {
         if (document.exitFullscreen) {
@@ -221,7 +283,7 @@ var onFullScreenClicked = function() {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-        video.className = "player";
+        document.getElementById("player-container-demo-3").className = "demo-player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
@@ -246,14 +308,14 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
         for (i = 0 ; i < audioTracks.length; i++) {
             selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id+'</option>';
         }
-        audioListInPlayer.innerHTML = selectOptions;
+       /* audioListInPlayer.innerHTML = selectOptions;
         audioListInPlayer.style.visibility = 'visible';
-        audioListInPlayer.selectedIndex = audioList.selectedIndex;
+        audioListInPlayer.selectedIndex = audioList.selectedIndex;*/
     }
 }
 
 var handleDuration = function(duration) {
-    if (duration !== Infinity) {
+  /*  if (duration !== Infinity) {
         seekBar.max = duration;
         durationText.textContent = setTimeWithSeconds(duration);
         videoDuration = duration;
@@ -262,12 +324,12 @@ var handleDuration = function(duration) {
         durationText.textContent = null;
         videoDuration = null;
         currentTimeText.textContent  = null;
-    }
+    }*/
 }
 
 var handleTimeUpdate = function(time) {
-    seekBar.value = time;
-    currentTimeText.textContent = setTimeWithSeconds(time);
+    /*seekBar.value = time;
+    currentTimeText.textContent = setTimeWithSeconds(time);*/
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
@@ -286,9 +348,9 @@ var handleSubtitleStyleChange = function(style){
 
 var handlePlayState = function(state) {
     setPlaying(state);
-    if (state === true) {
+    /*if (state === true) {
         document.getElementById('bufferingDiv').style.visibility="hidden";
-    }
+    }*/
 }
 
 var handleDownloadedBitrate = function(bitrate, time) {
@@ -403,9 +465,9 @@ var reset = function() {
     resetCombo(audioTracks, audioList);
     resetCombo(subtitleTracks, subtitleList);
 
-    for (i = audioTracks.length - 1; i >= 0; i--) {
+    /*for (i = audioTracks.length - 1; i >= 0; i--) {
         audioListInPlayer.options.remove(i);
-    }
+    }*/
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
@@ -423,18 +485,39 @@ var reset = function() {
 
 var setVolumeOff = function(value) {
     if (value) {
-        volumeButton.className = "fa fa-volume-off button button-volume left";
+        volumeOffSvg.style.display = "block";
+        volumeOnSvg.style.display = "none";
     } else {
-        volumeButton.className = "fa fa-volume-up button button-volume left";
+        volumeOffSvg.style.display = "none";
+        volumeOnSvg.style.display = "block";
     }
 }
 
 var setPlaying = function(value) {
     if(value) {
-        playPauseButton.className = "fa fa-pause button button-playpause left";
+        playPauseButton.className = "tooltip op-play op-pause stop-anchor";
+        playPauseButton.title = "Pause";
     } else {
-        playPauseButton.className = "fa fa-play button button-playpause left";
+        playPauseButton.className = "tooltip op-play stop-anchor";
+        playPauseButton.title = "Play";
     }
+}
+
+var stopVolumeTimer = function() {
+    clearTimeout(volumeTimer);
+}
+
+var restartVolumeTimer = function() {
+    clearTimeout(volumeTimer);
+    volumeTimer = setTimeout(function(){hideVolumePanel();}, 3000);
+}
+
+var showVolumePanel = function() {
+    panelVolume.className = "op-container-volume";
+}
+
+var hideVolumePanel = function() {
+    panelVolume.className = "op-container-volume op-hidden";
 }
 
 var setTimeWithSeconds = function(sec) {

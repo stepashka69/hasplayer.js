@@ -136,6 +136,10 @@
         orangeHasPlayer.setMute(!orangeHasPlayer.getMute());
     };
 
+    function setPlayerVolume(value) {
+        orangeHasPlayer.setVolume(value);
+    };
+
     function changePlayerState() {
         if (video.paused) {
             orangeHasPlayer.play();
