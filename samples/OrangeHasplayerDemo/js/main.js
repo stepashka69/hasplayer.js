@@ -165,7 +165,7 @@ var getDOMElements = function() {
 
 var registerGUIEvents = function() {
     volumeButton.addEventListener('click', onMuteClicked);
-    volumeButton.addEventListener('mouseover', onMuteEnter);
+    volumeButton.addEventListener('mouseenter', onMuteEnter);
     panelVolume.addEventListener('mouseover', onPanelVolumeEnter);
     panelVolume.addEventListener('mouseout', onPanelVolumeOut);
     fullscreenButton.addEventListener('click', onFullScreenClicked);
@@ -211,6 +211,7 @@ var subtitleChanged = function(e) {
 var onMuteClicked = function() {
     setPlayerMute();
     setVolumeOff(orangeHasPlayer.getMute());
+    hideVolumePanel();
 }
 
 var onMuteEnter = function() {
@@ -517,6 +518,7 @@ var showVolumePanel = function() {
 }
 
 var hideVolumePanel = function() {
+    clearTimeout(volumeTimer);
     panelVolume.className = "op-container-volume op-hidden";
 }
 
