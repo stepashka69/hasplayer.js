@@ -6,9 +6,10 @@ var orangeHasPlayer = null,
     volumeOffSvg = null,
     panelVolume = null,
     sliderVolume = null,
-    volumeLabel = null;
+    volumeLabel = null,
     volumeTimer = null,
     fullscreenButton = null,
+    loadingElement = null,
     audioList = null,
     audioListInPlayer = null,
     subtitleList = null,
@@ -26,27 +27,25 @@ var orangeHasPlayer = null,
     subtitlesCSSStyle = null,
     legendChart = null,
     lineChartData = {
-        labels : [],
-        datasets : [
-        {
+        labels: [],
+        datasets: [{
             label: "Downloaded Bitrate",
-            fillColor : "rgba(220,220,220,0.2)",
-            strokeColor : "rgba(220,220,220,1)",
-            pointColor : "rgba(220,220,220,1)",
-            pointStrokeColor : "#fff",
-            pointHighlightFill : "#fff",
-            pointHighlightStroke : "rgba(220,220,220,1)",
-            data : []
-        },
-        {
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: []
+        }, {
             label: "Played Bitrate",
-            fillColor : "rgba(151,187,205,0.2)",
-            strokeColor : "rgba(151,187,205,1)",
-            pointColor : "rgba(151,187,205,1)",
-            pointStrokeColor : "#fff",
-            pointHighlightFill : "#fff",
-            pointHighlightStroke : "rgba(151,187,205,1)",
-            data : []
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: []
         }]
     };
 
@@ -135,6 +134,7 @@ window.onload = function() {
 
         var onStreamClicked = function(streamInfos) {
             reset();
+            showLoadingElement();
             loadStream(streamInfos);
         }
 
@@ -160,6 +160,7 @@ var getDOMElements = function() {
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
     playerContainer = document.getElementById("player-container");
+    loadingElement = document.getElementById("LoadingModule");
     //seekbar = document.getElementById('seekBar');
     //durationText = document.getElementById('duration');
     //currentTimeText = document.getElementById('current-time');
@@ -176,7 +177,7 @@ var registerGUIEvents = function() {
     audioList.addEventListener('change', audioChanged);
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
-    video.addEventListener('dblclick', onFullScreenClicked); 
+    video.addEventListener('dblclick', onFullScreenClicked);
     /*seekbar.addEventListener('click', onSeekClicked); */
 
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
@@ -185,12 +186,12 @@ var registerGUIEvents = function() {
 }
 
 /********************************************************************************************************************
-*
-*
-*                  GUI events
-*
-*
-**********************************************************************************************************************/
+ *
+ *
+ *                  GUI events
+ *
+ *
+ **********************************************************************************************************************/
 var onFullScreenChange = function(e) {
     var state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
     if (!state) {
@@ -211,8 +212,8 @@ var onPlayPauseClicked = function(e) {
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
     if (e.target === audioList) {
-       // audioListInPlayer.selectedIndex = audioList.selectedIndex;
-    }else{
+        // audioListInPlayer.selectedIndex = audioList.selectedIndex;
+    } else {
         audioList.selectedIndex = audioListInPlayer.selectedIndex;
     }
 }
@@ -237,35 +238,35 @@ var onPanelVolumeEnter = function() {
 }
 
 var onSliderVolumeChange = function() {
-    setPlayerVolume(sliderVolume.value/100);
+    setPlayerVolume(sliderVolume.value / 100);
     volumeLabel.innerHTML = sliderVolume.value;
     if (sliderVolume.value === 0) {
         sliderVolume.className = "op-volume";
-    }else if (sliderVolume.value > 0 &&  sliderVolume.value <= 8) {
+    } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
         sliderVolume.className = "op-volume op-range8";
-    }else if(sliderVolume.value > 8 &&  sliderVolume.value <= 16) {
+    } else if (sliderVolume.value > 8 && sliderVolume.value <= 16) {
         sliderVolume.className = "op-volume op-range16";
-    }else if(sliderVolume.value >= 16 &&  sliderVolume.value <= 24) {
+    } else if (sliderVolume.value >= 16 && sliderVolume.value <= 24) {
         sliderVolume.className = "op-volume op-range24";
-    }else if(sliderVolume.value >= 24 &&  sliderVolume.value <= 32) {
+    } else if (sliderVolume.value >= 24 && sliderVolume.value <= 32) {
         sliderVolume.className = "op-volume op-range32";
-    }else if(sliderVolume.value >= 32 &&  sliderVolume.value <= 40) {
+    } else if (sliderVolume.value >= 32 && sliderVolume.value <= 40) {
         sliderVolume.className = "op-volume op-range40";
-    }else if(sliderVolume.value >= 40 &&  sliderVolume.value <= 48) {
+    } else if (sliderVolume.value >= 40 && sliderVolume.value <= 48) {
         sliderVolume.className = "op-volume op-range48";
-    }else if(sliderVolume.value >= 48 &&  sliderVolume.value <= 56) {
+    } else if (sliderVolume.value >= 48 && sliderVolume.value <= 56) {
         sliderVolume.className = "op-volume op-range56";
-    }else if(sliderVolume.value >= 56 &&  sliderVolume.value <= 64) {
+    } else if (sliderVolume.value >= 56 && sliderVolume.value <= 64) {
         sliderVolume.className = "op-volume op-range64";
-    }else if(sliderVolume.value >= 64 &&  sliderVolume.value <= 72) {
+    } else if (sliderVolume.value >= 64 && sliderVolume.value <= 72) {
         sliderVolume.className = "op-volume op-range72";
-    }else if(sliderVolume.value >= 72 &&  sliderVolume.value <= 80) {
+    } else if (sliderVolume.value >= 72 && sliderVolume.value <= 80) {
         sliderVolume.className = "op-volume op-range80";
-    }else if(sliderVolume.value >= 80 &&  sliderVolume.value <= 88) {
+    } else if (sliderVolume.value >= 80 && sliderVolume.value <= 88) {
         sliderVolume.className = "op-volume op-range88";
-    }else if(sliderVolume.value >= 88 &&  sliderVolume.value <= 96) {
+    } else if (sliderVolume.value >= 88 && sliderVolume.value <= 96) {
         sliderVolume.className = "op-volume op-range96";
-    }else if(sliderVolume.value >= 96) {
+    } else if (sliderVolume.value >= 96) {
         sliderVolume.className = "op-volume op-range100";
     }
 }
@@ -278,7 +279,7 @@ var onFullScreenClicked = function() {
     if (!document.fullscreenElement && // alternative standard method
         !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
         if (playerContainer.requestFullscreen) {
-           playerContainer.requestFullscreen();
+            playerContainer.requestFullscreen();
         } else if (playerContainer.msRequestFullscreen) {
             playerContainer.msRequestFullscreen();
         } else if (playerContainer.mozRequestFullScreen) {
@@ -303,14 +304,14 @@ var onFullScreenClicked = function() {
 }
 
 /********************************************************************************************************************
-*
-*
-*                  functions called by OrangeHasPlayer to update GUI
-*
-*
-**********************************************************************************************************************/
+ *
+ *
+ *                  functions called by OrangeHasPlayer to update GUI
+ *
+ *
+ **********************************************************************************************************************/
 
-var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
+var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     audioTracks = _audioTracks;
     currentaudioTrack = _selectedAudioTrack;
 
@@ -319,17 +320,17 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack){
 
     if (audioTracks && audioTracks.length > 1) {
         var selectOptions = "";
-        for (i = 0 ; i < audioTracks.length; i++) {
-            selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id+'</option>';
+        for (i = 0; i < audioTracks.length; i++) {
+            selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id + '</option>';
         }
-       /* audioListInPlayer.innerHTML = selectOptions;
+        /* audioListInPlayer.innerHTML = selectOptions;
         audioListInPlayer.style.visibility = 'visible';
         audioListInPlayer.selectedIndex = audioList.selectedIndex;*/
     }
 }
 
 var handleDuration = function(duration) {
-  /*  if (duration !== Infinity) {
+    /*  if (duration !== Infinity) {
         seekBar.max = duration;
         durationText.textContent = setTimeWithSeconds(duration);
         videoDuration = duration;
@@ -346,7 +347,7 @@ var handleTimeUpdate = function(time) {
     currentTimeText.textContent = setTimeWithSeconds(time);*/
 }
 
-var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
+var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
     //init subtitles tracks
     subtitleTracks = _subtitleTracks;
     currentsubtitleTrack = _selectedSubtitleTrack;
@@ -355,16 +356,18 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack){
     selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
 }
 
-var handleSubtitleStyleChange = function(style){
+var handleSubtitleStyleChange = function(style) {
     subtitlesCSSStyle = style;
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
 
 var handlePlayState = function(state) {
     setPlaying(state);
-    /*if (state === true) {
-        document.getElementById('bufferingDiv').style.visibility="hidden";
-    }*/
+    if (state === true) {
+        hideLoadingElement();
+    }else {
+        showLoadingElement();
+    }
 }
 
 var handleDownloadedBitrate = function(bitrate, time) {
@@ -377,37 +380,37 @@ var handlePlayBitrate = function(bitrate, time) {
     handleGraphUpdate();
 }
 
-var handleGraphUpdate = function(){
+var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
-        if(window.myLine.datasets[0].points.length >20){
+        if (window.myLine.datasets[0].points.length > 20) {
             window.myLine.removeData();
         }
 
         if (playedBitrate.length === 0) {
             playedBitrate.push(downloadedBitrate[0]);
         }
-        window.myLine.addData([downloadedBitrate[downloadedBitrate.length-1],playedBitrate[playedBitrate.length-1]],"");
+        window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
         window.myLine.update();
     }
 }
 
-var handleBitrates = function(bitrates){
+var handleBitrates = function(bitrates) {
     var ctx = document.getElementById("canvas").getContext("2d");
-    
+
     window.myLine = new Chart(ctx).Line(lineChartData, {
-            responsive: true,
-            bezierCurve : false,
-            animation: false,
-            scaleBeginAtZero: false,
-            // Boolean - If we want to override with a hard coded scale
-            scaleOverride: true,
-            // ** Required if scaleOverride is true **
-            // Number - The number of steps in a hard coded scale
-            scaleSteps: bitrates.length,
-            // Number - The value jump in the hard coded scale
-            scaleStepWidth: bitrates[bitrates.length-1]/bitrates.length,
-            // Number - The scale starting value
-            scaleStartValue: bitrates[0]
+        responsive: true,
+        bezierCurve: false,
+        animation: false,
+        scaleBeginAtZero: false,
+        // Boolean - If we want to override with a hard coded scale
+        scaleOverride: true,
+        // ** Required if scaleOverride is true **
+        // Number - The number of steps in a hard coded scale
+        scaleSteps: bitrates.length,
+        // Number - The value jump in the hard coded scale
+        scaleStepWidth: bitrates[bitrates.length - 1] / bitrates.length,
+        // Number - The scale starting value
+        scaleStartValue: bitrates[0]
     });
 
     if (legendChart === null) {
@@ -416,7 +419,7 @@ var handleBitrates = function(bitrates){
     }
 }
 
-var handleError = function(e){
+var handleError = function(e) {
     //manage GUI to show errors
 }
 
@@ -508,7 +511,7 @@ var setVolumeOff = function(value) {
 }
 
 var setPlaying = function(value) {
-    if(value) {
+    if (value) {
         playPauseButton.className = "tooltip op-play op-pause stop-anchor";
         playPauseButton.title = "Pause";
     } else {
@@ -523,7 +526,9 @@ var stopVolumeTimer = function() {
 
 var restartVolumeTimer = function() {
     clearTimeout(volumeTimer);
-    volumeTimer = setTimeout(function(){hideVolumePanel();}, 3000);
+    volumeTimer = setTimeout(function() {
+        hideVolumePanel();
+    }, 3000);
 }
 
 var showVolumePanel = function() {
@@ -535,15 +540,29 @@ var hideVolumePanel = function() {
     panelVolume.className = "op-container-volume op-hidden";
 }
 
+var showLoadingElement = function() {
+    loadingElement.className = "op-loading";
+}
+
+var hideLoadingElement = function() {
+    loadingElement.className = "op-loading op-none";
+}
+
 var setTimeWithSeconds = function(sec) {
     var sec_num = parseInt(sec, 10); // don't forget the second param
-    var hours   = Math.floor(sec_num / 3600);
+    var hours = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    var time    = hours+':'+minutes+':'+seconds;
+    if (hours < 10) {
+        hours = "0" + hours;
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+    var time = hours + ':' + minutes + ':' + seconds;
     return time;
 }
