@@ -22,6 +22,9 @@ var orangeHasPlayer = null,
     durationText = null,
     currentTimeText = null,
     videoDuration = null,
+    previousChannel = null,
+    nextChannel = null,
+    selectedItem = null,
     downloadedBitrate = [],
     playedBitrate = [],
     subtitlesCSSStyle = null,
@@ -139,6 +142,7 @@ window.onload = function() {
         }
 
         streamItem.addEventListener('click', function() {
+            selectedItem = this;
             onStreamClicked(stream);
         })
 
@@ -156,6 +160,8 @@ var getDOMElements = function() {
     volumeLabel = document.getElementById('volumeLabel');
     fullscreenButton = document.getElementById('button-fullscreen');
     audioList = document.getElementById('audioCombo');
+    previousChannel = document.getElementById('previousChannel');
+    nextChannel = document.getElementById('nextChannel')
     //audioListInPlayer = document.getElementById('audio-tracks');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
@@ -183,6 +189,9 @@ var registerGUIEvents = function() {
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('fullscreenchange', onFullScreenChange);
+
+    previousChannel.addEventListener('click', onPreviousClicked);
+    nextChannel.addEventListener('click', onNextChannelClicked);
 }
 
 /********************************************************************************************************************
@@ -301,6 +310,14 @@ var onFullScreenClicked = function() {
         document.getElementById("player-container-demo-3").className = "demo-player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
+}
+
+var onPreviousClicked = function() {
+    selectedItem.previousSibling.click();
+}
+
+var onNextChannelClicked = function() {
+    selectedItem.nextSibling.click();
 }
 
 /********************************************************************************************************************
