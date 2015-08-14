@@ -9,6 +9,8 @@ var orangeHasPlayer = null,
     volumeLabel = null,
     volumeTimer = null,
     fullscreenButton = null,
+    settingsButton = null,
+    settingsMenuModule = null,
     loadingElement = null,
     audioList = null,
     audioListInPlayer = null,
@@ -167,6 +169,8 @@ var getDOMElements = function() {
     playPauseButton = document.getElementById('button-playpause');
     playerContainer = document.getElementById("player-container");
     loadingElement = document.getElementById("LoadingModule");
+    settingsButton = document.getElementById("settingsButton");
+    settingsMenuModule = document.getElementById("SettingsMenuModule");
     //seekbar = document.getElementById('seekBar');
     //durationText = document.getElementById('duration');
     //currentTimeText = document.getElementById('current-time');
@@ -192,6 +196,8 @@ var registerGUIEvents = function() {
 
     previousChannel.addEventListener('click', onPreviousClicked);
     nextChannel.addEventListener('click', onNextChannelClicked);
+
+    settingsButton.addEventListener('click', onSettingsClicked);
 }
 
 /********************************************************************************************************************
@@ -318,6 +324,14 @@ var onPreviousClicked = function() {
 
 var onNextChannelClicked = function() {
     selectedItem.nextSibling.click();
+}
+
+var onSettingsClicked = function() {
+    if (hasClass(settingsMenuModule, "op-hidden-translate-up")) {
+        settingsMenuModule.className = "op-settings-menu op-show-translate-up";
+    } else {
+        settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
+    }
 }
 
 /********************************************************************************************************************
@@ -582,4 +596,7 @@ var setTimeWithSeconds = function(sec) {
     }
     var time = hours + ':' + minutes + ':' + seconds;
     return time;
+}
+function hasClass(element, className) {
+    return element.className && new RegExp("(^|\\s)" + className + "(\\s|$)").test(element.className);
 }
