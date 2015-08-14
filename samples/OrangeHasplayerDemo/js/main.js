@@ -188,7 +188,7 @@ var registerGUIEvents = function() {
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked);
-    /*seekbar.addEventListener('click', onSeekClicked); */
+    //seekbar.addEventListener('click', onSeekClicked);
 
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
@@ -374,8 +374,8 @@ var handleDuration = function(duration) {
 }
 
 var handleTimeUpdate = function(time) {
-    /*seekBar.value = time;
-    currentTimeText.textContent = setTimeWithSeconds(time);*/
+    //seekBar.width = time;
+    //currentTimeText.textContent = setTimeWithSeconds(time);
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
@@ -597,6 +597,7 @@ var setTimeWithSeconds = function(sec) {
     var time = hours + ':' + minutes + ':' + seconds;
     return time;
 }
+
 function hasClass(element, className) {
     return element.className && new RegExp("(^|\\s)" + className + "(\\s|$)").test(element.className);
 }
