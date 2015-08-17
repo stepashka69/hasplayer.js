@@ -264,36 +264,6 @@ var onPanelVolumeEnter = function() {
 
 var onSliderVolumeChange = function() {
     setPlayerVolume(sliderVolume.value / 100);
-    volumeLabel.innerHTML = sliderVolume.value;
-    if (sliderVolume.value === 0) {
-        sliderVolume.className = "op-volume";
-    } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
-        sliderVolume.className = "op-volume op-range8";
-    } else if (sliderVolume.value > 8 && sliderVolume.value <= 16) {
-        sliderVolume.className = "op-volume op-range16";
-    } else if (sliderVolume.value >= 16 && sliderVolume.value <= 24) {
-        sliderVolume.className = "op-volume op-range24";
-    } else if (sliderVolume.value >= 24 && sliderVolume.value <= 32) {
-        sliderVolume.className = "op-volume op-range32";
-    } else if (sliderVolume.value >= 32 && sliderVolume.value <= 40) {
-        sliderVolume.className = "op-volume op-range40";
-    } else if (sliderVolume.value >= 40 && sliderVolume.value <= 48) {
-        sliderVolume.className = "op-volume op-range48";
-    } else if (sliderVolume.value >= 48 && sliderVolume.value <= 56) {
-        sliderVolume.className = "op-volume op-range56";
-    } else if (sliderVolume.value >= 56 && sliderVolume.value <= 64) {
-        sliderVolume.className = "op-volume op-range64";
-    } else if (sliderVolume.value >= 64 && sliderVolume.value <= 72) {
-        sliderVolume.className = "op-volume op-range72";
-    } else if (sliderVolume.value >= 72 && sliderVolume.value <= 80) {
-        sliderVolume.className = "op-volume op-range80";
-    } else if (sliderVolume.value >= 80 && sliderVolume.value <= 88) {
-        sliderVolume.className = "op-volume op-range88";
-    } else if (sliderVolume.value >= 88 && sliderVolume.value <= 96) {
-        sliderVolume.className = "op-volume op-range96";
-    } else if (sliderVolume.value >= 96) {
-        sliderVolume.className = "op-volume op-range100";
-    }
 }
 
 var onPanelVolumeOut = function() {
@@ -405,6 +375,39 @@ var handleDuration = function(duration) {
         videoDuration = null;
         currentTimeText.textContent  = null;
     }*/
+}
+
+var handleVolumeChange = function(volumeLevel) {
+    volumeLabel.innerHTML = Math.round(volumeLevel*100);
+    if (sliderVolume.value === 0) {
+        sliderVolume.className = "op-volume";
+    } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
+        sliderVolume.className = "op-volume op-range8";
+    } else if (sliderVolume.value > 8 && sliderVolume.value <= 16) {
+        sliderVolume.className = "op-volume op-range16";
+    } else if (sliderVolume.value >= 16 && sliderVolume.value <= 24) {
+        sliderVolume.className = "op-volume op-range24";
+    } else if (sliderVolume.value >= 24 && sliderVolume.value <= 32) {
+        sliderVolume.className = "op-volume op-range32";
+    } else if (sliderVolume.value >= 32 && sliderVolume.value <= 40) {
+        sliderVolume.className = "op-volume op-range40";
+    } else if (sliderVolume.value >= 40 && sliderVolume.value <= 48) {
+        sliderVolume.className = "op-volume op-range48";
+    } else if (sliderVolume.value >= 48 && sliderVolume.value <= 56) {
+        sliderVolume.className = "op-volume op-range56";
+    } else if (sliderVolume.value >= 56 && sliderVolume.value <= 64) {
+        sliderVolume.className = "op-volume op-range64";
+    } else if (sliderVolume.value >= 64 && sliderVolume.value <= 72) {
+        sliderVolume.className = "op-volume op-range72";
+    } else if (sliderVolume.value >= 72 && sliderVolume.value <= 80) {
+        sliderVolume.className = "op-volume op-range80";
+    } else if (sliderVolume.value >= 80 && sliderVolume.value <= 88) {
+        sliderVolume.className = "op-volume op-range88";
+    } else if (sliderVolume.value >= 88 && sliderVolume.value <= 96) {
+        sliderVolume.className = "op-volume op-range96";
+    } else if (sliderVolume.value >= 96) {
+        sliderVolume.className = "op-volume op-range100";
+    }
 }
 
 var handleTimeUpdate = function(time) {

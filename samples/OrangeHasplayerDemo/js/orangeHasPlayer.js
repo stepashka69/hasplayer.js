@@ -93,7 +93,7 @@
     };
 
     function onVolumeChange() {
-
+        handleVolumeChange(orangeHasPlayer.getVolume());
     };
 
     function onPlay() {
