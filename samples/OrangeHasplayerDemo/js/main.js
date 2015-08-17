@@ -309,7 +309,7 @@ var onNextChannelClicked = function() {
 var onSettingsClicked = function() {
     if (hasClass(menuModule, "op-show-translate-up")) {
         menuModule.className = "op-menu op-hidden-translate-up";
-    }   
+    }
 
     if (hasClass(settingsMenuModule, "op-hidden-translate-up")) {
         settingsMenuModule.className = "op-settings-menu op-show-translate-up";
@@ -321,21 +321,21 @@ var onSettingsClicked = function() {
 var onMenuClicked = function() {
     if (hasClass(settingsMenuModule, "op-show-translate-up")) {
         settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
-    }   
-    
+    }
+
     if (hasClass(menuModule, "op-hidden-translate-up")) {
         menuModule.className = "op-menu op-show-translate-up";
     } else {
         menuModule.className = "op-menu op-hidden-translate-up";
-    }   
+    }
 }
 
 var onLanguagesClicked = function() {
-     if (hasClass(languagesModule, "op-hidden")) {
+    if (hasClass(languagesModule, "op-hidden")) {
         languagesModule.className = "op-screen op-languages";
     } else {
         languagesModule.className = "op-screen op-languages op-hidden";
-    }   
+    }
 }
 
 /********************************************************************************************************************
@@ -378,7 +378,7 @@ var handleDuration = function(duration) {
 }
 
 var handleVolumeChange = function(volumeLevel) {
-    volumeLabel.innerHTML = Math.round(volumeLevel*100);
+    volumeLabel.innerHTML = Math.round(volumeLevel * 100);
     if (sliderVolume.value === 0) {
         sliderVolume.className = "op-volume";
     } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
@@ -433,7 +433,7 @@ var handlePlayState = function(state) {
     setPlaying(state);
     if (state === true) {
         hideLoadingElement();
-    }else {
+    } else {
         showLoadingElement();
     }
 }
