@@ -1,5 +1,4 @@
-var orangeHasPlayer = null,
-    video = null,
+var video = null,
     playerContainer = null,
     volumeButton = null,
     volumeOnSvg = null,
@@ -20,6 +19,10 @@ var orangeHasPlayer = null,
     currentBitrateSpan = null,
     lowBitrateSpan = null,
     languagesModule = null,
+    errorModule = null,
+    titleError = null,
+    smallErrorMessage = null,
+    longErrorMessage = null,
     languagesButton = null,
     loadingElement = null,
     audioList = null,
@@ -149,6 +152,7 @@ window.onload = function() {
 
         var onStreamClicked = function(streamInfos) {
             reset();
+            hideErrorModule();
             showLoadingElement();
             loadStream(streamInfos);
         }
@@ -192,6 +196,11 @@ var getDOMElements = function() {
     highBitrateSpan = document.getElementById("highBitrateSpan");
     currentBitrateSpan = document.getElementById("bandwith-binding");
     lowBitrateSpan = document.getElementById("lowBitrateSpan");
+
+    errorModule = document.getElementById("ErrorModule");
+    titleError = document.getElementById("titleError");
+    smallErrorMessage = document.getElementById("smallMessageError");
+    longErrorMessage = document.getElementById("longMessageError");
     //seekbar = document.getElementById('seekBar');
     //durationText = document.getElementById('duration');
     //currentTimeText = document.getElementById('current-time');
@@ -528,6 +537,11 @@ var handleBitrates = function(bitrates) {
 
 var handleError = function(e) {
     //manage GUI to show errors
+
+    titleError.innerHTML = e.event.code;
+    smallErrorMessage.innerHTML = e.event.message;
+
+    showErrorModule();
 }
 
 /**********************************************************************************************************************/
@@ -661,6 +675,14 @@ var hideControlBar = function() {
 
 var showControlBar = function() {
     controlBarModule.className = "op-control-bar";
+}
+
+var showErrorModule = function() {
+    errorModule.className = "op-error";
+}
+
+var hideErrorModule = function() {
+    errorModule.className = "op-error op-hidden";
 }
 
 var setTimeWithSeconds = function(sec) {

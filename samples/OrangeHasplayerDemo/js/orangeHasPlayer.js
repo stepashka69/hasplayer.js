@@ -1,4 +1,5 @@
-    var config,
+    var orangeHasPlayer = null,
+        config = null,
         configMetrics = {
             "name": "csQoE (local)",
             "activationUrl": "http://localhost:8080/config",
@@ -8,6 +9,7 @@
             "formatter": "CSQoE",
             "sendingTime": 10000
         };
+
     /********************************************************************************************************************
     *
     *
@@ -15,7 +17,6 @@
     *
     *
     **********************************************************************************************************************/
-
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
         orangeHasPlayer.init(video);
@@ -64,8 +65,12 @@
     *
     *
     **********************************************************************************************************************/
+    /**
+     * [onload description]
+     * @return {[type]} [description]
+     */
     function onload() {
-        //handle onload events to get audio, subtitles tracks
+        //handle onload events to get audio, subtitles tracks, etc...
         //init audio tracks
         handleAudioDatas(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
         //init subtitle tracks
@@ -76,14 +81,26 @@
         handleBitrates(orangeHasPlayer.getVideoBitrates());
     };
 
+    /**
+     * [onSubtitlesStyleChanged description]
+     * @param  {[type]} style [description]
+     */
     function onSubtitlesStyleChanged(style) {
         handleSubtitleStyleChange(style);
     };
 
+    /**
+     * [onError description]
+     * @param  {[type]} e [description]
+     */
     function onError(e) {
         handleError(e);
     };
 
+    /**
+     * [onPlayBitrateChanged description]
+     * @param  {[type]} e [description]
+     */
     function onPlayBitrateChanged(e) {
         handlePlayBitrate(e.detail.bitrate, e.detail.time);
     };
