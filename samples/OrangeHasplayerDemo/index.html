@@ -253,7 +253,7 @@
                             <a class="op-settings-menu-item op-settings-menu-format stop-anchor selected" data-settings="format" role="button">
                                 Mode d'affichage
                             </a>
-                            <a class="op-settings-menu-item op-settings-menu-quality stop-anchor" data-settings="quality" role="button">
+                            <a id="videoQualityButton" class="op-settings-menu-item op-settings-menu-quality stop-anchor" data-settings="quality" role="button">
                                 Qualité vidéo
                             </a>
                         </div>
@@ -351,7 +351,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="op-screen op-settings-quality op-hidden" id="1439555937954-QualityModule" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
+                        <div class="op-screen op-settings-quality op-hidden" id="QualityModule" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
                             <table>
                                 <tbody>
                                     <tr>
@@ -363,10 +363,10 @@
                                         <td>
                                             <ul>
                                                 <li>Haute 
-                                                    <span>1.2</span>
+                                                    <span id="highBitrateSpan">1.2</span>
                                                 </li>
                                                 <li class="op-quality-current">Reçue <span id="bandwith-binding">1.2</span> Mbits</li>
-                                                <li>Basse <span>0.2</span></li>
+                                                <li>Basse <span id="lowBitrateSpan">0.2</span></li>
                                             </ul>
                                         </td>
                                     </tr>

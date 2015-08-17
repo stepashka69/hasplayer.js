@@ -13,6 +13,12 @@ var orangeHasPlayer = null,
     menuModule = null,
     settingsButton = null,
     settingsMenuModule = null,
+    videoQualityButton = null,
+    controlBarModule = null,
+    qualityModule = null,
+    highBitrateSpan = null,
+    currentBitrateSpan = null,
+    lowBitrateSpan = null,
     languagesModule = null,
     languagesButton = null,
     loadingElement = null,
@@ -179,6 +185,13 @@ var getDOMElements = function() {
     menuModule = document.getElementById("MenuModule");
     languagesModule = document.getElementById("LanguagesModule");
     languagesButton = document.getElementById("languagesButton");
+    videoQualityButton = document.getElementById("videoQualityButton");
+    qualityModule = document.getElementById("QualityModule");
+    controlBarModule = document.getElementById("ControlBarModule");
+
+    highBitrateSpan = document.getElementById("highBitrateSpan");
+    currentBitrateSpan = document.getElementById("bandwith-binding");
+    lowBitrateSpan = document.getElementById("lowBitrateSpan");
     //seekbar = document.getElementById('seekBar');
     //durationText = document.getElementById('duration');
     //currentTimeText = document.getElementById('current-time');
@@ -208,6 +221,8 @@ var registerGUIEvents = function() {
     settingsButton.addEventListener('click', onSettingsClicked);
     menuButton.addEventListener('click', onMenuClicked);
     languagesButton.addEventListener('click', onLanguagesClicked);
+
+    videoQualityButton.addEventListener('click', onVideoQualityClicked);
 }
 
 /********************************************************************************************************************
@@ -331,10 +346,30 @@ var onMenuClicked = function() {
 }
 
 var onLanguagesClicked = function() {
+    if (!hasClass(qualityModule, "op-hidden")) {
+        qualityModule.className = "op-screen op-settings-quality op-hidden";
+    }
+
     if (hasClass(languagesModule, "op-hidden")) {
         languagesModule.className = "op-screen op-languages";
+        hideControlBar();
     } else {
         languagesModule.className = "op-screen op-languages op-hidden";
+        showControlBar();
+    }
+}
+
+var onVideoQualityClicked = function() {
+    if (!hasClass(languagesModule, "op-hidden")) {
+        languagesModule.className = "op-screen op-languages op-hidden";
+    }
+
+    if (hasClass(qualityModule, "op-hidden")) {
+        qualityModule.className = "op-screen op-settings-quality";
+        hideControlBar();
+    } else {
+        qualityModule.className = "op-screen op-settings-quality op-hidden";
+        showControlBar();
     }
 }
 
@@ -446,6 +481,7 @@ var handleDownloadedBitrate = function(bitrate, time) {
 var handlePlayBitrate = function(bitrate, time) {
     playedBitrate.push(bitrate);
     handleGraphUpdate();
+    currentBitrateSpan.innerHTML = bitrate/1000000;
 }
 
 var handleGraphUpdate = function() {
@@ -485,6 +521,9 @@ var handleBitrates = function(bitrates) {
         legendChart = window.myLine.generateLegend();
         document.getElementById('chartLegend').innerHTML = "<span style='background-color:rgba(220,220,220,1)'>Downloaded Bitrate</span><br/><br/><span style='background-color:rgba(151,187,205,1)'>Played Bitrate</span>";
     }
+
+    highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
+    lowBitrateSpan.innerHTML = bitrates[0]/1000000;
 }
 
 var handleError = function(e) {
@@ -614,6 +653,14 @@ var showLoadingElement = function() {
 
 var hideLoadingElement = function() {
     loadingElement.className = "op-loading op-none";
+}
+
+var hideControlBar = function() {
+    controlBarModule.className = "op-control-bar op-none";
+}
+
+var showControlBar = function() {
+    controlBarModule.className = "op-control-bar";
 }
 
 var setTimeWithSeconds = function(sec) {
