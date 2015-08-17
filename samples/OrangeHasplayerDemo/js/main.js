@@ -9,8 +9,12 @@ var orangeHasPlayer = null,
     volumeLabel = null,
     volumeTimer = null,
     fullscreenButton = null,
+    menuButton = null,
+    menuModule = null,
     settingsButton = null,
     settingsMenuModule = null,
+    languagesModule = null,
+    languagesButton = null,
     loadingElement = null,
     audioList = null,
     audioListInPlayer = null,
@@ -171,6 +175,10 @@ var getDOMElements = function() {
     loadingElement = document.getElementById("LoadingModule");
     settingsButton = document.getElementById("settingsButton");
     settingsMenuModule = document.getElementById("SettingsMenuModule");
+    menuButton = document.getElementById("menuButton");
+    menuModule = document.getElementById("MenuModule");
+    languagesModule = document.getElementById("LanguagesModule");
+    languagesButton = document.getElementById("languagesButton");
     //seekbar = document.getElementById('seekBar');
     //durationText = document.getElementById('duration');
     //currentTimeText = document.getElementById('current-time');
@@ -198,6 +206,8 @@ var registerGUIEvents = function() {
     nextChannel.addEventListener('click', onNextChannelClicked);
 
     settingsButton.addEventListener('click', onSettingsClicked);
+    menuButton.addEventListener('click', onMenuClicked);
+    languagesButton.addEventListener('click', onLanguagesClicked);
 }
 
 /********************************************************************************************************************
@@ -327,11 +337,35 @@ var onNextChannelClicked = function() {
 }
 
 var onSettingsClicked = function() {
+    if (hasClass(menuModule, "op-show-translate-up")) {
+        menuModule.className = "op-menu op-hidden-translate-up";
+    }   
+
     if (hasClass(settingsMenuModule, "op-hidden-translate-up")) {
         settingsMenuModule.className = "op-settings-menu op-show-translate-up";
     } else {
         settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
     }
+}
+
+var onMenuClicked = function() {
+    if (hasClass(settingsMenuModule, "op-show-translate-up")) {
+        settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
+    }   
+    
+    if (hasClass(menuModule, "op-hidden-translate-up")) {
+        menuModule.className = "op-menu op-show-translate-up";
+    } else {
+        menuModule.className = "op-menu op-hidden-translate-up";
+    }   
+}
+
+var onLanguagesClicked = function() {
+     if (hasClass(languagesModule, "op-hidden")) {
+        languagesModule.className = "op-screen op-languages";
+    } else {
+        languagesModule.className = "op-screen op-languages op-hidden";
+    }   
 }
 
 /********************************************************************************************************************

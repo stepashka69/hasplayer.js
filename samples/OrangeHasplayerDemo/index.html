@@ -229,6 +229,25 @@
                             </div>
                         </div>
                     </div>
+                    <div id="MenuModule" class="op-menu op-hidden-translate-up" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
+                        <div class="op-menu-small-infos">
+                        TODO
+                        </div>
+                        <div class="op-menu-items">
+                            <a class="op-menu-item op-menu-sumup stop-anchor" data-menu="sumup" role="button">
+                                Résumé
+                            </a>
+                            <a id="languagesButton" class="op-menu-item op-menu-languages stop-anchor" data-menu="languages" role="button">
+                                Langue
+                            </a>
+                            <a class="op-menu-item op-menu-mosaic stop-anchor" data-menu="mosaic" role="button">
+                                Liste des chaînes
+                            </a>
+                            <a class="op-menu-item op-menu-shortcuts stop-anchor" data-menu="shortcuts" role="button">
+                                Aide
+                            </a>
+                        </div>
+                    </div>
                     <div id="SettingsMenuModule" class="op-settings-menu op-hidden-translate-up" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
                         <div class="op-settings-menu-items">
                             <a class="op-settings-menu-item op-settings-menu-format stop-anchor selected" data-settings="format" role="button">
@@ -254,20 +273,78 @@
                                         <div class="op-summary">
                                             <div class="op-languages-title">Choix de la langue</div>
                                             <div class="op-languages-line">
-                                                <input type="radio" name="language" id="fra" value="fra" checked="checked">
-                                                <label for="fra">
-                                                    <span class="op-radio">
-                                                          <!-- inject:radio:svg -->
-                                                          <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">    <rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1_1_">  <g>     <g>         <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>     </g>    </g></g></svg>
-                                                          <!-- endinject -->
-                                                    </span>
-                                                    <span class="op-radiocheck">
-                                                          <!-- inject:radio-plein:svg -->
-                                                          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">  <rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">   <g>     <g>         <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>     </g>    </g></g><g id="Calque_2">   <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1        S11.5,7.9,15.9,7.9z"></path></g></svg>
-                                                          <!-- endinject -->
-                                                    </span>
-                                                    <span>Français</span>
-                                                </label>
+                                                <input type="radio" name="language" id="fra" value="fra">
+                                                    <label for="fra">
+                                                        <span class="op-radio">
+                                                            <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+                                                                <g id="Calque_3" display="none">
+                                                                    <rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect>
+                                                                </g>
+                                                                <g id="Calque_1_1_">
+                                                                    <g>
+                                                                        <g>
+                                                                            <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>
+                                                                        </g>
+                                                                    </g>
+                                                                </g>
+                                                            </svg>
+                                                        </span>
+                                                        <span class="op-radiocheck">
+                                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+                                                                <g id="Calque_3" display="none">
+                                                                    <rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect>
+                                                                </g>
+                                                                <g id="Calque_1">
+                                                                    <g>
+                                                                        <g>
+                                                                            <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>
+                                                                        </g>
+                                                                    </g>
+                                                                </g>
+                                                                <g id="Calque_2">
+                                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1        S11.5,7.9,15.9,7.9z"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </span> 
+                                                        <span>Français</span>
+                                                    </label>
+                                                </input>
+                                                <input type="radio" name="language" id="fre" value="fre" checked="checked">
+                                                    <label for="fre">
+                                                        <span class="op-radio">
+                                                            <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+                                                                <g id="Calque_3" display="none">    
+                                                                    <rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect>
+                                                                </g>
+                                                                <g id="Calque_1_1_">
+                                                                    <g>
+                                                                        <g>
+                                                                            <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>
+                                                                        </g>
+                                                                    </g>
+                                                                </g>
+                                                            </svg>
+                                                        </span>
+                                                        <span class="op-radiocheck">
+                                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+                                                                <g id="Calque_3" display="none">
+                                                                    <rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect>
+                                                                </g>
+                                                                <g id="Calque_1">
+                                                                    <g>
+                                                                        <g>
+                                                                            <circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle>
+                                                                        </g>
+                                                                    </g>
+                                                                </g>
+                                                                <g id="Calque_2">
+                                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1        S11.5,7.9,15.9,7.9z"></path>
+                                                                </g>
+                                                            </svg>
+                                                        </span>
+                                                        <span>Français sous-titré</span>
+                                                    </label>
+                                                </input>                                                
                                             </div>
                                         </div>
                                     </div>
@@ -312,7 +389,7 @@
                         </div>
                         <div class="op-controls">
                             <div class="op-control-left">
-                                <a role="button" title="Menu" class="tooltip first op-control-menu stop-anchor">
+                                <a role="button" id="menuButton" title="Menu" class="tooltip first op-control-menu stop-anchor">
                                     <div class="op-control">
                                     <!-- inject:menu:svg -->
                                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Menu"><path fill="#000000" d="M1 4h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 14h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 24h30v4.286h-30v-4.286z"></path></svg>
