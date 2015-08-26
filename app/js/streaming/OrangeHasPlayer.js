@@ -169,13 +169,9 @@ OrangeHasPlayer = function() {
      */
     this.play = function() {
         _isPlayerInitialized();
-
-        if (state === "PLAYER_STOPPED" || state === "PLAYER_PAUSED") {
-            video.play();
-        } else {
-            mediaPlayer.play();
-        }
-
+       
+        video.play();
+     
         state = 'PLAYER_RUNNING';
     };
 
@@ -222,30 +218,6 @@ OrangeHasPlayer = function() {
         } else {
             throw new Error('OrangeHasPlayer.pause(): pause is impossible on live stream');
         }
-    };
-
-    /**
-     * set the HasPlayer auto play to value.
-     * @method setAutoPlay
-     * @access public
-     * @memberof OrangeHasPlayer#
-     * @param value - auto play value.
-     */
-    this.setAutoPlay = function(value) {
-        _isPlayerInitialized();
-        mediaPlayer.setAutoPlay(value);
-    };
-
-    /**
-     * get if the HasPlayer has enabled the auto play. Default value is true
-     * @method getAutoPlay
-     * @access public
-     * @memberof OrangeHasPlayer#
-     * @return auto play value
-     */
-    this.getAutoPlay = function() {
-        _isPlayerInitialized();
-        return mediaPlayer.getAutoPlay();
     };
 
     /**
