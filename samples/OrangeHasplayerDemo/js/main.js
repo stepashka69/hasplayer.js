@@ -32,6 +32,7 @@ var video = null,
     currentsubtitleTrack = null,
     playPauseButton = null,
     seekbar = null,
+    seekbarBackground = null,
     durationText = null,
     currentTimeText = null,
     videoDuration = null,
@@ -42,6 +43,9 @@ var video = null,
     playedBitrate = [],
     subtitlesCSSStyle = null,
     legendChart = null,
+    durationTime = null;
+    durationTimeSpan = null,
+    elapsedTimeSpan = null,
     lineChartData = {
         labels: [],
         datasets: [{
@@ -199,6 +203,12 @@ var getDOMElements = function() {
     titleError = document.getElementById("titleError");
     smallErrorMessage = document.getElementById("smallMessageError");
     longErrorMessage = document.getElementById("longMessageError");
+
+    durationTimeSpan = document.querySelector(".op-seek-bar-time-remaining span");
+    elapsedTimeSpan = document.querySelector(".op-seek-bar-time-elapsed span");
+
+    seekbar = document.querySelector('.bar-seek');
+    seekbarBackground = document.querySelector('.bar-background');
 }
 
 var registerGUIEvents = function() {
@@ -208,12 +218,10 @@ var registerGUIEvents = function() {
     panelVolume.addEventListener('mouseout', onPanelVolumeOut);
     fullscreenButton.addEventListener('click', onFullScreenClicked);
     sliderVolume.addEventListener('change', onSliderVolumeChange);
-    /*audioListInPlayer.addEventListener('change', audioChanged);*/
     audioList.addEventListener('change', audioChanged);
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked);
-    //seekbar.addEventListener('click', onSeekClicked);
 
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
@@ -226,6 +234,10 @@ var registerGUIEvents = function() {
     languagesButton.addEventListener('click', onLanguagesClicked);
 
     videoQualityButton.addEventListener('click', onVideoQualityClicked);
+
+
+    seekbarBackground.addEventListener('click', onSeekClicked);
+    seekbar.addEventListener('click', onSeekClicked);
 }
 
 /********************************************************************************************************************
@@ -243,8 +255,8 @@ var onFullScreenChange = function(e) {
 }
 
 var onSeekClicked = function(e) {
-    if (videoDuration) {
-        setSeekValue(e.offsetX * videoDuration / seekbar.clientWidth);
+    if (durationTime) {
+        setSeekValue(e.offsetX * durationTime / seekbarBackground.clientWidth);
     }
 }
 
@@ -387,16 +399,13 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
 }
 
 var handleDuration = function(duration) {
-    /*  if (duration !== Infinity) {
-        seekBar.max = duration;
-        durationText.textContent = setTimeWithSeconds(duration);
-        videoDuration = duration;
+    durationTime = duration;
+    if (duration !== Infinity) {
+        durationTimeSpan.textContent = setTimeWithSeconds(duration);
     } else {
-        seekBar.max = 0;
-        durationText.textContent = null;
-        videoDuration = null;
-        currentTimeText.textContent  = null;
-    }*/
+        durationTimeSpan.textContent = "00:00:00";
+        handleTimeUpdate(0);
+    }
 }
 
 var handleVolumeChange = function(volumeLevel) {
@@ -433,8 +442,13 @@ var handleVolumeChange = function(volumeLevel) {
 }
 
 var handleTimeUpdate = function(time) {
-    //seekBar.width = time;
-    //currentTimeText.textContent = setTimeWithSeconds(time);
+    elapsedTimeSpan.textContent = setTimeWithSeconds(time);
+    if (durationTime !== Infinity) {
+        var progress = (time / durationTime) * 100;
+        seekbar.style.width = progress + '%';
+     } else {
+        seekbar.style.width = 0;
+     }
 }
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
