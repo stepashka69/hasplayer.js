@@ -10,8 +10,6 @@ var video = null,
     fullscreenButton = null,
     menuButton = null,
     menuModule = null,
-    settingsButton = null,
-    settingsMenuModule = null,
     videoQualityButton = null,
     controlBarModule = null,
     qualityModule = null,
@@ -185,8 +183,6 @@ var getDOMElements = function() {
     playPauseButton = document.getElementById('button-playpause');
     playerContainer = document.getElementById("player-container");
     loadingElement = document.getElementById("LoadingModule");
-    settingsButton = document.getElementById("settingsButton");
-    settingsMenuModule = document.getElementById("SettingsMenuModule");
     menuButton = document.getElementById("menuButton");
     menuModule = document.getElementById("MenuModule");
     languagesModule = document.getElementById("LanguagesModule");
@@ -226,7 +222,6 @@ var registerGUIEvents = function() {
     previousChannel.addEventListener('click', onPreviousClicked);
     nextChannel.addEventListener('click', onNextChannelClicked);
 
-    settingsButton.addEventListener('click', onSettingsClicked);
     menuButton.addEventListener('click', onMenuClicked);
     languagesButton.addEventListener('click', onLanguagesClicked);
 
@@ -329,23 +324,7 @@ var onNextChannelClicked = function() {
     selectedItem.nextSibling.click();
 }
 
-var onSettingsClicked = function() {
-    if (hasClass(menuModule, "op-show-translate-up")) {
-        menuModule.className = "op-menu op-hidden-translate-up";
-    }
-
-    if (hasClass(settingsMenuModule, "op-hidden-translate-up")) {
-        settingsMenuModule.className = "op-settings-menu op-show-translate-up";
-    } else {
-        settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
-    }
-}
-
 var onMenuClicked = function() {
-    if (hasClass(settingsMenuModule, "op-show-translate-up")) {
-        settingsMenuModule.className = "op-settings-menu op-hidden-translate-up";
-    }
-
     if (hasClass(menuModule, "op-hidden-translate-up")) {
         menuModule.className = "op-menu op-show-translate-up";
     } else {
