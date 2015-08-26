@@ -68,20 +68,6 @@ var video = null,
     };
 
 window.onload = function() {
-    var xhr = new XMLHttpRequest();
-
-    xhr.open('GET', document.location + '/../json/sources.json');
-    xhr.onreadystatechange = function() {
-        //if (xhr.readyState === 3) {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            buildStreamsList(xhr.responseText);
-        }
-    }
-    xhr.send();
-
-    getDOMElements();
-    createHasPlayer();
-    registerGUIEvents();
 
     var buildStreamsList = function(jsonList) {
         // Prepare stream table
@@ -155,15 +141,32 @@ window.onload = function() {
             hideErrorModule();
             showLoadingElement();
             loadStream(streamInfos);
-        }
+        };
 
         streamItem.addEventListener('click', function() {
             selectedItem = this;
             onStreamClicked(stream);
-        })
+        });
 
         return streamItem;
-    }
+    };
+
+    var loadStreamList = function() {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', document.location + '/../json/sources.json');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                buildStreamsList(xhr.responseText);
+            }
+        };
+        xhr.send();
+    };
+
+    loadStreamList();
+    getDOMElements();
+    createHasPlayer();
+    registerGUIEvents();
 }
 
 var getDOMElements = function() {
@@ -177,8 +180,7 @@ var getDOMElements = function() {
     fullscreenButton = document.getElementById('button-fullscreen');
     audioList = document.getElementById('audioCombo');
     previousChannel = document.getElementById('previousChannel');
-    nextChannel = document.getElementById('nextChannel')
-    //audioListInPlayer = document.getElementById('audio-tracks');
+    nextChannel = document.getElementById('nextChannel');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
     playerContainer = document.getElementById("player-container");
@@ -201,9 +203,6 @@ var getDOMElements = function() {
     titleError = document.getElementById("titleError");
     smallErrorMessage = document.getElementById("smallMessageError");
     longErrorMessage = document.getElementById("longMessageError");
-    //seekbar = document.getElementById('seekBar');
-    //durationText = document.getElementById('duration');
-    //currentTimeText = document.getElementById('current-time');
 }
 
 var registerGUIEvents = function() {
@@ -244,7 +243,7 @@ var registerGUIEvents = function() {
 var onFullScreenChange = function(e) {
     var state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
     if (!state) {
-        document.getElementById("player-container-demo-3").className = "demo-player";
+        document.getElementById("player-container").className = "demo-player";
     }
 }
 
@@ -306,7 +305,7 @@ var onFullScreenClicked = function() {
         } else if (playerContainer.webkitRequestFullscreen) {
             playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         }
-        document.getElementById("player-container-demo-3").className = "demo-player.fullscreen";
+        document.getElementById("player-container").className = "demo-player.fullscreen";
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -317,7 +316,7 @@ var onFullScreenClicked = function() {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-        document.getElementById("player-container-demo-3").className = "demo-player";
+        document.getElementById("player-container").className = "demo-player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
@@ -567,7 +566,7 @@ var addCombo = function(tracks, combo) {
         option.value = tracks[i].lang;
 
         try {
-            combo.add(option, null); //Standard 
+            combo.add(option, null); //Standard
         } catch (error) {
             combo.add(option); // IE only
         }

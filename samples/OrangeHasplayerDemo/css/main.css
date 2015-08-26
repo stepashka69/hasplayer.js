@@ -156,10 +156,17 @@ h1 {
     text-align: center;
 }
 
+.demo-player {
+    width: 75%;
+    /*height: 480px;*/
+    position: relative;
+    margin: auto;
+}
+
  /* ******************************************************** */
  /* ************  CONTROL BAR AND BUTTONS ****************** */
  /* ******************************************************** */
-
+/*
 .controlBar {
     display: block;
     opacity: 0.9;
@@ -215,7 +222,6 @@ progress::-webkit-progress-value{
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     border-right: 1px solid #000;
-    /*border-radius:10px;*/
 }
 
 progress:hover {
@@ -329,3 +335,4 @@ progress:hover {
         margin-top: 25px;
     }
 }
+*/
