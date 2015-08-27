@@ -372,10 +372,9 @@ var onNextChannelClicked = function() {
 var onMenuClicked = function() {
     if (hasClass(menuModule, "op-hidden-translate-up")) {
         menuModule.className = "op-menu op-show-translate-up";
-        document.querySelector('.op-middle-container').className = "op-middle-container";
     } else {
         menuModule.className = "op-menu op-hidden-translate-up";
-        document.querySelector('.op-middle-container').className = "op-middle-container disabled";
+
     }
 }
 
@@ -387,9 +386,11 @@ var onLanguagesClicked = function() {
     if (hasClass(languagesModule, "op-hidden")) {
         languagesModule.className = "op-screen op-languages";
         hideControlBar();
+        enableMiddleContainer(true);
     } else {
         languagesModule.className = "op-screen op-languages op-hidden";
         showControlBar();
+        enableMiddleContainer(false);
     }
 }
 
@@ -401,9 +402,11 @@ var onVideoQualityClicked = function() {
     if (hasClass(qualityModule, "op-hidden")) {
         qualityModule.className = "op-screen op-settings-quality";
         hideControlBar();
+        enableMiddleContainer(true);
     } else {
         qualityModule.className = "op-screen op-settings-quality op-hidden";
         showControlBar();
+        enableMiddleContainer(false);
     }
 }
 
@@ -766,6 +769,14 @@ var showErrorModule = function() {
 
 var hideErrorModule = function() {
     errorModule.className = "op-error op-hidden";
+}
+
+var enableMiddleContainer = function(enabled) {
+    if (enabled) {
+        document.querySelector('.op-middle-container').className = "op-middle-container";
+    } else {
+        document.querySelector('.op-middle-container').className = "op-middle-container disabled";
+    }
 }
 
 var setTimeWithSeconds = function(sec) {
