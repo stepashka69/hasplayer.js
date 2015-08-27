@@ -380,6 +380,26 @@ var onVideoQualityClicked = function() {
  *
  **********************************************************************************************************************/
 
+var addLanguageLine = function(audioTrack, selectedAudioTrack) {
+
+    var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : "";
+    var html = '<div class="op-languages-line">' +
+                '<input type="radio" name="language" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
+                '<label for="' +  audioTrack.id + '">' +
+                '<span class="op-radio">' +
+                '<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1_1_"><g><g><circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g></svg>' +
+                '</span>' +
+                '<span class="op-radiocheck">' +
+                '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">	<g>		<g>			<circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g><g id="Calque_2">	<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1		S11.5,7.9,15.9,7.9z"></path></g></svg>' +
+                '</span>' +
+                '<span>' + audioTrack.lang + '</span>' +
+                '</label>' +
+                '</div>';
+
+    var languageContainer = document.querySelector('.op-summary');
+    languageContainer.insertAdjacentHTML('beforeend', html);
+}
+
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     audioTracks = _audioTracks;
     currentaudioTrack = _selectedAudioTrack;
@@ -387,9 +407,13 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     addCombo(audioTracks, audioList);
     selectCombo(audioTracks, audioList, currentaudioTrack);
 
+    resetLanguageLines();
+
     if (audioTracks && audioTracks.length > 1) {
         var selectOptions = "";
         for (i = 0; i < audioTracks.length; i++) {
+            addLanguageLine(audioTracks[i], _selectedAudioTrack);
+
             selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id + '</option>';
         }
         /* audioListInPlayer.innerHTML = selectOptions;
@@ -597,11 +621,23 @@ var resetSeekbar = function() {
     elapsedTimeSpan.textContent = "00:00:00";
 }
 
+var resetLanguageLines = function() {
+    var languageLines = document.getElementsByClassName('op-languages-line');
+
+    if (languageLines !== null) {
+        var languageContainer = document.querySelector('.op-summary');
+        while(languageLines.length > 0) {
+            languageContainer.removeChild(languageLines[0]);
+        }
+    }
+}
+
 var reset = function() {
     resetCombo(audioTracks, audioList);
     resetCombo(subtitleTracks, subtitleList);
 
     resetSeekbar();
+    resetLanguageLines();
 
     /*for (i = audioTracks.length - 1; i >= 0; i--) {
         audioListInPlayer.options.remove(i);
