@@ -13,6 +13,7 @@ var video = null,
     videoQualityButton = null,
     controlBarModule = null,
     qualityModule = null,
+    closeButton = null,
     highBitrateSpan = null,
     currentBitrateSpan = null,
     lowBitrateSpan = null,
@@ -193,6 +194,7 @@ var getDOMElements = function() {
     languagesButton = document.getElementById("languagesButton");
     videoQualityButton = document.getElementById("videoQualityButton");
     qualityModule = document.getElementById("QualityModule");
+    closeButton = document.getElementById("CloseCrossModule");
     controlBarModule = document.getElementById("ControlBarModule");
 
     highBitrateSpan = document.getElementById("highBitrateSpan");
@@ -232,6 +234,7 @@ var registerGUIEvents = function() {
 
     menuButton.addEventListener('click', onMenuClicked);
     languagesButton.addEventListener('click', onLanguagesClicked);
+    closeButton.addEventListener('click', onCloseButtonClicked);
 
     videoQualityButton.addEventListener('click', onVideoQualityClicked);
 
@@ -408,6 +411,14 @@ var onVideoQualityClicked = function() {
         showControlBar();
         enableMiddleContainer(false);
     }
+}
+
+var onCloseButtonClicked = function() {
+    languagesModule.className = "op-screen op-languages op-hidden";
+    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    enableMiddleContainer(false);
+    closeButton.className = "op-close op-hidden";
+    showControlBar();
 }
 
 /********************************************************************************************************************
@@ -774,8 +785,10 @@ var hideErrorModule = function() {
 var enableMiddleContainer = function(enabled) {
     if (enabled) {
         document.querySelector('.op-middle-container').className = "op-middle-container";
+        closeButton.className = "op-close";
     } else {
         document.querySelector('.op-middle-container').className = "op-middle-container disabled";
+        closeButton.className = "op-close op-hidden";
     }
 }
 
