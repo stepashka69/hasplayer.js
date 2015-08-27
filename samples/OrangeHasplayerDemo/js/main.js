@@ -591,9 +591,17 @@ var resetCombo = function(tracks, combo) {
     combo.style.visibility = 'hidden';
 }
 
+var resetSeekbar = function() {
+    seekbar.style.width = 0;
+    durationTimeSpan.textContent = "00:00:00";
+    elapsedTimeSpan.textContent = "00:00:00";
+}
+
 var reset = function() {
     resetCombo(audioTracks, audioList);
     resetCombo(subtitleTracks, subtitleList);
+
+    resetSeekbar();
 
     /*for (i = audioTracks.length - 1; i >= 0; i--) {
         audioListInPlayer.options.remove(i);
