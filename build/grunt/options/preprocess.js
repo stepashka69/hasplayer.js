@@ -4,11 +4,9 @@ module.exports = function(grunt) {
         protection = grunt.option('protection'),
 		proxy = grunt.option('proxy'),
         includeMetricsAgent = grunt.option('includeMetricsAgent'),
+        analytics = grunt.option('analytics'),
         includeHls = true,
         includeMss = true;
-
-
-    console.info("MetricsAgent ::: ", proxy, includeMetricsAgent);
 
     // Must check the type because it can be a boolean flag if no arguments are specified after the option.
     if (typeof(protocols) === 'string') {
@@ -39,6 +37,10 @@ module.exports = function(grunt) {
         includeMetricsAgent = false;
     }
 
+    if (typeof(analytics) !== 'boolean'){
+        analytics = false;
+    }
+
     var sendError = function(params) {
         return  'this.errHandler.sendError(' + params[0] + ', ' + params[1] + ');';
     };
@@ -55,6 +57,7 @@ module.exports = function(grunt) {
                 INCLUDE_METRICS_AGENT:includeMetricsAgent,
                 PROTECTION: protection,
 				PROXY: proxy,
+                ANALYTICS:analytics,
                 sendError: sendError,
                 reject: reject
             }
