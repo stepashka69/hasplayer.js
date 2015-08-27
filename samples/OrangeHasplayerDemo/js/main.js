@@ -338,8 +338,10 @@ var onNextChannelClicked = function() {
 var onMenuClicked = function() {
     if (hasClass(menuModule, "op-hidden-translate-up")) {
         menuModule.className = "op-menu op-show-translate-up";
+        document.querySelector('.op-middle-container').className = "op-middle-container";
     } else {
         menuModule.className = "op-menu op-hidden-translate-up";
+        document.querySelector('.op-middle-container').className = "op-middle-container disabled";
     }
 }
 
@@ -401,7 +403,6 @@ var addLanguageLine = function(audioTrack, selectedAudioTrack) {
     var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
-    document.getElementById(audioTrack.id).addEventListener('click', function() { console.log('click click click')});
 }
 
 var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
