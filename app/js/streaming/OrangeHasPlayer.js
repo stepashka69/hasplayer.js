@@ -514,6 +514,18 @@ OrangeHasPlayer = function() {
         return mediaPlayer.getQualityFor(type);
     };
 
+    /* select quality level for audio or video stream.
+     * If you want to set limit up and down for video for instance, you have to use setConfig function.
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param type - audio or video stream type.
+     * @param value - selected quality level, id of the quality not bitrate.
+     */
+    this.setQualityFor = function(type, value) {
+        _isPlayerInitialized();
+        mediaPlayer.setQualityFor(type, value);
+    }
+
     /**
      * get mute status.
      * @method getMute
@@ -736,11 +748,15 @@ OrangeHasPlayer = function() {
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
 
-        metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
+        if (typeof(MetricsAgent) !== 'undefined') {
+            metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
 
-        metricsAgent.init(function(activated) {
-            console.log("Metrics agent state: ", activated);
-        });
+            metricsAgent.init(function(activated) {
+                console.log("Metrics agent state: ", activated);
+            });
+        }else{
+            throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
+        }
     };
 };
 
