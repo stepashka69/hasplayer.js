@@ -203,7 +203,7 @@
         </div>
         <div id="main-container">
             <div id="player-container">
-                <div id="player-container" class="demo-player" tabindex="0">
+                <div id="demo-player-container" class="demo-player" tabindex="0">
                     <div id="VideoModule" class="op-video">
                         <video id="player" class="player"></video>
                     </div>
@@ -269,9 +269,7 @@
                                     <tr>
                                         <td>
                                             <ul>
-                                                <li>Haute
-                                                    <span id="highBitrateSpan">1.2</span>
-                                                </li>
+                                                <li>Haute <span id="highBitrateSpan">1.2</span></li>
                                                 <li class="op-quality-current">Reçue <span id="bandwith-binding">1.2</span> Mbits</li>
                                                 <li>Basse <span id="lowBitrateSpan">0.2</span></li>
                                             </ul>
@@ -282,7 +280,7 @@
                         </div>
                     </div>
                     <div id="ControlBarModule" class="op-control-bar" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
-                        <div class="op-seek-bar" id="1439371015636-SeekBarModule" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
+                        <div class="op-seek-bar" id="SeekBarModule" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
                             <div class="op-seek-bar-time op-seek-bar-time-elapsed">
                                 <span>00:00:00</span>
                             </div>
@@ -303,8 +301,7 @@
                                     <!-- endinject -->
                                     </div>
                                 </a>
-
-                        </div>
+                            </div>
                         <div class="op-control-center">
                             <a role="button" id="previousChannel" title="Chaîne précédente" class="tooltip op-chainemoins stop-anchor">
                                 <div class="op-control">
@@ -384,8 +381,8 @@
                                 <input id="slider-volume" class="op-volume op-range100" type="range" min="0" max="100" value="100">
                             </div>
                         </div>
-                        </div>
                     </div>
+                </div>
                     <div id="ErrorModule" class="op-error op-hidden" min-width="480px 689px 886px" max-width="1279px 1679px 2559px">
                         <div class="op-error-box">
                             <div class="op-error-picto op-picto-error">

@@ -185,7 +185,7 @@ var getDOMElements = function() {
     nextChannel = document.getElementById('nextChannel');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
-    playerContainer = document.getElementById("player-container");
+    playerContainer = document.getElementById("demo-player-container");
     loadingElement = document.getElementById("LoadingModule");
     menuButton = document.getElementById("menuButton");
     menuModule = document.getElementById("MenuModule");
@@ -250,7 +250,7 @@ var registerGUIEvents = function() {
 var onFullScreenChange = function(e) {
     var state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
     if (!state) {
-        document.getElementById("player-container").className = "demo-player";
+        document.getElementById("demo-player-container").className = "demo-player";
     }
 }
 
@@ -312,7 +312,7 @@ var onFullScreenClicked = function() {
         } else if (playerContainer.webkitRequestFullscreen) {
             playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         }
-        document.getElementById("player-container").className = "demo-player.fullscreen";
+        document.getElementById("demo-player-container").className = "demo-player.fullscreen";
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -323,7 +323,7 @@ var onFullScreenClicked = function() {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-        document.getElementById("player-container").className = "demo-player";
+        document.getElementById("demo-player-container").className = "demo-player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 }
