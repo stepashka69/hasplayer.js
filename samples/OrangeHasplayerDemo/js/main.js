@@ -380,11 +380,11 @@ var onVideoQualityClicked = function() {
  *
  **********************************************************************************************************************/
 
-var addLanguageLine = function(audioTrack, selectedAudioTrack) {
+var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
 
     var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : "";
     var html = '<div class="op-languages-line">' +
-                '<input type="radio" name="language" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
+                '<input type="radio" name="' + type + '" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
                 '<label for="' +  audioTrack.id + '">' +
                 '<span class="op-radio">' +
                 '<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1_1_"><g><g><circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g></svg>' +
@@ -395,30 +395,34 @@ var addLanguageLine = function(audioTrack, selectedAudioTrack) {
                 '<span>' + audioTrack.lang + '</span>' +
                 '</label>' +
                 '</div>';
+    return html;
+}
 
+var addLanguageLine = function(audioTrack, selectedAudioTrack) {
+    var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
+}
+
+var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
+    var html = createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle');
+    var subtitleContainer = document.querySelector('.op-panel-container');
+    subtitleContainer.insertAdjacentHTML('beforeend', html);
 }
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     audioTracks = _audioTracks;
     currentaudioTrack = _selectedAudioTrack;
 
-    addCombo(audioTracks, audioList);
-    selectCombo(audioTracks, audioList, currentaudioTrack);
-
     resetLanguageLines();
 
-    if (audioTracks && audioTracks.length > 1) {
-        var selectOptions = "";
+    if (audioTracks) {
+        //addCombo(audioTracks, audioList);
+        //selectCombo(audioTracks, audioList, currentaudioTrack);
+
         for (i = 0; i < audioTracks.length; i++) {
             addLanguageLine(audioTracks[i], _selectedAudioTrack);
-
-            selectOptions += '<option value="' + audioTracks[i].id + '">' + audioTracks[i].lang + ' - ' + audioTracks[i].id + '</option>';
         }
-        /* audioListInPlayer.innerHTML = selectOptions;
-        audioListInPlayer.style.visibility = 'visible';
-        audioListInPlayer.selectedIndex = audioList.selectedIndex;*/
     }
 }
 
@@ -480,8 +484,14 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
     subtitleTracks = _subtitleTracks;
     currentsubtitleTrack = _selectedSubtitleTrack;
 
-    addCombo(subtitleTracks, subtitleList);
-    selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
+    if (subtitleTracks) {
+        //addCombo(subtitleTracks, subtitleList);
+        //selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
+
+        for (i = 0; i < subtitleTracks.length; i++) {
+            addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
+        }
+    }
 }
 
 var handleSubtitleStyleChange = function(style) {
@@ -625,9 +635,8 @@ var resetLanguageLines = function() {
     var languageLines = document.getElementsByClassName('op-languages-line');
 
     if (languageLines !== null) {
-        var languageContainer = document.querySelector('.op-summary');
         while(languageLines.length > 0) {
-            languageContainer.removeChild(languageLines[0]);
+            languageLines[0].parentNode.removeChild(languageLines[0]);
         }
     }
 }
