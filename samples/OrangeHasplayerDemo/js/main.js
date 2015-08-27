@@ -417,8 +417,8 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     resetLanguageLines();
 
     if (audioTracks) {
-        //addCombo(audioTracks, audioList);
-        //selectCombo(audioTracks, audioList, currentaudioTrack);
+        addCombo(audioTracks, audioList);
+        selectCombo(audioTracks, audioList, currentaudioTrack);
 
         for (i = 0; i < audioTracks.length; i++) {
             addLanguageLine(audioTracks[i], _selectedAudioTrack);
@@ -485,8 +485,8 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
     currentsubtitleTrack = _selectedSubtitleTrack;
 
     if (subtitleTracks) {
-        //addCombo(subtitleTracks, subtitleList);
-        //selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
+        addCombo(subtitleTracks, subtitleList);
+        selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
 
         for (i = 0; i < subtitleTracks.length; i++) {
             addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
