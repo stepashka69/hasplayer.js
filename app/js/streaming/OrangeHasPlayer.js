@@ -748,11 +748,15 @@ OrangeHasPlayer = function() {
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
 
-        metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
+        if (typeof(MetricsAgent) !== 'undefined') {
+            metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
 
-        metricsAgent.init(function(activated) {
-            console.log("Metrics agent state: ", activated);
-        });
+            metricsAgent.init(function(activated) {
+                console.log("Metrics agent state: ", activated);
+            });
+        }else{
+            throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
+        }
     };
 };
 
