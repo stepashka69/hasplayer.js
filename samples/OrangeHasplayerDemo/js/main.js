@@ -265,6 +265,9 @@ var onPlayPauseClicked = function(e) {
 
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
+
+    document.getElementById(audioTracks[e.target.selectedIndex].id).checked = true;
+
     if (e.target === audioList) {
         // audioListInPlayer.selectedIndex = audioList.selectedIndex;
     } else {
@@ -272,8 +275,39 @@ var audioChanged = function(e) {
     }
 }
 
+var getTrackIndex = function(tracks, id) {
+    var index = -1;
+    for(var i = 0, len = tracks.length; i < len; i++) {
+        if (tracks[i].id === id) {
+            index = i;
+            break;
+        }
+    }
+
+    return index;
+}
+
+var onLanguageRadioClicked = function(e) {
+    var index = getTrackIndex(audioTracks, e.target.value);
+
+    if (index !== -1) {
+        changeAudio(index);
+        audioList.selectedIndex = index;
+    }
+}
+
+var onSubtitleRadioClicked = function(e) {
+    var index = getTrackIndex(subtitleTracks, e.target.value);
+
+    if (index !== -1) {
+        changeSubtitle(index);
+        subtitleList.selectedIndex = index;
+    }
+}
+
 var subtitleChanged = function(e) {
     changeSubtitle(e.target.selectedIndex);
+    document.getElementById(subtitleTracks[e.target.selectedIndex].id).checked = true;
 }
 
 var onMuteClicked = function() {
@@ -403,12 +437,14 @@ var addLanguageLine = function(audioTrack, selectedAudioTrack) {
     var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
+    document.getElementById(audioTrack.id).addEventListener('click', onLanguageRadioClicked);
 }
 
 var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
     var html = createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle');
     var subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
+    document.getElementById(subtitleTrack.id).addEventListener('click', onSubtitleRadioClicked);
 }
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
@@ -637,6 +673,7 @@ var resetLanguageLines = function() {
 
     if (languageLines !== null) {
         while(languageLines.length > 0) {
+            languageLines[0].removeEventListener('click');
             languageLines[0].parentNode.removeChild(languageLines[0]);
         }
     }
