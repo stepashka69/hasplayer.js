@@ -235,7 +235,6 @@ var registerGUIEvents = function() {
 
     videoQualityButton.addEventListener('click', onVideoQualityClicked);
 
-
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
 }
@@ -312,7 +311,7 @@ var onFullScreenClicked = function() {
         } else if (playerContainer.webkitRequestFullscreen) {
             playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         }
-        document.getElementById("demo-player-container").className = "demo-player.fullscreen";
+        document.getElementById("demo-player-container").className = "demo-player-fullscreen";
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -402,6 +401,7 @@ var addLanguageLine = function(audioTrack, selectedAudioTrack) {
     var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
+    document.getElementById(audioTrack.id).addEventListener('click', function() { console.log('click click click')});
 }
 
 var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
