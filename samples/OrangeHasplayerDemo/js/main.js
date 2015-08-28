@@ -581,6 +581,7 @@ var handlePlayBitrate = function(bitrate, time) {
 
 var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
+
         if (window.myLine.datasets[0].points.length > 20) {
             window.myLine.removeData();
         }
@@ -588,7 +589,18 @@ var handleGraphUpdate = function() {
         if (playedBitrate.length === 0) {
             playedBitrate.push(downloadedBitrate[0]);
         }
-        window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
+
+        if (downloadedBitrate.length > 0 && playedBitrate.length > 0) {
+            if (downloadedBitrate[downloadedBitrate.length - 1] === undefined) {
+                downloadedBitrate[downloadedBitrate.length - 1] = 0;
+            }
+
+            if (playedBitrate[playedBitrate.length - 1] === undefined) {
+                playedBitrate[playedBitrate.length - 1] = 0;
+            }
+            window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
+        }
+
         window.myLine.update();
     }
 }
