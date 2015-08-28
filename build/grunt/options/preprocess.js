@@ -38,7 +38,8 @@ module.exports = function(grunt) {
     }
 
     if (typeof(analytics) !== 'boolean'){
-        analytics = false;
+        // analitycs is always included unless boolean is set to false
+        analytics = true;
     }
 
     var sendError = function(params) {
