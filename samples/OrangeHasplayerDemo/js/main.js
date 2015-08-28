@@ -788,6 +788,11 @@ var hideErrorModule = function() {
 var hideBars = function() {
     controlBarModule.className = "op-control-bar op-fade-out";
     menuModule.className = "op-menu op-hidden-translate-up";
+
+    languagesModule.className = "op-screen op-languages op-hidden";
+    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    enableMiddleContainer(false);
+    closeButton.className = "op-close op-hidden";
 }
 var showBarsTimed = function() {
     controlBarModule.className = "op-control-bar";
