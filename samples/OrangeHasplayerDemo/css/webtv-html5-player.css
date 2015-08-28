@@ -1816,6 +1816,7 @@ div:-webkit-full-screen-ancestor:not(iframe) > .op-mosaic {
     .op-settings-quality .op-quality-current span {
       font-size: 30px; }
   .op-settings-quality ul {
+    text-align: left;
     margin-left: -20px;
     margin-top: 0; }
   .op-settings-quality ul:first-child, .op-settings-quality ul:last-child {
