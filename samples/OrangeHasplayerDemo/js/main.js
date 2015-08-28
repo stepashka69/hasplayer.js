@@ -231,6 +231,8 @@ var registerGUIEvents = function() {
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('fullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mouseenter', showBarsTimed);
+    playerContainer.addEventListener('mousemove', showBarsTimed);
+    playerContainer.addEventListener('click', showBarsTimed);
 
     previousChannel.addEventListener('click', onPreviousClicked);
     nextChannel.addEventListener('click', onNextChannelClicked);
@@ -380,7 +382,6 @@ var onMenuClicked = function() {
         menuModule.className = "op-menu op-show-translate-up";
     } else {
         menuModule.className = "op-menu op-hidden-translate-up";
-
     }
 }
 
@@ -393,10 +394,12 @@ var onLanguagesClicked = function() {
         languagesModule.className = "op-screen op-languages";
         hideControlBar();
         enableMiddleContainer(true);
+        clearTimeout(timer);
     } else {
         languagesModule.className = "op-screen op-languages op-hidden";
         showControlBar();
         enableMiddleContainer(false);
+        showBarsTimed();
     }
 }
 
@@ -409,11 +412,14 @@ var onVideoQualityClicked = function() {
         qualityModule.className = "op-screen op-settings-quality";
         hideControlBar();
         enableMiddleContainer(true);
+        clearTimeout(timer);
     } else {
         qualityModule.className = "op-screen op-settings-quality op-hidden";
         showControlBar();
         enableMiddleContainer(false);
+        showBarsTimed();
     }
+
 }
 
 var onCloseButtonClicked = function() {
@@ -794,10 +800,12 @@ var hideBars = function() {
     enableMiddleContainer(false);
     closeButton.className = "op-close op-hidden";
 }
-var showBarsTimed = function() {
-    controlBarModule.className = "op-control-bar";
-    clearTimeout(timer);
-    timer = setTimeout(hideBars, hidebarsTimeout);
+var showBarsTimed = function(e) {
+    if (hasClass(document.querySelector('.op-middle-container'), "disabled")) {
+        clearTimeout(timer);
+        timer = setTimeout(hideBars, hidebarsTimeout);
+        controlBarModule.className = "op-control-bar";
+    }
 }
 
 var enableMiddleContainer = function(enabled) {
