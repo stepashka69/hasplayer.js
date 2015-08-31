@@ -55,8 +55,6 @@ Mss.dependencies.createVOWidevinePssh = function (KID) {
         length = pssh.length,
         dataLength = length - 32;
 
-    console.log("**************************** VOWV");
-
     // Update box length value
     pssh[0] = (length & 0xFF000000) >> 32;
     pssh[1] = (length & 0x00FF0000) >> 16;
