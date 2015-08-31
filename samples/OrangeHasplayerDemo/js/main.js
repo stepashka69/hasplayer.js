@@ -53,18 +53,18 @@ var video = null,
         labels: [],
         datasets: [{
             label: "Downloaded Bitrate",
-            fillColor: "rgba(220,220,220,0.2)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
+            fillColor: "rgba(41, 128, 185, 0.2)",
+            strokeColor: "rgba(41, 128, 185, 1)",
+            pointColor: "rgba(41, 128, 185, 1)",
             pointStrokeColor: "#fff",
             pointHighlightFill: "#fff",
             pointHighlightStroke: "rgba(220,220,220,1)",
             data: []
         }, {
             label: "Played Bitrate",
-            fillColor: "rgba(151,187,205,0.2)",
-            strokeColor: "rgba(151,187,205,1)",
-            pointColor: "rgba(151,187,205,1)",
+            fillColor: "rgba(231, 76, 60, 0.2)",
+            strokeColor: "rgba(231, 76, 60, 1)",
+            pointColor: "rgba(231, 76, 60, 1)",
             pointStrokeColor: "#fff",
             pointHighlightFill: "#fff",
             pointHighlightStroke: "rgba(151,187,205,1)",
@@ -582,7 +582,7 @@ var handlePlayBitrate = function(bitrate, time) {
 var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
 
-        if (window.myLine.datasets[0].points.length > 20) {
+        if (window.myLine.datasets[0].points.length > 200) {
             window.myLine.removeData();
         }
 
@@ -608,9 +608,9 @@ var handleGraphUpdate = function() {
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById("canvas").getContext("2d");
 
-    window.myLine = new Chart(ctx).Line(lineChartData, {
+    window.myLine = new Chart(ctx).LineConstant(lineChartData, {
         responsive: true,
-        bezierCurve: false,
+        constantCurve: true,
         animation: false,
         scaleBeginAtZero: false,
         // Boolean - If we want to override with a hard coded scale
@@ -621,12 +621,14 @@ var handleBitrates = function(bitrates) {
         // Number - The value jump in the hard coded scale
         scaleStepWidth: bitrates[bitrates.length - 1] / bitrates.length,
         // Number - The scale starting value
-        scaleStartValue: bitrates[0]
+        scaleStartValue: bitrates[0],
+        pointDot : false,
+        showTooltips: false
     });
 
     if (legendChart === null) {
         legendChart = window.myLine.generateLegend();
-        document.getElementById('chartLegend').innerHTML = "<span style='background-color:rgba(220,220,220,1)'>Downloaded Bitrate</span><br/><br/><span style='background-color:rgba(151,187,205,1)'>Played Bitrate</span>";
+        document.getElementById('chartLegend').innerHTML = "<span style='background-color:" + lineChartData.datasets[0].strokeColor + "'>Downloaded Bitrate</span><br/><br/><span style='background-color:" + lineChartData.datasets[1].strokeColor + "'>Played Bitrate</span>";
     }
 
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;

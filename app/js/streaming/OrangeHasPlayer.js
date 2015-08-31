@@ -145,6 +145,9 @@ OrangeHasPlayer = function() {
         audiotracks = [];
         subtitletracks = [];
 
+        downloadedBdthValue = undefined;
+        videoQualityChanged = [];
+
         _isPlayerInitialized();
 
         if (metricsAgent && url) {
