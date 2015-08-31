@@ -474,6 +474,15 @@ Mss.dependencies.MssParser = function () {
             mpd.ContentProtection_asArray = contentProtections;
             /* @endif */
 
+            /* @if VOWV=true */
+            if (navigator.userAgent.indexOf("Chrome") >= 0) {
+                contentProtections[contentProtections.length - 1].pssh = {
+                    __text : Mss.dependencies.createVOWidevinePssh(getKIDFromProtectionHeader(manifest.Protection.ProtectionHeader))
+                };
+            }
+            /* @endif */
+
+
             /* @if PROTECTION=false */
             /* @exec sendError('MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED','"protected content detected but protection module is not included."') */
             /* @exec reject('"[MssParser] Protected content detected but protection module is not included."') */

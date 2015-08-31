@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 		proxy = grunt.option('proxy'),
         metricsAgent = grunt.option('metricsAgent'),
         analytics = grunt.option('analytics'),
+        vowv = grunt.option('vowv'),
         hls = true,
         mss = true;
 
@@ -39,8 +40,13 @@ module.exports = function(grunt) {
     }
 
     if (typeof(analytics) !== 'boolean') {
-        // analitycs is always included unless boolean is set to false
+        // analytics is always included unless boolean is set to false
         analytics = true;
+    }
+
+    if ((typeof(vowv) !== 'boolean') || (mss === false)) {
+        // include VO WV pssh generation only if mss is activated
+        vowv = false;
     }
 
     var sendError = function(params) {
@@ -57,6 +63,7 @@ module.exports = function(grunt) {
                 HLS: hls,
                 MSS: mss,
                 METRICS_AGENT:metricsAgent,
+                VOWV:vowv,
                 PROTECTION: protection,
 				PROXY: proxy,
                 ANALYTICS:analytics,

@@ -98,7 +98,7 @@ MediaPlayer.dependencies.protection.KeySystem_Widevine = function() {
             }
         },
 
-        doGetInitData = function () {
+        doGetInitData = function (cpData) {
 
             // Check if protection data contains the pssh
             if (protData.pssh) {
@@ -106,7 +106,7 @@ MediaPlayer.dependencies.protection.KeySystem_Widevine = function() {
             }
 
             // Else get initData from content protection
-            return MediaPlayer.dependencies.protection.CommonEncryption.parseInitDataFromContentProtection();
+            return MediaPlayer.dependencies.protection.CommonEncryption.parseInitDataFromContentProtection(cpData);
         };
 
     return {

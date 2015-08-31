@@ -9,6 +9,7 @@ module.exports = {
                     '-protection                Include/exclude protection module.\n\n' +
                     '-proxy                     Include/exclude OrangeHasPlayer proxy.\n\n' +
                     '-analytics                 Include/exclude analytics.\n\n' +
+                    '-vowv                      Include/exclude source code for VO Widevine pssh generation.\n\n' +
                     '-metricsAgent              Include/exclude MetricsAgent in hasplayer distribution.\n\n'
             }, {
                 name: 'doc',
