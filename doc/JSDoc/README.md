@@ -20,7 +20,7 @@ Add hasplayer.js to the end of the body.
   <script src="yourPathToHasplayer/hasplayer.js"></script>
 </body>
 ```
-Now comes the good stuff. We need to create a context. Then from that context we create a media player, initialize it, attach it to our "videoPlayer" and then tell it where to get the video from. We will do this in an anonymous self executing function, that way it will run as soon as the page loads. So, here is how we do it:
+Now comes the good stuff. We need to create an OrangeHasPlayer. Then we need to initialize it, attach it to our "videoPlayer" and then tell it where to get the video from. We will do this in an anonymous self executing function, that way it will run as soon as the page loads. So, here is how we do it:
 ``` js
 (function(){
     var url = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest";
@@ -52,4 +52,28 @@ When it is all done, it should look similar to this:
         </script>
     </body>
 </html>
+```
+
+## Next Step
+
+orangeHasPlayer offers events to be notify of differents events on video streaming. Those events are, for a part, sent by the HTML5 video  element, and for an other part, sent by hasPlayer.js.
+ 
+```
+function registerHasPlayerEvents() {
+	orangeHasPlayer.addEventListener("error", onError);
+	orangeHasPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
+	orangeHasPlayer.addEventListener("loadeddata", onload);
+	orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
+	orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
+	orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
+	orangeHasPlayer.addEventListener("play", onPlay);
+	orangeHasPlayer.addEventListener("pause", onPause);
+	orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
+};
+```
+For instance, callback function looks like this :
+```
+function onPlayBitrateChanged(e) {
+	handlePlayBitrate(e.detail.bitrate, e.detail.time);
+};
 ```
