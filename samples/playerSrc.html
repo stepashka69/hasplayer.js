@@ -144,7 +144,7 @@
 <script src="../../app/js/dash/vo/Period.js"></script>
 <script src="../../app/js/dash/vo/Representation.js"></script>
 <script src="../../app/js/dash/vo/Segment.js"></script>
-<!-- @if INCLUDE_HLS=true -->
+<!-- @if HLS=true -->
 <!-- /app/js/hls -->
 <script src="../../app/js/hls/Hls.js"></script>
 <script src="../../app/js/hls/dependencies/HlsDemux.js"></script>
@@ -152,7 +152,7 @@
 <script src="../../app/js/hls/dependencies/HlsHandler.js"></script>
 <script src="../../app/js/hls/dependencies/HlsFragmentController.js"></script>
 <!-- @endif -->
-<!-- @if INCLUDE_MSS=true -->
+<!-- @if MSS=true -->
 <!-- /app/js/mss -->
 <script src="../../app/js/mss/Mss.js"></script>
 <script src="../../app/js/mss/dependencies/MssParser.js"></script>
@@ -166,5 +166,9 @@
 <script src="../../app/js/utils/CopyMethods.js"></script>
 <script src="../../app/js/utils/ObjectIron.js"></script>
 <script src="../../app/js/utils/xhr.js"></script>
+
+<!-- @if METRICS_AGENT=true -->
+<script src="../../app/lib/metricsagent.min.js"></script>
+<!-- @endif -->
 <!-- /source -->
 

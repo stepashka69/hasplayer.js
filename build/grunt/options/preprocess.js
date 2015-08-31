@@ -3,21 +3,21 @@ module.exports = function(grunt) {
     var protocols  = grunt.option('protocol'),
         protection = grunt.option('protection'),
 		proxy = grunt.option('proxy'),
-        includeMetricsAgent = grunt.option('includeMetricsAgent'),
+        metricsAgent = grunt.option('metricsAgent'),
         analytics = grunt.option('analytics'),
-        includeHls = true,
-        includeMss = true;
+        hls = true,
+        mss = true;
 
     // Must check the type because it can be a boolean flag if no arguments are specified after the option.
     if (typeof(protocols) === 'string') {
         protocols = grunt.option('protocol').toLowerCase().split(',');
-        includeHls = includeMss = false;
+        hls = mss = false;
 
         for (var i in protocols) {
             if (protocols[i] === 'hls') {
-                includeHls = true;
+                hls = true;
             } else if (protocols[i] === 'mss') {
-                includeMss = true;
+                mss = true;
             }
             else if (protocols[i] !== 'dash') {
                 console.error("PREPROCESS ERROR: protocol '" + protocols[i] + "' is not supported. Expected 'hls', 'mss' or 'dash'.");
@@ -26,6 +26,7 @@ module.exports = function(grunt) {
     }
 
     if (typeof(protection) !== 'boolean') {
+        // protection is always included unless boolean is set to false
         protection = true;
     }
 	
@@ -33,11 +34,11 @@ module.exports = function(grunt) {
         proxy = false;
     }
 
-    if (typeof(includeMetricsAgent) !== 'boolean'){
-        includeMetricsAgent = false;
+    if (typeof(metricsAgent) !== 'boolean') {
+        metricsAgent = false;
     }
 
-    if (typeof(analytics) !== 'boolean'){
+    if (typeof(analytics) !== 'boolean') {
         // analitycs is always included unless boolean is set to false
         analytics = true;
     }
@@ -53,9 +54,9 @@ module.exports = function(grunt) {
     return {
         options: {
             context : {
-                INCLUDE_HLS: includeHls,
-                INCLUDE_MSS: includeMss,
-                INCLUDE_METRICS_AGENT:includeMetricsAgent,
+                HLS: hls,
+                MSS: mss,
+                METRICS_AGENT:metricsAgent,
                 PROTECTION: protection,
 				PROXY: proxy,
                 ANALYTICS:analytics,
