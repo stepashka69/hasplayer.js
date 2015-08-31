@@ -3,7 +3,7 @@
     "allowUnknownTags": true
   },
   "source": {
-        "include": ["../app/js/streaming/OrangeHasPlayer.js"]
+        "include": ["../app/js/streaming/OrangeHasPlayer.js", "../doc/JSDoc/README.md"]
   },
   "plugins": ["plugins/markdown"],
   "templates": {
