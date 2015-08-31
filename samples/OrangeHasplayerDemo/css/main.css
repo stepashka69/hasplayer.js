@@ -154,7 +154,9 @@ h1 {
     text-align: center;
 }
 
-
+.lineconstant-legend{
+    list-style-type: none;
+}
 
 #protection-data-container table {
     border: 1px solid black;

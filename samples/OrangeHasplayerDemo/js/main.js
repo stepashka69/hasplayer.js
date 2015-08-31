@@ -632,12 +632,14 @@ var handleBitrates = function(bitrates) {
         // Number - The scale starting value
         scaleStartValue: bitrates[0],
         pointDot : false,
-        showTooltips: false
+        showTooltips: false,
+        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
+
     });
 
     if (legendChart === null) {
         legendChart = window.myLine.generateLegend();
-        document.getElementById('chartLegend').innerHTML = "<span style='background-color:" + lineChartData.datasets[0].strokeColor + "'>Downloaded Bitrate</span><br/><br/><span style='background-color:" + lineChartData.datasets[1].strokeColor + "'>Played Bitrate</span>";
+        document.getElementById('chartLegend').innerHTML = legendChart;
     }
 
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
