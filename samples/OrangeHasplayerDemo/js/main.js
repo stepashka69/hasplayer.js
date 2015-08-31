@@ -450,6 +450,7 @@ var onCloseButtonClicked = function() {
 var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
 
     var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : "";
+    var lang =  audioTrack.lang !== undefined ? audioTrack.lang : audioTrack.id;
     var html = '<div class="op-languages-line">' +
                 '<input type="radio" name="' + type + '" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
                 '<label for="' +  audioTrack.id + '">' +
@@ -459,7 +460,7 @@ var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
                 '<span class="op-radiocheck">' +
                 '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">	<g>		<g>			<circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g><g id="Calque_2">	<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1		S11.5,7.9,15.9,7.9z"></path></g></svg>' +
                 '</span>' +
-                '<span> ' + audioTrack.lang + '</span>' +
+                '<span> ' + lang + '</span>' +
                 '</label>' +
                 '</div>';
     return html;
