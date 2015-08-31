@@ -266,6 +266,7 @@ var onStreamClicked = function(streamInfos) {
     if (streamInfos.protData) {
         displayProtectionData(streamInfos.protData);
     }
+    showBarsTimed();
 };
 
 var onFullScreenChange = function(e) {
