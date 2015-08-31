@@ -13,6 +13,7 @@ var video = null,
     videoQualityButton = null,
     controlBarModule = null,
     qualityModule = null,
+    closeButton = null,
     highBitrateSpan = null,
     currentBitrateSpan = null,
     lowBitrateSpan = null,
@@ -46,6 +47,8 @@ var video = null,
     durationTime = null;
     durationTimeSpan = null,
     elapsedTimeSpan = null,
+    hidebarsTimeout = 5000,
+    timer = null,
     lineChartData = {
         labels: [],
         datasets: [{
@@ -193,6 +196,7 @@ var getDOMElements = function() {
     languagesButton = document.getElementById("languagesButton");
     videoQualityButton = document.getElementById("videoQualityButton");
     qualityModule = document.getElementById("QualityModule");
+    closeButton = document.getElementById("CloseCrossModule");
     controlBarModule = document.getElementById("ControlBarModule");
 
     highBitrateSpan = document.getElementById("highBitrateSpan");
@@ -226,15 +230,18 @@ var registerGUIEvents = function() {
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('fullscreenchange', onFullScreenChange);
+    playerContainer.addEventListener('mouseenter', showBarsTimed);
+    playerContainer.addEventListener('mousemove', showBarsTimed);
+    playerContainer.addEventListener('click', showBarsTimed);
 
     previousChannel.addEventListener('click', onPreviousClicked);
     nextChannel.addEventListener('click', onNextChannelClicked);
 
     menuButton.addEventListener('click', onMenuClicked);
     languagesButton.addEventListener('click', onLanguagesClicked);
+    closeButton.addEventListener('click', onCloseButtonClicked);
 
     videoQualityButton.addEventListener('click', onVideoQualityClicked);
-
 
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
@@ -266,6 +273,9 @@ var onPlayPauseClicked = function(e) {
 
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
+
+    document.getElementById(audioTracks[e.target.selectedIndex].id).checked = true;
+
     if (e.target === audioList) {
         // audioListInPlayer.selectedIndex = audioList.selectedIndex;
     } else {
@@ -273,8 +283,39 @@ var audioChanged = function(e) {
     }
 }
 
+var getTrackIndex = function(tracks, id) {
+    var index = -1;
+    for(var i = 0, len = tracks.length; i < len; i++) {
+        if (tracks[i].id === id) {
+            index = i;
+            break;
+        }
+    }
+
+    return index;
+}
+
+var onLanguageRadioClicked = function(e) {
+    var index = getTrackIndex(audioTracks, e.target.value);
+
+    if (index !== -1) {
+        changeAudio(index);
+        audioList.selectedIndex = index;
+    }
+}
+
+var onSubtitleRadioClicked = function(e) {
+    var index = getTrackIndex(subtitleTracks, e.target.value);
+
+    if (index !== -1) {
+        changeSubtitle(index);
+        subtitleList.selectedIndex = index;
+    }
+}
+
 var subtitleChanged = function(e) {
     changeSubtitle(e.target.selectedIndex);
+    document.getElementById(subtitleTracks[e.target.selectedIndex].id).checked = true;
 }
 
 var onMuteClicked = function() {
@@ -312,7 +353,7 @@ var onFullScreenClicked = function() {
         } else if (playerContainer.webkitRequestFullscreen) {
             playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         }
-        document.getElementById("demo-player-container").className = "demo-player.fullscreen";
+        document.getElementById("demo-player-container").className = "demo-player-fullscreen";
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -352,9 +393,13 @@ var onLanguagesClicked = function() {
     if (hasClass(languagesModule, "op-hidden")) {
         languagesModule.className = "op-screen op-languages";
         hideControlBar();
+        enableMiddleContainer(true);
+        clearTimeout(timer);
     } else {
         languagesModule.className = "op-screen op-languages op-hidden";
         showControlBar();
+        enableMiddleContainer(false);
+        showBarsTimed();
     }
 }
 
@@ -366,10 +411,23 @@ var onVideoQualityClicked = function() {
     if (hasClass(qualityModule, "op-hidden")) {
         qualityModule.className = "op-screen op-settings-quality";
         hideControlBar();
+        enableMiddleContainer(true);
+        clearTimeout(timer);
     } else {
         qualityModule.className = "op-screen op-settings-quality op-hidden";
         showControlBar();
+        enableMiddleContainer(false);
+        showBarsTimed();
     }
+
+}
+
+var onCloseButtonClicked = function() {
+    languagesModule.className = "op-screen op-languages op-hidden";
+    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    enableMiddleContainer(false);
+    closeButton.className = "op-close op-hidden";
+    showControlBar();
 }
 
 /********************************************************************************************************************
@@ -392,7 +450,7 @@ var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
                 '<span class="op-radiocheck">' +
                 '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">	<g>		<g>			<circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g><g id="Calque_2">	<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1		S11.5,7.9,15.9,7.9z"></path></g></svg>' +
                 '</span>' +
-                '<span>' + audioTrack.lang + '</span>' +
+                '<span> ' + audioTrack.lang + '</span>' +
                 '</label>' +
                 '</div>';
     return html;
@@ -402,12 +460,14 @@ var addLanguageLine = function(audioTrack, selectedAudioTrack) {
     var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
+    document.getElementById(audioTrack.id).addEventListener('click', onLanguageRadioClicked);
 }
 
 var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
     var html = createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle');
     var subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
+    document.getElementById(subtitleTrack.id).addEventListener('click', onSubtitleRadioClicked);
 }
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
@@ -521,6 +581,7 @@ var handlePlayBitrate = function(bitrate, time) {
 
 var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
+
         if (window.myLine.datasets[0].points.length > 20) {
             window.myLine.removeData();
         }
@@ -528,7 +589,18 @@ var handleGraphUpdate = function() {
         if (playedBitrate.length === 0) {
             playedBitrate.push(downloadedBitrate[0]);
         }
-        window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
+
+        if (downloadedBitrate.length > 0 && playedBitrate.length > 0) {
+            if (downloadedBitrate[downloadedBitrate.length - 1] === undefined) {
+                downloadedBitrate[downloadedBitrate.length - 1] = 0;
+            }
+
+            if (playedBitrate[playedBitrate.length - 1] === undefined) {
+                playedBitrate[playedBitrate.length - 1] = 0;
+            }
+            window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
+        }
+
         window.myLine.update();
     }
 }
@@ -636,6 +708,7 @@ var resetLanguageLines = function() {
 
     if (languageLines !== null) {
         while(languageLines.length > 0) {
+            languageLines[0].removeEventListener('click');
             languageLines[0].parentNode.removeChild(languageLines[0]);
         }
     }
@@ -728,6 +801,33 @@ var showErrorModule = function() {
 
 var hideErrorModule = function() {
     errorModule.className = "op-error op-hidden";
+}
+
+var hideBars = function() {
+    controlBarModule.className = "op-control-bar op-fade-out";
+    menuModule.className = "op-menu op-hidden-translate-up";
+
+    languagesModule.className = "op-screen op-languages op-hidden";
+    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    enableMiddleContainer(false);
+    closeButton.className = "op-close op-hidden";
+}
+var showBarsTimed = function(e) {
+    if (hasClass(document.querySelector('.op-middle-container'), "disabled")) {
+        clearTimeout(timer);
+        timer = setTimeout(hideBars, hidebarsTimeout);
+        controlBarModule.className = "op-control-bar";
+    }
+}
+
+var enableMiddleContainer = function(enabled) {
+    if (enabled) {
+        document.querySelector('.op-middle-container').className = "op-middle-container";
+        closeButton.className = "op-close";
+    } else {
+        document.querySelector('.op-middle-container').className = "op-middle-container disabled";
+        closeButton.className = "op-close op-hidden";
+    }
 }
 
 var setTimeWithSeconds = function(sec) {
