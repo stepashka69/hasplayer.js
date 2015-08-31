@@ -10,7 +10,6 @@ module.exports = {
                                       '-analytics' + '\t\t' + 'false exclude analytics.\n\n'+
                                       '-includeMetricsAgent' + '\t\t' + 'Include MetricsAgent in hasplayer distribution.\n\n'},
                 {name: 'doc', info: 'Generate API documentation.\n'},
-                {name: 'source', info: 'Replace the player source files in each samples by the ones in samples/playerSrc.html.\n'},
                 {name: 'test', info: 'Run a syntaxic test on each player source file and show errors/warnings.\n'},
                 {name: 'help', info: 'Well... you\'re running it ;)\n'}
             ]
