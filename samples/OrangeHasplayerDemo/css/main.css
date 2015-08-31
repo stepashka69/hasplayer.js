@@ -29,7 +29,7 @@ h1 {
 #streams-container {
     width: 20%;
     min-width: 200px;
-    background: #ff8000;
+    background: #FF6600;
     border-right: 2px solid #004040;
     float: left;
     height:100vh;
@@ -49,10 +49,14 @@ h1 {
     padding: 2px;
     padding-top: 5px;
     padding-bottom: 5px;
-    background: rgba(0, 0, 0, 0.2);
-    font-size: 15px;
-    color: white;
     vertical-align: middle;
+}
+
+#streams-container tr {
+    color: #F3F3F3;
+    transition: 0.2s ease-in-out;
+    background: rgba(0, 0, 0, 0.08);
+    font-size: 15px;
 }
 
 #streams-container td:first-child img{
@@ -63,12 +67,14 @@ h1 {
    vertical-align: middle;
 }
 
-#streams-container tr:hover {
-    background: rgba(255, 255, 255, 0.4);
+#streams-container tr:hover, #streams-container tr.stream-selected {
+    background: #ff8000;
+    color: white;
+    transition: 0.2s ease-in-out;
 }
 
 #main-container {
-    background: #c0c0c0;
+    background: #d8d8d8;
     height:100vh;
     max-width: 100%;
     margin-left: 20%;
@@ -85,8 +91,6 @@ h1 {
 }
 
 #audio-container {
-    display:block;
-    float:left;
     max-width:80%;
     min-width: 150px;
     border-radius: 5px;
@@ -96,8 +100,6 @@ h1 {
 }
 
 #subtitle-container {
-    display:block;
-    float:left;
     max-width:80%;
     min-width: 150px;
     border-radius: 5px;
@@ -108,7 +110,6 @@ h1 {
 
 .demo-player {
     width: 75%;
-    /*height: 480px;*/
     position: relative;
     margin: auto;
 }
@@ -127,20 +128,20 @@ h1 {
 }
 
 #menu-data-container {
-    float:bottom;
     max-width: 100%;
-    height: 15vh;
+    height: 10vh;
     min-height: 50px;
     margin:auto;
     border-radius: 5px;
     margin-bottom: 3vh;
     text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 #bitrate-graph-container {
     float:bottom;
     max-width:100%;
-    height: 35vh;
     min-height: 100px;
     margin:auto;
     margin-bottom: 3vh;
@@ -159,7 +160,6 @@ h1 {
 }
 
 #protection-data-container table {
-    border: 1px solid black;
     border-collapse: collapse;
     margin: auto;
 }
@@ -167,11 +167,12 @@ h1 {
 #protection-data-container table td {
     padding: 5px;
     text-align: left;
+    background-color: #E6E6E6;
 }
 
 #protection-data-container table td.protection-data-name {
     font-weight: bold;
-    background: #DADADA;
+    background: #7EB6DE;
     text-align: center;
 }
 

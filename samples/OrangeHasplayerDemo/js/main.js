@@ -143,7 +143,12 @@ window.onload = function() {
         streamItem.setAttribute('class', 'stream-item');
 
         streamItem.addEventListener('click', function() {
+            if (selectedItem !== null) {
+                selectedItem.className = 'stream-item';
+            }
+
             selectedItem = this;
+            selectedItem.className = 'stream-item stream-selected';
             onStreamClicked(stream);
         });
 
