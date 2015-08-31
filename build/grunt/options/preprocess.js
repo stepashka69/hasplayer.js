@@ -3,6 +3,8 @@ module.exports = function(grunt) {
     var protocols  = grunt.option('protocol'),
         protection = grunt.option('protection'),
 		proxy = grunt.option('proxy'),
+        includeMetricsAgent = grunt.option('includeMetricsAgent'),
+        analytics = grunt.option('analytics'),
         includeHls = true,
         includeMss = true;
 
@@ -31,6 +33,15 @@ module.exports = function(grunt) {
         proxy = false;
     }
 
+    if (typeof(includeMetricsAgent) !== 'boolean'){
+        includeMetricsAgent = false;
+    }
+
+    if (typeof(analytics) !== 'boolean'){
+        // analitycs is always included unless boolean is set to false
+        analytics = true;
+    }
+
     var sendError = function(params) {
         return  'this.errHandler.sendError(' + params[0] + ', ' + params[1] + ');';
     };
@@ -44,8 +55,10 @@ module.exports = function(grunt) {
             context : {
                 INCLUDE_HLS: includeHls,
                 INCLUDE_MSS: includeMss,
+                INCLUDE_METRICS_AGENT:includeMetricsAgent,
                 PROTECTION: protection,
 				PROXY: proxy,
+                ANALYTICS:analytics,
                 sendError: sendError,
                 reject: reject
             }

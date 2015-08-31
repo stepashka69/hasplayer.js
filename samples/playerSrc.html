@@ -165,8 +165,15 @@
 <script src="../../app/js/hls/dependencies/HlsFragmentController.js"></script>
 <!-- @endif -->
 
+
+<!-- @if INCLUDE_METRICS_AGENT=true -->
+<script src="../../app/lib/metricsagent.min.js"></script>
+<!-- @endif -->
+
 <script src="../../app/js/utils/CopyMethods.js"></script>
 <script src="../../app/js/utils/ObjectIron.js"></script>
 <script src="../../app/js/utils/xhr.js"></script>
+<!-- @if ANALYTICS=true -->
 <script src="../../app/js/utils/analytics.js"></script>
+<!-- @endif -->
 <!-- /source -->
