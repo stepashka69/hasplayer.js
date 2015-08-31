@@ -1,5 +1,6 @@
 var video = null,
     playerContainer = null,
+    protectionDataContainer = null,
     volumeButton = null,
     volumeOnSvg = null,
     volumeOffSvg = null,
@@ -141,13 +142,6 @@ window.onload = function() {
 
         streamItem.setAttribute('class', 'stream-item');
 
-        var onStreamClicked = function(streamInfos) {
-            reset();
-            hideErrorModule();
-            showLoadingElement();
-            loadStream(streamInfos);
-        };
-
         streamItem.addEventListener('click', function() {
             selectedItem = this;
             onStreamClicked(stream);
@@ -213,7 +207,9 @@ var getDOMElements = function() {
 
     seekbar = document.querySelector('.bar-seek');
     seekbarBackground = document.querySelector('.bar-background');
-}
+
+    protectionDataContainer = document.getElementById('protection-data-container');
+};
 
 var registerGUIEvents = function() {
     volumeButton.addEventListener('click', onMuteClicked);
@@ -245,7 +241,7 @@ var registerGUIEvents = function() {
 
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
-}
+};
 
 /********************************************************************************************************************
  *
@@ -254,6 +250,19 @@ var registerGUIEvents = function() {
  *
  *
  **********************************************************************************************************************/
+var onStreamClicked = function(streamInfos) {
+    reset();
+    hideErrorModule();
+    showLoadingElement();
+    loadStream(streamInfos);
+
+    clearProtectionData();
+
+    if (streamInfos.protData) {
+        displayProtectionData(streamInfos.protData);
+    }
+};
+
 var onFullScreenChange = function(e) {
     var state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
     if (!state) {
@@ -814,12 +823,44 @@ var hideBars = function() {
     enableMiddleContainer(false);
     closeButton.className = "op-close op-hidden";
 }
+
 var showBarsTimed = function(e) {
     if (hasClass(document.querySelector('.op-middle-container'), "disabled")) {
         clearTimeout(timer);
         timer = setTimeout(hideBars, hidebarsTimeout);
         controlBarModule.className = "op-control-bar";
     }
+}
+
+var clearProtectionData = function() {
+    protectionDataContainer.innerHTML = "";
+}
+
+var displayProtectionData = function(streamInfos) {
+    var html = '<h3>Protection data</h3>';
+
+    html += "<table>";
+    for (var p in streamInfos) {
+        if (streamInfos.hasOwnProperty(p)) {
+            html += displayProtectionDatum(p, streamInfos[p]);
+        }
+    }
+
+    html += '</table>';
+
+    protectionDataContainer.innerHTML = html;
+}
+
+var displayProtectionDatum = function(protectionName, protectionDatum) {
+    var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>';
+
+    for (var p in protectionDatum) {
+        if (protectionDatum.hasOwnProperty(p)) {
+            html += '<tr><td>' + p + '</td><td>' + protectionDatum[p] + '</td></tr>';
+        }
+    }
+
+    return html;
 }
 
 var enableMiddleContainer = function(enabled) {
