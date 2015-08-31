@@ -166,7 +166,7 @@ window.onload = function() {
     getDOMElements();
     createHasPlayer();
     registerGUIEvents();
-}
+};
 
 var getDOMElements = function() {
     video = document.getElementById('player');
@@ -268,17 +268,17 @@ var onFullScreenChange = function(e) {
     if (!state) {
         document.getElementById("demo-player-container").className = "demo-player";
     }
-}
+};
 
 var onSeekClicked = function(e) {
     if (durationTime) {
         setSeekValue(e.offsetX * durationTime / seekbarBackground.clientWidth);
     }
-}
+};
 
 var onPlayPauseClicked = function(e) {
     changePlayerState();
-}
+};
 
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
@@ -290,7 +290,7 @@ var audioChanged = function(e) {
     } else {
         audioList.selectedIndex = audioListInPlayer.selectedIndex;
     }
-}
+};
 
 var getTrackIndex = function(tracks, id) {
     var index = -1;
@@ -302,7 +302,7 @@ var getTrackIndex = function(tracks, id) {
     }
 
     return index;
-}
+};
 
 var onLanguageRadioClicked = function(e) {
     var index = getTrackIndex(audioTracks, e.target.value);
@@ -311,7 +311,7 @@ var onLanguageRadioClicked = function(e) {
         changeAudio(index);
         audioList.selectedIndex = index;
     }
-}
+};
 
 var onSubtitleRadioClicked = function(e) {
     var index = getTrackIndex(subtitleTracks, e.target.value);
@@ -320,35 +320,35 @@ var onSubtitleRadioClicked = function(e) {
         changeSubtitle(index);
         subtitleList.selectedIndex = index;
     }
-}
+};
 
 var subtitleChanged = function(e) {
     changeSubtitle(e.target.selectedIndex);
     document.getElementById(subtitleTracks[e.target.selectedIndex].id).checked = true;
-}
+};
 
 var onMuteClicked = function() {
     setPlayerMute();
     setVolumeOff(orangeHasPlayer.getMute());
     hideVolumePanel();
-}
+};
 
 var onMuteEnter = function() {
     showVolumePanel();
     restartVolumeTimer();
-}
+};
 
 var onPanelVolumeEnter = function() {
     stopVolumeTimer();
-}
+};
 
 var onSliderVolumeChange = function() {
     setPlayerVolume(sliderVolume.value / 100);
-}
+};
 
 var onPanelVolumeOut = function() {
     restartVolumeTimer();
-}
+};
 
 var onFullScreenClicked = function() {
     if (!document.fullscreenElement && // alternative standard method
@@ -376,15 +376,15 @@ var onFullScreenClicked = function() {
         document.getElementById("demo-player-container").className = "demo-player";
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
-}
+};
 
 var onPreviousClicked = function() {
     selectedItem.previousSibling.click();
-}
+};
 
 var onNextChannelClicked = function() {
     selectedItem.nextSibling.click();
-}
+};
 
 var onMenuClicked = function() {
     if (hasClass(menuModule, "op-hidden-translate-up")) {
@@ -392,7 +392,7 @@ var onMenuClicked = function() {
     } else {
         menuModule.className = "op-menu op-hidden-translate-up";
     }
-}
+};
 
 var onLanguagesClicked = function() {
     if (!hasClass(qualityModule, "op-hidden")) {
@@ -410,7 +410,7 @@ var onLanguagesClicked = function() {
         enableMiddleContainer(false);
         showBarsTimed();
     }
-}
+};
 
 var onVideoQualityClicked = function() {
     if (!hasClass(languagesModule, "op-hidden")) {
@@ -429,7 +429,7 @@ var onVideoQualityClicked = function() {
         showBarsTimed();
     }
 
-}
+};
 
 var onCloseButtonClicked = function() {
     languagesModule.className = "op-screen op-languages op-hidden";
@@ -437,7 +437,7 @@ var onCloseButtonClicked = function() {
     enableMiddleContainer(false);
     closeButton.className = "op-close op-hidden";
     showControlBar();
-}
+};
 
 /********************************************************************************************************************
  *
@@ -464,21 +464,21 @@ var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
                 '</label>' +
                 '</div>';
     return html;
-}
+};
 
 var addLanguageLine = function(audioTrack, selectedAudioTrack) {
     var html = createLanguageLine(audioTrack, selectedAudioTrack, 'language');
     var languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
     document.getElementById(audioTrack.id).addEventListener('click', onLanguageRadioClicked);
-}
+};
 
 var addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
     var html = createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle');
     var subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
     document.getElementById(subtitleTrack.id).addEventListener('click', onSubtitleRadioClicked);
-}
+};
 
 var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     audioTracks = _audioTracks;
@@ -494,7 +494,7 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
             addLanguageLine(audioTracks[i], _selectedAudioTrack);
         }
     }
-}
+};
 
 var handleDuration = function(duration) {
     durationTime = duration;
@@ -504,7 +504,7 @@ var handleDuration = function(duration) {
         durationTimeSpan.textContent = "00:00:00";
         handleTimeUpdate(0);
     }
-}
+};
 
 var handleVolumeChange = function(volumeLevel) {
     volumeLabel.innerHTML = Math.round(volumeLevel * 100);
@@ -537,7 +537,7 @@ var handleVolumeChange = function(volumeLevel) {
     } else if (sliderVolume.value >= 96) {
         sliderVolume.className = "op-volume op-range100";
     }
-}
+};
 
 var handleTimeUpdate = function(time) {
     elapsedTimeSpan.textContent = setTimeWithSeconds(time);
@@ -547,7 +547,7 @@ var handleTimeUpdate = function(time) {
      } else {
         seekbar.style.width = 0;
      }
-}
+};
 
 var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
     //init subtitles tracks
@@ -562,12 +562,12 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
             addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
         }
     }
-}
+};
 
 var handleSubtitleStyleChange = function(style) {
     subtitlesCSSStyle = style;
     setSubtitlesCSSStyle(subtitlesCSSStyle);
-}
+};
 
 var handlePlayState = function(state) {
     setPlaying(state);
@@ -576,18 +576,18 @@ var handlePlayState = function(state) {
     } else {
         showLoadingElement();
     }
-}
+};
 
 var handleDownloadedBitrate = function(bitrate, time) {
     downloadedBitrate.push(bitrate);
     handleGraphUpdate();
-}
+};
 
 var handlePlayBitrate = function(bitrate, time) {
     playedBitrate.push(bitrate);
     handleGraphUpdate();
     currentBitrateSpan.innerHTML = bitrate/1000000;
-}
+};
 
 var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
@@ -613,7 +613,7 @@ var handleGraphUpdate = function() {
 
         window.myLine.update();
     }
-}
+};
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById("canvas").getContext("2d");
@@ -645,7 +645,7 @@ var handleBitrates = function(bitrates) {
 
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
-}
+};
 
 var handleError = function(e) {
     //manage GUI to show errors
@@ -654,7 +654,7 @@ var handleError = function(e) {
     smallErrorMessage.innerHTML = e.event.message;
 
     showErrorModule();
-}
+};
 
 /**********************************************************************************************************************/
 
@@ -668,7 +668,7 @@ var setSubtitlesCSSStyle = function(style) {
 
         document.getElementById("cueStyle").innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
     }
-}
+};
 
 var addCombo = function(tracks, combo) {
     var i, option;
@@ -687,7 +687,7 @@ var addCombo = function(tracks, combo) {
             combo.style.visibility = 'visible';
         }
     }
-}
+};
 
 var selectCombo = function(tracks, combo, currentTrack) {
     var i;
@@ -697,7 +697,7 @@ var selectCombo = function(tracks, combo, currentTrack) {
             combo.selectedIndex = i;
         }
     }
-}
+};
 
 var resetCombo = function(tracks, combo) {
     var i;
@@ -709,13 +709,13 @@ var resetCombo = function(tracks, combo) {
     tracks = [];
 
     combo.style.visibility = 'hidden';
-}
+};
 
 var resetSeekbar = function() {
     seekbar.style.width = 0;
     durationTimeSpan.textContent = "00:00:00";
     elapsedTimeSpan.textContent = "00:00:00";
-}
+};
 
 var resetLanguageLines = function() {
     var languageLines = document.getElementsByClassName('op-languages-line');
@@ -726,7 +726,7 @@ var resetLanguageLines = function() {
             languageLines[0].parentNode.removeChild(languageLines[0]);
         }
     }
-}
+};
 
 var reset = function() {
     resetCombo(audioTracks, audioList);
@@ -734,10 +734,6 @@ var reset = function() {
 
     resetSeekbar();
     resetLanguageLines();
-
-    /*for (i = audioTracks.length - 1; i >= 0; i--) {
-        audioListInPlayer.options.remove(i);
-    }*/
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
@@ -751,7 +747,7 @@ var reset = function() {
         lineChartData.datasets[0].data = [];
         lineChartData.datasets[1].data = [];
     }
-}
+};
 
 var setVolumeOff = function(value) {
     if (value) {
@@ -761,7 +757,7 @@ var setVolumeOff = function(value) {
         volumeOffSvg.style.display = "none";
         volumeOnSvg.style.display = "block";
     }
-}
+};
 
 var setPlaying = function(value) {
     if (value) {
@@ -771,51 +767,51 @@ var setPlaying = function(value) {
         playPauseButton.className = "tooltip op-play stop-anchor";
         playPauseButton.title = "Play";
     }
-}
+};
 
 var stopVolumeTimer = function() {
     clearTimeout(volumeTimer);
-}
+};
 
 var restartVolumeTimer = function() {
     clearTimeout(volumeTimer);
     volumeTimer = setTimeout(function() {
         hideVolumePanel();
     }, 3000);
-}
+};
 
 var showVolumePanel = function() {
     panelVolume.className = "op-container-volume";
-}
+};
 
 var hideVolumePanel = function() {
     clearTimeout(volumeTimer);
     panelVolume.className = "op-container-volume op-hidden";
-}
+};
 
 var showLoadingElement = function() {
     loadingElement.className = "op-loading";
-}
+};
 
 var hideLoadingElement = function() {
     loadingElement.className = "op-loading op-none";
-}
+};
 
 var hideControlBar = function() {
     controlBarModule.className = "op-control-bar op-none";
-}
+};
 
 var showControlBar = function() {
     controlBarModule.className = "op-control-bar";
-}
+};
 
 var showErrorModule = function() {
     errorModule.className = "op-error";
-}
+};
 
 var hideErrorModule = function() {
     errorModule.className = "op-error op-hidden";
-}
+};
 
 var hideBars = function() {
     controlBarModule.className = "op-control-bar op-fade-out";
@@ -825,7 +821,7 @@ var hideBars = function() {
     qualityModule.className = "op-screen op-settings-quality op-hidden";
     enableMiddleContainer(false);
     closeButton.className = "op-close op-hidden";
-}
+};
 
 var showBarsTimed = function(e) {
     if (hasClass(document.querySelector('.op-middle-container'), "disabled")) {
@@ -833,11 +829,11 @@ var showBarsTimed = function(e) {
         timer = setTimeout(hideBars, hidebarsTimeout);
         controlBarModule.className = "op-control-bar";
     }
-}
+};
 
 var clearProtectionData = function() {
     protectionDataContainer.innerHTML = "";
-}
+};
 
 var displayProtectionData = function(streamInfos) {
     var html = '<h3>Protection data</h3>';
@@ -852,7 +848,7 @@ var displayProtectionData = function(streamInfos) {
     html += '</table>';
 
     protectionDataContainer.innerHTML = html;
-}
+};
 
 var displayProtectionDatum = function(protectionName, protectionDatum) {
     var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>';
@@ -864,7 +860,7 @@ var displayProtectionDatum = function(protectionName, protectionDatum) {
     }
 
     return html;
-}
+};
 
 var enableMiddleContainer = function(enabled) {
     if (enabled) {
@@ -874,7 +870,7 @@ var enableMiddleContainer = function(enabled) {
         document.querySelector('.op-middle-container').className = "op-middle-container disabled";
         closeButton.className = "op-close op-hidden";
     }
-}
+};
 
 var setTimeWithSeconds = function(sec) {
     var sec_num = parseInt(sec, 10); // don't forget the second param
@@ -893,8 +889,8 @@ var setTimeWithSeconds = function(sec) {
     }
     var time = hours + ':' + minutes + ':' + seconds;
     return time;
-}
+};
 
 function hasClass(element, className) {
     return element.className && new RegExp("(^|\\s)" + className + "(\\s|$)").test(element.className);
-}
+};

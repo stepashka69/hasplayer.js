@@ -27,7 +27,7 @@
         orangeHasPlayer.setDefaultSubtitleLang('fre');
 
         registerHasPlayerEvents();
-    };
+    }
 
     function registerHasPlayerEvents() {
         orangeHasPlayer.addEventListener("error", onError);
@@ -39,7 +39,7 @@
         orangeHasPlayer.addEventListener("play", onPlay);
         orangeHasPlayer.addEventListener("pause", onPause);
         orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
-    };
+    }
 
     function loadHasPlayerConfig(fileUrl) {
         var reqConfig = new XMLHttpRequest();
@@ -56,7 +56,7 @@
         reqConfig.open("GET", fileUrl, true);
         reqConfig.setRequestHeader("Content-type", "application/json");
         reqConfig.send();
-    };
+    }
 
     /********************************************************************************************************************
     *
@@ -79,7 +79,7 @@
         handleDuration(orangeHasPlayer.getDuration());
         //init bitrates graph
         handleBitrates(orangeHasPlayer.getVideoBitrates());
-    };
+    }
 
     /**
      * [onSubtitlesStyleChanged description]
@@ -87,7 +87,7 @@
      */
     function onSubtitlesStyleChanged(style) {
         handleSubtitleStyleChange(style);
-    };
+    }
 
     /**
      * [onError description]
@@ -95,7 +95,7 @@
      */
     function onError(e) {
         handleError(e);
-    };
+    }
 
     /**
      * [onPlayBitrateChanged description]
@@ -103,23 +103,23 @@
      */
     function onPlayBitrateChanged(e) {
         handlePlayBitrate(e.detail.bitrate, e.detail.time);
-    };
+    }
 
     function onDownloadBitrateChanged(e){
         handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
-    };
+    }
 
     function onVolumeChange() {
         handleVolumeChange(orangeHasPlayer.getVolume());
-    };
+    }
 
     function onPlay() {
         handlePlayState(true);
-    };
+    }
 
     function onPause() {
         handlePlayState(false);
-    };
+    }
 
     function onTimeUpdate(){
         //update progress bar in GUI.
@@ -128,8 +128,8 @@
         }
 
         handleGraphUpdate(video.currentTime);
-    };
-    
+    }
+
     /********************************************************************************************************************
     *
     *
@@ -139,23 +139,23 @@
     **********************************************************************************************************************/
     function loadStream(streamInfos) {
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
-    };
+    }
 
     function changeAudio(index) {
         orangeHasPlayer.setAudioTrack(audioTracks[index]);
-    };
+    }
 
     function changeSubtitle() {
         orangeHasPlayer.setSubtitleTrack(subtitleTracks[subtitleList.selectedIndex]);
-    };
+    }
 
     function setPlayerMute() {
         orangeHasPlayer.setMute(!orangeHasPlayer.getMute());
-    };
+    }
 
     function setPlayerVolume(value) {
         orangeHasPlayer.setVolume(value);
-    };
+    }
 
     function changePlayerState() {
         if (video.paused) {
@@ -164,9 +164,9 @@
         else{
             orangeHasPlayer.pause();
         }
-    };
+    }
 
     function setSeekValue(seekTime) {
         orangeHasPlayer.seek(seekTime);
-    };
+    }
     /**********************************************************************************************************************/
