@@ -49,6 +49,7 @@ var video = null,
     durationTimeSpan = null,
     elapsedTimeSpan = null,
     hidebarsTimeout = 5000,
+    graphSteps = 150,
     timer = null,
     lineChartData = {
         labels: [],
@@ -598,7 +599,7 @@ var handlePlayBitrate = function(bitrate, time) {
 var handleGraphUpdate = function() {
     if (window.myLine !== undefined) {
 
-        if (window.myLine.datasets[0].points.length > 200) {
+        if (window.myLine.datasets[0].points.length > graphSteps) {
             window.myLine.removeData();
         }
 
@@ -640,6 +641,7 @@ var handleBitrates = function(bitrates) {
         scaleStartValue: bitrates[0],
         pointDot : false,
         showTooltips: false,
+        scaleShowVerticalLines : false,
         legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
 
     });
@@ -651,6 +653,9 @@ var handleBitrates = function(bitrates) {
 
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
+
+    // Add fake steps to prepare graph grid
+    window.myLine.addDataArray(Array.apply(null, new Array(graphSteps)).map(Array.prototype.valueOf,[0,0]));
 };
 
 var handleError = function(e) {
@@ -747,7 +752,6 @@ var reset = function() {
     playedBitrate = [];
 
     if (window.myLine !== undefined) {
-        window.myLine.clear();
         window.myLine.destroy();
         lineChartData.labels = [];
         lineChartData.datasets[0].data = [];

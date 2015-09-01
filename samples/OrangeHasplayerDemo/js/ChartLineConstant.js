@@ -84,5 +84,28 @@ Chart.types.Line.extend({
                     point.draw();
                 });
             },this);
+        },
+        addDataArray : function(arrayOfValuesArray){
+            //Map the values array for each of the datasets
+
+            for (var i = 0, len = arrayOfValuesArray.length; i < len; ++i) {
+                helpers.each(arrayOfValuesArray[i],function(value,datasetIndex){
+                    //Add a new point for each piece of data, passing any required data to draw.
+                    this.datasets[datasetIndex].points.push(new this.PointClass({
+                        value : value,
+                        label : '',
+                        x: this.scale.calculateX(this.scale.valuesCount+1),
+                        y: this.scale.endPoint,
+                        strokeColor : this.datasets[datasetIndex].pointStrokeColor,
+                        fillColor : this.datasets[datasetIndex].pointColor
+                    }));
+                },this);
+
+                this.scale.addXLabel('');
+            }
+
+            //Then re-render the chart.
+            this.update();
         }
 });
+
