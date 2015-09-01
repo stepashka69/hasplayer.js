@@ -655,7 +655,7 @@ var handleBitrates = function(bitrates) {
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
 
     // Add fake steps to prepare graph grid
-    window.myLine.addDataArray(Array.apply(null, new Array(graphSteps)).map(Array.prototype.valueOf,[0,0]));
+    window.myLine.addDataArray(Array.apply(null, new Array(graphSteps)).map(Array.prototype.valueOf,[null,null]));
 
     updateGraph = true;
 };

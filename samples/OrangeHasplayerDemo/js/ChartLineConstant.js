@@ -131,3 +131,4 @@ Chart.types.Line.extend({
             }
         }
 });
+
