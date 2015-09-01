@@ -421,23 +421,17 @@ input.op-volume {
   .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls {
     height: 42px; }
     .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls .op-container-volume {
-      right: 136px;
+      right: 74px;
       bottom: 37.8px; }
     .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls .tooltip:hover:after {
-      -webkit-transform: translate(calc(-50% + (18px / 2)), 0%);
-          -ms-transform: translate(calc(-50% + (18px / 2)), 0%);
-              transform: translate(calc(-50% + (18px / 2)), 0%);
-      bottom: 30.6px;
+              transform: translate(-50%, 0%);
+      bottom: 30px;
       font-size: 15px;
       padding: 5px 10px; }
     .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls .tooltip.first:hover:after {
-      -webkit-transform: translate(calc(-40% + (18px / 2)), 0%);
-          -ms-transform: translate(calc(-40% + (18px / 2)), 0%);
-              transform: translate(calc(-40% + (18px / 2)), 0%); }
+              transform: translate(-35%, 0%); }
     .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls .tooltip.last:hover:after {
-      -webkit-transform: translate(calc(-70% + (18px / 2)), 0%);
-          -ms-transform: translate(calc(-70% + (18px / 2)), 0%);
-              transform: translate(calc(-70% + (18px / 2)), 0%); }
+              transform: translate(-70%, 0%); }
     .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-controls .tooltip:hover:before {
       -webkit-transform: translate(calc(18px / 2), 0%);
           -ms-transform: translate(calc(18px / 2), 0%);
