@@ -129,8 +129,5 @@ Chart.types.Line.extend({
 
                 this.scale.addXLabel('');
             }
-
-            //Then re-render the chart.
-            this.update();
         }
 });
