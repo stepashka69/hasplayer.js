@@ -5,6 +5,20 @@ Chart.types.Line.extend({
     name: "LineConstant",
     initialize: function(data){
         Chart.types.Line.prototype.initialize.apply(this, arguments);
+        var self = this;
+        this.scale.calculateX = function(index){
+            var isRotated = (this.xLabelRotation > 0),
+                // innerWidth = (this.offsetGridLines) ? this.width - offsetLeft - this.padding : this.width - (offsetLeft + halfLabelWidth * 2) - this.padding,
+                innerWidth = this.width - (this.xScalePaddingLeft + this.xScalePaddingRight),
+                valueWidth = (self.options.stepsCount) ? innerWidth/self.options.stepsCount : innerWidth/Math.max((this.valuesCount - ((this.offsetGridLines) ? 0 : 1)), 1),
+                valueOffset = (valueWidth * index) + this.xScalePaddingLeft;
+
+            if (this.offsetGridLines){
+                valueOffset += (valueWidth/2);
+            }
+
+            return Math.round(valueOffset);
+        };
     },
     draw: function(ease) {
             var easingDecimal = ease || 1;
@@ -131,4 +145,3 @@ Chart.types.Line.extend({
             }
         }
 });
-

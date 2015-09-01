@@ -628,6 +628,7 @@ var handleBitrates = function(bitrates) {
     window.myLine = new Chart(ctx).LineConstant(lineChartData, {
         responsive: true,
         constantCurve: true,
+        stepsCount: graphSteps,
         animation: false,
         scaleBeginAtZero: false,
         // Boolean - If we want to override with a hard coded scale
@@ -653,9 +654,6 @@ var handleBitrates = function(bitrates) {
 
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
-
-    // Add fake steps to prepare graph grid
-    window.myLine.addDataArray(Array.apply(null, new Array(graphSteps)).map(Array.prototype.valueOf,[null,null]));
 
     updateGraph = true;
 };
