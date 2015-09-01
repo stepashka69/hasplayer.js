@@ -25,7 +25,6 @@ Chart.types.Line.extend({
 
             this.scale.draw(easingDecimal);
 
-
             helpers.each(this.datasets,function(dataset){
                 var pointsWithValues = helpers.where(dataset.points, hasValue);
 
@@ -85,6 +84,33 @@ Chart.types.Line.extend({
                 });
             },this);
         },
+        addData : function(valuesArray,label){
+            //Map the values array for each of the datasets
+
+            helpers.each(valuesArray,function(value,datasetIndex){
+                //Add a new point for each piece of data, passing any required data to draw.
+                this.datasets[datasetIndex].points.push(new this.PointClass({
+                    value : value,
+                    label : label,
+                    x: this.scale.calculateX(this.scale.valuesCount+1),
+                    y: this.scale.endPoint,
+                    strokeColor : this.datasets[datasetIndex].pointStrokeColor,
+                    fillColor : this.datasets[datasetIndex].pointColor
+                }));
+            },this);
+
+            this.scale.addXLabel(label);
+            //Then re-render the chart.
+            //this.update(); // DON'T RE-RENDER FOR PERFORMANCE ISSUES
+        },
+        removeData : function(){
+            this.scale.removeXLabel();
+            //Then re-render the chart.
+            helpers.each(this.datasets,function(dataset){
+                dataset.points.shift();
+            },this);
+            //this.update(); // DON'T RE-RENDER FOR PERFORMANCE ISSUES
+        },
         addDataArray : function(arrayOfValuesArray){
             //Map the values array for each of the datasets
 
@@ -108,4 +134,3 @@ Chart.types.Line.extend({
             this.update();
         }
 });
-

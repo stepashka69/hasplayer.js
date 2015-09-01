@@ -50,6 +50,7 @@ var video = null,
     elapsedTimeSpan = null,
     hidebarsTimeout = 5000,
     graphSteps = 150,
+    updateGraph = false,
     timer = null,
     lineChartData = {
         labels: [],
@@ -597,7 +598,7 @@ var handlePlayBitrate = function(bitrate, time) {
 };
 
 var handleGraphUpdate = function() {
-    if (window.myLine !== undefined) {
+    if (window.myLine !== undefined && updateGraph) {
 
         if (window.myLine.datasets[0].points.length > graphSteps) {
             window.myLine.removeData();
@@ -617,7 +618,6 @@ var handleGraphUpdate = function() {
             }
             window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
         }
-
         window.myLine.update();
     }
 };
@@ -656,6 +656,8 @@ var handleBitrates = function(bitrates) {
 
     // Add fake steps to prepare graph grid
     window.myLine.addDataArray(Array.apply(null, new Array(graphSteps)).map(Array.prototype.valueOf,[0,0]));
+
+    updateGraph = true;
 };
 
 var handleError = function(e) {
@@ -756,6 +758,7 @@ var reset = function() {
         lineChartData.labels = [];
         lineChartData.datasets[0].data = [];
         lineChartData.datasets[1].data = [];
+        updateGraph = false;
     }
 };
 
