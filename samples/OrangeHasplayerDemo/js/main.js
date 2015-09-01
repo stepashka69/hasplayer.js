@@ -219,7 +219,7 @@ var getDOMElements = function() {
 };
 
 var registerGUIEvents = function() {
-    volumeButton.addEventListener('click', onMuteClicked);
+    volumeButton.addEventListener('click', onMuteEnter);
     volumeButton.addEventListener('mouseenter', onMuteEnter);
     panelVolume.addEventListener('mouseover', onPanelVolumeEnter);
     panelVolume.addEventListener('mouseout', onPanelVolumeOut);
@@ -350,7 +350,16 @@ var onPanelVolumeEnter = function() {
     stopVolumeTimer();
 };
 
+var isMute = false;
 var onSliderVolumeChange = function() {
+    if (sliderVolume.value === "0") {
+        onMuteClicked();
+        isMute = true;
+    } else if (isMute) {
+        onMuteClicked();
+        isMute = false;
+    }
+
     setPlayerVolume(sliderVolume.value / 100);
 };
 
