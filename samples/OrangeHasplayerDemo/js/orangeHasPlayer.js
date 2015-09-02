@@ -98,7 +98,7 @@
      * @param  {[type]} e [description]
      */
     function onError(e) {
-        orangeHasPlayer.reset();
+        orangeHasPlayer.reset(2);
         handleError(e);
     }
 
