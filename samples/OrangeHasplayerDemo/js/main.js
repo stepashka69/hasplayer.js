@@ -51,6 +51,9 @@ var video = null,
     hidebarsTimeout = 5000,
     graphSteps = 150,
     updateGraph = false,
+    isMute = false,
+    lastChartTimeLabel = -1;
+    firstChartTime = -1,
     timer = null,
     lineChartData = {
         labels: [],
@@ -350,7 +353,6 @@ var onPanelVolumeEnter = function() {
     stopVolumeTimer();
 };
 
-var isMute = false;
 var onSliderVolumeChange = function() {
     if (sliderVolume.value === "0") {
         onMuteClicked();
@@ -597,16 +599,32 @@ var handlePlayState = function(state) {
 
 var handleDownloadedBitrate = function(bitrate, time) {
     downloadedBitrate.push(bitrate);
-    handleGraphUpdate();
+    handleGraphUpdate(time);
 };
 
 var handlePlayBitrate = function(bitrate, time) {
     playedBitrate.push(bitrate);
-    handleGraphUpdate();
+    handleGraphUpdate(time);
     currentBitrateSpan.innerHTML = bitrate/1000000;
 };
 
-var handleGraphUpdate = function() {
+var timeLabel = function(time) {
+    var label = "";
+    if (firstChartTime === -1) {
+        firstChartTime = Math.floor(time);
+    }
+
+    time -= firstChartTime;
+
+    if (time >= lastChartTimeLabel + 1) {
+        lastChartTimeLabel = Math.floor(time);
+        label = Math.round(time*100) / 100;
+    }
+
+    return label;
+};
+
+var handleGraphUpdate = function(time) {
     if (window.myLine !== undefined && updateGraph) {
 
         if (window.myLine.datasets[0].points.length > graphSteps) {
@@ -625,7 +643,7 @@ var handleGraphUpdate = function() {
             if (playedBitrate[playedBitrate.length - 1] === undefined) {
                 playedBitrate[playedBitrate.length - 1] = 0;
             }
-            window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], "");
+            window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], (time) ? timeLabel(time) : "");
         }
         window.myLine.update();
     }
@@ -767,6 +785,9 @@ var reset = function() {
         lineChartData.datasets[1].data = [];
         updateGraph = false;
     }
+
+    lastChartTimeLabel = -1;
+    firstChartTime = -1;
 };
 
 var setVolumeOff = function(value) {
