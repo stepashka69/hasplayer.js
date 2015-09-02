@@ -1,22 +1,26 @@
     var orangeHasPlayer = null,
         config = null,
         configMetrics = {
-            "name": "csQoE (local)",
-            "activationUrl": "http://localhost:8080/config",
+            "name": "Prisme (local)",
+            "activationUrl": "",
             "serverUrl": "http://localhost:8080/metrics",
+            "enable": true,
+            "eventsObjectFilter": "session;realtime",
+            "eventTypeSessionFilter": "error;profil,10,10;usage",
+            "eventTypeRealTimeFilter": "error,10,40,99;profil",
             "dbServerUrl": "http://localhost:8080/metricsDB",
             "collector": "HasPlayerCollector",
-            "formatter": "CSQoE",
+            "formatter": "Prisme",
             "sendingTime": 10000
         };
 
     /********************************************************************************************************************
-    *
-    *
-    *                  Init functions
-    *
-    *
-    **********************************************************************************************************************/
+     *
+     *
+     *                  Init functions
+     *
+     *
+     **********************************************************************************************************************/
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
         orangeHasPlayer.init(video);
@@ -59,12 +63,12 @@
     }
 
     /********************************************************************************************************************
-    *
-    *
-    *                   OrangeHasPlayer Events
-    *
-    *
-    **********************************************************************************************************************/
+     *
+     *
+     *                   OrangeHasPlayer Events
+     *
+     *
+     **********************************************************************************************************************/
     /**
      * [onload description]
      * @return {[type]} [description]
@@ -94,6 +98,7 @@
      * @param  {[type]} e [description]
      */
     function onError(e) {
+        orangeHasPlayer.reset();
         handleError(e);
     }
 
@@ -105,7 +110,7 @@
         handlePlayBitrate(e.detail.bitrate, e.detail.time);
     }
 
-    function onDownloadBitrateChanged(e){
+    function onDownloadBitrateChanged(e) {
         handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
     }
 
@@ -121,7 +126,7 @@
         handlePlayState(false);
     }
 
-    function onTimeUpdate(){
+    function onTimeUpdate() {
         //update progress bar in GUI.
         if (!orangeHasPlayer.isLive()) {
             handleTimeUpdate(video.currentTime);
@@ -131,12 +136,12 @@
     }
 
     /********************************************************************************************************************
-    *
-    *
-    *                   OrangeHasPlayer function calls
-    *
-    *
-    **********************************************************************************************************************/
+     *
+     *
+     *                   OrangeHasPlayer function calls
+     *
+     *
+     **********************************************************************************************************************/
     function loadStream(streamInfos) {
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
