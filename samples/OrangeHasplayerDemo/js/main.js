@@ -875,7 +875,7 @@ var displayProtectionDatum = function(protectionName, protectionDatum) {
 
     for (var p in protectionDatum) {
         if (protectionDatum.hasOwnProperty(p)) {
-            html += '<tr><td>' + p + '</td><td>' + protectionDatum[p] + '</td></tr>';
+            html += '<tr><td class="protection-key">' + p + '</td><td class="protection-value">' + protectionDatum[p] + '</td></tr>';
         }
     }
 
