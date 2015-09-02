@@ -150,7 +150,7 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        this.reset(); 
+        this.reset(0); 
 
         if (metricsAgent && url) {
             metricsAgent.createSession();
