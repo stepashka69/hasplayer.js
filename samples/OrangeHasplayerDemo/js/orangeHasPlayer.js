@@ -131,8 +131,6 @@
         if (!orangeHasPlayer.isLive()) {
             handleTimeUpdate(video.currentTime);
         }
-
-        handleGraphUpdate(video.currentTime);
     }
 
     /********************************************************************************************************************
