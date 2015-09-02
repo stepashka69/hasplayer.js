@@ -160,8 +160,7 @@
     function changePlayerState() {
         if (video.paused) {
             orangeHasPlayer.play();
-        }
-        else{
+        } else {
             orangeHasPlayer.pause();
         }
     }
