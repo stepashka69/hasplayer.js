@@ -41,16 +41,18 @@ var video = null,
     previousChannel = null,
     nextChannel = null,
     selectedItem = null,
-    downloadedBitrate = [],
-    playedBitrate = [],
     subtitlesCSSStyle = null,
     legendChart = null,
     durationTime = null;
     durationTimeSpan = null,
     elapsedTimeSpan = null,
     hidebarsTimeout = 5000,
-    graphSteps = 150,
     updateGraph = false,
+    graphUpdateTimeInterval = 200, // in milliseconds
+    graphUpdateWindow = 30000, // in milliseconds
+    graphSteps = graphUpdateWindow / graphUpdateTimeInterval,
+    graphTimer = null,
+    graphElapsedTime = 0,
     isMute = false,
     lastChartTimeLabel = -1;
     firstChartTime = -1,
@@ -272,6 +274,13 @@ var onStreamClicked = function(streamInfos) {
         displayProtectionData(streamInfos.protData);
     }
     showBarsTimed();
+
+    if (graphTimer === null) {
+        graphTimer = new Timer(handleGraphUpdate, graphUpdateTimeInterval, true);
+    } else {
+        graphTimer.stop();
+    }
+
 };
 
 var onFullScreenChange = function(e) {
@@ -592,59 +601,45 @@ var handlePlayState = function(state) {
     setPlaying(state);
     if (state === true) {
         hideLoadingElement();
+        graphTimer.start();
     } else {
+        graphTimer.pause();
         showLoadingElement();
     }
 };
 
 var handleDownloadedBitrate = function(bitrate, time) {
-    downloadedBitrate.push(bitrate);
-    handleGraphUpdate(time);
+    lastDownloadedBitrate = bitrate;
 };
 
 var handlePlayBitrate = function(bitrate, time) {
-    playedBitrate.push(bitrate);
-    handleGraphUpdate(time);
+    lastPlayedBitrate = bitrate;
     currentBitrateSpan.innerHTML = bitrate/1000000;
 };
 
-var timeLabel = function(time) {
+var timeLabel = function(elapsedTime) {
     var label = "";
-    if (firstChartTime === -1) {
-        firstChartTime = Math.floor(time);
-    }
 
-    time -= firstChartTime;
+    elapsedTime /= 1000;
 
-    if (time >= lastChartTimeLabel + 1) {
-        lastChartTimeLabel = Math.floor(time);
-        label = Math.round(time*100) / 100;
+    if (elapsedTime >= lastChartTimeLabel + 1) {
+        lastChartTimeLabel = Math.floor(elapsedTime);
+        label = lastChartTimeLabel;
     }
 
     return label;
 };
 
-var handleGraphUpdate = function(time) {
+var handleGraphUpdate = function() {
     if (window.myLine !== undefined && updateGraph) {
 
         if (window.myLine.datasets[0].points.length > graphSteps) {
             window.myLine.removeData();
+
         }
 
-        if (playedBitrate.length === 0) {
-            playedBitrate.push(downloadedBitrate[0]);
-        }
-
-        if (downloadedBitrate.length > 0 && playedBitrate.length > 0) {
-            if (downloadedBitrate[downloadedBitrate.length - 1] === undefined) {
-                downloadedBitrate[downloadedBitrate.length - 1] = 0;
-            }
-
-            if (playedBitrate[playedBitrate.length - 1] === undefined) {
-                playedBitrate[playedBitrate.length - 1] = 0;
-            }
-            window.myLine.addData([downloadedBitrate[downloadedBitrate.length - 1], playedBitrate[playedBitrate.length - 1]], (time) ? timeLabel(time) : "");
-        }
+        graphElapsedTime += graphUpdateTimeInterval;
+        window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
         window.myLine.update();
     }
 };
@@ -775,8 +770,8 @@ var reset = function() {
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
-    downloadedBitrate = [];
-    playedBitrate = [];
+    lastDownloadedBitrate = 0;
+    lastPlayedBitrate = 0;
 
     if (window.myLine !== undefined) {
         window.myLine.destroy();
@@ -788,6 +783,7 @@ var reset = function() {
 
     lastChartTimeLabel = -1;
     firstChartTime = -1;
+    graphElapsedTime = 0;
 };
 
 var setVolumeOff = function(value) {
