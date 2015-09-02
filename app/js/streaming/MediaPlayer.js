@@ -645,8 +645,6 @@ MediaPlayer = function(aContext) {
             loop = videoModel.getElement().loop;
             if (url) {
                 this.metricsModel.addSession(null, url, loop, null, "HasPlayer.js_" + this.getVersionHAS());
-            }else {
-                this.metricsModel.addState("video", "stopped");
             }
 
             this.uriQueryFragModel.reset();
@@ -673,9 +671,10 @@ MediaPlayer = function(aContext) {
          * @access public
          * @memberof MediaPlayer#
          */
-        reset: function() {
+        reset: function(reason) {
             this.attachSource(null);
             protectionData = null;
+            this.metricsModel.addState("video", "stopped", this.getVideoModel().getCurrentTime(), reason);
         },
 
         setDefaultAudioLang: function(language) {

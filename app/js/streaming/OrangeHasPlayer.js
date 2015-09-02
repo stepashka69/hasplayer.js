@@ -147,6 +147,8 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
+        this.reset(0); 
+
         if (metricsAgent && url) {
             metricsAgent.createSession();
         }
@@ -243,9 +245,9 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      */
-    this.reset = function() {
+    this.reset = function(reason) {
         _isPlayerInitialized();
-        mediaPlayer.reset();
+        mediaPlayer.reset(reason);
         if (metricsAgent) {
             metricsAgent.stop();
         }
