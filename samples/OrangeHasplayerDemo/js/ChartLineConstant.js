@@ -19,6 +19,35 @@ Chart.types.Line.extend({
 
             return Math.round(valueOffset);
         };
+
+        this.scale.calculateY = function(value){
+            if (self.options.scaleLabels) {
+                var yLabelGap = (this.endPoint - this.startPoint) / this.steps;
+                var yLabelCenter = this.endPoint - (yLabelGap * self.options.scaleLabels.indexOf(value));
+                return yLabelCenter;
+            } else {
+                var scalingFactor = this.drawingArea() / (this.min - this.max);
+                return this.endPoint - (scalingFactor * (value - this.min));
+            }
+        };
+
+        this.scale.buildYLabels = function(){
+            this.yLabels = [];
+
+            var stepDecimalPlaces = helpers.getDecimalPlaces(this.stepValue);
+
+            if (self.options.scaleLabels) {
+                 for (var i=0, len = self.options.scaleLabels.length; i < len; i++){
+                    this.yLabels.push(helpers.template(this.templateString,{value: self.options.scaleLabels[i].toFixed(stepDecimalPlaces)}));
+                }
+            } else {
+                for (var i=0; i<=this.steps; i++){
+                    this.yLabels.push(helpers.template(this.templateString,{value:(this.min + (i * this.stepValue)).toFixed(stepDecimalPlaces)}));
+                }
+            }
+
+            this.yLabelWidth = (this.display && this.showLabels) ? helpers.longestText(this.ctx,this.font,this.yLabels) : 0;
+        };
     },
     draw: function(ease) {
             var easingDecimal = ease || 1;
@@ -97,6 +126,66 @@ Chart.types.Line.extend({
                     point.draw();
                 });
             },this);
+        },
+        buildScale : function(labels){
+            var self = this;
+
+            var dataTotal = function(){
+                var values = [];
+                self.eachPoints(function(point){
+                    values.push(point.value);
+                });
+
+                return values;
+            };
+
+            var scaleOptions = {
+                templateString : this.options.scaleLabel,
+                height : this.chart.height,
+                width : this.chart.width,
+                ctx : this.chart.ctx,
+                textColor : this.options.scaleFontColor,
+                fontSize : this.options.scaleFontSize,
+                fontStyle : this.options.scaleFontStyle,
+                fontFamily : this.options.scaleFontFamily,
+                valuesCount : labels.length,
+                beginAtZero : this.options.scaleBeginAtZero,
+                integersOnly : this.options.scaleIntegersOnly,
+                calculateYRange : function(currentHeight){
+                    var updatedRanges = helpers.calculateScaleRange(
+                        dataTotal(),
+                        currentHeight,
+                        this.fontSize,
+                        this.beginAtZero,
+                        this.integersOnly
+                    );
+                    helpers.extend(this, updatedRanges);
+                },
+                xLabels : labels,
+                font : helpers.fontString(this.options.scaleFontSize, this.options.scaleFontStyle, this.options.scaleFontFamily),
+                lineWidth : this.options.scaleLineWidth,
+                lineColor : this.options.scaleLineColor,
+                showHorizontalLines : this.options.scaleShowHorizontalLines,
+                showVerticalLines : this.options.scaleShowVerticalLines,
+                gridLineWidth : (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
+                gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
+                padding: (this.options.showScale) ? 0 : this.options.pointDotRadius + this.options.pointDotStrokeWidth,
+                showLabels : this.options.scaleShowLabels,
+                display : this.options.showScale
+            };
+
+            if (this.options.scaleOverride){
+                helpers.extend(scaleOptions, {
+                    calculateYRange: helpers.noop,
+                    steps: this.options.scaleSteps,
+                    stepValue: this.options.scaleStepWidth,
+                    min: this.options.scaleStartValue,
+                    max: (this.options.scaleLabels) ? this.options.scaleLabels[this.options.scaleLabels.length - 1] : this.options.scaleStartValue + (this.options.scaleSteps * this.options.scaleStepWidth)
+                });
+            }
+
+
+            this.scale = new Chart.Scale(scaleOptions);
         },
         addData : function(valuesArray,label){
             //Map the values array for each of the datasets

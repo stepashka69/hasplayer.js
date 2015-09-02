@@ -657,14 +657,15 @@ var handleBitrates = function(bitrates) {
         scaleOverride: true,
         // ** Required if scaleOverride is true **
         // Number - The number of steps in a hard coded scale
-        scaleSteps: bitrates.length,
+        scaleSteps: bitrates.length - 1,
         // Number - The value jump in the hard coded scale
-        scaleStepWidth: bitrates[bitrates.length - 1] / bitrates.length,
+        scaleStepWidth: bitrates[bitrates.length - 1] / (bitrates.length - 1),
         // Number - The scale starting value
         scaleStartValue: bitrates[0],
         pointDot : false,
         showTooltips: false,
         scaleShowVerticalLines : false,
+        scaleLabels: bitrates,
         legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
 
     });
