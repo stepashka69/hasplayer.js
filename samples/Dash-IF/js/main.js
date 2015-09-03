@@ -968,6 +968,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
         if ($scope.chromecast.playing){
             $scope.stopInChromecast();
         }
+        
+        player.reset(0);
 
         if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
             metricsAgent.createSession();
