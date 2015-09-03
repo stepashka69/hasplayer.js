@@ -34,11 +34,9 @@ Chart.types.Line.extend({
         this.scale.buildYLabels = function(){
             this.yLabels = [];
 
-            var stepDecimalPlaces = helpers.getDecimalPlaces(this.stepValue);
-
             if (self.options.scaleLabels) {
                  for (var i=0, len = self.options.scaleLabels.length; i < len; i++){
-                    this.yLabels.push(helpers.template(this.templateString,{value: self.options.scaleLabels[i].toFixed(stepDecimalPlaces)}));
+                    this.yLabels.push(helpers.template(this.templateString,{value: self.options.scaleLabels[i]}));
                 }
             } else {
                 for (var i=0; i<=this.steps; i++){
