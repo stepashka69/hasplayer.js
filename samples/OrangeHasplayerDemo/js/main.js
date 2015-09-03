@@ -284,7 +284,7 @@ var onStreamClicked = function(streamInfos) {
         graphTimer.stop();
     }
 
-    streamUrl.innerHTML = streamInfos.name += ": " + streamInfos.url;
+    streamUrl.innerHTML = streamInfos.name + ": " + streamInfos.url;
 };
 
 var onFullScreenChange = function(e) {
