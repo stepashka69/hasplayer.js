@@ -276,7 +276,7 @@ var onStreamClicked = function(streamInfos) {
     showBarsTimed();
 
     if (graphTimer === null) {
-        graphTimer = new Timer(handleGraphUpdate, graphUpdateTimeInterval, true);
+        graphTimer = new LoopTimer(handleGraphUpdate, graphUpdateTimeInterval);
     } else {
         graphTimer.stop();
     }
