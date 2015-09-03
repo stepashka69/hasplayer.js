@@ -639,7 +639,6 @@ var handleGraphUpdate = function() {
 
         if (window.myLine.datasets[0].points.length > graphSteps) {
             window.myLine.removeData();
-
         }
 
         graphElapsedTime += graphUpdateTimeInterval;
@@ -682,8 +681,13 @@ var handleBitrates = function(bitrates) {
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
 
-    lastPlayedBitrate = bitrates[0];
+    lastPlayedBitrate = null;
+
     updateGraph = true;
+
+    // Init first graph value
+    graphElapsedTime = 0;
+    window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
 };
 
 var handleError = function(e) {
@@ -776,8 +780,8 @@ var reset = function() {
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
-    lastDownloadedBitrate = 0;
-    lastPlayedBitrate = 0;
+    lastDownloadedBitrate = null;
+    lastPlayedBitrate = null;
 
     if (window.myLine !== undefined) {
         window.myLine.destroy();
