@@ -682,6 +682,7 @@ var handleBitrates = function(bitrates) {
     highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
     lowBitrateSpan.innerHTML = bitrates[0]/1000000;
 
+    lastPlayedBitrate = bitrates[0];
     updateGraph = true;
 };
 
