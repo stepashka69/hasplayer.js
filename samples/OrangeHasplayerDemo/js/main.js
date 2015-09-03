@@ -61,7 +61,7 @@ var video = null,
     lineChartData = {
         labels: [],
         datasets: [{
-            label: "Downloaded Bitrate",
+            label: "— Downloaded Bitrate",
             fillColor: "rgba(41, 128, 185, 0.2)",
             strokeColor: "rgba(41, 128, 185, 1)",
             pointColor: "rgba(41, 128, 185, 1)",
@@ -70,7 +70,7 @@ var video = null,
             pointHighlightStroke: "rgba(220,220,220,1)",
             data: []
         }, {
-            label: "Played Bitrate",
+            label: "— Played Bitrate",
             fillColor: "rgba(231, 76, 60, 0.2)",
             strokeColor: "rgba(231, 76, 60, 1)",
             pointColor: "rgba(231, 76, 60, 1)",
@@ -883,9 +883,8 @@ var clearProtectionData = function() {
 };
 
 var displayProtectionData = function(streamInfos) {
-    var html = '<h3>Protection data</h3>';
+    var html = "<table>";
 
-    html += "<table>";
     for (var p in streamInfos) {
         if (streamInfos.hasOwnProperty(p)) {
             html += displayProtectionDatum(p, streamInfos[p]);
