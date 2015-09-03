@@ -53,7 +53,35 @@ When it is all done, it should look similar to this:
     </body>
 </html>
 ```
-
+## DRM Video Stream
+In the case of protected content, the code should look like this:
+```
+<!doctype html>
+<html>
+    <head>
+        <title>Hasplayer.js Rocks</title>
+    </head>
+    <body>
+        <div>
+            <video id="videoPlayer" controls="true"></video>
+        </div>
+        <script src="yourPathToHasplayer/hasplayer.js"></script>
+        <script>
+            (function(){
+                var url = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest";
+				var protData = {
+					com.microsoft.playready: {
+						laURL: "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
+						customData: "B2C99B73-CA41-4003-84A3AA16CE92B304"
+					};
+				var orangeHasPlayer = new OrangeHasPlayer();
+				orangeHasPlayer.init(document.querySelector("#videoPlayer"));
+				orangeHasPlayer.load(url, protData);
+            })();
+        </script>
+    </body>
+</html>
+```
 ## Next Step
 
 orangeHasPlayer offers events to be notify of differents events on video streaming. Those events are, for a part, sent by the HTML5 video  element, and for an other part, sent by hasPlayer.js.
