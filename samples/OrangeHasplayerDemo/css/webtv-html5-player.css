@@ -1162,6 +1162,7 @@ div:-webkit-full-screen-ancestor:not(iframe) > .op-feedback {
 .op-seek-bar {
   width: 100%;
   height: 30px;
+  transition: linear;
   position: absolute;
   display: -webkit-box;
   display: -webkit-flex;

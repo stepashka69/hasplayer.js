@@ -164,6 +164,7 @@ h1 {
 #protection-data-container table {
     border-collapse: collapse;
     margin: auto;
+    font-size: 13px;
 }
 
 #protection-data-container table td {
@@ -180,6 +181,12 @@ h1 {
 
 .protection-value {
     word-break: break-all;
+}
+
+.op-seek-bar .bar-container .bar-seek-zoom {
+    position: relative;
+    top: -2px;
+    height: 8px !important;
 }
 
  /* ******************************************************** */

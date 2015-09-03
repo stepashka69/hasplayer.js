@@ -34,6 +34,7 @@ var video = null,
     subtitleTracks = [],
     currentsubtitleTrack = null,
     playPauseButton = null,
+    seekbarContainer = null,
     seekbar = null,
     seekbarBackground = null,
     durationText = null,
@@ -218,6 +219,7 @@ var getDOMElements = function() {
     durationTimeSpan = document.querySelector(".op-seek-bar-time-remaining span");
     elapsedTimeSpan = document.querySelector(".op-seek-bar-time-elapsed span");
 
+    seekbarContainer = document.querySelector(".bar-container");
     seekbar = document.querySelector('.bar-seek');
     seekbarBackground = document.querySelector('.bar-background');
 
@@ -254,6 +256,8 @@ var registerGUIEvents = function() {
 
     videoQualityButton.addEventListener('click', onVideoQualityClicked);
 
+    seekbarContainer.addEventListener('mouseenter', onSeekBarModuleEnter);
+    seekbarContainer.addEventListener('mouseleave', onSeekBarModuleLeave);
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
 };
@@ -292,6 +296,16 @@ var onFullScreenChange = function(e) {
     if (!state) {
         document.getElementById("demo-player-container").className = "demo-player";
     }
+};
+
+var onSeekBarModuleEnter = function(e) {
+    seekbar.className = "bar-seek bar-seek-zoom";
+    seekbarBackground.className = "bar-background bar-seek-zoom";
+};
+
+var onSeekBarModuleLeave = function(e) {
+    seekbar.className = "bar-seek";
+    seekbarBackground.className = "bar-background";
 };
 
 var onSeekClicked = function(e) {
