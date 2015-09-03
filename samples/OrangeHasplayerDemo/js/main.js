@@ -1,6 +1,7 @@
 var video = null,
     playerContainer = null,
     protectionDataContainer = null,
+    streamUrl = null,
     volumeButton = null,
     volumeOnSvg = null,
     volumeOffSvg = null,
@@ -221,6 +222,8 @@ var getDOMElements = function() {
     seekbarBackground = document.querySelector('.bar-background');
 
     protectionDataContainer = document.getElementById('protection-data-container');
+
+    streamUrl = document.querySelector(".stream-url");
 };
 
 var registerGUIEvents = function() {
@@ -281,6 +284,7 @@ var onStreamClicked = function(streamInfos) {
         graphTimer.stop();
     }
 
+    streamUrl.innerHTML = streamInfos.name += ": " + streamInfos.url;
 };
 
 var onFullScreenChange = function(e) {
