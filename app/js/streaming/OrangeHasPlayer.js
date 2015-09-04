@@ -35,6 +35,7 @@ OrangeHasPlayer = function() {
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
         metricsAgent,
+        initialQuality = {},
         state = 'UNINITIALIZED';
 
     var _isPlayerInitialized = function() {
@@ -236,6 +237,16 @@ OrangeHasPlayer = function() {
 
         this.reset(0);
 
+        if (initialQuality.video) {
+            mediaPlayer.setQualityFor('video', initialQuality.video);
+            initialQuality.video = undefined;
+        }
+
+        if (initialQuality.audio) {
+            mediaPlayer.setQualityFor('audio', initialQuality.audio);
+            initialQuality.audio = undefined;
+        }
+
         if (metricsAgent && url) {
             metricsAgent.createSession();
         }
@@ -331,6 +342,8 @@ OrangeHasPlayer = function() {
      */
     this.reset = function(reason) {
         _isPlayerInitialized();
+        mediaPlayer.setQualityFor('video', 0);
+        mediaPlayer.setQualityFor('audio', 0);
         mediaPlayer.reset(reason);
         if (metricsAgent) {
             metricsAgent.stop();
@@ -756,9 +769,8 @@ OrangeHasPlayer = function() {
      * @param  {number} value - the new quality index (starting from 0) to be downloaded
      */
     this.setQualityFor = function(type, value) {
-        _isPlayerInitialized();
-        mediaPlayer.setQualityFor(type, value);
-    }
+        initialQuality[type] = value;
+    };
 
     /**
      * Sets some parameters values.

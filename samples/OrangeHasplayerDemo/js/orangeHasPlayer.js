@@ -24,6 +24,8 @@
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
         orangeHasPlayer.init(video);
+        orangeHasPlayer.setQualityFor('video', 1);
+        orangeHasPlayer.setQualityFor('audio', 1);
         loadHasPlayerConfig('hasplayer_config.json');
         orangeHasPlayer.loadMetricsAgent(configMetrics);
 
