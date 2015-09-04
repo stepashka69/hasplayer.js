@@ -239,6 +239,7 @@ var registerGUIEvents = function() {
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked);
+    video.addEventListener("ended", onVideoEnded);
 
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
@@ -312,6 +313,10 @@ var onSeekClicked = function(e) {
     if (durationTime) {
         setSeekValue(e.offsetX * durationTime / seekbarBackground.clientWidth);
     }
+};
+
+var onVideoEnded = function(e) {
+    graphTimer.stop();
 };
 
 var onPlayPauseClicked = function(e) {
