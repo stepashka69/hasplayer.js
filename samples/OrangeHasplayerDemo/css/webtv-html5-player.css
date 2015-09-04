@@ -436,7 +436,7 @@ input.op-volume {
       -webkit-transform: translate(calc(18px / 2), 0%);
           -ms-transform: translate(calc(18px / 2), 0%);
               transform: translate(calc(18px / 2), 0%);
-      bottom: 22.6px; }
+      bottom: 23px; }
   .op-control-bar[min-width~="886px"][max-width~="1279px"] .op-control {
     width: 18px;
     height: 18px; }
