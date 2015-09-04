@@ -229,6 +229,9 @@ OrangeHasPlayer = function() {
         audiotracks = [];
         subtitletracks = [];
 
+        downloadedBdthValue = undefined;
+        videoQualityChanged = [];
+
         _isPlayerInitialized();
 
         this.reset(0);
