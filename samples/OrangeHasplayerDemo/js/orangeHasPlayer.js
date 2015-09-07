@@ -24,10 +24,10 @@
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
         orangeHasPlayer.init(video);
-        orangeHasPlayer.setQualityFor('video', 1);
-        orangeHasPlayer.setQualityFor('audio', 1);
+        orangeHasPlayer.setInitialQualityFor('video', 0);
+        orangeHasPlayer.setInitialQualityFor('audio', 0);
         loadHasPlayerConfig('hasplayer_config.json');
-        orangeHasPlayer.loadMetricsAgent(configMetrics);
+        //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
         orangeHasPlayer.setDefaultAudioLang('deu');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
@@ -143,6 +143,8 @@
      *
      **********************************************************************************************************************/
     function loadStream(streamInfos) {
+        orangeHasPlayer.setInitialQualityFor('video', 0);
+        orangeHasPlayer.setInitialQualityFor('audio', 0);
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
@@ -166,7 +168,11 @@
         if (video.paused) {
             orangeHasPlayer.play();
         } else {
-            orangeHasPlayer.pause();
+            if (orangeHasPlayer.isLive()) {
+                orangeHasPlayer.stop();
+            } else {
+                orangeHasPlayer.pause();                
+            }
         }
     }
 

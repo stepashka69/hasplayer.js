@@ -35,7 +35,10 @@ OrangeHasPlayer = function() {
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
         metricsAgent,
-        initialQuality = {},
+        initialQuality = {
+            video: -1,
+            audio: -1
+        },
         state = 'UNINITIALIZED';
 
     var _isPlayerInitialized = function() {
@@ -98,8 +101,10 @@ OrangeHasPlayer = function() {
                 videoBitrates = metricsExt.getBitratesForType("video");
 
                 // case of downloaded quality change
-                if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != downloadedBdthValue)
-                    && (repSwitch !== null)) {
+                if ((httpRequest !== null) &&
+                    (videoBitrates !== null) &&
+                    (videoBitrates[httpRequest.quality] != downloadedBdthValue) &&
+                    (repSwitch !== null)) {
                     downloadedBdthValue = videoBitrates[httpRequest.quality];
                     videoQualityChanged.push({
                         mediaStartTime: httpRequest.startTime,
@@ -228,6 +233,15 @@ OrangeHasPlayer = function() {
         </pre>
      */
     this.load = function(url, protData) {
+        var config = {
+            video: {
+                "ABR.keepBandwidthCondition": true
+            },
+            audio: {
+                "ABR.keepBandwidthCondition": true
+            }
+        };
+
         audiotracks = [];
         subtitletracks = [];
 
@@ -238,14 +252,16 @@ OrangeHasPlayer = function() {
 
         this.reset(0);
         
-        if (initialQuality.video) {
+        if (initialQuality.video >= 0) {
             mediaPlayer.setQualityFor('video', initialQuality.video);
-            initialQuality.video = undefined;
+            config.video["ABR.keepBandwidthCondition"] = false;
+            initialQuality.video = -1;
         }
 
-        if (initialQuality.audio) {
+        if (initialQuality.audio >= 0) {
             mediaPlayer.setQualityFor('audio', initialQuality.audio);
-            initialQuality.audio = undefined;
+            config.audio["ABR.keepBandwidthCondition"] = false;
+            initialQuality.audio = -1;
         }
 
         if (metricsAgent && url) {
@@ -256,6 +272,10 @@ OrangeHasPlayer = function() {
         mediaPlayer.setDefaultAudioLang(defaultAudioLang);
         //init default subtitle language
         mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+
+        // Set config to set 'keepBandwidthCondition' parameter
+        mediaPlayer.setConfig(config);
+
         mediaPlayer.attachSource(url, protData);
         if (mediaPlayer.getAutoPlay()) {
             state = 'PLAYER_RUNNING';
@@ -749,27 +769,16 @@ OrangeHasPlayer = function() {
     /////////// ADVANCED CONFIGURATION
 
     /**
-     * Returns the current quality being downloaded for the given track type.
-     * @method getQualityFor
-     * @access public
-     * @memberof OrangeHasPlayer#
-     * @param {string} type - the track type ('video' or 'audio')
-     * @return {number} the current quality index (starting from 0) being downloaded
-     */
-    this.getQualityFor = function(type) {
-        _isPlayerInitialized();
-        return mediaPlayer.getQualityFor(type);
-    };
-
-    /**
-     * Sets the quality to be downloaded for the given track type.
+     * Sets the initial quality to be downloaded for the given track type.
+     * This method has to be used before each call to load() method to set the initial quality.
+     * Otherwise, the initial quality is set according to previous bandwidth condition.
      * @access public
      * @memberof OrangeHasPlayer#
      * @see [setConfig]{@link OrangeHasPlayer#setConfig} to set quality boundaries
      * @param {string} type - the track type ('video' or 'audio')
-     * @param  {number} value - the new quality index (starting from 0) to be downloaded
+     * @param  {number} value - the new initial quality index (starting from 0) to be downloaded
      */
-    this.setQualityFor = function(type, value) {
+    this.setInitialQualityFor = function(type, value) {
         initialQuality[type] = value;
     };
 
