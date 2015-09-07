@@ -537,12 +537,12 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
 
     resetLanguageLines();
 
-    if (audioTracks) {
+    if (audioTracks && currentaudioTrack) {
         addCombo(audioTracks, audioList);
         selectCombo(audioTracks, audioList, currentaudioTrack);
 
         for (i = 0; i < audioTracks.length; i++) {
-            addLanguageLine(audioTracks[i], _selectedAudioTrack);
+            addLanguageLine(audioTracks[i], currentaudioTrack);
         }
     }
 };
@@ -668,45 +668,47 @@ var handleGraphUpdate = function() {
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById("canvas").getContext("2d");
+    
+    if (bitrates) {
+        window.myLine = new Chart(ctx).LineConstant(lineChartData, {
+            responsive: true,
+            constantCurve: true,
+            stepsCount: graphSteps,
+            animation: false,
+            scaleBeginAtZero: false,
+            // Boolean - If we want to override with a hard coded scale
+            scaleOverride: true,
+            // ** Required if scaleOverride is true **
+            // Number - The number of steps in a hard coded scale
+            scaleSteps: bitrates.length - 1,
+            // Number - The value jump in the hard coded scale
+            scaleStepWidth: bitrates[bitrates.length - 1] / (bitrates.length - 1),
+            // Number - The scale starting value
+            scaleStartValue: bitrates[0],
+            pointDot : false,
+            showTooltips: false,
+            scaleShowVerticalLines : false,
+            scaleLabels: bitrates,
+            legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
 
-    window.myLine = new Chart(ctx).LineConstant(lineChartData, {
-        responsive: true,
-        constantCurve: true,
-        stepsCount: graphSteps,
-        animation: false,
-        scaleBeginAtZero: false,
-        // Boolean - If we want to override with a hard coded scale
-        scaleOverride: true,
-        // ** Required if scaleOverride is true **
-        // Number - The number of steps in a hard coded scale
-        scaleSteps: bitrates.length - 1,
-        // Number - The value jump in the hard coded scale
-        scaleStepWidth: bitrates[bitrates.length - 1] / (bitrates.length - 1),
-        // Number - The scale starting value
-        scaleStartValue: bitrates[0],
-        pointDot : false,
-        showTooltips: false,
-        scaleShowVerticalLines : false,
-        scaleLabels: bitrates,
-        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
+        });
 
-    });
+        if (legendChart === null) {
+            legendChart = window.myLine.generateLegend();
+            document.getElementById('chartLegend').innerHTML = legendChart;
+        }
 
-    if (legendChart === null) {
-        legendChart = window.myLine.generateLegend();
-        document.getElementById('chartLegend').innerHTML = legendChart;
+        highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
+        lowBitrateSpan.innerHTML = bitrates[0]/1000000;
+
+        lastPlayedBitrate = null;
+
+        updateGraph = true;
+
+        // Init first graph value
+        graphElapsedTime = 0;
+        window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
     }
-
-    highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
-    lowBitrateSpan.innerHTML = bitrates[0]/1000000;
-
-    lastPlayedBitrate = null;
-
-    updateGraph = true;
-
-    // Init first graph value
-    graphElapsedTime = 0;
-    window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
 };
 
 var handleError = function(e) {
