@@ -98,8 +98,7 @@ OrangeHasPlayer = function() {
                 videoBitrates = metricsExt.getBitratesForType("video");
 
                 // case of downloaded quality change
-                if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != downloadedBdthValue)
-                    && (repSwitch !== null)) {
+                if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != downloadedBdthValue) && (repSwitch !== null)) {
                     downloadedBdthValue = videoBitrates[httpRequest.quality];
                     videoQualityChanged.push({
                         mediaStartTime: httpRequest.startTime,
