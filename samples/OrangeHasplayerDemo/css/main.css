@@ -12,25 +12,22 @@ body {
 
 h1 {
     text-align: center;
-    width:100%;
     font-size:22px;
-    height: 30px;
-    padding-top:10px
+    margin-top: 0;
+    padding-top:10px;
+    width: 100%;
+    background: #AFAFAF;
 }
 
 #orange-logo {
-    float: left;
-    position:relative;
-    top: 5px;
-    left:5px;
-    box-shadow: 1px 1px 1px 1px #000;
+    width: 30px;
+    margin-right: 10px;
 }
 
 #streams-container {
     width: 20%;
     min-width: 200px;
     background: #FF6600;
-    border-right: 2px solid #004040;
     float: left;
     height:100vh;
     overflow: auto;
@@ -188,177 +185,3 @@ h1 {
     top: -2px;
     height: 8px !important;
 }
-
- /* ******************************************************** */
- /* ************  CONTROL BAR AND BUTTONS ****************** */
- /* ******************************************************** */
-/*
-.controlBar {
-    display: block;
-    opacity: 0.9;
-    text-align: center;
-    width: 100%;
-    height: 33px;
-    position: absolute;
-    bottom: 6px;
-    left: 0;
-    background-image: -webkit-linear-gradient(top, #ff8000 0%, #FFFFFF 100%);
-    background-image: linear-gradient(to bottom, #ff8000 0%, #FFFFFF 100%);
-    background-image: -ms-linear-gradient(top, #ff8000 0%, #FFFFFF 100%);
-}
-
-.seekbar-container {
-    overflow:hidden;
-    display: block;
-    width: auto;
-    position: relative;
-    padding: 8px 110px 8px 4px;
-    height: 21px;
-}
-
-.seekBar {
-    display: block;
-    height: 6px;
-    width: 100%;
-}
-
-progress{
-    display: inline-block;
-    background-image: -ms-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -moz-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -o-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #020303), color-stop(0.1, #3C4948), color-stop(0.9, #3C4948), color-stop(0.1, #3C4948), color-stop(1, #020303));
-    background-image: -webkit-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: linear-gradient(to right, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    color:#FFF;
-}
-
-progress::-webkit-progress-bar{
-    border-radius: 10px;
-    background-image: -ms-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -moz-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -o-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #020303), color-stop(0.1, #3C4948), color-stop(0.9, #3C4948), color-stop(0.1, #3C4948), color-stop(1, #020303));
-    background-image: -webkit-linear-gradient(left, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-    background-image: linear-gradient(to right, #020303 0%, #3C4948 10%, #3C4948 90%, #3C4948 10%, #020303 100%);
-}
-
-progress::-webkit-progress-value{
-    background: #818181 !important;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-right: 1px solid #000;
-}
-
-progress:hover {
-    cursor: pointer;
-}
-
-.time {
-    position: absolute;
-    top: 0;
-    right: 4px;
-}
-
-.time div:hover {
-    cursor: default;
-}
-
-.current-time, .duration {
-    font: 10px Arial;
-    display: inline-block;
-    padding: 0 0 0 5px;
-    margin-right: 5px;
-}
-
-.duration {
-    border-left: 1px solid;
-    color: #656762;
-}
-
-.select {
-    display: inline-block;
-    border: 1px solid #283332;
-    height: 21px;
-    vertical-align: top;
-    color: #fff;
-    font: 11px Arial;
-    padding: 0px 4px;
-    margin-top: 4px;
-    margin-right: 4px;
-    background: transparent;
-    outline: none;
-}
-
-.select option {
-    display: block;
-    background: #313131;
-    color: #fff;
-    outline: none;
-    padding: 5px;
-}
-
-.button {
-    border-width: 0 1px 0 0;
-    border-style: dotted;
-    border-color: #3E4743;
-    width: 40px;
-    text-align: center;
-    margin-right: 5px;
-    margin-top: 4px;
-    font-size: 21px;
-    vertical-align: top;
-    background: -webkit-linear-gradient(#43777E, #A2DAE1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.button:hover {
-    cursor: pointer;
-}
-
-.left {
-    float: left;
-}
-
-.right {
-    float: right;
-}
-
-.live {
-    display: none;
-    float: left;
-    font: 13px Arial;
-    color: #eee;
-    padding: 3px;
-}
-
-.bufferingDiv{
-    position: fixed;
-    z-index: 3;
-    margin: 0 auto;
-    left: 0;
-    right: 0;
-    top: 50%;
-    margin-top: -30px;
-    width: 60px;
-    height: 60px;
-    list-style: none;
-    visibility:hidden;
-}
-
-@-webkit-keyframes 'loadbars' {
-    0%{
-        height: 10px;
-        margin-top: 25px;
-      }
-    50%{
-        height:50px;
-        margin-top: 0px;
-    }
-    100%{
-        height: 10px;
-        margin-top: 25px;
-    }
-}
-*/
