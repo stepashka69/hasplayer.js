@@ -44,7 +44,7 @@ OrangeHasPlayer = function() {
         }
     };
 
-    var _onloaded = function(/*e*/) {
+    var _onloaded = function( /*e*/ ) {
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
         }
@@ -190,7 +190,7 @@ OrangeHasPlayer = function() {
      * @param {String} parameters.dbServerUrl - the inside events database server (for debug purpose)
      * @param {String} parameters.collector - the collector type ('HasPlayer')
      * @param {String} parameters.formatter - the formatter type ('CSQoE' or 'PRISME')
-     * @param {Integer} parameters.sendingTime - the periodic delay (in milliseconds) for sending events to collector  
+     * @param {Integer} parameters.sendingTime - the periodic delay (in milliseconds) for sending events to collector
      */
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
@@ -236,7 +236,7 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
 
         this.reset(0);
-        
+
         if (initialQuality.video) {
             mediaPlayer.setQualityFor('video', initialQuality.video);
             initialQuality.video = undefined;
@@ -492,13 +492,23 @@ OrangeHasPlayer = function() {
             mediaPlayerAudioTracks;
 
         _isPlayerInitialized();
-        mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
-        for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
-            audiotracks.push({
-                id: mediaPlayerAudioTracks[i].id,
-                lang: mediaPlayerAudioTracks[i].lang
-            });
+
+        if (audiotracks.length === 0) {
+
+            mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
+
+            if (mediaPlayerAudioTracks) {
+                for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+                    audiotracks.push({
+                        id: mediaPlayerAudioTracks[i].id,
+                        lang: mediaPlayerAudioTracks[i].lang
+                    });
+                }
+            } else {
+                throw new Error('OrangeHasPlayer.getAudioTracks(): no audio tracks found');
+            }
         }
+
         return audiotracks;
     };
 
@@ -515,12 +525,16 @@ OrangeHasPlayer = function() {
             mediaPlayerAudioTracks;
 
         _isPlayerInitialized();
+
         mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
-        for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
-            if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
-                (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
-                mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
-                return;
+
+        if (mediaPlayerAudioTracks) {
+            for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+                if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
+                    (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
+                    mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
+                    return;
+                }
             }
         }
 
@@ -542,11 +556,13 @@ OrangeHasPlayer = function() {
 
         selectedTrack = mediaPlayer.getSelectedAudioTrack();
 
-        for (i = 0; i < audiotracks.length; i++) {
-            if (audiotracks[i].id === selectedTrack.id ||
-                audiotracks[i].lang === selectedTrack.lang) {
-                selectedAudioTrack = audiotracks[i];
-                return selectedAudioTrack;
+        if (selectedTrack) {
+            for (i = 0; i < audiotracks.length; i++) {
+                if (audiotracks[i].id === selectedTrack.id ||
+                    audiotracks[i].lang === selectedTrack.lang) {
+                    selectedAudioTrack = audiotracks[i];
+                    return selectedAudioTrack;
+                }
             }
         }
         return null;
@@ -589,13 +605,23 @@ OrangeHasPlayer = function() {
             mediaPlayerSubtitleTracks;
 
         _isPlayerInitialized();
-        mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
-        for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
-            subtitletracks.push({
-                id: mediaPlayerSubtitleTracks[i].id,
-                lang: mediaPlayerSubtitleTracks[i].lang
-            });
+
+        if (subtitletracks.length === 0) {
+
+            mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
+
+            if (mediaPlayerSubtitleTracks) {
+                for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+                    subtitletracks.push({
+                        id: mediaPlayerSubtitleTracks[i].id,
+                        lang: mediaPlayerSubtitleTracks[i].lang
+                    });
+                }
+            } else {
+                throw new Error('OrangeHasPlayer.getSubtitleTracks(): no subtitle tracks found');
+            }
         }
+
         return subtitletracks;
     };
 
@@ -612,12 +638,16 @@ OrangeHasPlayer = function() {
             mediaPlayerSubtitleTracks;
 
         _isPlayerInitialized();
+
         mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
-        for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
-            if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
-                (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
-                mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
-                return;
+
+        if (mediaPlayerSubtitleTracks) {
+            for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+                if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
+                    (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
+                    mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
+                    return;
+                }
             }
         }
 
