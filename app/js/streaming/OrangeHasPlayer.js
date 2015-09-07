@@ -34,7 +34,10 @@ OrangeHasPlayer = function() {
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
-        metricsAgent,
+        metricsAgent = {
+            ref: null,
+            isActivated: false
+        },
         initialQuality = {
             video: -1,
             audio: -1
@@ -199,10 +202,11 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
 
         if (typeof(MetricsAgent) !== 'undefined') {
-            metricsAgent = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
+            metricsAgent.ref = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
 
-            metricsAgent.init(function(activated) {
+            metricsAgent.ref.init(function(activated) {
                 console.log("Metrics agent state: ", activated);
+                metricsAgent.isActivated = activated;
             });
         } else {
             throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
@@ -261,8 +265,8 @@ OrangeHasPlayer = function() {
             initialQuality.audio = -1;
         }
 
-        if (metricsAgent && url) {
-            metricsAgent.createSession();
+        if (metricsAgent.ref && metricsAgent.isActivated && url) {
+            metricsAgent.ref.createSession();
         }
 
         //init default audio language
@@ -363,8 +367,8 @@ OrangeHasPlayer = function() {
         mediaPlayer.setQualityFor('video', 0);
         mediaPlayer.setQualityFor('audio', 0);
         mediaPlayer.reset(reason);
-        if (metricsAgent) {
-            metricsAgent.stop();
+        if (metricsAgent.ref) {
+            metricsAgent.ref.stop();
         }
     };
 
