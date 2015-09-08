@@ -59,6 +59,13 @@ var video = null,
     lastChartTimeLabel = -1;
     firstChartTime = -1,
     timer = null,
+    streamFilters = {
+        vod: true,
+        live: true,
+        hls: true,
+        mss: true,
+        dash: true
+    },
     lineChartData = {
         labels: [],
         datasets: [{
@@ -118,7 +125,8 @@ window.onload = function() {
             streamItemProtocol = document.createElement('td'),
             streamItemType = document.createElement('td'),
             streamItemTypeIcon = document.createElement('img'),
-            streamItemProtection = document.createElement('td');
+            streamItemProtection = document.createElement('td'),
+            className = "stream-item";
 
         streamItem.appendChild(streamItemType);
         streamItem.appendChild(streamItemName);
@@ -126,22 +134,27 @@ window.onload = function() {
         streamItem.appendChild(streamItemProtection);
 
         if (stream.type.toLowerCase() === 'live') {
+            className += " stream-live";
             streamItemTypeIcon.src = 'res/live_icon.png';
         } else if (stream.type.toLowerCase() === 'vod') {
+            className += " stream-vod";
             streamItemTypeIcon.src = 'res/vod_icon.png';
         }
 
         streamItemType.appendChild(streamItemTypeIcon);
         streamItemName.innerHTML = stream.name;
         streamItemProtocol.innerHTML = stream.protocol;
+        className += " stream-" + stream.protocol.toLowerCase();
 
         var protections = [];
         if (stream.protData) {
             var protectionsNames = Object.getOwnPropertyNames(stream.protData);
             for (var i = 0, len = protectionsNames.length; i < len; i++) {
                 if (S(protectionsNames[i]).contains('playready')) {
+                    className += " stream-playready";
                     protections.push("PR");
                 } else if (S(protectionsNames[i]).contains('widevine')) {
+                    className += " stream-widevine";
                     protections.push("WV");
                 }
             }
@@ -149,15 +162,15 @@ window.onload = function() {
 
         streamItemProtection.innerHTML = protections.join(',');
 
-        streamItem.setAttribute('class', 'stream-item');
+        streamItem.setAttribute('class', className);
 
         streamItem.addEventListener('click', function() {
             if (selectedItem !== null) {
-                selectedItem.className = 'stream-item';
+                selectedItem.id = '';
             }
 
             selectedItem = this;
-            selectedItem.className = 'stream-item stream-selected';
+            selectedItem.id = 'stream-selected';
             onStreamClicked(stream);
         });
 
@@ -180,6 +193,38 @@ window.onload = function() {
     getDOMElements();
     createHasPlayer();
     registerGUIEvents();
+};
+
+var initStreamListFilter = function() {
+    var vodFilter = document.getElementById('display-vod-streams'),
+    liveFilter = document.getElementById('display-live-streams'),
+    hlsFilter = document.getElementById('display-hls-streams'),
+    mssFilter = document.getElementById('display-mss-streams'),
+    dashFilter = document.getElementById('display-dash-streams');
+
+    var filterStreams = function() {
+        var elts = document.getElementsByClassName("stream-item");
+
+        for (var i = 0, len = elts.length; i < len; i++) {
+            var className = elts[i].className;
+            var hidden = false;
+            if ((streamFilters.vod && (className.indexOf("stream-vod") !== -1) ||
+                streamFilters.live && (className.indexOf("stream-live") !== -1)) &&
+                (streamFilters.hls && (className.indexOf("stream-hls") !== -1) ||
+                streamFilters.mss && (className.indexOf("stream-mss") !== -1) ||
+                streamFilters.dash && (className.indexOf("stream-dash") !== -1))) {
+                elts[i].style.display = "";
+            } else {
+                elts[i].style.display = "none";
+            }
+        }
+    };
+
+    vodFilter.addEventListener("click", function(e) { streamFilters.vod = this.checked; filterStreams(); });
+    liveFilter.addEventListener("click", function(e) { streamFilters.live = this.checked; filterStreams(); });
+    hlsFilter.addEventListener("click", function(e) { streamFilters.hls = this.checked; filterStreams(); });
+    mssFilter.addEventListener("click", function(e) { streamFilters.mss = this.checked; filterStreams(); });
+    dashFilter.addEventListener("click", function(e) { streamFilters.dash = this.checked; filterStreams(); });
 };
 
 var getDOMElements = function() {
@@ -261,6 +306,8 @@ var registerGUIEvents = function() {
     seekbarContainer.addEventListener('mouseleave', onSeekBarModuleLeave);
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
+
+    initStreamListFilter();
 };
 
 /********************************************************************************************************************
@@ -668,7 +715,7 @@ var handleGraphUpdate = function() {
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById("canvas").getContext("2d");
-    
+
     if (bitrates) {
         window.myLine = new Chart(ctx).LineConstant(lineChartData, {
             responsive: true,

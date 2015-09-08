@@ -201,6 +201,14 @@
     </head>
     <body>
         <div id="streams-container">
+            <div id="streams-filter">
+                <label for="display-vod-streams">VOD</label><input type="checkbox" name="filter-stream-type" id="display-vod-streams" checked>
+                <label for="display-live-streams">Live</label><input type="checkbox" name="filter-stream-type" id="display-live-streams" checked>
+
+                <label for="display-hls-streams">HLS</label><input type="checkbox" name="filter-stream-protocol" id="display-hls-streams" checked>
+                <label for="display-mss-streams">MSS</label><input type="checkbox" name="filter-stream-protocol" id="display-mss-streams" checked>
+                <label for="display-dash-streams">DASH</label><input type="checkbox" name="filter-stream-protocol" id="display-dash-streams" checked>
+            </div>
 
         </div>
         <div id="main-container">
