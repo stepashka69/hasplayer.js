@@ -64,7 +64,7 @@ OrangeHasPlayer = function() {
         event.initCustomEvent(type, false, false, {
             type: value.streamType,
             bitrate: value.switchedQuality,
-            representationid: value.representationId,
+            representationId: value.representationId,
             time: video.currentTime,
             width: value.width,
             height: value.height
@@ -471,7 +471,16 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @param {string} type - the event type for listen to, either any HTML video element event or player event
-     * ('play_bitrate', 'download_bitrate', 'error' or 'subtitlesStyleChanged') events
+     * ('play_bitrate', 'download_bitrate', 'error' or 'subtitlesStyleChanged') events.
+     * For play_bitrate and download_bitrate events, callback parameter contains, in detail attribute, those values :
+     * <pre>
+     *  type: stream type (audio or video),
+     *  bitrate: new bitrate,
+     *  representationId: id for the stream representation,
+     *  time: video currentTime value,
+     *  width: video width for video stream, undefined otherwise,
+     *  height: video height for video stream, undefined otherwise
+     * </pre>
      * @param {callback} listener - the callback which is called when an event of the specified type occurs
      * @param {boolean} useCapture - @see HTML DOM addEventListener() method documentation
      */
