@@ -72,6 +72,18 @@ h1 {
     transition: 0.2s ease-in-out;
 }
 
+#streams-filter {
+    display: flex;
+}
+
+#streams-filter fieldset{
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    text-align: right;
+}
+
 #main-container {
     height:100vh;
     max-width: 100%;
