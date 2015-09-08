@@ -109,11 +109,15 @@
      * @param  {[type]} e [description]
      */
     function onPlayBitrateChanged(e) {
-        handlePlayBitrate(e.detail.bitrate, e.detail.time);
+        if (e.detail.type === "video") {
+            handlePlayBitrate(e.detail.bitrate, e.detail.time);
+        }
     }
 
     function onDownloadBitrateChanged(e) {
-        handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
+        if (e.detail.type === "video") {
+            handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
+        }
     }
 
     function onVolumeChange() {

@@ -28,8 +28,11 @@ OrangeHasPlayer = function() {
         audiotracks = [],
         subtitletracks = [],
         videoQualityChanged = [],
+        audioQualityChanged = [],
         videoBitrates = null,
-        downloadedBdthValue,
+        audioBitrates = null,
+        videoDownloadedBdthValue,
+        audioDownloadedBdthValue,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
@@ -59,7 +62,9 @@ OrangeHasPlayer = function() {
     var _dispatchBitrateEvent = function(type, value) {
         var event = document.createEvent("CustomEvent");
         event.initCustomEvent(type, false, false, {
+            type: value.streamType,
             bitrate: value.switchedQuality,
+            representationid: value.representationId,
             time: video.currentTime,
             width: value.width,
             height: value.height
@@ -82,6 +87,17 @@ OrangeHasPlayer = function() {
                 break;
             }
         }
+
+        // Check for playing quality change
+        for (i = 0; i < audioQualityChanged.length; i += 1) {
+            currentSwitch = audioQualityChanged[i];
+            if (currentTime >= currentSwitch.mediaStartTime) {
+                _dispatchBitrateEvent('play_bitrate', currentSwitch);
+                // And remove when it's played
+                audioQualityChanged.splice(0, 1);
+                break;
+            }
+        }
     };
 
     var _metricChanged = function(e) {
@@ -94,26 +110,45 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
         metricsExt = mediaPlayer.getMetricsExt();
 
-        if (e.data.stream == "video") {
-            metrics = mediaPlayer.getMetricsFor("video");
-            if (metrics && metricsExt) {
-                repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
-                httpRequests = metricsExt.getHttpRequests(metrics);
-                httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
-
-                videoBitrates = metricsExt.getBitratesForType("video");
+        metrics = mediaPlayer.getMetricsFor(e.data.stream);
+        if (metrics && metricsExt) {
+            repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
+            httpRequests = metricsExt.getHttpRequests(metrics);
+            httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
+            
+            if (e.data.stream == "video") {
+                videoBitrates = metricsExt.getBitratesForType(e.data.stream);
 
                 // case of downloaded quality change
-                if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != downloadedBdthValue) && (repSwitch !== null)) {
-                    downloadedBdthValue = videoBitrates[httpRequest.quality];
+                if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != videoDownloadedBdthValue) && (repSwitch !== null)) {
+                    videoDownloadedBdthValue = videoBitrates[httpRequest.quality];
                     videoQualityChanged.push({
+                        streamType: e.data.stream,
                         mediaStartTime: httpRequest.startTime,
                         switchedQuality: videoBitrates[httpRequest.quality],
                         downloadStartTime: httpRequest.trequest,
+                        representationId: repSwitch.to,
                         width: metricsExt.getVideoWidthForRepresentation(repSwitch.to),
                         height: metricsExt.getVideoHeightForRepresentation(repSwitch.to)
                     });
                     _dispatchBitrateEvent('download_bitrate', videoQualityChanged[videoQualityChanged.length - 1]);
+                }
+            }else if (e.data.stream == "audio") {
+                audioBitrates = metricsExt.getBitratesForType(e.data.stream);
+
+                // case of downloaded quality change
+                if ((httpRequest !== null && audioBitrates !== null) && (audioBitrates[httpRequest.quality] != audioDownloadedBdthValue) && (repSwitch !== null)) {
+                    audioDownloadedBdthValue = audioBitrates[httpRequest.quality];
+                    audioQualityChanged.push({
+                        streamType: e.data.stream,
+                        mediaStartTime: httpRequest.startTime,
+                        switchedQuality: audioBitrates[httpRequest.quality],
+                        downloadStartTime: httpRequest.trequest,
+                        representationId: repSwitch.to,
+                        width: metricsExt.getVideoWidthForRepresentation(repSwitch.to),
+                        height: metricsExt.getVideoHeightForRepresentation(repSwitch.to)
+                    });
+                    _dispatchBitrateEvent('download_bitrate', audioQualityChanged[audioQualityChanged.length - 1]);
                 }
             }
         }
@@ -246,8 +281,10 @@ OrangeHasPlayer = function() {
         audiotracks = [];
         subtitletracks = [];
 
-        downloadedBdthValue = undefined;
+        videoDownloadedBdthValue = undefined;
+        audioDownloadedBdthValue = undefined;
         videoQualityChanged = [];
+        audioQualityChanged = [];
 
         _isPlayerInitialized();
 
