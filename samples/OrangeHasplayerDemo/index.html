@@ -212,13 +212,12 @@
                 <span><label for="display-dash-streams">DASH</label><input type="checkbox" name="filter-stream-protocol" id="display-dash-streams" checked></span>
                 </fieldset>
             </div>
-
         </div>
         <div id="main-container">
+            <h1><img src="res/orange.gif" id="orange-logo"/>Orange Has Player</h1>
             <div id="player-container">
 
-                <h1><img src="res/orange.gif" id="orange-logo"/>Orange Has Player</h1>
-                <h2 class="stream-url"></h2>
+                <div class="stream-url"></div>
                 <div id="demo-player-container" class="demo-player" tabindex="0">
                     <div id="VideoModule" class="op-video">
                         <video id="player" class="player"></video>
@@ -406,19 +405,52 @@
                     </div>
                 </div>
             </div>
-            <div id="menu-data-container">
-                <div id="audio-container">audio :
-                    <select name="audioCombo" id="audioCombo"></select>
+            <div id="settings-container" class="module">
+                <div id="quick-settings">
+                    <div id="audio-container" class="quick-settings-item">Audio :
+                        <select name="audioCombo" id="audioCombo"></select>
+                    </div>
+                    <div id="subtitle-container" class="quick-settings-item">Sous-titres :
+                        <select name="subtitleCombo" id="subtitleCombo"></select>
+                    </div>
+                    <button id="globalMenu" class="quick-settings-item">Paramètres avancés</button>
                 </div>
-                <div id="subtitle-container">subtitle :
-                    <select name="subtitleCombo" id="subtitleCombo"></select>
+                <div id="menu-container" class="menu-container-closed">
+                    <fieldset>
+                        <div class="settings-item">
+                            <label for="default_audio_language">Langue par défaut : </label>
+                            <select id="default_audio_language">
+                                <option value="audio_french">Français</option>
+                                <option value="audio_english">Anglais</option>
+                                <option value="audio_german">Allemand</option>
+                            </select>
+                        </div>
+                        <div class="settings-item">
+                            <label for="default_subtitle_language">Sous-titres par défaut : </label>
+                            <select id="default_subtitle_language">
+                                <option value="subtitle_none">aucun</option>
+                                <option value="subtitle_french">Français</option>
+                                <option value="subtitle_english">Anglais</option>
+                                <option value="subtitle_german">Allemand</option>
+                            </select>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="settings-item">
+                            <label for="enable-metrics-agent">Metrics agent</label><input type="checkbox" name="enable-metrics-agent" id="enable-metrics-agent" />
+                            <select id="metrics-agent-options" disabled></select>
+                        </div>
+                        <div class="settings-item">
+                            <label for="enable-optimized-zapping">Zapping optimisé</label><input type="checkbox" name="enable-optimized-zapping" id="enable-optimized-zapping" checked/>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
-            <div id="bitrate-graph-container">
+            <div id="bitrate-graph-container" class="module">
                 <div id="chartLegend"></div>
                 <canvas id="canvas" height="50"></canvas>
             </div>
-            <div id="protection-data-container">
+            <div id="protection-data-container" class="module">
             </div>
         </div>
     </body>
