@@ -765,7 +765,6 @@ var handlePlayState = function(state) {
         graphTimer.start();
     } else {
         graphTimer.pause();
-        showLoadingElement();
     }
 };
 

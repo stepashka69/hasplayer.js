@@ -45,6 +45,8 @@
         orangeHasPlayer.addEventListener('play', onPlay);
         orangeHasPlayer.addEventListener('pause', onPause);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
+        video.addEventListener('waiting', onWaiting);
+        video.addEventListener('playing', onPlaying);
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -110,6 +112,7 @@
      */
     function onPlayBitrateChanged(e) {
         if (e.detail.type === 'video') {
+            hideLoadingElement();
             handlePlayBitrate(e.detail.bitrate, e.detail.time);
         }
     }
@@ -130,6 +133,14 @@
 
     function onPause() {
         handlePlayState(false);
+    }
+
+    function onWaiting() {
+        showLoadingElement();
+    }
+
+    function onPlaying() {
+        hideLoadingElement();
     }
 
     function onTimeUpdate() {
