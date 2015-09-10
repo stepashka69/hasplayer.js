@@ -147,8 +147,10 @@
      *
      **********************************************************************************************************************/
     function loadStream(streamInfos) {
-        //orangeHasPlayer.setInitialQualityFor('video', 0);
-        //orangeHasPlayer.setInitialQualityFor('audio', 0);
+        if (!optimizedZappingEnabled) {
+            orangeHasPlayer.setInitialQualityFor('video', 0);
+            orangeHasPlayer.setInitialQualityFor('audio', 0);
+        }
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 

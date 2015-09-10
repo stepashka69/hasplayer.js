@@ -31,10 +31,12 @@ var video = null,
     audioListInPlayer = null,
     subtitleList = null,
     enableMetricsCheckbox = null,
+    enableOptimzedZappingCheckbox = null,
     metricsOptions =  null,
     configMetrics = null,
     defaultAudioLangCombobox = null,
     defaultSubtitleLangCombobox = null,
+    optimizedZappingEnabled = true,
     audioTracks = [],
     currentaudioTrack = null,
     subtitleTracks = [],
@@ -306,6 +308,8 @@ var getDOMElements = function() {
 
     defaultAudioLangCombobox = document.getElementById("default_audio_language");
     defaultSubtitleLangCombobox = document.getElementById("default_subtitle_language");
+
+    enableOptimzedZappingCheckbox = document.getElementById("enable-optimized-zapping");
 };
 
 var registerGUIEvents = function() {
@@ -349,6 +353,8 @@ var registerGUIEvents = function() {
 
     defaultAudioLangCombobox.addEventListener('change', onChangeDefaultAudioLang);
     defaultSubtitleLangCombobox.addEventListener('change', onChangeDefaultSubtitleLang);
+
+    enableOptimzedZappingCheckbox.addEventListener('click', onEnableOptimizedZapping);
 
     initStreamListFilter();
 };
@@ -613,6 +619,10 @@ var onChangeDefaultAudioLang = function(e) {
 
 var onChangeDefaultSubtitleLang = function(e) {
     orangeHasPlayer.setDefaultSubtitleLang(defaultSubtitleLangCombobox.value);
+};
+
+var onEnableOptimizedZapping = function(e) {
+    optimizedZappingEnabled = enableOptimzedZappingCheckbox.checked;
 };
 
 
