@@ -2,7 +2,7 @@
  * Global
  ******************************/
 
-html{
+html {
     min-height:100%;
     position: relative;
 }
@@ -140,7 +140,7 @@ h1 {
  * Player container
  ******************************/
 
-#player-container:-webkit-full-screen{
+#player-container:-webkit-full-screen {
     position:absolute;
     left:0px;
     top:0px;
@@ -213,8 +213,8 @@ h1 {
     border: 0;
 }
 
-#menu-container.menu-container-closed {
-    display:none;
+.hidden {
+    display: none !important;
 }
 
 
@@ -261,7 +261,6 @@ h1 {
 #protection-data-container table td {
     padding: 5px;
     text-align: left;
-
 }
 
 #protection-data-container table td.protection-data-name {

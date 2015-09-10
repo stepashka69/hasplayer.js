@@ -803,7 +803,9 @@ var handleGraphUpdate = function() {
 };
 
 var handleBitrates = function(bitrates) {
-    var ctx = document.getElementById("canvas").getContext("2d");
+    graphContainer.className = 'module';
+
+    var ctx = document.getElementById('canvas').getContext('2d');
 
     if (bitrates) {
         window.myLine = new Chart(ctx).LineConstant(lineChartData, {
@@ -1036,11 +1038,14 @@ var showBarsTimed = function(e) {
 };
 
 var clearProtectionData = function() {
-    protectionDataContainer.innerHTML = "";
+    protectionDataContainer.innerHTML = '';
+    protectionDataContainer.className = 'module hidden';
 };
 
 var displayProtectionData = function(streamInfos) {
-    var html = "<table>";
+    protectionDataContainer.className = 'module';
+
+    var html = '<table>';
 
     for (var p in streamInfos) {
         if (streamInfos.hasOwnProperty(p)) {
