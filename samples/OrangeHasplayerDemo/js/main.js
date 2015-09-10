@@ -374,12 +374,9 @@ var onStreamClicked = function(streamInfos) {
     showLoadingElement();
     loadStream(streamInfos);
 
-    clearProtectionData();
-
     if (streamInfos.protData) {
         displayProtectionData(streamInfos.protData);
     }
-    showBarsTimed();
 
     if (graphTimer === null) {
         graphTimer = new LoopTimer(handleGraphUpdate, graphUpdateTimeInterval);
@@ -388,6 +385,8 @@ var onStreamClicked = function(streamInfos) {
     }
 
     streamUrl.innerHTML = streamInfos.url;
+
+    showBarsTimed();
 };
 
 var onFullScreenChange = function(e) {
@@ -936,6 +935,8 @@ var resetLanguageLines = function() {
 var reset = function() {
     resetCombo(audioTracks, audioList);
     resetCombo(subtitleTracks, subtitleList);
+
+    clearProtectionData();
 
     resetSeekbar();
     resetLanguageLines();
