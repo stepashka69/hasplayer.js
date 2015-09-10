@@ -92,6 +92,7 @@ h1 {
 
 #streams-filter {
     display: flex;
+    justify-content: center;
 }
 
 #streams-filter fieldset {
