@@ -33,6 +33,8 @@ var video = null,
     enableMetricsCheckbox = null,
     metricsOptions =  null,
     configMetrics = null,
+    defaultAudioLangCombobox = null,
+    defaultSubtitleLangCombobox = null,
     audioTracks = [],
     currentaudioTrack = null,
     subtitleTracks = [],
@@ -301,6 +303,9 @@ var getDOMElements = function() {
 
     metricsOptions =  document.getElementById("metrics-agent-options");
     enableMetricsCheckbox = document.getElementById("enable-metrics-agent");
+
+    defaultAudioLangCombobox = document.getElementById("default_audio_language");
+    defaultSubtitleLangCombobox = document.getElementById("default_subtitle_language");
 };
 
 var registerGUIEvents = function() {
@@ -341,6 +346,9 @@ var registerGUIEvents = function() {
 
     enableMetricsCheckbox.addEventListener('click', onEnableMetrics);
     metricsOptions.addEventListener('change', onSelectMetricsAgent);
+
+    defaultAudioLangCombobox.addEventListener('change', onChangeDefaultAudioLang);
+    defaultSubtitleLangCombobox.addEventListener('change', onChangeDefaultSubtitleLang);
 
     initStreamListFilter();
 };
@@ -590,7 +598,6 @@ var onEnableMetrics = function() {
 };
 
 var onSelectMetricsAgent = function (value) {
-    metricsAgentActive = value;
     if (typeof MetricsAgent === 'function') {
         if (enableMetricsCheckbox.checked) {
             orangeHasPlayer.loadMetricsAgent(configMetrics.items[metricsOptions.selectedIndex]);
@@ -599,6 +606,15 @@ var onSelectMetricsAgent = function (value) {
         }
     }
 };
+
+var onChangeDefaultAudioLang = function(e) {
+    orangeHasPlayer.setDefaultAudioLang(defaultAudioLangCombobox.value);
+};
+
+var onChangeDefaultSubtitleLang = function(e) {
+    orangeHasPlayer.setDefaultSubtitleLang(defaultSubtitleLangCombobox.value);
+};
+
 
 /********************************************************************************************************************
  *

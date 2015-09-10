@@ -29,7 +29,7 @@
         /*loadHasPlayerConfig('hasplayer_config.json');
         orangeHasPlayer.loadMetricsAgent(configMetrics);*/
 
-        orangeHasPlayer.setDefaultAudioLang('deu');
+        orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
 
         registerHasPlayerEvents();
