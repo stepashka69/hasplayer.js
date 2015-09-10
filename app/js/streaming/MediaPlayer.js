@@ -103,9 +103,11 @@ MediaPlayer = function(aContext) {
                 streamController = system.getObject("streamController");
                 streamController.setVideoModel(videoModel);
                 streamController.setAutoPlay(autoPlay);
-                streamController.setDefaultAudioLang(defaultAudioLang);
-                streamController.setDefaultSubtitleLang(defaultSubtitleLang);
             }
+
+            streamController.setDefaultAudioLang(defaultAudioLang);
+            streamController.setDefaultSubtitleLang(defaultSubtitleLang);
+
             // ORANGE: add source stream parameters
             streamController.load(source, protectionData);
             system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
@@ -263,7 +265,7 @@ MediaPlayer = function(aContext) {
     system.mapValue("system", system);
     system.mapOutlet("system");
     system.injectInto(context);
-   
+
 
     return {
         /**
