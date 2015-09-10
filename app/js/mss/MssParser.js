@@ -477,7 +477,7 @@ Mss.dependencies.MssParser = function () {
             /* @if VOWV=true */
             if (navigator.userAgent.indexOf("Chrome") >= 0) {
                 contentProtections[contentProtections.length - 1].pssh = {
-                    __text : Mss.dependencies.createVOWidevinePssh(getKIDFromProtectionHeader(manifest.Protection.ProtectionHeader))
+                    __text : Mss.dependencies.createVOWidevinePssh(getKIDFromProtectionHeader(manifest.Protection.ProtectionHeader), this.debug)
                 };
             }
             /* @endif */
