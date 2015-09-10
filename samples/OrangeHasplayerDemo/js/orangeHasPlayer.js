@@ -26,8 +26,8 @@
         orangeHasPlayer.init(video);
         orangeHasPlayer.setInitialQualityFor('video', 0);
         orangeHasPlayer.setInitialQualityFor('audio', 0);
-        /*loadHasPlayerConfig('hasplayer_config.json');
-        orangeHasPlayer.loadMetricsAgent(configMetrics);*/
+        loadHasPlayerConfig('json/hasplayer_config.json');
+        //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
         orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
