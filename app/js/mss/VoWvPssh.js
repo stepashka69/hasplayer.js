@@ -13,7 +13,7 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-Mss.dependencies.createVOWidevinePssh = function (KID) {
+Mss.dependencies.createVOWidevinePssh = function (KID, debug) {
 
     var pssh = new Uint8Array([
             0xFF, 0xFF, 0xFF, 0xFF, // Box length
@@ -70,10 +70,26 @@ Mss.dependencies.createVOWidevinePssh = function (KID) {
     // Set KID
     pssh.set(KID, 36);
 
+    if (debug) {
+        var str = "";
+        for (var i = 0; i < pssh.length; i++) {
+            str += "\\0x" + pssh[i].toString(16);
+        }
+        debug.log("[VoWvPssh] " + str);
+    }
+
     pssh = String.fromCharCode.apply(null, pssh);
+
+    if (debug) {
+        debug.log("[VoWvPssh] " + pssh);
+    }
 
     // Encode in Base 64
     pssh = BASE64.encodeASCII(pssh);
+
+    if (debug) {
+        debug.log("[VoWvPssh] " + pssh);
+    }
 
     return pssh;
 };

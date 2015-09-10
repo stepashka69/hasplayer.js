@@ -2,7 +2,7 @@ var helpers = Chart.helpers;
 
 Chart.types.Line.extend({
     // Passing in a name registers this chart in the Chart namespace in the same way
-    name: "LineConstant",
+    name: 'LineConstant',
     initialize: function(data){
         Chart.types.Line.prototype.initialize.apply(this, arguments);
         var self = this;
@@ -166,7 +166,7 @@ Chart.types.Line.extend({
                 showHorizontalLines : this.options.scaleShowHorizontalLines,
                 showVerticalLines : this.options.scaleShowVerticalLines,
                 gridLineWidth : (this.options.scaleShowGridLines) ? this.options.scaleGridLineWidth : 0,
-                gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : "rgba(0,0,0,0)",
+                gridLineColor : (this.options.scaleShowGridLines) ? this.options.scaleGridLineColor : 'rgba(0,0,0,0)',
                 padding: (this.options.showScale) ? 0 : this.options.pointDotRadius + this.options.pointDotStrokeWidth,
                 showLabels : this.options.scaleShowLabels,
                 display : this.options.showScale

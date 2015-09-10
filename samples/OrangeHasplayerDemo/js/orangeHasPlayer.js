@@ -1,17 +1,17 @@
     var orangeHasPlayer = null,
         config = null,
         configMetrics = {
-            "name": "Prisme (local)",
-            "activationUrl": "",
-            "serverUrl": "http://localhost:8080/metrics",
-            "enable": true,
-            "eventsObjectFilter": "session;realtime",
-            "eventTypeSessionFilter": "error;profil,10,10;usage",
-            "eventTypeRealTimeFilter": "error,10,40,99;profil",
-            "dbServerUrl": "http://localhost:8080/metricsDB",
-            "collector": "HasPlayerCollector",
-            "formatter": "Prisme",
-            "sendingTime": 10000
+            'name': 'Prisme (local)',
+            'activationUrl': '',
+            'serverUrl': 'http://localhost:8080/metrics',
+            'enable': true,
+            'eventsObjectFilter': 'session;realtime',
+            'eventTypeSessionFilter': 'error;profil,10,10;usage',
+            'eventTypeRealTimeFilter': 'error,10,40,99;profil',
+            'dbServerUrl': 'http://localhost:8080/metricsDB',
+            'collector': 'HasPlayerCollector',
+            'formatter': 'Prisme',
+            'sendingTime': 10000
         };
 
     /********************************************************************************************************************
@@ -26,25 +26,25 @@
         orangeHasPlayer.init(video);
         orangeHasPlayer.setInitialQualityFor('video', 0);
         orangeHasPlayer.setInitialQualityFor('audio', 0);
-        loadHasPlayerConfig('hasplayer_config.json');
-        orangeHasPlayer.loadMetricsAgent(configMetrics);
+        /*loadHasPlayerConfig('hasplayer_config.json');
+        orangeHasPlayer.loadMetricsAgent(configMetrics);*/
 
-        orangeHasPlayer.setDefaultAudioLang('deu');
+        orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
 
         registerHasPlayerEvents();
     }
 
     function registerHasPlayerEvents() {
-        orangeHasPlayer.addEventListener("error", onError);
-        orangeHasPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
-        orangeHasPlayer.addEventListener("loadeddata", onload);
-        orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
-        orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
-        orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
-        orangeHasPlayer.addEventListener("play", onPlay);
-        orangeHasPlayer.addEventListener("pause", onPause);
-        orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
+        orangeHasPlayer.addEventListener('error', onError);
+        orangeHasPlayer.addEventListener('subtitlesStyleChanged', onSubtitlesStyleChanged);
+        orangeHasPlayer.addEventListener('loadeddata', onload);
+        orangeHasPlayer.addEventListener('play_bitrate', onPlayBitrateChanged);
+        orangeHasPlayer.addEventListener('download_bitrate', onDownloadBitrateChanged);
+        orangeHasPlayer.addEventListener('volumechange', onVolumeChange);
+        orangeHasPlayer.addEventListener('play', onPlay);
+        orangeHasPlayer.addEventListener('pause', onPause);
+        orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -59,8 +59,8 @@
             }
         };
 
-        reqConfig.open("GET", fileUrl, true);
-        reqConfig.setRequestHeader("Content-type", "application/json");
+        reqConfig.open('GET', fileUrl, true);
+        reqConfig.setRequestHeader('Content-type', 'application/json');
         reqConfig.send();
     }
 
@@ -109,13 +109,13 @@
      * @param  {[type]} e [description]
      */
     function onPlayBitrateChanged(e) {
-        if (e.detail.type === "video") {
+        if (e.detail.type === 'video') {
             handlePlayBitrate(e.detail.bitrate, e.detail.time);
         }
     }
 
     function onDownloadBitrateChanged(e) {
-        if (e.detail.type === "video") {
+        if (e.detail.type === 'video') {
             handleDownloadedBitrate(e.detail.bitrate, e.detail.time);
         }
     }
@@ -147,8 +147,10 @@
      *
      **********************************************************************************************************************/
     function loadStream(streamInfos) {
-        orangeHasPlayer.setInitialQualityFor('video', 0);
-        orangeHasPlayer.setInitialQualityFor('audio', 0);
+        if (!optimizedZappingEnabled) {
+            orangeHasPlayer.setInitialQualityFor('video', 0);
+            orangeHasPlayer.setInitialQualityFor('audio', 0);
+        }
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
@@ -175,7 +177,7 @@
             if (orangeHasPlayer.isLive()) {
                 orangeHasPlayer.stop();
             } else {
-                orangeHasPlayer.pause();                
+                orangeHasPlayer.pause();
             }
         }
     }

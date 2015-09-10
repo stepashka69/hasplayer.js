@@ -199,13 +199,6 @@ input.op-range100::-webkit-slider-runnable-track {
 .op-visible {
   display: block !important; }
 
-button {
-  background-color: #ff9700;
-  font-family: 'OrangeSans55', Helvetica;
-  font-weight: bold;
-  font-size: 1em;
-  color: #fff;
-  border: none; }
 
 div::-webkit-scrollbar {
   width: 0.250em; }
