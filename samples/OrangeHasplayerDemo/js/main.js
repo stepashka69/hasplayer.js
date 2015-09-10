@@ -57,6 +57,7 @@ var video = null,
     durationTimeSpan = null,
     elapsedTimeSpan = null,
     hidebarsTimeout = 5000,
+    graphContainer = null,
     updateGraph = false,
     graphUpdateTimeInterval = 200, // in milliseconds
     graphUpdateWindow = 30000, // in milliseconds
@@ -77,22 +78,22 @@ var video = null,
     lineChartData = {
         labels: [],
         datasets: [{
-            label: "— Downloaded Bitrate",
-            fillColor: "rgba(41, 128, 185, 0.2)",
-            strokeColor: "rgba(41, 128, 185, 1)",
-            pointColor: "rgba(41, 128, 185, 1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
+            label: '— Downloaded Bitrate',
+            fillColor: 'rgba(41, 128, 185, 0.2)',
+            strokeColor: 'rgba(41, 128, 185, 1)',
+            pointColor: 'rgba(41, 128, 185, 1)',
+            pointStrokeColor: '#fff',
+            pointHighlightFill: '#fff',
+            pointHighlightStroke: 'rgba(220,220,220,1)',
             data: []
         }, {
-            label: "— Played Bitrate",
-            fillColor: "rgba(231, 76, 60, 0.2)",
-            strokeColor: "rgba(231, 76, 60, 1)",
-            pointColor: "rgba(231, 76, 60, 1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(151,187,205,1)",
+            label: '— Played Bitrate',
+            fillColor: 'rgba(231, 76, 60, 0.2)',
+            strokeColor: 'rgba(231, 76, 60, 1)',
+            pointColor: 'rgba(231, 76, 60, 1)',
+            pointStrokeColor: '#fff',
+            pointHighlightFill: '#fff',
+            pointHighlightStroke: 'rgba(151,187,205,1)',
             data: []
         }]
     };
@@ -134,7 +135,7 @@ window.onload = function() {
             streamItemType = document.createElement('td'),
             streamItemTypeIcon = document.createElement('img'),
             streamItemProtection = document.createElement('td'),
-            className = "stream-item";
+            className = 'stream-item';
 
         streamItem.appendChild(streamItemType);
         streamItem.appendChild(streamItemName);
@@ -142,28 +143,28 @@ window.onload = function() {
         streamItem.appendChild(streamItemProtection);
 
         if (stream.type.toLowerCase() === 'live') {
-            className += " stream-live";
+            className += ' stream-live';
             streamItemTypeIcon.src = 'res/live_icon.png';
         } else if (stream.type.toLowerCase() === 'vod') {
-            className += " stream-vod";
+            className += ' stream-vod';
             streamItemTypeIcon.src = 'res/vod_icon.png';
         }
 
         streamItemType.appendChild(streamItemTypeIcon);
         streamItemName.innerHTML = stream.name;
         streamItemProtocol.innerHTML = stream.protocol;
-        className += " stream-" + stream.protocol.toLowerCase();
+        className += ' stream-' + stream.protocol.toLowerCase();
 
         var protections = [];
         if (stream.protData) {
             var protectionsNames = Object.getOwnPropertyNames(stream.protData);
             for (var i = 0, len = protectionsNames.length; i < len; i++) {
                 if (S(protectionsNames[i]).contains('playready')) {
-                    className += " stream-playready";
-                    protections.push("PR");
+                    className += ' stream-playready';
+                    protections.push('PR');
                 } else if (S(protectionsNames[i]).contains('widevine')) {
-                    className += " stream-widevine";
-                    protections.push("WV");
+                    className += ' stream-widevine';
+                    protections.push('WV');
                 }
             }
         }
@@ -212,28 +213,27 @@ var initStreamListFilter = function() {
     dashFilter = document.getElementById('display-dash-streams');
 
     var filterStreams = function() {
-        var elts = document.getElementsByClassName("stream-item");
+        var elts = document.getElementsByClassName('stream-item');
 
         for (var i = 0, len = elts.length; i < len; i++) {
-            var className = elts[i].className;
             var hidden = false;
-            if ((streamFilters.vod && (className.indexOf("stream-vod") !== -1) ||
-                streamFilters.live && (className.indexOf("stream-live") !== -1)) &&
-                (streamFilters.hls && (className.indexOf("stream-hls") !== -1) ||
-                streamFilters.mss && (className.indexOf("stream-mss") !== -1) ||
-                streamFilters.dash && (className.indexOf("stream-dash") !== -1))) {
-                elts[i].style.display = "";
+            if ((streamFilters.vod && hasClass(elts[i], 'stream-vod') ||
+                streamFilters.live && hasClass(elts[i], 'stream-live')) &&
+                (streamFilters.hls && hasClass(elts[i], 'stream-hls') ||
+                streamFilters.mss && hasClass(elts[i], 'stream-mss') ||
+                streamFilters.dash && hasClass(elts[i], 'stream-dash'))) {
+                elts[i].style.display = '';
             } else {
-                elts[i].style.display = "none";
+                elts[i].style.display = 'none';
             }
         }
     };
 
-    vodFilter.addEventListener("click", function(e) { streamFilters.vod = this.checked; filterStreams(); });
-    liveFilter.addEventListener("click", function(e) { streamFilters.live = this.checked; filterStreams(); });
-    hlsFilter.addEventListener("click", function(e) { streamFilters.hls = this.checked; filterStreams(); });
-    mssFilter.addEventListener("click", function(e) { streamFilters.mss = this.checked; filterStreams(); });
-    dashFilter.addEventListener("click", function(e) { streamFilters.dash = this.checked; filterStreams(); });
+    vodFilter.addEventListener('click', function(e) { streamFilters.vod = this.checked; filterStreams(); });
+    liveFilter.addEventListener('click', function(e) { streamFilters.live = this.checked; filterStreams(); });
+    hlsFilter.addEventListener('click', function(e) { streamFilters.hls = this.checked; filterStreams(); });
+    mssFilter.addEventListener('click', function(e) { streamFilters.mss = this.checked; filterStreams(); });
+    dashFilter.addEventListener('click', function(e) { streamFilters.dash = this.checked; filterStreams(); });
 };
 
 var initMetricsAgentOptions = function() {
@@ -250,8 +250,8 @@ var initMetricsAgentOptions = function() {
                 metricsOptions.selectedIndex = -1;
             }
         };
-        reqMA.open("GET", "./json/metricsagent_config.json", true);
-        reqMA.setRequestHeader("Content-type", "application/json");
+        reqMA.open('GET', './json/metricsagent_config.json', true);
+        reqMA.setRequestHeader('Content-type', 'application/json');
         reqMA.send();
 };
 
@@ -269,47 +269,49 @@ var getDOMElements = function() {
     nextChannel = document.getElementById('nextChannel');
     subtitleList = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
-    playerContainer = document.getElementById("demo-player-container");
-    loadingElement = document.getElementById("LoadingModule");
-    menuButton = document.getElementById("menuButton");
-    menuModule = document.getElementById("MenuModule");
-    languagesModule = document.getElementById("LanguagesModule");
-    languagesButton = document.getElementById("languagesButton");
-    videoQualityButton = document.getElementById("videoQualityButton");
-    qualityModule = document.getElementById("QualityModule");
-    closeButton = document.getElementById("CloseCrossModule");
-    controlBarModule = document.getElementById("ControlBarModule");
+    playerContainer = document.getElementById('demo-player-container');
+    loadingElement = document.getElementById('LoadingModule');
+    menuButton = document.getElementById('menuButton');
+    menuModule = document.getElementById('MenuModule');
+    languagesModule = document.getElementById('LanguagesModule');
+    languagesButton = document.getElementById('languagesButton');
+    videoQualityButton = document.getElementById('videoQualityButton');
+    qualityModule = document.getElementById('QualityModule');
+    closeButton = document.getElementById('CloseCrossModule');
+    controlBarModule = document.getElementById('ControlBarModule');
 
-    highBitrateSpan = document.getElementById("highBitrateSpan");
-    currentBitrateSpan = document.getElementById("bandwith-binding");
-    lowBitrateSpan = document.getElementById("lowBitrateSpan");
+    highBitrateSpan = document.getElementById('highBitrateSpan');
+    currentBitrateSpan = document.getElementById('bandwith-binding');
+    lowBitrateSpan = document.getElementById('lowBitrateSpan');
 
-    errorModule = document.getElementById("ErrorModule");
-    titleError = document.getElementById("titleError");
-    smallErrorMessage = document.getElementById("smallMessageError");
-    longErrorMessage = document.getElementById("longMessageError");
+    errorModule = document.getElementById('ErrorModule');
+    titleError = document.getElementById('titleError');
+    smallErrorMessage = document.getElementById('smallMessageError');
+    longErrorMessage = document.getElementById('longMessageError');
 
-    durationTimeSpan = document.querySelector(".op-seek-bar-time-remaining span");
-    elapsedTimeSpan = document.querySelector(".op-seek-bar-time-elapsed span");
+    durationTimeSpan = document.querySelector('.op-seek-bar-time-remaining span');
+    elapsedTimeSpan = document.querySelector('.op-seek-bar-time-elapsed span');
 
-    seekbarContainer = document.querySelector(".bar-container");
+    seekbarContainer = document.querySelector('.bar-container');
     seekbar = document.querySelector('.bar-seek');
     seekbarBackground = document.querySelector('.bar-background');
 
     protectionDataContainer = document.getElementById('protection-data-container');
 
-    streamUrl = document.querySelector(".stream-url");
+    streamUrl = document.querySelector('.stream-url');
 
-    globalMenu = document.getElementById("globalMenu");
-    menuContainer = document.getElementById("menu-container");
+    globalMenu = document.getElementById('globalMenu');
+    menuContainer = document.getElementById('menu-container');
 
-    metricsOptions =  document.getElementById("metrics-agent-options");
-    enableMetricsCheckbox = document.getElementById("enable-metrics-agent");
+    metricsOptions =  document.getElementById('metrics-agent-options');
+    enableMetricsCheckbox = document.getElementById('enable-metrics-agent');
 
-    defaultAudioLangCombobox = document.getElementById("default_audio_language");
-    defaultSubtitleLangCombobox = document.getElementById("default_subtitle_language");
+    defaultAudioLangCombobox = document.getElementById('default_audio_language');
+    defaultSubtitleLangCombobox = document.getElementById('default_subtitle_language');
 
-    enableOptimzedZappingCheckbox = document.getElementById("enable-optimized-zapping");
+    enableOptimzedZappingCheckbox = document.getElementById('enable-optimized-zapping');
+
+    graphContainer = document.getElementById('bitrate-graph-container');
 };
 
 var registerGUIEvents = function() {
@@ -323,7 +325,7 @@ var registerGUIEvents = function() {
     subtitleList.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked);
-    video.addEventListener("ended", onVideoEnded);
+    video.addEventListener('ended', onVideoEnded);
 
     playerContainer.addEventListener('webkitfullscreenchange', onFullScreenChange);
     playerContainer.addEventListener('mozfullscreenchange', onFullScreenChange);
@@ -391,18 +393,18 @@ var onStreamClicked = function(streamInfos) {
 var onFullScreenChange = function(e) {
     var state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
     if (!state) {
-        document.getElementById("demo-player-container").className = "demo-player";
+        document.getElementById('demo-player-container').className = 'demo-player';
     }
 };
 
 var onSeekBarModuleEnter = function(e) {
-    seekbar.className = "bar-seek bar-seek-zoom";
-    seekbarBackground.className = "bar-background bar-seek-zoom";
+    seekbar.className = 'bar-seek bar-seek-zoom';
+    seekbarBackground.className = 'bar-background bar-seek-zoom';
 };
 
 var onSeekBarModuleLeave = function(e) {
-    seekbar.className = "bar-seek";
-    seekbarBackground.className = "bar-background";
+    seekbar.className = 'bar-seek';
+    seekbarBackground.className = 'bar-background';
 };
 
 var onSeekClicked = function(e) {
@@ -482,7 +484,7 @@ var onPanelVolumeEnter = function() {
 };
 
 var onSliderVolumeChange = function() {
-    if (sliderVolume.value === "0") {
+    if (sliderVolume.value === '0') {
         onMuteClicked();
         isMute = true;
     } else if (isMute) {
@@ -509,7 +511,7 @@ var onFullScreenClicked = function() {
         } else if (playerContainer.webkitRequestFullscreen) {
             playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
         }
-        document.getElementById("demo-player-container").className = "demo-player-fullscreen";
+        document.getElementById('demo-player-container').className = 'demo-player-fullscreen';
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -520,7 +522,7 @@ var onFullScreenClicked = function() {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
-        document.getElementById("demo-player-container").className = "demo-player";
+        document.getElementById('demo-player-container').className = 'demo-player';
     }
     setSubtitlesCSSStyle(subtitlesCSSStyle);
 };
@@ -534,25 +536,25 @@ var onNextChannelClicked = function() {
 };
 
 var onMenuClicked = function() {
-    if (hasClass(menuModule, "op-hidden-translate-up")) {
-        menuModule.className = "op-menu op-show-translate-up";
+    if (hasClass(menuModule, 'op-hidden-translate-up')) {
+        menuModule.className = 'op-menu op-show-translate-up';
     } else {
-        menuModule.className = "op-menu op-hidden-translate-up";
+        menuModule.className = 'op-menu op-hidden-translate-up';
     }
 };
 
 var onLanguagesClicked = function() {
-    if (!hasClass(qualityModule, "op-hidden")) {
-        qualityModule.className = "op-screen op-settings-quality op-hidden";
+    if (!hasClass(qualityModule, 'op-hidden')) {
+        qualityModule.className = 'op-screen op-settings-quality op-hidden';
     }
 
-    if (hasClass(languagesModule, "op-hidden")) {
-        languagesModule.className = "op-screen op-languages";
+    if (hasClass(languagesModule, 'op-hidden')) {
+        languagesModule.className = 'op-screen op-languages';
         hideControlBar();
         enableMiddleContainer(true);
         clearTimeout(timer);
     } else {
-        languagesModule.className = "op-screen op-languages op-hidden";
+        languagesModule.className = 'op-screen op-languages op-hidden';
         showControlBar();
         enableMiddleContainer(false);
         showBarsTimed();
@@ -560,17 +562,17 @@ var onLanguagesClicked = function() {
 };
 
 var onVideoQualityClicked = function() {
-    if (!hasClass(languagesModule, "op-hidden")) {
-        languagesModule.className = "op-screen op-languages op-hidden";
+    if (!hasClass(languagesModule, 'op-hidden')) {
+        languagesModule.className = 'op-screen op-languages op-hidden';
     }
 
-    if (hasClass(qualityModule, "op-hidden")) {
-        qualityModule.className = "op-screen op-settings-quality";
+    if (hasClass(qualityModule, 'op-hidden')) {
+        qualityModule.className = 'op-screen op-settings-quality';
         hideControlBar();
         enableMiddleContainer(true);
         clearTimeout(timer);
     } else {
-        qualityModule.className = "op-screen op-settings-quality op-hidden";
+        qualityModule.className = 'op-screen op-settings-quality op-hidden';
         showControlBar();
         enableMiddleContainer(false);
         showBarsTimed();
@@ -579,18 +581,18 @@ var onVideoQualityClicked = function() {
 };
 
 var onCloseButtonClicked = function() {
-    languagesModule.className = "op-screen op-languages op-hidden";
-    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    languagesModule.className = 'op-screen op-languages op-hidden';
+    qualityModule.className = 'op-screen op-settings-quality op-hidden';
     enableMiddleContainer(false);
-    closeButton.className = "op-close op-hidden";
+    closeButton.className = 'op-close op-hidden';
     showControlBar();
 };
 
 var onGlobalMenuClicked = function() {
-    if (menuContainer.className.indexOf("menu-container-closed") !== -1) {
-        menuContainer.className = "";
+    if (hasClass(menuContainer, 'hidden')) {
+        menuContainer.className = '';
     } else {
-        menuContainer.className = 'menu-container-closed';
+        menuContainer.className = 'hidden';
     }
 };
 
@@ -636,7 +638,7 @@ var onEnableOptimizedZapping = function(e) {
 
 var createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
 
-    var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : "";
+    var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : '';
     var lang =  audioTrack.lang !== undefined ? audioTrack.lang : audioTrack.id;
     var html = '<div class="op-languages-line">' +
                 '<input type="radio" name="' + type + '" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
@@ -688,7 +690,7 @@ var handleDuration = function(duration) {
     if (duration !== Infinity) {
         durationTimeSpan.textContent = setTimeWithSeconds(duration);
     } else {
-        durationTimeSpan.textContent = "00:00:00";
+        durationTimeSpan.textContent = '00:00:00';
         handleTimeUpdate(0);
     }
 };
@@ -696,33 +698,33 @@ var handleDuration = function(duration) {
 var handleVolumeChange = function(volumeLevel) {
     volumeLabel.innerHTML = Math.round(volumeLevel * 100);
     if (sliderVolume.value === 0) {
-        sliderVolume.className = "op-volume";
+        sliderVolume.className = 'op-volume';
     } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
-        sliderVolume.className = "op-volume op-range8";
+        sliderVolume.className = 'op-volume op-range8';
     } else if (sliderVolume.value > 8 && sliderVolume.value <= 16) {
-        sliderVolume.className = "op-volume op-range16";
+        sliderVolume.className = 'op-volume op-range16';
     } else if (sliderVolume.value >= 16 && sliderVolume.value <= 24) {
-        sliderVolume.className = "op-volume op-range24";
+        sliderVolume.className = 'op-volume op-range24';
     } else if (sliderVolume.value >= 24 && sliderVolume.value <= 32) {
-        sliderVolume.className = "op-volume op-range32";
+        sliderVolume.className = 'op-volume op-range32';
     } else if (sliderVolume.value >= 32 && sliderVolume.value <= 40) {
-        sliderVolume.className = "op-volume op-range40";
+        sliderVolume.className = 'op-volume op-range40';
     } else if (sliderVolume.value >= 40 && sliderVolume.value <= 48) {
-        sliderVolume.className = "op-volume op-range48";
+        sliderVolume.className = 'op-volume op-range48';
     } else if (sliderVolume.value >= 48 && sliderVolume.value <= 56) {
-        sliderVolume.className = "op-volume op-range56";
+        sliderVolume.className = 'op-volume op-range56';
     } else if (sliderVolume.value >= 56 && sliderVolume.value <= 64) {
-        sliderVolume.className = "op-volume op-range64";
+        sliderVolume.className = 'op-volume op-range64';
     } else if (sliderVolume.value >= 64 && sliderVolume.value <= 72) {
-        sliderVolume.className = "op-volume op-range72";
+        sliderVolume.className = 'op-volume op-range72';
     } else if (sliderVolume.value >= 72 && sliderVolume.value <= 80) {
-        sliderVolume.className = "op-volume op-range80";
+        sliderVolume.className = 'op-volume op-range80';
     } else if (sliderVolume.value >= 80 && sliderVolume.value <= 88) {
-        sliderVolume.className = "op-volume op-range88";
+        sliderVolume.className = 'op-volume op-range88';
     } else if (sliderVolume.value >= 88 && sliderVolume.value <= 96) {
-        sliderVolume.className = "op-volume op-range96";
+        sliderVolume.className = 'op-volume op-range96';
     } else if (sliderVolume.value >= 96) {
-        sliderVolume.className = "op-volume op-range100";
+        sliderVolume.className = 'op-volume op-range100';
     }
 };
 
@@ -777,7 +779,7 @@ var handlePlayBitrate = function(bitrate, time) {
 };
 
 var timeLabel = function(elapsedTime) {
-    var label = "";
+    var label = '';
 
     elapsedTime /= 1000;
 
@@ -827,7 +829,7 @@ var handleBitrates = function(bitrates) {
             showTooltips: false,
             scaleShowVerticalLines : false,
             scaleLabels: bitrates,
-            legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style=\"color:<%=lineChartData.datasets[i].strokeColor%>\"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>"
+            legendTemplate : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style="color:<%=lineChartData.datasets[i].strokeColor%>"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>'
 
         });
 
@@ -842,6 +844,8 @@ var handleBitrates = function(bitrates) {
         lastPlayedBitrate = null;
 
         updateGraph = true;
+
+
 
         // Init first graph value
         graphElapsedTime = 0;
@@ -868,7 +872,7 @@ var setSubtitlesCSSStyle = function(style) {
             fontSize = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length - 1)) / 100;
         }
 
-        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
+        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
     }
 };
 
@@ -876,7 +880,7 @@ var addCombo = function(tracks, combo) {
     var i, option;
 
     for (i = 0; i < tracks.length; i++) {
-        option = document.createElement("option");
+        option = document.createElement('option');
         option.text = tracks[i].id;
         option.value = tracks[i].lang;
 
@@ -915,8 +919,8 @@ var resetCombo = function(tracks, combo) {
 
 var resetSeekbar = function() {
     seekbar.style.width = 0;
-    durationTimeSpan.textContent = "00:00:00";
-    elapsedTimeSpan.textContent = "00:00:00";
+    durationTimeSpan.textContent = '00:00:00';
+    elapsedTimeSpan.textContent = '00:00:00';
 };
 
 var resetLanguageLines = function() {
@@ -957,21 +961,21 @@ var reset = function() {
 
 var setVolumeOff = function(value) {
     if (value) {
-        volumeOffSvg.style.display = "block";
-        volumeOnSvg.style.display = "none";
+        volumeOffSvg.style.display = 'block';
+        volumeOnSvg.style.display = 'none';
     } else {
-        volumeOffSvg.style.display = "none";
-        volumeOnSvg.style.display = "block";
+        volumeOffSvg.style.display = 'none';
+        volumeOnSvg.style.display = 'block';
     }
 };
 
 var setPlaying = function(value) {
     if (value) {
-        playPauseButton.className = "tooltip op-play op-pause stop-anchor";
-        playPauseButton.title = "Pause";
+        playPauseButton.className = 'tooltip op-play op-pause stop-anchor';
+        playPauseButton.title = 'Pause';
     } else {
-        playPauseButton.className = "tooltip op-play stop-anchor";
-        playPauseButton.title = "Play";
+        playPauseButton.className = 'tooltip op-play stop-anchor';
+        playPauseButton.title = 'Play';
     }
 };
 
@@ -987,53 +991,53 @@ var restartVolumeTimer = function() {
 };
 
 var showVolumePanel = function() {
-    panelVolume.className = "op-container-volume";
+    panelVolume.className = 'op-container-volume';
 };
 
 var hideVolumePanel = function() {
     clearTimeout(volumeTimer);
-    panelVolume.className = "op-container-volume op-hidden";
+    panelVolume.className = 'op-container-volume op-hidden';
 };
 
 var showLoadingElement = function() {
-    loadingElement.className = "op-loading";
+    loadingElement.className = 'op-loading';
 };
 
 var hideLoadingElement = function() {
-    loadingElement.className = "op-loading op-none";
+    loadingElement.className = 'op-loading op-none';
 };
 
 var hideControlBar = function() {
-    controlBarModule.className = "op-control-bar op-none";
+    controlBarModule.className = 'op-control-bar op-none';
 };
 
 var showControlBar = function() {
-    controlBarModule.className = "op-control-bar";
+    controlBarModule.className = 'op-control-bar';
 };
 
 var showErrorModule = function() {
-    errorModule.className = "op-error";
+    errorModule.className = 'op-error';
 };
 
 var hideErrorModule = function() {
-    errorModule.className = "op-error op-hidden";
+    errorModule.className = 'op-error op-hidden';
 };
 
 var hideBars = function() {
-    controlBarModule.className = "op-control-bar op-fade-out";
-    menuModule.className = "op-menu op-hidden-translate-up";
+    controlBarModule.className = 'op-control-bar op-fade-out';
+    menuModule.className = 'op-menu op-hidden-translate-up';
 
-    languagesModule.className = "op-screen op-languages op-hidden";
-    qualityModule.className = "op-screen op-settings-quality op-hidden";
+    languagesModule.className = 'op-screen op-languages op-hidden';
+    qualityModule.className = 'op-screen op-settings-quality op-hidden';
     enableMiddleContainer(false);
-    closeButton.className = "op-close op-hidden";
+    closeButton.className = 'op-close op-hidden';
 };
 
 var showBarsTimed = function(e) {
-    if (hasClass(document.querySelector('.op-middle-container'), "disabled")) {
+    if (hasClass(document.querySelector('.op-middle-container'), 'disabled')) {
         clearTimeout(timer);
         timer = setTimeout(hideBars, hidebarsTimeout);
-        controlBarModule.className = "op-control-bar";
+        controlBarModule.className = 'op-control-bar';
     }
 };
 
@@ -1072,11 +1076,11 @@ var displayProtectionDatum = function(protectionName, protectionDatum) {
 
 var enableMiddleContainer = function(enabled) {
     if (enabled) {
-        document.querySelector('.op-middle-container').className = "op-middle-container";
-        closeButton.className = "op-close";
+        document.querySelector('.op-middle-container').className = 'op-middle-container';
+        closeButton.className = 'op-close';
     } else {
-        document.querySelector('.op-middle-container').className = "op-middle-container disabled";
-        closeButton.className = "op-close op-hidden";
+        document.querySelector('.op-middle-container').className = 'op-middle-container disabled';
+        closeButton.className = 'op-close op-hidden';
     }
 };
 
@@ -1087,18 +1091,18 @@ var setTimeWithSeconds = function(sec) {
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
     if (hours < 10) {
-        hours = "0" + hours;
+        hours = '0' + hours;
     }
     if (minutes < 10) {
-        minutes = "0" + minutes;
+        minutes = '0' + minutes;
     }
     if (seconds < 10) {
-        seconds = "0" + seconds;
+        seconds = '0' + seconds;
     }
     var time = hours + ':' + minutes + ':' + seconds;
     return time;
 };
 
 function hasClass(element, className) {
-    return element.className && new RegExp("(^|\\s)" + className + "(\\s|$)").test(element.className);
+    return element.className && new RegExp('(^|\\s)' + className + '(\\s|$)').test(element.className);
 };
