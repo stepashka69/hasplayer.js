@@ -67,21 +67,21 @@ var video = null,
     optimizedZappingEnabled = true,
     metricsConfig = null,
 
-    // Protection data
-    protectionDataContainer = null,
-
     // Main Container
     streamUrl = null,
 
     // Modules
     streamsPanel = null,
-    graph = null;
+    graph = null,
+    protectionDataViewer = null;
 
 window.onload = function() {
     streamsPanel = new StreamsPanel();
     streamsPanel.init();
 
     graph = new Graph();
+    protectionDataViewer = new ProtectionDataViewer();
+    protectionDataViewer.init(document.getElementById('protection-data-container'));
 
     initMetricsAgentOptions();
     getDOMElements();
@@ -149,8 +149,6 @@ var getDOMElements = function() {
     seekbar = document.querySelector('.bar-seek');
     seekbarBackground = document.querySelector('.bar-background');
 
-    protectionDataContainer = document.getElementById('protection-data-container');
-
     streamUrl = document.querySelector('.stream-url');
 
     settingsMenuButton = document.getElementById('settingsMenuButton');
@@ -208,8 +206,6 @@ var registerGUIEvents = function() {
     defaultSubtitleLangCombobox.addEventListener('change', onChangeDefaultSubtitleLang);
 
     enableOptimzedZappingCheckbox.addEventListener('click', onEnableOptimizedZapping);
-
-
 };
 
 /********************************************************************************************************************
@@ -226,7 +222,7 @@ var onStreamClicked = function(streamInfos) {
     loadStream(streamInfos);
 
     if (streamInfos.protData) {
-        displayProtectionData(streamInfos.protData);
+        protectionDataViewer.display(streamInfos.protData);
     }
 
     graph.initTimer();
@@ -710,7 +706,7 @@ var reset = function() {
     resetCombo(audioTracks, audioListCombobox);
     resetCombo(subtitleTracks, subtitleListCombobox);
 
-    clearProtectionData();
+    protectionDataViewer.clear();
 
     resetSeekbar();
     resetLanguageLines();
@@ -801,39 +797,6 @@ var showBarsTimed = function(e) {
         barsTimer = setTimeout(hideBars, hidebarsTimeout);
         controlBarModule.className = 'op-control-bar';
     }
-};
-
-var clearProtectionData = function() {
-    protectionDataContainer.innerHTML = '';
-    protectionDataContainer.className = 'module hidden';
-};
-
-var displayProtectionData = function(streamInfos) {
-    protectionDataContainer.className = 'module';
-
-    var html = '<table>';
-
-    for (var p in streamInfos) {
-        if (streamInfos.hasOwnProperty(p)) {
-            html += displayProtectionDatum(p, streamInfos[p]);
-        }
-    }
-
-    html += '</table>';
-
-    protectionDataContainer.innerHTML = html;
-};
-
-var displayProtectionDatum = function(protectionName, protectionDatum) {
-    var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>';
-
-    for (var p in protectionDatum) {
-        if (protectionDatum.hasOwnProperty(p)) {
-            html += '<tr><td class="protection-key">' + p + '</td><td class="protection-value">' + protectionDatum[p] + '</td></tr>';
-        }
-    }
-
-    return html;
 };
 
 var enableMiddleContainer = function(enabled) {
