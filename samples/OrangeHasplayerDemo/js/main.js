@@ -1,73 +1,56 @@
+    // Player
 var video = null,
     playerContainer = null,
-    protectionDataContainer = null,
-    streamUrl = null,
+    controlBarModule = null,
+    menuModule = null,
+    menuButton = null,
+
+    previousChannel = null,
+    playPauseButton = null,
+    nextChannel = null,
+
+    panelVolume = null,
     volumeButton = null,
     volumeOnSvg = null,
     volumeOffSvg = null,
-    panelVolume = null,
     sliderVolume = null,
     volumeLabel = null,
     volumeTimer = null,
     fullscreenButton = null,
-    menuButton = null,
-    menuModule = null,
-    globalMenu = null,
+
+    seekbarContainer = null,
+    seekbar = null,
+    seekbarBackground = null,
+    videoDuration = null;
+    durationTimeSpan = null,
+    elapsedTimeSpan = null,
+
     videoQualityButton = null,
-    controlBarModule = null,
     qualityModule = null,
     closeButton = null,
     highBitrateSpan = null,
     currentBitrateSpan = null,
     lowBitrateSpan = null,
+
     languagesModule = null,
+    languagesButton = null,
+
     errorModule = null,
     titleError = null,
     smallErrorMessage = null,
     longErrorMessage = null,
-    languagesButton = null,
-    loadingElement = null,
-    audioList = null,
-    audioListInPlayer = null,
-    subtitleList = null,
-    enableMetricsCheckbox = null,
-    enableOptimzedZappingCheckbox = null,
-    metricsOptions =  null,
-    configMetrics = null,
-    defaultAudioLangCombobox = null,
-    defaultSubtitleLangCombobox = null,
-    optimizedZappingEnabled = true,
-    audioTracks = [],
-    currentaudioTrack = null,
-    subtitleTracks = [],
-    currentsubtitleTrack = null,
-    playPauseButton = null,
-    seekbarContainer = null,
-    seekbar = null,
-    seekbarBackground = null,
-    durationText = null,
-    currentTimeText = null,
-    videoDuration = null,
-    previousChannel = null,
-    nextChannel = null,
-    selectedItem = null,
-    subtitlesCSSStyle = null,
-    legendChart = null,
-    durationTime = null;
-    durationTimeSpan = null,
-    elapsedTimeSpan = null,
+
+    barsTimer = null,
     hidebarsTimeout = 5000,
-    graphContainer = null,
-    updateGraph = false,
-    graphUpdateTimeInterval = 200, // in milliseconds
-    graphUpdateWindow = 30000, // in milliseconds
-    graphSteps = graphUpdateWindow / graphUpdateTimeInterval,
-    graphTimer = null,
-    graphElapsedTime = 0,
+
     isMute = false,
-    lastChartTimeLabel = -1;
-    firstChartTime = -1,
-    timer = null,
+    subtitlesCSSStyle = null,
+
+    // Spinner
+    loadingElement = null,
+
+    // Streams panel
+    selectedStreamElement = null,
     streamFilters = {
         vod: true,
         live: true,
@@ -75,10 +58,47 @@ var video = null,
         mss: true,
         dash: true
     },
+
+    // Quick settings
+    audioListCombobox = null,
+    subtitleListCombobox = null,
+    audioTracks = [],
+    subtitleTracks = [],
+    currentaudioTrack = null,
+    currentsubtitleTrack = null,
+
+    // Settings
+    settingsMenuButton = null,
+    enableMetricsCheckbox = null,
+    enableOptimzedZappingCheckbox = null,
+    metricsAgentCombobox =  null,
+    defaultAudioLangCombobox = null,
+    defaultSubtitleLangCombobox = null,
+    optimizedZappingEnabled = true,
+    metricsConfig = null,
+
+    // Protection data
+    protectionDataContainer = null,
+
+    // Main Container
+    streamUrl = null,
+
+    // Graph
+    graphContainer = null,
+    graphLegend = null,
+    updateGraph = false,
+    graphUpdateTimeInterval = 200, // in milliseconds
+    graphUpdateWindow = 30000, // in milliseconds
+    graphSteps = graphUpdateWindow / graphUpdateTimeInterval,
+    graphTimer = null,
+    graphElapsedTime = 0,
+    lastGraphTimeLabel = -1;
+    firstGraphTime = -1,
+
     lineChartData = {
         labels: [],
         datasets: [{
-            label: '— Downloaded Bitrate',
+            label: '&mdash; Downloaded Bitrate',
             fillColor: 'rgba(41, 128, 185, 0.2)',
             strokeColor: 'rgba(41, 128, 185, 1)',
             pointColor: 'rgba(41, 128, 185, 1)',
@@ -87,7 +107,7 @@ var video = null,
             pointHighlightStroke: 'rgba(220,220,220,1)',
             data: []
         }, {
-            label: '— Played Bitrate',
+            label: '&mdash; Played Bitrate',
             fillColor: 'rgba(231, 76, 60, 0.2)',
             strokeColor: 'rgba(231, 76, 60, 1)',
             pointColor: 'rgba(231, 76, 60, 1)',
@@ -100,25 +120,27 @@ var video = null,
 
 window.onload = function() {
 
-    var buildStreamsList = function(jsonList) {
-        // Prepare stream table
-        var tableNode = document.getElementById('streams-table'),
-            i;
+    var initStreamTable = function() {
+         // Prepare stream table
+        var tableNode = document.getElementById('streams-table');
 
         if (tableNode) {
-            while (tableNode.firstChild) {
-                tableNode.removeChild(tableNode.firstChild);
-            }
+            clearContent(tableNode);
         } else {
             tableNode = document.createElement('table');
             tableNode.id = 'streams-table';
             document.getElementById('streams-container').appendChild(tableNode);
         }
 
-        var streamsList = JSON.parse(jsonList);
+        return tableNode;
+    };
+
+    var buildStreamsList = function(jsonList) {
+        var tableNode = initStreamTable(),
+            streamsList = JSON.parse(jsonList);
 
         // Add stream elements
-        for (i = 0, len = streamsList.items.length; i < len; i++) {
+        for (var i = 0, len = streamsList.items.length; i < len; i++) {
             var stream = streamsList.items[i];
 
             if (stream.protocol) {
@@ -174,12 +196,12 @@ window.onload = function() {
         streamItem.setAttribute('class', className);
 
         streamItem.addEventListener('click', function() {
-            if (selectedItem !== null) {
-                selectedItem.id = '';
+            if (selectedStreamElement !== null) {
+                selectedStreamElement.id = '';
             }
 
-            selectedItem = this;
-            selectedItem.id = 'stream-selected';
+            selectedStreamElement = this;
+            selectedStreamElement.id = 'stream-selected';
             onStreamClicked(stream);
         });
 
@@ -240,14 +262,14 @@ var initMetricsAgentOptions = function() {
         var reqMA = new XMLHttpRequest();
         reqMA.onload = function () {
             if (reqMA.status === 200) {
-                configMetrics = JSON.parse(reqMA.responseText);
+                metricsConfig = JSON.parse(reqMA.responseText);
 
-                metricsOptions.innerHTML = '';
+                metricsAgentCombobox.innerHTML = '';
 
-                for (var i = 0, len = configMetrics.items.length; i < len; i++) {
-                    metricsOptions.innerHTML += '<option value="' + i + '">' + configMetrics.items[i].name + '</option>';
+                for (var i = 0, len = metricsConfig.items.length; i < len; i++) {
+                    metricsAgentCombobox.innerHTML += '<option value="' + i + '">' + metricsConfig.items[i].name + '</option>';
                 }
-                metricsOptions.selectedIndex = -1;
+                metricsAgentCombobox.selectedIndex = -1;
             }
         };
         reqMA.open('GET', './json/metricsagent_config.json', true);
@@ -264,10 +286,10 @@ var getDOMElements = function() {
     volumeOffSvg = document.getElementById('volumeOff');
     volumeLabel = document.getElementById('volumeLabel');
     fullscreenButton = document.getElementById('button-fullscreen');
-    audioList = document.getElementById('audioCombo');
+    audioListCombobox = document.getElementById('audioCombo');
     previousChannel = document.getElementById('previousChannel');
     nextChannel = document.getElementById('nextChannel');
-    subtitleList = document.getElementById('subtitleCombo');
+    subtitleListCombobox = document.getElementById('subtitleCombo');
     playPauseButton = document.getElementById('button-playpause');
     playerContainer = document.getElementById('demo-player-container');
     loadingElement = document.getElementById('LoadingModule');
@@ -300,10 +322,10 @@ var getDOMElements = function() {
 
     streamUrl = document.querySelector('.stream-url');
 
-    globalMenu = document.getElementById('globalMenu');
+    settingsMenuButton = document.getElementById('settingsMenuButton');
     menuContainer = document.getElementById('menu-container');
 
-    metricsOptions =  document.getElementById('metrics-agent-options');
+    metricsAgentCombobox =  document.getElementById('metrics-agent-options');
     enableMetricsCheckbox = document.getElementById('enable-metrics-agent');
 
     defaultAudioLangCombobox = document.getElementById('default_audio_language');
@@ -321,8 +343,8 @@ var registerGUIEvents = function() {
     panelVolume.addEventListener('mouseout', onPanelVolumeOut);
     fullscreenButton.addEventListener('click', onFullScreenClicked);
     sliderVolume.addEventListener('change', onSliderVolumeChange);
-    audioList.addEventListener('change', audioChanged);
-    subtitleList.addEventListener('change', subtitleChanged);
+    audioListCombobox.addEventListener('change', audioChanged);
+    subtitleListCombobox.addEventListener('change', subtitleChanged);
     playPauseButton.addEventListener('click', onPlayPauseClicked);
     video.addEventListener('dblclick', onFullScreenClicked);
     video.addEventListener('ended', onVideoEnded);
@@ -348,10 +370,10 @@ var registerGUIEvents = function() {
     seekbarBackground.addEventListener('click', onSeekClicked);
     seekbar.addEventListener('click', onSeekClicked);
 
-    globalMenu.addEventListener('click', onGlobalMenuClicked);
+    settingsMenuButton.addEventListener('click', onGlobalMenuClicked);
 
     enableMetricsCheckbox.addEventListener('click', onEnableMetrics);
-    metricsOptions.addEventListener('change', onSelectMetricsAgent);
+    metricsAgentCombobox.addEventListener('change', onSelectMetricsAgent);
 
     defaultAudioLangCombobox.addEventListener('change', onChangeDefaultAudioLang);
     defaultSubtitleLangCombobox.addEventListener('change', onChangeDefaultSubtitleLang);
@@ -407,8 +429,8 @@ var onSeekBarModuleLeave = function(e) {
 };
 
 var onSeekClicked = function(e) {
-    if (durationTime) {
-        setSeekValue(e.offsetX * durationTime / seekbarBackground.clientWidth);
+    if (videoDuration) {
+        setSeekValue(e.offsetX * videoDuration / seekbarBackground.clientWidth);
     }
 };
 
@@ -422,14 +444,7 @@ var onPlayPauseClicked = function(e) {
 
 var audioChanged = function(e) {
     changeAudio(e.target.selectedIndex);
-
     document.getElementById(audioTracks[e.target.selectedIndex].id).checked = true;
-
-    if (e.target === audioList) {
-        // audioListInPlayer.selectedIndex = audioList.selectedIndex;
-    } else {
-        audioList.selectedIndex = audioListInPlayer.selectedIndex;
-    }
 };
 
 var getTrackIndex = function(tracks, id) {
@@ -449,7 +464,7 @@ var onLanguageRadioClicked = function(e) {
 
     if (index !== -1) {
         changeAudio(index);
-        audioList.selectedIndex = index;
+        audioListCombobox.selectedIndex = index;
     }
 };
 
@@ -458,7 +473,7 @@ var onSubtitleRadioClicked = function(e) {
 
     if (index !== -1) {
         changeSubtitle(index);
-        subtitleList.selectedIndex = index;
+        subtitleListCombobox.selectedIndex = index;
     }
 };
 
@@ -527,11 +542,15 @@ var onFullScreenClicked = function() {
 };
 
 var onPreviousClicked = function() {
-    selectedItem.previousSibling.click();
+    if (selectedStreamElement.previousSibling) {
+        selectedStreamElement.previousSibling.click();
+    }
 };
 
 var onNextChannelClicked = function() {
-    selectedItem.nextSibling.click();
+    if (selectedStreamElement.nextSibling) {
+        selectedStreamElement.nextSibling.click();
+    }
 };
 
 var onMenuClicked = function() {
@@ -551,7 +570,7 @@ var onLanguagesClicked = function() {
         languagesModule.className = 'op-screen op-languages';
         hideControlBar();
         enableMiddleContainer(true);
-        clearTimeout(timer);
+        clearTimeout(barsTimer);
     } else {
         languagesModule.className = 'op-screen op-languages op-hidden';
         showControlBar();
@@ -569,7 +588,7 @@ var onVideoQualityClicked = function() {
         qualityModule.className = 'op-screen op-settings-quality';
         hideControlBar();
         enableMiddleContainer(true);
-        clearTimeout(timer);
+        clearTimeout(barsTimer);
     } else {
         qualityModule.className = 'op-screen op-settings-quality op-hidden';
         showControlBar();
@@ -597,17 +616,17 @@ var onGlobalMenuClicked = function() {
 
 var onEnableMetrics = function() {
     if (enableMetricsCheckbox.checked) {
-        metricsOptions.disabled = false;
+        metricsAgentCombobox.disabled = false;
     } else {
         enableMetricsCheckbox.checked = true;
-        //metricsOptions.disabled = true;
+        //metricsAgentCombobox.disabled = true;
     }
 };
 
 var onSelectMetricsAgent = function (value) {
     if (typeof MetricsAgent === 'function') {
         if (enableMetricsCheckbox.checked) {
-            orangeHasPlayer.loadMetricsAgent(configMetrics.items[metricsOptions.selectedIndex]);
+            orangeHasPlayer.loadMetricsAgent(metricsConfig.items[metricsAgentCombobox.selectedIndex]);
         } else if (metricsAgent) {
             metricsAgent.stop();
         }
@@ -675,8 +694,8 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     resetLanguageLines();
 
     if (audioTracks && currentaudioTrack) {
-        addCombo(audioTracks, audioList);
-        selectCombo(audioTracks, audioList, currentaudioTrack);
+        addCombo(audioTracks, audioListCombobox);
+        selectCombo(audioTracks, audioListCombobox, currentaudioTrack);
 
         for (i = 0; i < audioTracks.length; i++) {
             addLanguageLine(audioTracks[i], currentaudioTrack);
@@ -685,7 +704,7 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
 };
 
 var handleDuration = function(duration) {
-    durationTime = duration;
+    videoDuration = duration;
     if (duration !== Infinity) {
         durationTimeSpan.textContent = setTimeWithSeconds(duration);
     } else {
@@ -729,8 +748,8 @@ var handleVolumeChange = function(volumeLevel) {
 
 var handleTimeUpdate = function(time) {
     elapsedTimeSpan.textContent = setTimeWithSeconds(time);
-    if (durationTime !== Infinity) {
-        var progress = (time / durationTime) * 100;
+    if (videoDuration !== Infinity) {
+        var progress = (time / videoDuration) * 100;
         seekbar.style.width = progress + '%';
      } else {
         seekbar.style.width = 0;
@@ -743,8 +762,8 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
     currentsubtitleTrack = _selectedSubtitleTrack;
 
     if (subtitleTracks) {
-        addCombo(subtitleTracks, subtitleList);
-        selectCombo(subtitleTracks, subtitleList, currentsubtitleTrack);
+        addCombo(subtitleTracks, subtitleListCombobox);
+        selectCombo(subtitleTracks, subtitleListCombobox, currentsubtitleTrack);
 
         for (i = 0; i < subtitleTracks.length; i++) {
             addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
@@ -781,9 +800,9 @@ var timeLabel = function(elapsedTime) {
 
     elapsedTime /= 1000;
 
-    if (elapsedTime >= lastChartTimeLabel + 1) {
-        lastChartTimeLabel = Math.floor(elapsedTime);
-        label = lastChartTimeLabel;
+    if (elapsedTime >= lastGraphTimeLabel + 1) {
+        lastGraphTimeLabel = Math.floor(elapsedTime);
+        label = lastGraphTimeLabel;
     }
 
     return label;
@@ -831,9 +850,9 @@ var handleBitrates = function(bitrates) {
 
         });
 
-        if (legendChart === null) {
-            legendChart = window.myLine.generateLegend();
-            document.getElementById('chartLegend').innerHTML = legendChart;
+        if (graphLegend === null) {
+            graphLegend = window.myLine.generateLegend();
+            document.getElementById('chartLegend').innerHTML = graphLegend;
         }
 
         highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
@@ -933,8 +952,8 @@ var resetLanguageLines = function() {
 };
 
 var reset = function() {
-    resetCombo(audioTracks, audioList);
-    resetCombo(subtitleTracks, subtitleList);
+    resetCombo(audioTracks, audioListCombobox);
+    resetCombo(subtitleTracks, subtitleListCombobox);
 
     clearProtectionData();
 
@@ -954,8 +973,8 @@ var reset = function() {
         updateGraph = false;
     }
 
-    lastChartTimeLabel = -1;
-    firstChartTime = -1;
+    lastGraphTimeLabel = -1;
+    firstGraphTime = -1;
     graphElapsedTime = 0;
 };
 
@@ -1035,8 +1054,8 @@ var hideBars = function() {
 
 var showBarsTimed = function(e) {
     if (hasClass(document.querySelector('.op-middle-container'), 'disabled')) {
-        clearTimeout(timer);
-        timer = setTimeout(hideBars, hidebarsTimeout);
+        clearTimeout(barsTimer);
+        barsTimer = setTimeout(hideBars, hidebarsTimeout);
         controlBarModule.className = 'op-control-bar';
     }
 };
@@ -1106,3 +1125,9 @@ var setTimeWithSeconds = function(sec) {
 function hasClass(element, className) {
     return element.className && new RegExp('(^|\\s)' + className + '(\\s|$)').test(element.className);
 };
+
+function clearContent(element) {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
