@@ -73,44 +73,16 @@ var video = null,
     // Main Container
     streamUrl = null,
 
-    // Graph
-    graphContainer = null,
-    graphLegend = null,
-    updateGraph = false,
-    graphUpdateTimeInterval = 200, // in milliseconds
-    graphUpdateWindow = 30000, // in milliseconds
-    graphSteps = graphUpdateWindow / graphUpdateTimeInterval,
-    graphTimer = null,
-    graphElapsedTime = 0,
-    lastGraphTimeLabel = -1;
-    firstGraphTime = -1,
-
-    lineChartData = {
-        labels: [],
-        datasets: [{
-            label: '&mdash; Downloaded Bitrate',
-            fillColor: 'rgba(41, 128, 185, 0.2)',
-            strokeColor: 'rgba(41, 128, 185, 1)',
-            pointColor: 'rgba(41, 128, 185, 1)',
-            pointStrokeColor: '#fff',
-            pointHighlightFill: '#fff',
-            pointHighlightStroke: 'rgba(220,220,220,1)',
-            data: []
-        }, {
-            label: '&mdash; Played Bitrate',
-            fillColor: 'rgba(231, 76, 60, 0.2)',
-            strokeColor: 'rgba(231, 76, 60, 1)',
-            pointColor: 'rgba(231, 76, 60, 1)',
-            pointStrokeColor: '#fff',
-            pointHighlightFill: '#fff',
-            pointHighlightStroke: 'rgba(151,187,205,1)',
-            data: []
-        }]
-    };
+    // Modules
+    streamsPanel = null,
+    graph = null;
 
 window.onload = function() {
-    var streamsPanel = new StreamsPanel();
+    streamsPanel = new StreamsPanel();
     streamsPanel.init();
+
+    graph = new Graph();
+
     initMetricsAgentOptions();
     getDOMElements();
     createHasPlayer();
@@ -191,8 +163,6 @@ var getDOMElements = function() {
     defaultSubtitleLangCombobox = document.getElementById('default_subtitle_language');
 
     enableOptimzedZappingCheckbox = document.getElementById('enable-optimized-zapping');
-
-    graphContainer = document.getElementById('bitrate-graph-container');
 };
 
 var registerGUIEvents = function() {
@@ -259,11 +229,7 @@ var onStreamClicked = function(streamInfos) {
         displayProtectionData(streamInfos.protData);
     }
 
-    if (graphTimer === null) {
-        graphTimer = new LoopTimer(handleGraphUpdate, graphUpdateTimeInterval);
-    } else {
-        graphTimer.stop();
-    }
+    graph.initTimer();
 
     streamUrl.innerHTML = streamInfos.url;
 
@@ -294,7 +260,7 @@ var onSeekClicked = function(e) {
 };
 
 var onVideoEnded = function(e) {
-    graphTimer.stop();
+    graph.timer.stop();
 };
 
 var onPlayPauseClicked = function(e) {
@@ -638,94 +604,25 @@ var handlePlayState = function(state) {
     setPlaying(state);
     if (state === true) {
         hideLoadingElement();
-        graphTimer.start();
+        graph.timer.start();
     } else {
-        graphTimer.pause();
+        graph.timer.pause();
     }
 };
 
 var handleDownloadedBitrate = function(bitrate, time) {
-    lastDownloadedBitrate = bitrate;
+    graph.lastDownloadedBitrate = bitrate;
 };
 
 var handlePlayBitrate = function(bitrate, time) {
-    lastPlayedBitrate = bitrate;
+    graph.lastPlayedBitrate = bitrate;
     currentBitrateSpan.innerHTML = bitrate/1000000;
 };
 
-var timeLabel = function(elapsedTime) {
-    var label = '';
-
-    elapsedTime /= 1000;
-
-    if (elapsedTime >= lastGraphTimeLabel + 1) {
-        lastGraphTimeLabel = Math.floor(elapsedTime);
-        label = lastGraphTimeLabel;
-    }
-
-    return label;
-};
-
-var handleGraphUpdate = function() {
-    if (window.myLine !== undefined && updateGraph) {
-
-        if (window.myLine.datasets[0].points.length > graphSteps) {
-            window.myLine.removeData();
-        }
-
-        graphElapsedTime += graphUpdateTimeInterval;
-        window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
-        window.myLine.update();
-    }
-};
 
 var handleBitrates = function(bitrates) {
-    graphContainer.className = 'module';
-
     var ctx = document.getElementById('canvas').getContext('2d');
-
-    if (bitrates) {
-        window.myLine = new Chart(ctx).LineConstant(lineChartData, {
-            responsive: true,
-            constantCurve: true,
-            stepsCount: graphSteps,
-            animation: false,
-            scaleBeginAtZero: false,
-            // Boolean - If we want to override with a hard coded scale
-            scaleOverride: true,
-            // ** Required if scaleOverride is true **
-            // Number - The number of steps in a hard coded scale
-            scaleSteps: bitrates.length - 1,
-            // Number - The value jump in the hard coded scale
-            scaleStepWidth: bitrates[bitrates.length - 1] / (bitrates.length - 1),
-            // Number - The scale starting value
-            scaleStartValue: bitrates[0],
-            pointDot : false,
-            showTooltips: false,
-            scaleShowVerticalLines : false,
-            scaleLabels: bitrates,
-            legendTemplate : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<lineChartData.datasets.length; i++){%><li><span style="color:<%=lineChartData.datasets[i].strokeColor%>"><%if(lineChartData.datasets[i].label){%><%=lineChartData.datasets[i].label%><%}%></span></li><%}%></ul>'
-
-        });
-
-        if (graphLegend === null) {
-            graphLegend = window.myLine.generateLegend();
-            document.getElementById('chartLegend').innerHTML = graphLegend;
-        }
-
-        highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
-        lowBitrateSpan.innerHTML = bitrates[0]/1000000;
-
-        lastPlayedBitrate = null;
-
-        updateGraph = true;
-
-
-
-        // Init first graph value
-        graphElapsedTime = 0;
-        window.myLine.addData([lastDownloadedBitrate, lastPlayedBitrate], timeLabel(graphElapsedTime));
-    }
+    graph.init(ctx, bitrates);
 };
 
 var handleError = function(e) {
@@ -820,20 +717,8 @@ var reset = function() {
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
-    lastDownloadedBitrate = null;
-    lastPlayedBitrate = null;
 
-    if (window.myLine !== undefined) {
-        window.myLine.destroy();
-        lineChartData.labels = [];
-        lineChartData.datasets[0].data = [];
-        lineChartData.datasets[1].data = [];
-        updateGraph = false;
-    }
-
-    lastGraphTimeLabel = -1;
-    firstGraphTime = -1;
-    graphElapsedTime = 0;
+    graph.reset();
 };
 
 var setVolumeOff = function(value) {
