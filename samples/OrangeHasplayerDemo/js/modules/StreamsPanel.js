@@ -76,10 +76,10 @@ StreamsPanel.prototype.createStreamEntry = function(stream) {
     if (stream.protData) {
         var protectionsNames = Object.getOwnPropertyNames(stream.protData);
         for (var i = 0, len = protectionsNames.length; i < len; i++) {
-            if (S(protectionsNames[i]).contains('playready')) {
+            if (protectionsNames[i].indexOf('playready') > -1) {
                 className += ' stream-playready';
                 protections.push('PR');
-            } else if (S(protectionsNames[i]).contains('widevine')) {
+            } else if (protectionsNames[i].indexOf('widevine') > -1) {
                 className += ' stream-widevine';
                 protections.push('WV');
             }
