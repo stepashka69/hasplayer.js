@@ -1,0 +1,35 @@
+### Release Notes v1.2.1 (2015/09/11)
+* New OrangeHasPlayer API for easier and more efficient integration into webapps
+* New OrangeHasPlayer demonstration webapp and API jsdoc
+* Enable keeping ABR bandwidth conditions when loading new stream
+* Optimized ABR rules according to buffering state of the video player
+* Add support for default audio/text language to be selected at startup
+* Autoplay management accross all platforms (mainly for Android devices)
+* Bugs fixing (seek, MSS segments processing, Edge support...)
+
+### Release Notes v1.2.0 (2015/07/01)
+* HLS support
+* EME support refactoring with multiple versions support (taken from dash.js project)
+* PlayReady to Widevine content protection conversion (requires coordination between PlayReady and Widevine licensers)
+* Configuration mechanism for streaming and ABR controllers
+* Enhanced errors handling
+* Fallback mechanism for segment download failure 
+* Optimized ABR rules
+* Enhanced TTML subtitles support
+* Configurable build process (protocol(s), EME support)
+* And many bug corrections
+
+### Release Notes v1.1.0 (2014/10/31)
+* Based on dash.js v1.2.0 (see dash.js release notes)
+* Simplified BufferController with sequential segments downloading
+* Optimized and simplified live edge searching
+* TTML subtitles support
+* Quality filtering functionnality
+* Sample application (samples/DemoPlayer) with dynamic bandwidth chart
+
+### Release Notes v1.0.0 (2014/04/16)
+* Based on dash.js v1.1.0 (see dash.js release notes)
+* Smooth Streaming support (live and VOD)
+* Automatic protocol detection (DASH vs MSS)
+* PlayReady support with CustomData and licenser back URL
+* Multi-languages audio support
