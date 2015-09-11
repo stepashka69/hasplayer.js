@@ -288,8 +288,6 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        this.reset(0);
-
         if (initialQuality.video >= 0) {
             mediaPlayer.setQualityFor('video', initialQuality.video);
             config.video["ABR.keepBandwidthCondition"] = false;
@@ -306,13 +304,16 @@ OrangeHasPlayer = function() {
             metricsAgent.ref.createSession();
         }
 
+        // Set config to set 'keepBandwidthCondition' parameter
+        mediaPlayer.setConfig(config);
+
+        // Reset the player
+        this.reset(0);
+
         //init default audio language
         mediaPlayer.setDefaultAudioLang(defaultAudioLang);
         //init default subtitle language
         mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
-
-        // Set config to set 'keepBandwidthCondition' parameter
-        mediaPlayer.setConfig(config);
 
         mediaPlayer.attachSource(url, protData);
         if (mediaPlayer.getAutoPlay()) {
