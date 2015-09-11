@@ -714,34 +714,35 @@ var handleDuration = function(duration) {
 };
 
 var handleVolumeChange = function(volumeLevel) {
+    var sliderValue = parseInt(sliderVolume.value);
     volumeLabel.innerHTML = Math.round(volumeLevel * 100);
-    if (sliderVolume.value === 0) {
+    if (sliderValue === 0) {
         sliderVolume.className = 'op-volume';
-    } else if (sliderVolume.value > 0 && sliderVolume.value <= 8) {
+    } else if (sliderValue > 0 && sliderValue <= 8) {
         sliderVolume.className = 'op-volume op-range8';
-    } else if (sliderVolume.value > 8 && sliderVolume.value <= 16) {
+    } else if (sliderValue > 8 && sliderValue <= 16) {
         sliderVolume.className = 'op-volume op-range16';
-    } else if (sliderVolume.value >= 16 && sliderVolume.value <= 24) {
+    } else if (sliderValue >= 16 && sliderValue <= 24) {
         sliderVolume.className = 'op-volume op-range24';
-    } else if (sliderVolume.value >= 24 && sliderVolume.value <= 32) {
+    } else if (sliderValue >= 24 && sliderValue <= 32) {
         sliderVolume.className = 'op-volume op-range32';
-    } else if (sliderVolume.value >= 32 && sliderVolume.value <= 40) {
+    } else if (sliderValue >= 32 && sliderValue <= 40) {
         sliderVolume.className = 'op-volume op-range40';
-    } else if (sliderVolume.value >= 40 && sliderVolume.value <= 48) {
+    } else if (sliderValue >= 40 && sliderValue <= 48) {
         sliderVolume.className = 'op-volume op-range48';
-    } else if (sliderVolume.value >= 48 && sliderVolume.value <= 56) {
+    } else if (sliderValue >= 48 && sliderValue <= 56) {
         sliderVolume.className = 'op-volume op-range56';
-    } else if (sliderVolume.value >= 56 && sliderVolume.value <= 64) {
+    } else if (sliderValue >= 56 && sliderValue <= 64) {
         sliderVolume.className = 'op-volume op-range64';
-    } else if (sliderVolume.value >= 64 && sliderVolume.value <= 72) {
+    } else if (sliderValue >= 64 && sliderValue <= 72) {
         sliderVolume.className = 'op-volume op-range72';
-    } else if (sliderVolume.value >= 72 && sliderVolume.value <= 80) {
+    } else if (sliderValue >= 72 && sliderValue <= 80) {
         sliderVolume.className = 'op-volume op-range80';
-    } else if (sliderVolume.value >= 80 && sliderVolume.value <= 88) {
+    } else if (sliderValue >= 80 && sliderValue <= 88) {
         sliderVolume.className = 'op-volume op-range88';
-    } else if (sliderVolume.value >= 88 && sliderVolume.value <= 96) {
+    } else if (sliderValue >= 88 && sliderValue <= 96) {
         sliderVolume.className = 'op-volume op-range96';
-    } else if (sliderVolume.value >= 96) {
+    } else if (sliderValue >= 96) {
         sliderVolume.className = 'op-volume op-range100';
     }
 };
