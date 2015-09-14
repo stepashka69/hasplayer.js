@@ -48,9 +48,9 @@ Mss.dependencies.createVOWidevinePssh = function (KID, debug) {
             0xFF, 0xFF, 0xFF, 0xFF,*/
             0x2a,                   // Content type flag
             0x02,                   // Content type length            
-            0x53, 0x44,             // Content type = 'SD'  
-            0x32,                   // Policy flag
-            0x00                    // Policy length   
+            0x53, 0x44              // Content type = 'SD'  
+            /*0x32,                   // Policy flag
+            0x00                    // Policy length*/
         ]),
         length = pssh.length,
         dataLength = length - 32;
