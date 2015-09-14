@@ -155,7 +155,6 @@ Desktop.ini
 *.egg
 *.egg-info
 dist
-build
 eggs
 parts
 bin
@@ -182,3 +181,4 @@ pip-log.txt
 
 doc/Dash.js.~ml
 /server/MSS
+app/lib/metricsagent.min.js

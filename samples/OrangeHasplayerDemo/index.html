@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Hasplayer Demo</title>
+        <link type="text/css" rel="stylesheet" href="css/main.css" media="screen"/>
+        <link type="text/css" rel="stylesheet" href="css/webtv-html5-player.css" />
+
+        <!-- source -->
+<!--(if target dev)><!-->
+<script src="../../app/lib/log4javascript.js"></script>
+<!--<!(endif)-->
+
+<script src="../../app/lib/q.js"></script>
+<script src="../../app/lib/xml2json.js"></script>
+<script src="../../app/lib/objectiron.js"></script>
+<script src="../../app/lib/dijon.js"></script>
+<script src="../../app/lib/Math.js"></script>
+<script src="../../app/lib/long.js"></script>
+<!-- @if PROTECTION=true -->
+<script src="../../app/lib/base64.js"></script>
+<!-- @endif -->
+
+<script src="../../app/lib/mp4lib/mp4lib.js"></script>
+<script src="../../app/lib/mp4lib/mp4lib-boxes.js"></script>
+<script src="../../app/lib/mp4lib/mp4lib-fields.js"></script>
+
+<script src="../../app/lib/mpegts/mpegts.js"></script>
+<script src="../../app/lib/mpegts/ts.js"></script>
+<script src="../../app/lib/mpegts/binary.js"></script>
+<script src="../../app/lib/mpegts/pes.js"></script>
+<script src="../../app/lib/mpegts/psi.js"></script>
+<script src="../../app/lib/mpegts/adaptationField.js"></script>
+<script src="../../app/lib/mpegts/pts.js"></script>
+<script src="../../app/lib/mpegts/pat.js"></script>
+<script src="../../app/lib/mpegts/pmt.js"></script>
+<script src="../../app/lib/mpegts/aac.js"></script>
+<script src="../../app/lib/mpegts/h264.js"></script>
+
+<!-- @if PROXY=true -->
+<script src="../../app/js/streaming/OrangeHasPlayer.js"></script>
+<!-- @endif -->
+<script src="../../app/js/streaming/MediaPlayer.js"></script>
+<script src="../../app/js/streaming/Context.js"></script>
+<script src="../../app/js/streaming/ErrorHandler.js"></script>
+<script src="../../app/js/streaming/Capabilities.js"></script>
+<script src="../../app/js/streaming/EventBus.js"></script>
+<script src="../../app/js/streaming/Debug.js"></script>
+<script src="../../app/js/streaming/Config.js"></script>
+<script src="../../app/js/streaming/TokenAuthentication.js"></script>
+<script src="../../app/js/streaming/VideoModel.js"></script>
+<script src="../../app/js/streaming/vo/SegmentRequest.js"></script>
+<script src="../../app/js/streaming/ManifestLoader.js"></script>
+<script src="../../app/js/streaming/ManifestUpdater.js"></script>
+<script src="../../app/js/streaming/ManifestModel.js"></script>
+<script src="../../app/js/streaming/MediaSourceExtensions.js"></script>
+<script src="../../app/js/streaming/MetricsExtensions.js"></script>
+<script src="../../app/js/streaming/SourceBufferExtensions.js"></script>
+<script src="../../app/js/streaming/VideoModelExtensions.js"></script>
+<script src="../../app/js/streaming/BufferExtensions.js"></script>
+<script src="../../app/js/streaming/FragmentController.js"></script>
+<script src="../../app/js/streaming/AbrController.js"></script>
+<script src="../../app/js/streaming/FragmentLoader.js"></script>
+<script src="../../app/js/streaming/FragmentModel.js"></script>
+<script src="../../app/js/streaming/StreamController.js"></script>
+<script src="../../app/js/streaming/RequestScheduler.js"></script>
+<script src="../../app/js/streaming/SchedulerExtensions.js"></script>
+<script src="../../app/js/streaming/SchedulerModel.js"></script>
+<script src="../../app/js/streaming/Stream.js"></script>
+<script src="../../app/js/streaming/BufferController.js"></script>
+<script src="../../app/js/streaming/Parser.js"></script>
+<script src="../../app/js/streaming/ContextManager.js"></script>
+<script src="../../app/js/streaming/rules/SwitchRequest.js"></script>
+<script src="../../app/js/streaming/rules/DownloadRatioRule.js"></script>
+<script src="../../app/js/streaming/rules/InsufficientBufferRule.js"></script>
+<script src="../../app/js/streaming/rules/LimitSwitchesRule.js"></script>
+<script src="../../app/js/streaming/rules/BaseRulesCollection.js"></script>
+<script src="../../app/js/streaming/rules/o/DownloadRatioRule.js"></script>
+<script src="../../app/js/streaming/rules/o/InsufficientBufferRule.js"></script>
+<script src="../../app/js/streaming/Notifier.js"></script>
+<script src="../../app/js/streaming/EventController.js"></script>
+<script src="../../app/js/streaming/URIQueryAndFragmentModel.js"></script>
+<script src="../../app/js/streaming/vo/URIFragmentData.js"></script>
+<script src="../../app/js/streaming/vo/Event.js"></script>
+<script src="../../app/js/streaming/vo/Error.js"></script>
+
+
+<script src="../../app/js/streaming/vo/Mp4Track.js"></script>
+<script src="../../app/js/streaming/Mp4Processor.js"></script>
+
+
+<!-- @if PROTECTION=true -->
+<!--Protection-->
+<script src="../../app/js/streaming/protection/ProtectionModel.js"></script>
+<script src="../../app/js/streaming/protection/ProtectionModel_01b.js"></script>
+<script src="../../app/js/streaming/protection/ProtectionModel_3Feb2014.js"></script>
+<script src="../../app/js/streaming/protection/ProtectionModel_21Jan2015.js"></script>
+<script src="../../app/js/streaming/protection/vo/ClearKeyKeySet.js"></script>
+<script src="../../app/js/streaming/protection/vo/KeyPair.js"></script>
+<script src="../../app/js/streaming/protection/vo/SessionToken.js"></script>
+
+<script src="../../app/js/streaming/protection/ProtectionController.js"></script>
+<script src="../../app/js/streaming/protection/ProtectionExtensions.js"></script>
+<script src="../../app/js/streaming/protection/CommonEncryption.js"></script>
+
+<script src="../../app/js/streaming/protection/drm/KeySystem.js"></script>
+<script src="../../app/js/streaming/protection/drm/KeySystem_Access.js"></script>
+<script src="../../app/js/streaming/protection/drm/KeySystem_ClearKey.js"></script>
+<script src="../../app/js/streaming/protection/drm/KeySystem_PlayReady.js"></script>
+<script src="../../app/js/streaming/protection/drm/KeySystem_Widevine.js"></script>
+<script src="../../app/js/streaming/protection/drm/KeySystem.js"></script>
+
+<script src="../../app/js/streaming/protection/vo/KeyMessage.js"></script>
+<script src="../../app/js/streaming/protection/vo/LicenseRequestComplete.js"></script>
+<script src="../../app/js/streaming/protection/vo/NeedKey.js"></script>
+<script src="../../app/js/streaming/protection/vo/ProtectionData.js"></script>
+<script src="../../app/js/streaming/protection/vo/KeySystemAccess.js"></script>
+<script src="../../app/js/streaming/protection/vo/KeySystemConfiguration.js"></script>
+<script src="../../app/js/streaming/protection/vo/MediaCapability.js"></script>
+<!-- @endif -->
+
+<script src="../../app/js/streaming/captioning/VTTParser.js"></script>
+<script src="../../app/js/streaming/captioning/TTMLParser.js"></script>
+<script src="../../app/js/streaming/captioning/TextTrackExtensions.js"></script>
+<script src="../../app/js/streaming/captioning/TextSourceBuffer.js"></script>
+<script src="../../app/js/streaming/captioning/TextController.js"></script>
+<script src="../../app/js/streaming/captioning/TextTTMLXMLMP4SourceBuffer.js"></script>
+
+<script src="../../app/js/streaming/vo/MetricsList.js"></script>
+<script src="../../app/js/streaming/MetricsModel.js"></script>
+<script src="../../app/js/streaming/vo/metrics/BufferLevel.js"></script>
+<script src="../../app/js/streaming/vo/metrics/DroppedFrames.js"></script>
+<script src="../../app/js/streaming/vo/metrics/HTTPRequest.js"></script>
+<script src="../../app/js/streaming/vo/metrics/ManifestUpdate.js"></script>
+<script src="../../app/js/streaming/vo/metrics/PlayList.js"></script>
+<script src="../../app/js/streaming/vo/metrics/RepresentationSwitch.js"></script>
+<script src="../../app/js/streaming/vo/metrics/TCPConnection.js"></script>
+<script src="../../app/js/streaming/vo/metrics/BandwidthBoundaries.js"></script>
+<script src="../../app/js/streaming/vo/metrics/RepresentationBoundaries.js"></script>
+<script src="../../app/js/streaming/vo/metrics/State.js"></script>
+<script src="../../app/js/streaming/vo/metrics/Session.js"></script>
+<script src="../../app/js/streaming/vo/metrics/Condition.js"></script>
+
+<script src="../../app/js/dash/Dash.js"></script>
+<script src="../../app/js/dash/DashContext.js"></script>
+<script src="../../app/js/dash/vo/Mpd.js"></script>
+<script src="../../app/js/dash/vo/Period.js"></script>
+<script src="../../app/js/dash/vo/AdaptationSet.js"></script>
+<script src="../../app/js/dash/vo/Representation.js"></script>
+<script src="../../app/js/dash/vo/Segment.js"></script>
+<script src="../../app/js/dash/vo/Event.js"></script>
+<script src="../../app/js/dash/vo/EventStream.js"></script>
+<script src="../../app/js/dash/DashParser.js"></script>
+<script src="../../app/js/dash/DashHandler.js"></script>
+<script src="../../app/js/dash/BaseURLExtensions.js"></script>
+<script src="../../app/js/dash/FragmentExtensions.js"></script>
+<script src="../../app/js/dash/DashManifestExtensions.js"></script>
+<script src="../../app/js/dash/DashMetricsExtensions.js"></script>
+<script src="../../app/js/dash/TimelineConverter.js"></script>
+
+<!-- @if INCLUDE_MSS=true -->
+<script src="../../app/js/mss/Mss.js"></script>
+<script src="../../app/js/mss/MssParser.js"></script>
+<script src="../../app/js/mss/MssHandler.js"></script>
+<script src="../../app/js/mss/MssFragmentController.js"></script>
+<script src="../../app/js/mss/VoWvPssh.js"></script>
+<!-- @endif -->
+
+<!-- @if INCLUDE_HLS=true -->
+<script src="../../app/js/hls/Hls.js"></script>
+<script src="../../app/js/hls/HlsDemux.js"></script>
+<script src="../../app/js/hls/HlsParser.js"></script>
+<script src="../../app/js/hls/HlsHandler.js"></script>
+<script src="../../app/js/hls/HlsFragmentController.js"></script>
+<!-- @endif -->
+
+<script src="../../app/js/utils/CopyMethods.js"></script>
+<script src="../../app/js/utils/ObjectIron.js"></script>
+<script src="../../app/js/utils/xhr.js"></script>
+<script src="../../app/js/utils/analytics.js"></script>
+<!-- /source -->
+
+<!-- metricsagent -->
+<script src="../../../metricsagent.js/src/MetricsAgent.js"></script>
+<script src="../../../metricsagent.js/src/MetricsDatabase.js"></script>
+<script src="../../../metricsagent.js/src/MetricsSender.js"></script>
+<script src="../../../metricsagent.js/src/MetricsVo.js"></script>
+<script src="../../../metricsagent.js/src/collectors/HasPlayerCollector.js"></script>
+<script src="../../../metricsagent.js/src/formatters/AbstractFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/CSQoEFormatter.js"></script>
+<script src="../../../metricsagent.js/src/formatters/PrismeFormatter.js"></script>
+<!-- /metricsagent -->
+<script type="text/javascript" src="js/libs/string.min.js"></script>
+<script type="text/javascript" src="js/libs/Chart.js"></script>
+<script type="text/javascript" src="js/libs/ChartLineConstant.js"></script>
+<script type="text/javascript" src="js/libs/LoopTimer.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/orangeHasPlayer.js"></script>
+
+    <style id="cueStyle" type="text/css"></style>
+    </head>
+    <body>
+        <div id="streams-container">
+            <div id="streams-filter">
+                <fieldset>
+                <span><label for="display-vod-streams">VOD</label><input type="checkbox" name="filter-stream-type" id="display-vod-streams" checked></span>
+                <span><label for="display-live-streams">Live</label><input type="checkbox" name="filter-stream-type" id="display-live-streams" checked></span>
+                </fieldset>
+                <fieldset>
+                <span><label for="display-hls-streams">HLS</label><input type="checkbox" name="filter-stream-protocol" id="display-hls-streams" checked></span>
+                <span><label for="display-mss-streams">MSS</label><input type="checkbox" name="filter-stream-protocol" id="display-mss-streams" checked></span>
+                <span><label for="display-dash-streams">DASH</label><input type="checkbox" name="filter-stream-protocol" id="display-dash-streams" checked></span>
+                </fieldset>
+            </div>
+        </div>
+        <div id="main-container">
+            <h1><img src="res/orange.gif" id="orange-logo"/>Orange Has Player</h1>
+            <div id="player-container">
+
+                <div class="stream-url"></div>
+                <div id="demo-player-container" class="demo-player" tabindex="0">
+                    <div id="VideoModule" class="op-video">
+                        <video id="player" class="player"></video>
+                    </div>
+                    <div id="LoadingModule" class="op-loading op-none">
+                        <div class="spinner">
+                            <div class="spinner-container container1">
+                                <div class="circle1"></div>
+                                <div class="circle2"></div>
+                                <div class="circle3"></div>
+                                <div class="circle4"></div>
+                            </div>
+                            <div class="spinner-container container2">
+                                <div class="circle1"></div>
+                                <div class="circle2"></div>
+                                <div class="circle3"></div>
+                                <div class="circle4"></div>
+                            </div>
+                            <div class="spinner-container container3">
+                                <div class="circle1"></div>
+                                <div class="circle2"></div>
+                                <div class="circle3"></div>
+                                <div class="circle4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="MenuModule" class="op-menu op-hidden-translate-up" min-width="886px" max-width="1279px">
+                        <div class="op-menu-items">
+                            <a id="languagesButton" class="op-menu-item op-menu-languages stop-anchor" data-menu="languages" role="button">
+                                Langue
+                            </a>
+                            <a id="videoQualityButton" class="op-menu-item op-settings-menu-quality stop-anchor" data-settings="quality" role="button">
+                                Qualité vidéo
+                            </a>
+                        </div>
+                    </div>
+                    <div id="MiddleContainer" class="op-middle-container disabled" min-width="886px" max-width="1279px">
+                        <div class="op-close op-hidden" id="CloseCrossModule">
+                            <a class="stop-anchor">
+                                <!-- inject:close:svg -->
+                                <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><path fill="#444444" d="M28.9,24L28.9,24l-8-8l8-8l0,0c0.1-0.1,0.1-0.2,0.2-0.3c0.1-0.3,0-0.6-0.2-0.9l-3.8-3.8 c-0.2-0.2-0.6-0.3-0.9-0.2c-0.1,0-0.2,0.1-0.3,0.2l0,0l-8,8l-8-8l0,0C7.9,3,7.8,2.9,7.7,2.9c-0.3-0.1-0.6,0-0.9,0.2L3.1,6.8 C2.8,7.1,2.8,7.4,2.9,7.7C2.9,7.8,3,7.9,3.1,8l0,0l8,8l-8,8l0,0c-0.1,0.1-0.1,0.2-0.2,0.3c-0.1,0.3,0,0.6,0.2,0.9l3.8,3.8   c0.2,0.2,0.6,0.3,0.9,0.2c0.1,0,0.2-0.1,0.3-0.2l0,0l8-8l8,8l0,0c0.1,0.1,0.2,0.1,0.3,0.2c0.3,0.1,0.6,0,0.9-0.2l3.8-3.8    c0.2-0.2,0.3-0.6,0.2-0.9C29.1,24.2,29,24.1,28.9,24z"></path></svg>
+                                <!-- endinject -->
+                            </a>
+                        </div>
+                        <div class="op-screen op-languages op-hidden" id="LanguagesModule" min-width="886px" max-width="1279px">
+                            <div class="op-languages-container">
+                                <div>
+                                    <div class="op-double-panel" id="languages-double-panel">
+                                        <div class="op-summary">
+                                            <div class="op-languages-title">Choix de la langue</div>
+                                        </div>
+                                        <div class="op-panel-container">
+                                            <div class="op-languages-title">Choix des sous-titres</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="op-screen op-settings-quality op-hidden" id="QualityModule" min-width="886px" max-width="1279px">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="op-quality-title">La qualité vidéo s'adapte au débit Internet</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ul>
+                                                <li>Haute <span id="highBitrateSpan">1.2</span></li>
+                                                <li class="op-quality-current">Reçue <span id="bandwith-binding">1.2</span> Mbits</li>
+                                                <li>Basse <span id="lowBitrateSpan">0.2</span></li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="ControlBarModule" class="op-control-bar" min-width="886px" max-width="1279px">
+                        <div class="op-seek-bar" id="SeekBarModule" min-width="886px" max-width="1279px">
+                            <div class="op-seek-bar-time op-seek-bar-time-elapsed">
+                                <span>00:00:00</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-background"></div>
+                                <div class="bar-seek" id="seekBar"></div>
+                            </div>
+                            <div class="op-seek-bar-time op-seek-bar-time-remaining">
+                                <span>00:00:00</span>
+                            </div>
+                        </div>
+                        <div class="op-controls">
+                            <div class="op-control-left">
+                                <a role="button" id="menuButton" title="Menu" class="tooltip first op-control-menu stop-anchor">
+                                    <div class="op-control">
+                                    <!-- inject:menu:svg -->
+                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Menu"><path fill="#000000" d="M1 4h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 14h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 24h30v4.286h-30v-4.286z"></path></svg>
+                                    <!-- endinject -->
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="op-control-center">
+                                <a role="button" id="previousChannel" title="Flux précédent" class="tooltip op-chainemoins stop-anchor">
+                                    <div class="op-control">
+                                        <!-- inject:chainemoins:svg -->
+                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne précédente">    <g id="chaine-">        <g id="svg_5">            <path id="svg_6" d="m0.300001,4.670589v19.764704h5.435294v2.594118h20.629411v-2.594118h5.435293v-19.764704h-31.499998l0,0zm15.688235,20.505881c-0.617648,0 -1.111765,-0.494118 -1.111765,-1.111765c0,-0.617647 0.494117,-1.111763 1.111765,-1.111763c0.617646,0 1.111764,0.494116 1.111764,1.111763c0.123529,0.617647 -0.494118,1.111765 -1.111764,1.111765zm13.217647,-3.705883h-26.435294v-14.082351h26.435294v14.082351l0,0z" fill="#434343"></path>            <g id="svg_7">                <rect id="svg_8" height="2.470588" width="9.388235" fill="#434343" y="13.194118" x="11.294118"></rect>            </g>        </g>    </g></svg>
+                                    <!-- endinject -->
+                                    </div>
+                                </a>
+                                <a id="button-playpause" role="button" title="Play" class="tooltip op-play stop-anchor">
+                                    <div class="op-control">
+                                        <!-- inject:play2:svg -->
+                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Play">
+                                        <path id="svg_1" d="m3.626999,31.24099l26.127003,-15.241442l-26.127003,-15.235536l0,30.476978z" fill="#000000">
+                                        </path>
+                                        </svg>
+                                        <!-- endinject -->
+                                        <!-- inject:pause:svg -->
+                                        <!--?xml version="1.0" encoding="utf-8" ?-->
+                                        <svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Pause">
+                                        <g id="pause">
+                                            <g>
+                                                <rect id="svg_12" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="1.3">
+                                                </rect>
+                                                <rect id="svg_13" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="19.182475">
+                                                </rect>
+                                            </g>
+                                        </g>
+                                        </svg>
+                                        <!-- endinject -->
+                                    </div>
+                                </a>
+                                <a role="button" id="nextChannel" title="Flux suivant" class="tooltip op-chaineplus stop-anchor">
+                                    <div class="op-control">
+                                        <!-- inject:chaineplus:svg -->
+                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne suivante">    <g id="chaine_x2B__1_">        <g id="svg_1">            <path id="svg_2" d="m0.299999,4.774015v19.655905h5.43937v2.596062h20.521259v-2.596062h5.439371v-19.655905h-31.4l0,0zm15.7,20.397637c-0.61811,0 -1.112599,-0.494488 -1.112599,-1.112598c0,-0.618109 0.49449,-1.112597 1.112599,-1.112597c0.618112,0 1.112597,0.494488 1.112597,1.112597c0.123621,0.618111 -0.494486,1.112598 -1.112597,1.112598zm13.227559,-3.70866h-26.331496v-14.092914h26.331496v14.092914l0,0z" fill="#424242"></path>            <g id="svg_3">                <rect id="svg_4" height="9.395276" width="2.472441" fill="#424242" y="9.842519" x="14.763778"></rect>                <rect id="svg_5" height="2.472441" width="9.395276" fill="#424242" y="13.180314" x="11.302361"></rect>            </g>        </g>    </g></svg>
+                                    <!-- endinject -->
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="op-control-right">
+                                <a id="button-volume" role="button" title="Volume" class="tooltip op-sound stop-anchor">
+                                    <div class="op-control">
+                                        <!-- inject:son:svg -->
+                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOn" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: block;">    <g id="svg_11">        <path fill="#000000" d="m20.561682,27.761684v2.641121c0,0 -3.081308,-2.641121 -3.521494,-3.081308c-1.46729,-1.320564 -2.934581,-2.641123 -4.401871,-3.961685c-0.440186,-0.440184 -1.027103,-0.586912 -1.614017,-0.586912c-3.228038,0 -6.309347,0 -9.537384,0c-0.146729,0 -0.440187,0 -0.586916,0v-13.645797c0,0 7.189721,0 10.1243,0c0.586914,0 1.173832,-0.293457 1.760747,-0.586917c2.494391,-2.200934 4.988786,-4.548598 7.483178,-6.749532c0.14673,-0.146729 0.14673,-0.146729 0.293457,-0.293458v26.264489l0,0l0,0z" id="svg_8"></path>        <path fill="#000000" d="m27.164488,23.653273l-0.146729,-0.14673c-0.440189,-0.440187 -0.58692,-1.027103 -0.293459,-1.614019c1.17383,-1.760748 1.907476,-3.814955 1.907476,-6.015887s-0.586916,-4.25514 -1.760748,-6.015888c-0.293459,-0.586916 -0.146729,-1.173832 0.293459,-1.614018l0.146729,-0.146729c0.586914,-0.440187 1.32056,-0.293459 1.760746,0.293457c2.787851,3.961682 3.228037,10.271029 -0.14673,14.966354c-0.440184,0.586918 -1.173828,0.733648 -1.760744,0.293461l0,0z" id="svg_9"></path>        <path fill="#000000" d="m23.496264,11.328037v0c0.586916,-0.440187 1.467289,-0.293458 1.760746,0.293458c1.32056,2.200934 1.614019,5.72243 -0.146729,8.51028c-0.440184,0.586916 -1.173832,0.733644 -1.760746,0.293459v0c-0.440189,-0.440186 -0.58692,-1.027103 -0.293459,-1.614017c0.586918,-0.880379 0.880373,-1.907478 0.880373,-2.934581s-0.293455,-2.054206 -0.733644,-2.934581c-0.293459,-0.586915 -0.146729,-1.17383 0.293459,-1.614017l0,0z" id="svg_10"></path>    </g></svg>
+                                        <!-- endinject -->
+                                        <!-- inject:mute:svg -->
+                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: none;">    <g id="svg_7">        <path id="svg_4" d="m20.89936,27.96454v2.68648c0,0 -3.13423,-2.68648 -3.58197,-3.13422c-1.49249,-1.34324 -2.98498,-2.68649 -4.47747,-4.02972c-0.44775,-0.44774 -1.04474,-0.59699 -1.64174,-0.59699c-3.28348,0 -6.41771,0 -9.70118,0c-0.14925,0 -0.44775,0 -0.597,0v-13.88015c0,0 7.3132,0 10.29818,0c0.59699,0 1.19399,-0.2985 1.79099,-0.597c2.53723,-2.23873 5.07446,-4.62672 7.6117,-6.86545c0.14925,-0.14925 0.14925,-0.14925 0.29849,-0.2985v26.71556l0,0z" fill="#000000"></path>        <path id="svg_5" d="m24.32462,11.58148l6.88038,5.9625l-1.95516,2.25515l-6.88038,-5.9625l1.95516,-2.25515z" fill="#000000"></path>        <path id="svg_6" d="m31.12889,13.49038l-6.43711,6.43711l-2.11038,-2.11038l6.43711,-6.43711l2.11038,2.11038z" fill="#000000"></path>    </g></svg>
+                                        <!-- endinject -->
+                                    </div>
+                                </a>
+                                <a role="button" id="button-fullscreen" title="Plein écran" class="tooltip last op-zoom stop-anchor">
+                                    <div class="op-control">
+                                        <!-- inject:zoom_Big:svg -->
+                                        <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" aria-label="Plein écran"><g>  <path fill="#464545" d="M10.3,19.6h11.8v-7.1H10.3V19.6z M30.1,27.3v-5.2h1.6v6.7H25v-1.5L30.1,27.3z M7,27.3v1.5H0.2v-6.7h1.6v5.2     L7,27.3z M1.9,4.9v5.2H0.2V3.4H7v1.5L1.9,4.9z M30.3,5h-5.2V3.4h6.7v6.7h-1.5L30.3,5z"></path></g></svg>
+                                        <!-- endinject -->
+                                        <!-- inject:zoom_Small:svg -->
+                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Plein écran"><path fill="#000000" d="M26.1 9.2v3.9h2.4v-6.3h-6.7v2.4z"></path><path fill="#000000" d="M26.1 22.5h-4.3v2.4h6.7v-6.4h-2.4z"></path><path fill="#000000" d="M5.9 22.5v-4h-2.4v6.4h6.7v-2.4z"></path><path fill="#000000" d="M5.9 9.2h4.3v-2.4h-6.7v6.3h2.4z"></path><path fill="#000000" d="M10.6 12.8h10.7v6h-10.7v-6z"></path></svg>
+                                        <!-- endinject -->
+                                    </div>
+                                </a>
+                                <div id="panel-volume" role="slide" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% sound" class="op-container-volume op-hidden">
+                                    <span id="volumeLabel" class="op-volume-value">100</span>
+                                    <input id="slider-volume" class="op-volume op-range100" type="range" min="0" max="100" value="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ErrorModule" class="op-error op-hidden" min-width="886px" max-width="1279px">
+                        <div class="op-error-box">
+                            <div class="op-error-picto op-picto-error">
+                                <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><g id="erreur">  <path fill="#444444" d="M16,28.5c-3.8,0-7.5,0-11.3,0c-0.4,0-0.8,0-1.1-0.1c-1.8-0.5-2.7-2-2.2-4c0.1-0.5,0.3-0.9,0.5-1.3      c3.6-6.2,7.2-12.5,10.8-18.7c1.1-1.9,3-2.4,4.7-1.7c0.8,0.3,1.3,0.9,1.8,1.6C22.8,10.5,26.4,16.8,30,23c0.5,0.9,0.8,1.8,0.6,2.9     c-0.2,1.6-1.5,2.6-3.3,2.6c-3.6,0-7.2,0-10.7,0C16.4,28.5,16.2,28.5,16,28.5z M16,20.3c1.1,1.1,2.1,2.1,3.1,3.2     c0.4,0.4,0.9,0.5,1.4,0.4c1-0.3,1.3-1.5,0.5-2.3c-1-1-2.1-2.1-3.1-3.1c0.1-0.1,0.2-0.2,0.3-0.3c0.9-0.9,1.8-1.7,2.6-2.6     c0.6-0.6,0.7-1.5,0.1-2c-0.6-0.6-1.4-0.5-2,0.1c-0.7,0.7-1.5,1.5-2.2,2.2c-0.2,0.2-0.5,0.5-0.7,0.7c-0.2-0.1-0.3-0.2-0.4-0.3        c-0.9-0.9-1.7-1.8-2.6-2.6c-0.6-0.6-1.4-0.6-2-0.1c-0.6,0.6-0.5,1.4,0.1,2c0.7,0.7,1.4,1.4,2.1,2c0.3,0.3,0.6,0.6,1,0.9     c-0.2,0.2-0.3,0.2-0.4,0.3c-0.9,0.9-1.9,1.9-2.8,2.8c-0.4,0.4-0.5,0.9-0.3,1.4c0.3,1,1.5,1.3,2.3,0.5C13.9,22.4,14.9,21.4,16,20.3z      "></path></g></svg>
+                            </div>
+                            <div class="op-error-picto op-picto-alert">
+                                <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><path fill="#444444" d="M15.9,28.5c-3.7,0-7.5,0-11.2,0c-0.5,0-1.1-0.1-1.6-0.3C1.8,27.8,1,26.4,1.3,25c0.1-0.7,0.3-1.3,0.7-2   c3.5-6.2,7.1-12.3,10.7-18.5c0.6-1,1.3-1.8,2.5-2.1c1.6-0.4,3.1,0.3,4,1.9c0.8,1.4,1.6,2.8,2.4,4.2c2.8,4.8,5.5,9.6,8.3,14.4    c0.6,1,0.9,2,0.7,3.2c-0.2,1.3-1.2,2.1-2.4,2.3c-0.4,0.1-0.8,0.1-1.3,0.1C26.1,28.5,19.6,28.5,15.9,28.5z M14.3,11.1    c0.1,1.7,0.3,3.4,0.4,5c0.1,1.1,0.2,2.2,0.3,3.2c0.1,0.6,0.4,0.9,1,1c0.6,0,0.9-0.3,1-1c0-0.3,0.1-0.6,0.1-0.9  c0.1-1.5,0.3-3,0.4-4.5c0.1-1.1,0.2-2.2,0.2-3.3c0-1.4-1.4-2.2-2.5-1.5C14.4,9.6,14.3,10.3,14.3,11.1z M16,25.5c1,0,1.7-0.7,1.7-1.7 s-0.8-1.7-1.7-1.7c-0.9,0-1.7,0.7-1.7,1.7S15,25.5,16,25.5z"></path></svg>
+                            </div>
+                            <div class="op-error-picto op-picto-info op-visible">
+                                <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><path fill="#444444" d="M16,1.3C7.9,1.3,1.3,7.9,1.3,16S7.9,30.7,16,30.7S30.7,24.1,30.7,16S24.1,1.3,16,1.3z M14.6,7.6 C15,7.2,15.5,7,16,7c0.6,0,1,0.2,1.4,0.6S18,8.5,18,9c0,0.6-0.2,1-0.6,1.4S16.6,11,16,11s-1-0.2-1.4-0.6S14,9.6,14,9    S14.2,8,14.6,7.6z M19.1,24.9C19.1,25,19,25,19,25h-6c-0.1,0-0.1-0.1-0.1-0.1v-0.3c0-0.1,0.1-0.2,0.1-0.2l0.7-0.2   c0.1,0,0.2-0.1,0.2-0.2l0.3-1c0-0.1,0-0.2,0-0.3v-6.5c0-0.1,0-0.2,0-0.3c0,0-0.1-0.8-0.3-0.9S13,14.5,13,14.5   c-0.1,0-0.1-0.1-0.1-0.2V14c0-0.1,0.1-0.1,0.1-0.1h4.7c0.1,0,0.1,0.1,0.1,0.1v8.8c0,0.1,0,0.2,0,0.3c0,0,0.1,0.8,0.2,1  s0.8,0.3,0.8,0.3c0.1,0,0.1,0.1,0.1,0.2L19.1,24.9L19.1,24.9z"></path><path display="none" fill="#444444" d="M15.9,28.5c-3.7,0-7.5,0-11.2,0c-0.5,0-1.1-0.1-1.6-0.3C1.8,27.8,1,26.4,1.3,25 c0.1-0.7,0.3-1.3,0.7-2c3.5-6.2,7.1-12.3,10.7-18.5c0.6-1,1.3-1.8,2.5-2.1c1.6-0.4,3.1,0.3,4,1.9c0.8,1.4,1.6,2.8,2.4,4.2   c2.8,4.8,5.5,9.6,8.3,14.4c0.6,1,0.9,2,0.7,3.2c-0.2,1.3-1.2,2.1-2.4,2.3c-0.4,0.1-0.8,0.1-1.3,0.1C26.1,28.5,19.6,28.5,15.9,28.5z   M14.3,11.1c0.1,1.7,0.3,3.4,0.4,5c0.1,1.1,0.2,2.2,0.3,3.2c0.1,0.6,0.4,0.9,1,1c0.6,0,0.9-0.3,1-1c0-0.3,0.1-0.6,0.1-0.9   c0.1-1.5,0.3-3,0.4-4.5c0.1-1.1,0.2-2.2,0.2-3.3c0-1.4-1.4-2.2-2.5-1.5C14.4,9.6,14.3,10.3,14.3,11.1z M16,25.5c1,0,1.7-0.7,1.7-1.7 s-0.8-1.7-1.7-1.7c-0.9,0-1.7,0.7-1.7,1.7S15,25.5,16,25.5z"></path></svg>
+                            </div>
+                            <div class="op-error-title" id="titleError"></div>
+                            <div class="op-error-description" id="smallMessageError"></div>
+                            <div class="op-error-description-long" id="longMessageError"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="settings-container" class="module">
+                <div id="quick-settings">
+                    <div id="audio-container" class="quick-settings-item">Audio :
+                        <select name="audioCombo" id="audioCombo"></select>
+                    </div>
+                    <div id="subtitle-container" class="quick-settings-item">Sous-titres :
+                        <select name="subtitleCombo" id="subtitleCombo"></select>
+                    </div>
+                    <button id="settingsMenuButton" class="quick-settings-item">Paramètres avancés</button>
+                </div>
+                <div id="menu-container" class="hidden">
+                    <fieldset>
+                        <div class="settings-item">
+                            <label for="default_audio_language">Langue par défaut : </label>
+                            <select id="default_audio_language">
+                                <option value="fra" selected>Français</option>
+                                <option value="eng">Anglais</option>
+                                <option value="deu">Allemand</option>
+                            </select>
+                        </div>
+                        <div class="settings-item">
+                            <label for="default_subtitle_language">Sous-titres par défaut : </label>
+                            <select id="default_subtitle_language">
+                                <option value="subtitle_none">aucun</option>
+                                <option value="fre">Français</option>
+                                <option value="eng">Anglais</option>
+                                <option value="deu" selected>Allemand</option>
+                            </select>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="settings-item">
+                            <label for="enable-metrics-agent">Metrics agent</label><input type="checkbox" name="enable-metrics-agent" id="enable-metrics-agent" />
+                            <select id="metrics-agent-options" disabled></select>
+                        </div>
+                        <div class="settings-item">
+                            <label for="enable-optimized-zapping">Zapping optimisé</label><input type="checkbox" name="enable-optimized-zapping" id="enable-optimized-zapping" checked/>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div id="bitrate-graph-container" class="module hidden">
+                <div id="chartLegend"></div>
+                <canvas id="canvas" height="40px"></canvas>
+            </div>
+            <div id="protection-data-container" class="module hidden">
+            </div>
+        </div>
+    </body>
+</html>

@@ -2,15 +2,26 @@ module.exports = {
 
     info: {
         options: {
-            tasks: [
-                {name: 'build', info: 'Create built and minified versions of the player with some samples to try out.\n\n' +
-                                      '-protocol dash,mss,hls' + '\t\t' + 'Embed specified protocols. Dash is always included but specifying it alone will exclude other protocols.\n\n' +
-                                      '-no-protection'         + '\t\t' + 'Exclude protection module.\n\n'},
-                {name: 'doc', info: 'Generate API documentation.\n'},
-                {name: 'source', info: 'Replace the player source files in each samples by the ones in samples/playerSrc.html.\n'},
-                {name: 'test', info: 'Run a syntaxic test on each player source file and show errors/warnings.\n'},
-                {name: 'help', info: 'Well... you\'re running it ;)\n'}
-            ]
+            tasks: [{
+                name: 'build',
+                info: 'Create built and minified versions of the player with some samples to try out. Options:\n\n' +
+                    '-protocol dash,mss,hls     Embed specified protocols. Dash is always included but specifying it alone will exclude other protocols.\n\n' +
+                    '-protection                Include/exclude protection module.\n\n' +
+                    '-proxy                     Include/exclude OrangeHasPlayer proxy.\n\n' +
+                    '-analytics                 Include/exclude analytics.\n\n' +
+                    '-vowv                      Include/exclude source code for VO Widevine pssh generation.\n\n' +
+                    '-metricsAgent              Include/exclude MetricsAgent in hasplayer distribution.\n\n'
+            }, {
+                name: 'doc',
+                info: 'Generate API documentation.\n'
+            }, {
+                name: 'test',
+                info: 'Run a syntaxic test on each player source file and show errors/warnings.\n'
+            }, {
+                name: 'help',
+                info: 'Well... you\'re running it ;)\n'
+            }]
+
         }
     }
 
