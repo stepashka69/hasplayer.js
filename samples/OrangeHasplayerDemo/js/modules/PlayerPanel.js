@@ -199,7 +199,7 @@ PlayerPanel.prototype.onSliderVolumeChange = function() {
         this.isMute = false;
     }
 
-    setPlayerVolume(this.sliderVolume.value / 100);
+    setPlayerVolume(parseInt(this.sliderVolume.value, 10) / 100);
 };
 
 PlayerPanel.prototype.onVideoQualityClicked = function() {
@@ -293,34 +293,35 @@ PlayerPanel.prototype.setVolumeOff = function(value) {
 };
 
 PlayerPanel.prototype.onVolumeChange = function(volumeLevel) {
+    var sliderValue = parseInt(this.sliderVolume.value, 10);
     this.volumeLabel.innerHTML = Math.round(volumeLevel * 100);
-    if (this.sliderVolume.value === 0) {
+    if (sliderValue === 0) {
         this.sliderVolume.className = 'op-volume';
-    } else if (this.sliderVolume.value > 0 && this.sliderVolume.value <= 8) {
+    } else if (sliderValue > 0 && sliderValue <= 8) {
         this.sliderVolume.className = 'op-volume op-range8';
-    } else if (this.sliderVolume.value > 8 && this.sliderVolume.value <= 16) {
+    } else if (sliderValue > 8 && sliderValue <= 16) {
         this.sliderVolume.className = 'op-volume op-range16';
-    } else if (this.sliderVolume.value >= 16 && this.sliderVolume.value <= 24) {
+    } else if (sliderValue >= 16 && sliderValue <= 24) {
        this. sliderVolume.className = 'op-volume op-range24';
-    } else if (this.sliderVolume.value >= 24 && this.sliderVolume.value <= 32) {
+    } else if (sliderValue >= 24 && sliderValue <= 32) {
         this.sliderVolume.className = 'op-volume op-range32';
-    } else if (this.sliderVolume.value >= 32 && this.sliderVolume.value <= 40) {
+    } else if (sliderValue >= 32 && sliderValue <= 40) {
         this.sliderVolume.className = 'op-volume op-range40';
-    } else if (this.sliderVolume.value >= 40 && this.sliderVolume.value <= 48) {
+    } else if (sliderValue >= 40 && sliderValue <= 48) {
         this.sliderVolume.className = 'op-volume op-range48';
-    } else if (this.sliderVolume.value >= 48 && this.sliderVolume.value <= 56) {
+    } else if (sliderValue >= 48 && sliderValue <= 56) {
         this.sliderVolume.className = 'op-volume op-range56';
-    } else if (this.sliderVolume.value >= 56 && this.sliderVolume.value <= 64) {
+    } else if (sliderValue >= 56 && sliderValue <= 64) {
         this.sliderVolume.className = 'op-volume op-range64';
-    } else if (this.sliderVolume.value >= 64 && this.sliderVolume.value <= 72) {
+    } else if (sliderValue >= 64 && sliderValue <= 72) {
         this.sliderVolume.className = 'op-volume op-range72';
-    } else if (this.sliderVolume.value >= 72 && this.sliderVolume.value <= 80) {
+    } else if (sliderValue >= 72 && sliderValue <= 80) {
         this.sliderVolume.className = 'op-volume op-range80';
-    } else if (this.sliderVolume.value >= 80 && this.sliderVolume.value <= 88) {
+    } else if (sliderValue >= 80 && sliderValue <= 88) {
         this.sliderVolume.className = 'op-volume op-range88';
-    } else if (this.sliderVolume.value >= 88 && this.sliderVolume.value <= 96) {
+    } else if (sliderValue >= 88 && sliderValue <= 96) {
         this.sliderVolume.className = 'op-volume op-range96';
-    } else if (this.sliderVolume.value >= 96) {
+    } else if (sliderValue >= 96) {
         this.sliderVolume.className = 'op-volume op-range100';
     }
 };
