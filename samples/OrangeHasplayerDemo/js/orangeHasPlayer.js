@@ -80,9 +80,9 @@
     function onload() {
         //handle onload events to get audio, subtitles tracks, etc...
         //init audio tracks
-        handleAudioDatas(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
+        handleAudioData(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
         //init subtitle tracks
-        handleSubtitleDatas(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
+        handleSubtitleData(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
         //init duration value for VOD content
         handleDuration(orangeHasPlayer.getDuration());
         //init bitrates graph
@@ -148,7 +148,7 @@
      *
      *
      **********************************************************************************************************************/
-    function loadStream(streamInfos) {
+    function loadStream(streamInfos, optimizedZappingEnabled) {
         if (!optimizedZappingEnabled) {
             orangeHasPlayer.setInitialQualityFor('video', 0);
             orangeHasPlayer.setInitialQualityFor('audio', 0);
@@ -156,12 +156,12 @@
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
-    function changeAudio(index) {
-        orangeHasPlayer.setAudioTrack(audioTracks[index]);
+    function changeAudio(track) {
+        orangeHasPlayer.setAudioTrack(track);
     }
 
-    function changeSubtitle(index) {
-        orangeHasPlayer.setSubtitleTrack(subtitleTracks[index]);
+    function changeSubtitle(track) {
+        orangeHasPlayer.setSubtitleTrack(track);
     }
 
     function setPlayerMute() {

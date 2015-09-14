@@ -496,6 +496,22 @@ PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitle
     document.getElementById(subtitleTrack.id).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
 };
 
+PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
+    if (_audioTracks && _currenTrack) {
+        for (var i = 0; i < _audioTracks.length; i++) {
+            this.addLanguageLine(_audioTracks[i], _currenTrack);
+        }
+    }
+};
+
+PlayerPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
+    if (_subtitleTracks && _selectedSubtitleTrack) {
+        for (var i = 0; i < _subtitleTracks.length; i++) {
+            this.addSubtitleLine(_subtitleTracks[i], _selectedSubtitleTrack);
+        }
+    }
+};
+
 PlayerPanel.prototype.onLanguageRadioClicked = function(e) {
     minivents.emit('language-radio-clicked', e.target.value);
 };
