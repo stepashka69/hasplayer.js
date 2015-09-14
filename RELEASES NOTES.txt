@@ -1,4 +1,4 @@
-### Release Notes v1.2.1 (2015/09/11)
+### Release Notes v1.2.1 (2015/09/14)
 * New OrangeHasPlayer API for easier and more efficient integration into webapps
 * New OrangeHasPlayer demonstration webapp and API jsdoc
 * Enable keeping ABR bandwidth conditions when loading new stream
