@@ -83,6 +83,10 @@ Graph.prototype.init = function(ctx, bitrates) {
     }
 };
 
+Graph.prototype.setupEventListeners = function() {
+    minivents.on('video-ended', this.stop);
+};
+
 Graph.prototype.timeLabel = function(_elapsedTime) {
     var label = '';
 

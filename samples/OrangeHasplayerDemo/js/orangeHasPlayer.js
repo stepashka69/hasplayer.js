@@ -1,5 +1,6 @@
     var orangeHasPlayer = null,
         config = null,
+        video = null,
         configMetrics = {
             'name': 'Prisme (local)',
             'activationUrl': '',
@@ -23,6 +24,7 @@
      **********************************************************************************************************************/
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
+        video = document.getElementById('player');
         orangeHasPlayer.init(video);
         orangeHasPlayer.setInitialQualityFor('video', 0);
         orangeHasPlayer.setInitialQualityFor('audio', 0);
@@ -45,8 +47,6 @@
         orangeHasPlayer.addEventListener('play', onPlay);
         orangeHasPlayer.addEventListener('pause', onPause);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
-        video.addEventListener('waiting', onWaiting);
-        video.addEventListener('playing', onPlaying);
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -112,7 +112,6 @@
      */
     function onPlayBitrateChanged(e) {
         if (e.detail.type === 'video') {
-            hideLoadingElement();
             handlePlayBitrate(e.detail.bitrate, e.detail.time);
         }
     }
@@ -133,14 +132,6 @@
 
     function onPause() {
         handlePlayState(false);
-    }
-
-    function onWaiting() {
-        showLoadingElement();
-    }
-
-    function onPlaying() {
-        hideLoadingElement();
     }
 
     function onTimeUpdate() {
@@ -169,8 +160,8 @@
         orangeHasPlayer.setAudioTrack(audioTracks[index]);
     }
 
-    function changeSubtitle() {
-        orangeHasPlayer.setSubtitleTrack(subtitleTracks[subtitleList.selectedIndex]);
+    function changeSubtitle(index) {
+        orangeHasPlayer.setSubtitleTrack(subtitleTracks[index]);
     }
 
     function setPlayerMute() {

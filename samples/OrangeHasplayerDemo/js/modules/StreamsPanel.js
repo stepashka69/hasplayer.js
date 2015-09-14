@@ -12,6 +12,12 @@ var StreamsPanel = function() {
 StreamsPanel.prototype.init = function() {
     this.initStreamListFilter();
     this.loadStreamList();
+    this.setupEventListeners();
+};
+
+StreamsPanel.prototype.setupEventListeners = function() {
+    minivents.on('play-prev-stream', this.onPlayPreviousStream.bind(this));
+    minivents.on('play-next-stream', this.onPlayNextStream.bind(this));
 };
 
 StreamsPanel.prototype.initStreamTable = function() {
@@ -145,4 +151,16 @@ StreamsPanel.prototype.initStreamListFilter = function() {
     hlsFilter.addEventListener('click', function(e) { self.streamFilters.hls = this.checked; self.filterStreams(); });
     mssFilter.addEventListener('click', function(e) { self.streamFilters.mss = this.checked; self.filterStreams(); });
     dashFilter.addEventListener('click', function(e) { self.streamFilters.dash = this.checked; self.filterStreams(); });
+};
+
+StreamsPanel.prototype.onPlayPreviousStream = function() {
+    if (this.selectedStreamElement.previousSibling) {
+        this.selectedStreamElement.previousSibling.click();
+    }
+};
+
+StreamsPanel.prototype.onPlayNextStream = function() {
+    if (this.selectedStreamElement.nextSibling) {
+        this.selectedStreamElement.nextSibling.click();
+    }
 };
