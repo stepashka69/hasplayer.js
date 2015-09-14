@@ -1,4 +1,4 @@
-var Graph = function() {
+var GraphPanel = function() {
     this.container = null;
     this.legend = null;
     this.update = false;
@@ -36,7 +36,7 @@ var Graph = function() {
     };
 };
 
-Graph.prototype.init = function(ctx, bitrates) {
+GraphPanel.prototype.init = function(ctx, bitrates) {
     this.container = document.getElementById('bitrate-graph-container');
     this.container.className = 'module';
     var self = this;
@@ -83,11 +83,11 @@ Graph.prototype.init = function(ctx, bitrates) {
     }
 };
 
-Graph.prototype.setupEventListeners = function() {
+GraphPanel.prototype.setupEventListeners = function() {
     minivents.on('video-ended', this.stop);
 };
 
-Graph.prototype.timeLabel = function(_elapsedTime) {
+GraphPanel.prototype.timeLabel = function(_elapsedTime) {
     var label = '';
 
     _elapsedTime /= 1000;
@@ -100,7 +100,7 @@ Graph.prototype.timeLabel = function(_elapsedTime) {
     return label;
 };
 
-Graph.prototype.handleGraphUpdate = function() {
+GraphPanel.prototype.handleGraphUpdate = function() {
     if (window.hasBitratesGraph !== undefined && this.update) {
 
         if (window.hasBitratesGraph.datasets[0].points.length > this.steps) {
@@ -113,7 +113,7 @@ Graph.prototype.handleGraphUpdate = function() {
     }
 };
 
-Graph.prototype.initTimer = function() {
+GraphPanel.prototype.initTimer = function() {
     var self = this;
     if (this.timer === null) {
         this.timer = new LoopTimer(function() { self.handleGraphUpdate(); }, this.updateTimeInterval);
@@ -122,7 +122,7 @@ Graph.prototype.initTimer = function() {
     }
 };
 
-Graph.prototype.reset = function () {
+GraphPanel.prototype.reset = function () {
     this.lastDownloadedBitrate = null;
     this.lastPlayedBitrate = null;
     this.lastTimeLabel = -1;

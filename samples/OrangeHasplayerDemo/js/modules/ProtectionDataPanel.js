@@ -1,17 +1,17 @@
-var ProtectionDataViewer = function() {
+var ProtectionDataPanel = function() {
     this.protectionDataContainer = null;
 };
 
-ProtectionDataViewer.prototype.init = function(elt) {
+ProtectionDataPanel.prototype.init = function(elt) {
     this.protectionDataContainer = elt;
 };
 
-ProtectionDataViewer.prototype.clear = function() {
+ProtectionDataPanel.prototype.clear = function() {
     this.protectionDataContainer.innerHTML = '';
     this.protectionDataContainer.className = 'module hidden';
 };
 
-ProtectionDataViewer.prototype.displayDatum = function(protectionName, protectionDatum) {
+ProtectionDataPanel.prototype.displayDatum = function(protectionName, protectionDatum) {
     var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>';
 
     for (var p in protectionDatum) {
@@ -23,7 +23,7 @@ ProtectionDataViewer.prototype.displayDatum = function(protectionName, protectio
     return html;
 };
 
-ProtectionDataViewer.prototype.display = function(streamInfos) {
+ProtectionDataPanel.prototype.display = function(streamInfos) {
     this.protectionDataContainer.className = 'module';
 
     var html = '<table>';

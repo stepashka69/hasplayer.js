@@ -21,10 +21,10 @@ var // Quick settings
     menuContainer = null,
 
     // Modules
-    playerWrapper = null,
+    playerPanel = null,
     streamsPanel = null,
-    graph = null,
-    protectionDataViewer = null,
+    graphPanel = null,
+    protectionDataPanel = null,
 
     minivents = null;
 
@@ -32,15 +32,15 @@ var // Quick settings
 window.onload = function() {
     minivents = new Events();
 
-    playerWrapper = new PlayerPanel();
-    playerWrapper.init();
+    playerPanel = new PlayerPanel();
+    playerPanel.init();
 
     streamsPanel = new StreamsPanel();
     streamsPanel.init();
 
-    graph = new Graph();
-    protectionDataViewer = new ProtectionDataViewer();
-    protectionDataViewer.init(document.getElementById('protection-data-container'));
+    graphPanel = new GraphPanel();
+    protectionDataPanel = new ProtectionDataPanel();
+    protectionDataPanel.init(document.getElementById('protection-data-container'));
 
     initMetricsAgentOptions();
     getDOMElements();
@@ -106,10 +106,10 @@ var onStreamClicked = function(streamInfos) {
     loadStream(streamInfos);
 
     if (streamInfos.protData) {
-        protectionDataViewer.display(streamInfos.protData);
+        protectionDataPanel.display(streamInfos.protData);
     }
 
-    graph.initTimer();
+    graphPanel.initTimer();
 
     streamUrl.innerHTML = streamInfos.url;
 };
@@ -206,14 +206,14 @@ var handleAudioDatas = function(_audioTracks, _selectedAudioTrack) {
     audioTracks = _audioTracks;
     currentaudioTrack = _selectedAudioTrack;
 
-    playerWrapper.resetLanguageLines();
+    playerPanel.resetLanguageLines();
 
     if (audioTracks && currentaudioTrack) {
         addCombo(audioTracks, audioListCombobox);
         selectCombo(audioTracks, audioListCombobox, currentaudioTrack);
 
         for (var i = 0; i < audioTracks.length; i++) {
-            playerWrapper.addLanguageLine(audioTracks[i], currentaudioTrack);
+            playerPanel.addLanguageLine(audioTracks[i], currentaudioTrack);
         }
     }
 };
@@ -228,53 +228,53 @@ var handleSubtitleDatas = function(_subtitleTracks, _selectedSubtitleTrack) {
         selectCombo(subtitleTracks, subtitleListCombobox, currentsubtitleTrack);
 
         for (var i = 0; i < subtitleTracks.length; i++) {
-            playerWrapper.addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
+            playerPanel.addSubtitleLine(subtitleTracks[i], _selectedSubtitleTrack);
         }
     }
 };
 
 var handleSubtitleStyleChange = function(style) {
-    playerWrapper.setSubtitlesCSSStyle(style);
+    playerPanel.setSubtitlesCSSStyle(style);
 };
 
 var handlePlayState = function(state) {
-    playerWrapper.setPlaying(state);
+    playerPanel.setPlaying(state);
     if (state === true) {
-        playerWrapper.hideLoadingElement();
-        graph.timer.start();
+        playerPanel.hideLoadingElement();
+        graphPanel.timer.start();
     } else {
-        graph.timer.pause();
+        graphPanel.timer.pause();
     }
 };
 
 var handleVolumeChange = function(volumeLevel) {
-    playerWrapper.onVolumeChange(volumeLevel);
+    playerPanel.onVolumeChange(volumeLevel);
 };
 
 var handleDuration = function(duration) {
-   playerWrapper.setDuration(duration);
+   playerPanel.setDuration(duration);
 };
 
 var handleTimeUpdate = function(time) {
-    playerWrapper.setPlayingTime(time);
+    playerPanel.setPlayingTime(time);
 };
 
 var handleDownloadedBitrate = function(bitrate, time) {
-    graph.lastDownloadedBitrate = bitrate;
+    graphPanel.lastDownloadedBitrate = bitrate;
 };
 
 var handlePlayBitrate = function(bitrate, time) {
-    graph.lastPlayedBitrate = bitrate;
-    playerWrapper.setCurrentBitrate(bitrate);
+    graphPanel.lastPlayedBitrate = bitrate;
+    playerPanel.setCurrentBitrate(bitrate);
 };
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById('canvas').getContext('2d');
-    graph.init(ctx, bitrates);
+    graphPanel.init(ctx, bitrates);
 };
 
 var handleError = function(e) {
-    playerWrapper.displayError(e.event.code, e.event.message);
+    playerPanel.displayError(e.event.code, e.event.message);
 };
 
 /**********************************************************************************************************************/
@@ -324,12 +324,12 @@ var reset = function() {
     resetCombo(audioTracks, audioListCombobox);
     resetCombo(subtitleTracks, subtitleListCombobox);
 
-    protectionDataViewer.clear();
+    protectionDataPanel.clear();
 
-    playerWrapper.reset();
+    playerPanel.reset();
 
     currentaudioTrack = null;
     currentsubtitleTrack = null;
 
-    graph.reset();
+    graphPanel.reset();
 };
