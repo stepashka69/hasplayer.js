@@ -71,12 +71,12 @@ SettingsPanel.prototype.initMetricsAgentOptions = function() {
 };
 
 SettingsPanel.prototype.audioChanged = function(e) {
-    changeAudio(e.target.selectedIndex);
+    changeAudio(this.audioTracks[e.target.selectedIndex]);
     document.getElementById(this.audioTracks[e.target.selectedIndex].id).checked = true;
 };
 
 SettingsPanel.prototype.subtitleChanged = function(e) {
-    changeSubtitle(e.target.selectedIndex);
+    changeSubtitle(this.subtitleTracks[e.target.selectedIndex]);
     document.getElementById(this.subtitleTracks[e.target.selectedIndex].id).checked = true;
 };
 
