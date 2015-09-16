@@ -532,7 +532,7 @@ PlayerPanel.prototype.resetLanguageLines = function() {
 
     if (languageLines !== null) {
         while(languageLines.length > 0) {
-            languageLines[0].removeEventListener('click');
+            languageLines[0].removeEventListener('click', this.onLanguageRadioClicked.bind(this));
             languageLines[0].parentNode.removeChild(languageLines[0]);
         }
     }

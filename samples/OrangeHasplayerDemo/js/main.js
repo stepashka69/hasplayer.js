@@ -29,10 +29,17 @@ window.onload = function() {
 
     getDOMElements();
     createHasPlayer();
+
+    displayVersion();
 };
 
 var getDOMElements = function() {
     streamUrl = document.querySelector('.stream-url');
+};
+
+var displayVersion = function() {
+    var title = document.getElementById('app-title');
+    title.innerHTML += ' ' + orangeHasPlayer.getVersionFull();
 };
 
 /********************************************************************************************************************
