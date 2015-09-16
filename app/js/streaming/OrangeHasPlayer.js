@@ -392,6 +392,10 @@ OrangeHasPlayer = function() {
         if (!this.isLive()) {
             video.currentTime = 0;
         }
+        
+        if (metricsAgent.ref) {
+            metricsAgent.ref.stop();
+        }
     };
 
     /**
