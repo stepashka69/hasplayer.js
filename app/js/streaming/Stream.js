@@ -801,6 +801,9 @@ MediaPlayer.dependencies.Stream = function() {
                 if (audioRange.end < startTime) {
                     return;
                 }
+                if (audioRange.start > startTime) {
+                    startTime = audioRange.start;
+                }
             }
 
             self.debug.info("[Stream] Check start time: OK");
