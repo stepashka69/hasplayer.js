@@ -100,10 +100,10 @@ OrangeHasPlayer = function() {
         }
     };
 
-    var _metricChanged = function(e) {
+    var _metricAdded = function(e) {
+        if (e.data.metric === "HttpRequest") {
         var metricsExt,
             repSwitch,
-            httpRequests,
             httpRequest,
             metrics;
 
@@ -113,12 +113,10 @@ OrangeHasPlayer = function() {
         metrics = mediaPlayer.getMetricsFor(e.data.stream);
         if (metrics && metricsExt) {
             repSwitch = metricsExt.getCurrentRepresentationSwitch(metrics);
-            httpRequests = metricsExt.getHttpRequests(metrics);
-            httpRequest = (httpRequests.length > 0) ? httpRequests[httpRequests.length - 1] : null;
+                httpRequest = e.data.value;
             
             if (e.data.stream == "video") {
                 videoBitrates = metricsExt.getBitratesForType(e.data.stream);
-
                 // case of downloaded quality change
                 if ((httpRequest !== null && videoBitrates !== null) && (videoBitrates[httpRequest.quality] != videoDownloadedBdthValue) && (repSwitch !== null)) {
                     videoDownloadedBdthValue = videoBitrates[httpRequest.quality];
@@ -152,6 +150,7 @@ OrangeHasPlayer = function() {
                 }
             }
         }
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +178,7 @@ OrangeHasPlayer = function() {
         state = 'PLAYER_CREATED';
 
         this.addEventListener("loadeddata", _onloaded.bind(this));
-        mediaPlayer.addEventListener("metricChanged", _metricChanged);
+        mediaPlayer.addEventListener("metricAdded", _metricAdded);
         video.addEventListener("timeupdate", _onUpdate);
     };
 
