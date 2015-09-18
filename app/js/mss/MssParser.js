@@ -456,6 +456,7 @@ Mss.dependencies.MssParser = function () {
 
             // Get KID (in CENC format) from protection header
             KID = getKIDFromProtectionHeader(manifest.Protection.ProtectionHeader);
+            this.debug.log("[MssParser] KID = " + MediaPlayer.utils.arrayToHexString(KID));
 
             // Create ContentProtection for PR
             contentProtection = createPRContentProtection.call(this, manifest.Protection.ProtectionHeader);
@@ -475,11 +476,11 @@ Mss.dependencies.MssParser = function () {
             /* @endif */
 
             /* @if VOWV=true */
-            if (navigator.userAgent.indexOf("Chrome") >= 0) {
+            /*if (navigator.userAgent.indexOf("Chrome") >= 0) {
                 contentProtections[contentProtections.length - 1].pssh = {
                     __text : Mss.dependencies.createVOWidevinePssh(getKIDFromProtectionHeader(manifest.Protection.ProtectionHeader), this.debug)
                 };
-            }
+            }*/
             /* @endif */
 
 
