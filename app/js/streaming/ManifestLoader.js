@@ -80,7 +80,11 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                         self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
                         deferred.resolve(manifest);
                     },
-                    function () {
+                    function (error) {
+                        self.debug.error("[ManifestLoader] Manifest parsing error.");
+                        var data = {};
+                        data.mpdUrl = url;
+                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : "+error, data);
                         deferred.reject(request);
                     }
                 );
@@ -111,8 +115,14 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                         doLoad.call(self, url, remainingAttempts);
                     }, RETRY_INTERVAL);
                 } else {
-                    self.debug.log("Failed loading manifest: " + url + " no retry attempts left");
-                    self.errHandler.downloadError("manifest", url, request);
+                    var data = {},
+                        msgError = "Failed loading manifest: " + url + " no retry attempts left";
+
+                    self.debug.log(msgError);
+                    
+                    data.url = url;
+                    data.request = request;
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, msgError, data);
                     deferred.reject(request);
                 }
             };

@@ -21,6 +21,8 @@
 
     var streams = [],
         activeStream,
+        protectionController,
+        ownProtectionController = false,
         //TODO set correct value for threshold
         STREAM_BUFFER_END_THRESHOLD = 6,
         STREAM_END_THRESHOLD = 0.2,
@@ -35,6 +37,8 @@
         audioTracks,
         subtitleTracks,
         protectionData,
+        defaultAudioLang = 'und',
+        defaultSubtitleLang = 'und',
 
         play = function () {
             activeStream.play();
@@ -287,6 +291,25 @@
                 return Q.when(false);
             }
 
+
+            if (self.capabilities.supportsEncryptedMedia()) {
+                if (!protectionController) {
+                    protectionController = self.system.getObject("protectionController");
+                    /*self.eventBus.dispatchEvent({
+                        type: MediaPlayer.events.PROTECTION_CREATED,
+                        data: {
+                            controller: protectionController,
+                            manifest: manifest
+                        }
+                    });*/
+                    ownProtectionController = true;
+                }
+                protectionController.setMediaElement(self.videoModel.getElement());
+                if (protectionData) {
+                    protectionController.setProtectionData(protectionData);
+                }
+            }
+
             self.manifestExt.getMpd(manifest).then(
                 function(mpd) {
                     if (activeStream) {
@@ -320,8 +343,10 @@
                                 if (!stream) {
                                     stream = self.system.getObject("stream");
                                     stream.setVideoModel(pIdx === 0 ? self.videoModel : createVideoModel.call(self));
-                                    stream.initProtection(self.protectionData);
+                                    stream.initProtection(protectionController);
                                     stream.setAutoPlay(autoPlay);
+                                    stream.setDefaultAudioLang(defaultAudioLang);
+                                    stream.setDefaultSubtitleLang(defaultSubtitleLang);
                                     stream.load(manifest, period);
                                     streams.push(stream);
                                 }
@@ -384,7 +409,7 @@
                     self.system.notify("streamsComposed");
                 },
                 function(errMsg) {
-                    self.errHandler.manifestError(errMsg, "nostreamscomposed", self.manifestModel.getValue());
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, errMsg, self.manifestModel.getValue());
                     self.reset();
                 }
             );
@@ -409,6 +434,9 @@
         metricsExt: undefined,
         videoExt: undefined,
         errHandler: undefined,
+        notify: undefined,
+        subscribe: undefined,
+        unsubscribe: undefined,
         // ORANGE: set updateTime date
         startTime : undefined,
         startPlayingTime : undefined,
@@ -451,6 +479,15 @@
             return audioTracks;
         },
 
+        getSelectedAudioTrack: function() {
+
+            if (activeStream) {
+                return activeStream.getSelectedAudioTrack();
+            }
+
+            return undefined;
+        },
+
         // ORANGE: audioTrack Management
         setAudioTrack:function(audioTrack){
             if(activeStream){
@@ -469,13 +506,22 @@
             }
         },
         
+        getSelectedSubtitleTrack: function() {
+            
+            if(activeStream){
+                return activeStream.getSelectedSubtitleTrack();
+            }
+
+            return undefined;
+        },
+        
         // ORANGE: add source stream parameters
         load: function (url, protData) {
             var self = this;
 
             self.currentURL = url;
             if (protData) {
-                self.protectionData = protData;
+                protectionData = protData;
             }
 
             self.debug.info("[StreamController] load url: " + url);
@@ -490,7 +536,7 @@
                     self.manifestUpdater.start();
                 },
                 function () {
-                    self.reset();
+                    self.debug.error("[StreamController] Manifest loading error.");
                 }
             );
         },
@@ -510,6 +556,7 @@
                 if (stream !== activeStream) {
                     removeVideoElement(stream.getVideoModel().getElement());
                 }
+                delete streams[i];
             }
 
             streams = [];
@@ -519,6 +566,46 @@
             isPeriodSwitchingInProgress = false;
             activeStream = null;
             protectionData = null;
+
+            // Teardown the protection system, if necessary
+            if (!protectionController) {
+                this.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+            }
+            else if (ownProtectionController) {
+                var teardownComplete = {},
+                        self = this;
+                teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE] = function () {
+
+                    // Complete teardown process
+                    ownProtectionController = false;
+                    protectionController = null;
+                    protectionData = null;
+
+                    /*if (manifestUrl) {
+                        self.eventBus.dispatchEvent({
+                            type: MediaPlayer.events.PROTECTION_DESTROYED,
+                            data: manifestUrl
+                        });
+                    }*/
+
+                    self.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+                };
+                protectionController.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE, teardownComplete, undefined, true);
+                protectionController.teardown();
+            } else {
+                protectionController.setMediaElement(null);
+                protectionController = null;
+                protectionData = null;
+                this.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+            }
+        },
+
+        setDefaultAudioLang: function(language) {
+            defaultAudioLang = language;
+        },
+
+        setDefaultSubtitleLang: function(language) {
+            defaultSubtitleLang = language;
         },
 
         play: play,
@@ -529,4 +616,9 @@
 
 MediaPlayer.dependencies.StreamController.prototype = {
     constructor: MediaPlayer.dependencies.StreamController
+};
+
+MediaPlayer.dependencies.StreamController.eventList = {
+    ENAME_STREAMS_COMPOSED: "streamsComposed",
+    ENAME_TEARDOWN_COMPLETE: "streamTeardownComplete"
 };

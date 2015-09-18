@@ -18,6 +18,7 @@ MediaPlayer.di.Context = function () {
         var videoElement = document.createElement("video"),
             debug = this.system.getObject("debug");
 
+        /* @if PROTECTION=true */
         // Detect EME APIs.  Look for newest API versions first
         if (MediaPlayer.models.ProtectionModel_21Jan2015.detect(videoElement)) {
             this.system.mapClass('protectionModel', MediaPlayer.models.ProtectionModel_21Jan2015);
@@ -32,6 +33,7 @@ MediaPlayer.di.Context = function () {
             debug.log("No supported version of EME detected on this user agent!");
             debug.log("Attempts to play encrypted content will fail!");
         }
+        /* @endif */
     };
 
     return {
@@ -53,9 +55,15 @@ MediaPlayer.di.Context = function () {
             this.system.mapSingleton('uriQueryFragModel', MediaPlayer.models.URIQueryAndFragmentModel);
             //this.system.mapClass('protectionModel', MediaPlayer.models.ProtectionModel);
 
+            /* @if PROTECTION=true */
             this.system.mapSingleton('ksPlayReady', MediaPlayer.dependencies.protection.KeySystem_PlayReady);
             this.system.mapSingleton('ksWidevine', MediaPlayer.dependencies.protection.KeySystem_Widevine);
             this.system.mapSingleton('ksClearKey', MediaPlayer.dependencies.protection.KeySystem_ClearKey);
+            this.system.mapSingleton('serverPlayReady', MediaPlayer.dependencies.protection.servers.PlayReady);
+            this.system.mapSingleton('serverWidevine', MediaPlayer.dependencies.protection.servers.Widevine);
+            this.system.mapSingleton('serverClearKey', MediaPlayer.dependencies.protection.servers.ClearKey);
+            this.system.mapSingleton('serverDRMToday', MediaPlayer.dependencies.protection.servers.DRMToday);
+            /* @endif */
 
             this.system.mapSingleton('textSourceBuffer', MediaPlayer.dependencies.TextSourceBuffer);
             this.system.mapSingleton('textTTMLXMLMP4SourceBuffer', MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer);
@@ -64,9 +72,11 @@ MediaPlayer.di.Context = function () {
             this.system.mapSingleton('bufferExt', MediaPlayer.dependencies.BufferExtensions);
             this.system.mapSingleton('abrController', MediaPlayer.dependencies.AbrController);
             this.system.mapSingleton('errHandler', MediaPlayer.dependencies.ErrorHandler);
-            this.system.mapSingleton('protectionExt', MediaPlayer.dependencies.ProtectionExtensions);
             this.system.mapSingleton('videoExt', MediaPlayer.dependencies.VideoModelExtensions);
+            /* @if PROTECTION=true */
+            this.system.mapSingleton('protectionExt', MediaPlayer.dependencies.ProtectionExtensions);
             this.system.mapClass('protectionController', MediaPlayer.dependencies.ProtectionController);
+            /* @endif */
 
             mapProtectionModel.call(this); // Determines EME API support and version
 
@@ -91,6 +101,39 @@ MediaPlayer.di.Context = function () {
             this.system.mapClass('schedulerModel', MediaPlayer.dependencies.SchedulerModel);
 
             this.system.mapSingleton('notifier', MediaPlayer.dependencies.Notifier);
+
+            this.system.mapClass('indexHandler', Dash.dependencies.DashHandler);
+            this.system.mapClass('baseURLExt', Dash.dependencies.BaseURLExtensions);
+            this.system.mapClass('fragmentExt', Dash.dependencies.FragmentExtensions);
+            this.system.mapSingleton('manifestExt', Dash.dependencies.DashManifestExtensions);
+            //this.system.mapSingleton('metricsExt', Dash.dependencies.DashMetricsExtensions);
+            this.system.mapSingleton('timelineConverter', Dash.dependencies.TimelineConverter);
+
+            this.system.mapClass('parser', MediaPlayer.dependencies.Parser);
+
+            // Then, our parser will choose which parser call between Dash, Mss and Hls. To do that, it need references
+            this.system.mapClass('dashParser', Dash.dependencies.DashParser);
+            // @if MSS=true
+            this.system.mapClass('mssParser', Mss.dependencies.MssParser);
+            // @endif
+            // @if HLS=true
+            this.system.mapClass('hlsParser', Hls.dependencies.HlsParser);
+            this.system.mapClass('hlsDemux', Hls.dependencies.HlsDemux);
+            // @endif
+
+            // creation of a context manager to plug some specific parts of the code
+            this.system.mapSingleton('contextManager', MediaPlayer.modules.ContextManager);
+
+            // here replace dash or streaming modules by ours
+            this.system.mapSingleton('metricsExt', MediaPlayer.dependencies.MetricsExtensions);
+            this.system.mapSingleton('config', MediaPlayer.utils.Config);
+
+            // overload ABR rules
+            this.system.mapClass('downloadRatioRule', MediaPlayer.rules.o.DownloadRatioRule);
+            this.system.mapClass('insufficientBufferRule', MediaPlayer.rules.o.InsufficientBufferRule);
+
+            // plug message handler. When the message is notify, the contextManager is called
+            this.system.mapHandler('setContext', 'contextManager', 'setContext');
         }
     };
 };

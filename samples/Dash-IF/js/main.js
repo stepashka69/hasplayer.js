@@ -155,7 +155,7 @@ app.directive('chart', function() {
         link: function (scope, elem, attrs) {
             var chartBuffer = null,
             optionsBuffer = {series: {shadowSize: 0},yaxis: {min: 0},xaxis: {show: false}};
-            
+
 
             // If the data changes somehow, update it in the chart
             scope.$watch('bufferData', function(v) {
@@ -241,10 +241,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         previousPlayedQuality = 0,
         previousDownloadedQuality= 0,
         maxGraphPoints = 50,
-        initAudioTracks = true,
-        initTextTracks = true,
         metricsAgent = null,
-        configMetrics = null;
+        configMetrics = null,
+        subtitlesCSSStyle = null;
 
     $scope.chromecast = {};
     $scope.chromecast.apiOk = false;
@@ -454,8 +453,37 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 
+    function onload(e){
+        //init audio tracks
+        $scope.audioTracks = player.getAudioTracks();
+        $scope.audioData = $scope.audioTracks[0];
+        //init subtitles tracks
+        $scope.textTracks = player.getSubtitleTracks();
+        $scope.textData = $scope.textTracks[0];
+    }
+
+    //if video size change, player has to update subtitles size
+    function onFullScreenChange(){
+        setSubtitlesCSSStyle(subtitlesCSSStyle);
+    }
+
+
+    function setSubtitlesCSSStyle(style){
+        if(style){
+            var fontSize = style.data.fontSize;
+
+            if (style.data.fontSize[style.data.fontSize.length-1] ==='%') {
+                fontSize  = (video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length-1))/100;
+            }
+
+            document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+fontSize+'px;font-family: '+style.data.fontFamily+'}';
+        }
+    }
+
+
     function onSubtitlesStyleChanged(style) {
-        document.getElementById("cueStyle").innerHTML = '::cue{ background-color:'+style.data.backgroundColor+';color:'+style.data.color+';font-size: '+style.data.fontSize+';font-family: '+style.data.fontFamily+'}';
+        subtitlesCSSStyle = style;
+        setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
     function metricChanged(e) {
@@ -487,7 +515,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
                 if ($('#sliderBitrate').labeledslider( "option", "max" ) === 0) {
                     var labels = [];
-                    for (var i = 0; i < metrics.bitrateValues.length; i++) {
+                    for (var i = 0; metrics.bitrateValues!= null && i < metrics.bitrateValues.length; i++) {
                         labels.push(Math.round(metrics.bitrateValues[i] / 1000) + "k");
                     }
 
@@ -503,7 +531,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 }
 
                 // case of downloaded quality change
-                if ((metrics.httpRequest !== null)  && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality)) {
+                if ((metrics.httpRequest !== null)  && (metrics.bitrateValues!== null && (metrics.bitrateValues[metrics.httpRequest.quality] != previousDownloadedQuality))) {
                 // save quality change for later when video currentTime = mediaStartTime
                 qualityChangements.push({
                     mediaStartTime : metrics.httpRequest.startTime,
@@ -512,7 +540,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 });
                 previousDownloadedQuality = metrics.bitrateValues[metrics.httpRequest.quality];
             }
-            
+
             for (var p in qualityChangements) {
                 var currentQualityChangement = qualityChangements[p];
                 //time of downloaded quality change
@@ -531,7 +559,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
             dlSeries.push(dlPoint);
             var playPoint = [video.currentTime, Math.round(previousPlayedQuality / 1000)];
             playSeries.push(playPoint);
-            
+
             videoSeries.push([parseFloat(video.currentTime), Math.round(parseFloat(metrics.bufferLengthValue))]);
 
             if (videoSeries.length > maxGraphPoints) {
@@ -563,12 +591,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         metrics = getCribbedMetricsFor("audio");
         if (metrics) {
 
-            if (initAudioTracks) {
-                $scope.audioTracks = player.getAudioTracks();
-                $scope.audioData = $scope.audioTracks[0];
-                initAudioTracks = false;
-            }
-
             $scope.audioBitrate = metrics.bandwidthValue;
             $scope.audioIndex = metrics.bitrateIndexValue;
             $scope.audioPendingIndex = metrics.pendingIndex;
@@ -597,14 +619,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 
-    if (e.data.stream == "text") {
-        if (initTextTracks) {
-            $scope.textTracks = player.getSubtitleTracks();
-            $scope.textData = $scope.textTracks[0];
-            initTextTracks = false;
-        }
-    }
-
     $scope.invalidateDisplay(true);
     $scope.safeApply();
 }
@@ -616,7 +630,37 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     ////////////////////////////////////////
 
     function onError(e) {
-        console.error(e);
+        console.error("an error has occured with error code = "+e.event.code);
+
+        switch (e.event.code) {
+            case "DOWNLOAD_ERR_MANIFEST" :
+            case "DOWNLOAD_ERR_SIDX" :
+            case "DOWNLOAD_ERR_CONTENT" :
+            case "DOWNLOAD_ERR_INIT" :
+                 console.error(" url :\""+e.event.data.url+"\" and request response :\""+ e.event.data.request.responseXML+"\"");
+                 break;
+            case "MANIFEST_ERR_CODEC" :
+            case "MANIFEST_ERR_PARSE" :
+            case "MANIFEST_ERR_NOSTREAM" :
+                 console.error("Manifest URL was "+e.event.data.mpdUrl+" with message :\""+e.event.message+"\"");
+                 break;
+            case "CC_ERR_PARSE" :
+                 console.error("message :\""+e.event.message+"\" for content = "+e.event.data);
+                 break;
+            default :
+                 if (e.event.message) {
+                    console.error("message :\""+e.event.message+"\"");
+                 }
+                 break;
+        };
+
+        if (e.event.code != "HASPLAYER_INIT_ERROR") {
+            //stop
+            player.reset(2);
+            if (metricsAgent) {
+                metricsAgent.stop();
+            }
+        }
     }
 
     ////////////////////////////////////////
@@ -695,18 +739,25 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     ////////////////////////////////////////
 
     video = document.querySelector(".dash-video-player video");
-    context = new Custom.di.CustomContext();
+    context = new MediaPlayer.di.Context();
     player = new MediaPlayer(context);
-    
+
     $scope.version = player.getVersion();
     $scope.versionHAS = player.getVersionHAS();
     $scope.versionFull = player.getVersionFull();
     $scope.buildDate = player.getBuildDate();
 
+    $scope.laURL = "";
+    $scope.customData = "";
+
     player.startup();
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
+    video.addEventListener("loadeddata", onload.bind(this));
+    video.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
+    video.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
+    video.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
     player.attachView(video);
     player.setAutoPlay(true);
     player.getDebug().setLevel(4);
@@ -715,7 +766,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     }
     $scope.player = player;
     $scope.videojsIsOn = false;
-    
+
     $scope.activateVideoJS = function() {
         if(!$scope.videojsIsOn) {
             videojs(video, { "controls": true, "autoplay": true, "preload": "auto" });
@@ -802,12 +853,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 metricsAgent.init(function (activated) {
                     $scope.metricsAgentActive = activated;
                     console.log("Metrics agent state: ", activated);
-                    $scope.$apply();
+                    setTimeout(function (){
+                        $scope.$apply();
+                    }, 500);
                     if (activated === false) {
                         alert("Metrics agent not available!");
                     }
                 });
-            } else {
+            } else if (metricsAgent) {
                 metricsAgent.stop();
             }
         }
@@ -974,6 +1027,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     $scope.setStream = function (item) {
         $scope.selectedItem = item;
+        $scope.laURL = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].laURL : "";
+        $scope.customData = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].customData : "";
     };
 
     function resetBitratesSlider () {
@@ -995,15 +1050,26 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         });
     }
     function initPlayer() {
-        initAudioTracks = initTextTracks = true;
-        
+
         function DRMParams() {
             this.backUrl = null;
             this.customData = null;
         }
-        
+
+        // Update PR protection data
+        if (($scope.laURL.length > 0) || (($scope.customData.length > 0))) {
+            if (!$scope.selectedItem.protData) {
+                $scope.selectedItem.protData = {};
+            }
+            if (!$scope.selectedItem.protData['com.widevine.alpha']) {
+                $scope.selectedItem.protData['com.widevine.alpha'] = {};
+            }
+            $scope.selectedItem.protData['com.widevine.alpha'].laURL = $scope.laURL;
+            $scope.selectedItem.protData['com.widevine.alpha'].customData = $scope.customData;
+        }
+
         resetBitratesSlider();
-        
+
         //ORANGE : reset subtitles data.
         $scope.textTracks = null;
         $scope.textData = null;
@@ -1020,6 +1086,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         if ($scope.chromecast.playing){
             $scope.stopInChromecast();
         }
+        
+        player.reset(0);
 
         if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
             metricsAgent.createSession();
@@ -1030,7 +1098,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     $scope.loadInPlayer = function(url) {
         var demoPlayer;
-        
+
         if(window.jsonData === undefined) {
             demoPlayer = '../DemoPlayer/index.html?url=';
         } else {
@@ -1070,6 +1138,3 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 }]);
-
-
-
