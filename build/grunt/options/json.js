@@ -16,6 +16,20 @@ module.exports = {
             '<%= appDashif %>/json/showcase_libraries.json'
         ],
         dest: '<%= path %>/json.js'
+    },
+
+    orangeHasplayer: {
+        options: {
+            namespace: 'jsonData',
+            includePath: false,
+            processName: function(filename) {
+                return filename.toLowerCase();
+            }
+        },
+        src: [
+            '<%= orangeHasPlayer %>/json/sources.json'
+        ],
+        dest: '<%= path %>/json.js'
     }
-  
+
 };

@@ -11,6 +11,12 @@ module.exports = {
         ]
     },
 
+    orangeHasPlayer: {
+        src: [
+             '<%= orangeHasPlayer %>/index.html'
+        ]
+    },
+
     options: {
         dest: '<%= path %>'
     }

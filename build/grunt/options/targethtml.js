@@ -10,5 +10,11 @@ module.exports = {
 		files: {
 			'<%= path %>/index.html': '<%= path %>/index.html'
 		}
+	},
+
+	orangeHasplayer: {
+		files: {
+			'<%= path %>/orangeHasplayer.html': '<%= path %>/orangeHasplayer.html'
+		}
 	}
 };
