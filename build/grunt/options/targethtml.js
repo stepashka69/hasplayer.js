@@ -1,10 +1,20 @@
 module.exports = {
 
-	build: {
+	hasplayer: {
 		files: {
-			'<%= path %>/index.html': '<%= path %>/index.html',
 			'<%= path %>/source/playerSrc.html': '<%= path %>/source/playerSrc.html'
 		}
+	},
+
+    dashif: {
+		files: {
+			'<%= path %>/index.html': '<%= path %>/index.html'
+		}
+	},
+
+	orangeHasplayer: {
+		files: {
+			'<%= path %>/orangeHasplayer.html': '<%= path %>/orangeHasplayer.html'
+		}
 	}
-    
 };
