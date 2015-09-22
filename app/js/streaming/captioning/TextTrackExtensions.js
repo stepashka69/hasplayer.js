@@ -30,7 +30,8 @@ MediaPlayer.utils.TextTrackExtensions = function () {
         },
 
         addTextTrack: function(video, captionData,  label, scrlang, isDefaultTrack) {
-            var track = null;
+            var track = null,
+                i;
 
             //no function removeTextTrack is defined
             //add one, only if it's necessary
@@ -48,8 +49,8 @@ MediaPlayer.utils.TextTrackExtensions = function () {
             track.default = isDefaultTrack;
             track.mode = "showing";
 
-            for(var item in captionData) {
-                var currentItem = captionData[item];
+            for(i = 0; i < captionData.length; i++) {
+                var currentItem = captionData[i];
                 track.addCue(new Cue(currentItem.start, currentItem.end, currentItem.data));
             }
 
