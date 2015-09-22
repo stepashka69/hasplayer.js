@@ -66,18 +66,18 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
     };
     
     var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
+    var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
+    var CHANNEL_IDS = [192, 118, 119];
+    var CHANNEL_NAMES = ['TF1', 'M6', 'W9'];
 
-    var CHANNEL_IDS = [192, 118];
-
-
-    var formatData = function(response,channelId){
+    var formatData = function(response, channelId, channelName) {
         if (!Array.prototype.find) {
           Array.prototype.find = function(predicate) {
             if (this === null) {
-              throw new TypeError('Array.prototype.find a été appelé sur null ou undefined');
+                throw new TypeError('Array.prototype.find a été appelé sur null ou undefined');
             }
             if (typeof predicate !== 'function') {
-              throw new TypeError('predicate doit être une fonction');
+                throw new TypeError('predicate doit être une fonction');
             }
             var list = Object(this);
             var length = list.length >>> 0;
@@ -85,19 +85,19 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
             var value;
 
             for (var i = 0; i < length; i++) {
-              value = list[i];
-              if (predicate.call(thisArg, value, i, list)) {
-                return value;
-              }
+                value = list[i];
+                if (predicate.call(thisArg, value, i, list)) {
+                    return value;
+                }
             }
             return undefined;
           };
         }
 
         var formattedSource = {
-            'type':'MSS',
-            'name':'Widevine TVM live-int '+channelId,
-            'url':response.url,
+            'type': 'MSS',
+            'name': 'Widevine TVM live-int ' + channelId + ' (' + channelName + ')',
+            'url': response.url,
             'browsers': 'cdsbi',
             'protData' : {
                 'com.widevine.alpha':{
@@ -115,21 +115,19 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
         return formattedSource;
     };
 
-    var getSource = function(channelId){
-
+    var getSource = function(channelId, channelName) {
         var url = {
-            method:"GET",
-            url:TVM_SERVER+'channels/'+channelId+"/url",
+            method: "GET",
+            url: TVM_SERVER + 'channels/' + channelId + "/url",
             headers: TVM_HEADERS
         };
-        return $http(url).then(function(response){
-            if(response.data && response.data.response){
-
-                return formatData(response.data.response, channelId);
-            }else{
+        return $http(url).then(function(response) {
+            if(response.data && response.data.response) {
+                return formatData(response.data.response, channelId, channelName);
+            } else {
                 return null;
             }
-        },function(err){
+        }, function(err) {
             return null;
         });
     };
@@ -137,9 +135,9 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
 
 
     var getSources = function(){
-        var promises= [];
-        for(var i=0; i<CHANNEL_IDS.length;i++){
-            promises.push(getSource(CHANNEL_IDS[i]));
+        var promises = [];
+        for(var i = 0; i < CHANNEL_IDS.length; i++) {
+            promises.push(getSource(CHANNEL_IDS[i], CHANNEL_NAMES[i]));
         }
         return $q.all(promises);
     };
