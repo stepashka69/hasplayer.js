@@ -13,7 +13,7 @@ define({
             }
         }
         M = M[2] ? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
-        if ((tem= ua.match(/version\/(\d+)/i))!== null) M.splice(1, 1, tem[1]);
+        if ((tem = ua.match(/version\/(\d+)/i)) !== null) M.splice(1, 1, tem[1]);
         return M.join(' ');
     }
 });

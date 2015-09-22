@@ -12,26 +12,26 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function() {
-            return document.querySelector("video").currentTime;
+            return document.querySelector('video').currentTime;
         };
 
         var tests = function(stream, startTime) {
 
-            var url = config.testPage + "?url=" + stream + "#s=" + startTime;
+            var url = config.testPage + '?url=' + stream + '#s=' + startTime;
 
             registerSuite({
                 name: 'Test playing streams with start time',
 
                 'Initialize the test': function() {
-                    console.log("[TEST_START-TIME] stream: " + stream);
-                    console.log("[TEST_START-TIME] startTime: " + startTime);
+                    console.log('[TEST_START-TIME] stream: ' + stream);
+                    console.log('[TEST_START-TIME] startTime: ' + startTime);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_START-TIME] current time = " + videoCurrentTime);
+                        console.log('[TEST_START-TIME] current time = ' + videoCurrentTime);
                     });
                 },
 
@@ -40,17 +40,17 @@ define([
 
                     return command.then(pollUntil(
                         function (_startTime) {
-                            var time = document.querySelector("video").currentTime;
+                            var time = document.querySelector('video').currentTime;
                             return (time > _startTime) ? true : null;
                         }, [startTime], 10000))
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
-                            console.log("[TEST_START-TIME] current time = " + time);
+                            console.log('[TEST_START-TIME] current time = ' + time);
                             videoCurrentTime = time;
                         });
                     }, function (error) {
-                        assert.ok(false, "[TEST_START-TIME] Failed to start at time " + startTime);
+                        assert.ok(false, '[TEST_START-TIME] Failed to start at time ' + startTime);
                     });
                 }
             });

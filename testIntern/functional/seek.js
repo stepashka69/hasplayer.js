@@ -20,29 +20,29 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function () {
-            return document.querySelector("video").currentTime;
+            return document.querySelector('video').currentTime;
         };
 
         var seek = function (time) {
-            document.querySelector("video").currentTime = time;
+            document.querySelector('video').currentTime = time;
         };
 
         var test_init = function(stream) {
 
-            var url = config.testPage + "?url=" + stream;
+            var url = config.testPage + '?url=' + stream;
 
             registerSuite({
                 name: 'Test seeking functionnality',
 
                 'Initialize the test': function() {
-                    console.log("[TEST_SEEK] stream: " + stream);
+                    console.log('[TEST_SEEK] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_SEEK] current time = " + videoCurrentTime);
+                        console.log('[TEST_SEEK] current time = ' + videoCurrentTime);
                     });
                 },
 
@@ -52,7 +52,7 @@ define([
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log("[TEST_SEEK] current time = " + time);
+                        console.log('[TEST_SEEK] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
@@ -74,17 +74,17 @@ define([
                     // Wait for current time > 30, i.e. seek has been done and video is playing
                     .then(pollUntil(
                         function (seekTime) {
-                            var time = document.querySelector("video").currentTime;
+                            var time = document.querySelector('video').currentTime;
                             return (time > seekTime) ? true : null;
                         }, [seekTime], 10000))
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
-                            console.log("[TEST_SEEK] current time = " + time);
+                            console.log('[TEST_SEEK] current time = ' + time);
                             videoCurrentTime = time;
                         });
                     }, function (error) {
-                        assert.ok(false, "[TEST_SEEK] Failed to seek");
+                        assert.ok(false, '[TEST_SEEK] Failed to seek');
                     });
                 },
 
@@ -95,7 +95,7 @@ define([
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
-                        console.log("[TEST_SEEK] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+                        console.log('[TEST_SEEK] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
                         assert.ok(delay >= 1.5);
                     });
                 }

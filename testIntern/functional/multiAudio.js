@@ -20,33 +20,33 @@ define([
         };
 
         var getVideoCurrentTime = function () {
-            return document.querySelector("video").currentTime;
+            return document.querySelector('video').currentTime;
         };
 
         var test_init = function(stream) {
 
-            var url = config.testPage + "?url=" + stream;
+            var url = config.testPage + '?url=' + stream;
 
             registerSuite({
                 name: 'Test multi-audio functionnality',
 
                 'Initialize the test': function() {
-                    console.log("[TEST_MULTI-AUDIO] stream: " + stream);
+                    console.log('[TEST_MULTI-AUDIO] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_MULTI-AUDIO] current time = " + videoCurrentTime);
-                        //console.log("Before getAudioTracks call "+new Date().toLocaleTimeString());
+                        console.log('[TEST_MULTI-AUDIO] current time = ' + videoCurrentTime);
+                        //console.log('Before getAudioTracks call '+new Date().toLocaleTimeString());
                     })
                     .execute(getAudioTracks)
                     .then(function (tracks) {
                         if (tracks) {
-                            //console.log("After getAudioTracks call "+new Date().toLocaleTimeString());
+                            //console.log('After getAudioTracks call '+new Date().toLocaleTimeString());
                             for (var i = 0; i < tracks.length; i++) {
-                                console.log("[TEST_MULTI-AUDIO] audioTrack["+i+"].id = " + tracks[i].id);
+                                console.log('[TEST_MULTI-AUDIO] audioTrack['+i+'].id = ' + tracks[i].id);
                             }
                         }
                     });
@@ -58,7 +58,7 @@ define([
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log("[TEST_MULTI-AUDIO] current time = " + time);
+                        console.log('[TEST_MULTI-AUDIO] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
@@ -82,7 +82,7 @@ define([
                             // Check if new track has been activated
                             // 1 - Get the metrics for audio track
                             // 2 - Check if last audio segment url contains the provided pattern
-                            var metrics = window.player.getMetricsFor("audio"),
+                            var metrics = window.player.getMetricsFor('audio'),
                                 metricsExt = window.player.getMetricsExt(),
                                 httpRequests = metricsExt.getHttpRequests(metrics);
 
@@ -93,9 +93,9 @@ define([
                             return httpRequests[httpRequests.length-1].url.indexOf(urlPattern) > 0 ? true : null;
                         }, [track.urlPattern], 10000, 1000))
                     .then(function () {
-                        assert.ok(true, "");
+                        assert.ok(true, '');
                     }, function (error) {
-                        assert.ok(false, "[TEST_MULTI-AUDIO] Failed to change audio track");
+                        assert.ok(false, '[TEST_MULTI-AUDIO] Failed to change audio track');
                     });
                 },
 
@@ -106,7 +106,7 @@ define([
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
-                        console.log("[TEST_MULTI-AUDIO] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+                        console.log('[TEST_MULTI-AUDIO] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
                         //assert.ok(delay >= 4.5);
                         assert.ok(time > videoCurrentTime);
                     });

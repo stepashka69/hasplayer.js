@@ -20,25 +20,25 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function() {
-            return document.querySelector("video").currentTime;
+            return document.querySelector('video').currentTime;
         };
 
         var tests = function(stream) {
 
-            var url = config.testPage + "?url=" + stream;
+            var url = config.testPage + '?url=' + stream;
 
             registerSuite({
                 name: 'Test playing streams',
 
                 'Initialize the test': function() {
-                    console.log("[TEST_PLAY] stream: " + stream);
+                    console.log('[TEST_PLAY] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_PLAY] current time = " + videoCurrentTime);
+                        console.log('[TEST_PLAY] current time = ' + videoCurrentTime);
                     });
                 },
 
@@ -48,7 +48,7 @@ define([
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log("[TEST_PLAY] current time = " + time);
+                        console.log('[TEST_PLAY] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
@@ -61,7 +61,7 @@ define([
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
-                        console.log("[TEST_PLAY] current time = " + time + " (" + Math.round(delay*100)/100 + ")");
+                        console.log('[TEST_PLAY] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
                         assert.ok(delay >= 9); // 9 for sleep precision
                     });
                 }

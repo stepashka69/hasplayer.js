@@ -20,37 +20,37 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function() {
-            return document.querySelector("video").currentTime;
+            return document.querySelector('video').currentTime;
         };
 
         var pause = function () {
-            document.querySelector("video").pause();
+            document.querySelector('video').pause();
         };
 
         var play = function () {
-            document.querySelector("video").play();
+            document.querySelector('video').play();
         };
 
         var isPaused = function () {
-            return document.querySelector("video").paused;
+            return document.querySelector('video').paused;
         };
 
         var tests = function(stream) {
 
-            var url = config.testPage + "?url=" + stream;
+            var url = config.testPage + '?url=' + stream;
 
             registerSuite({
                 name: 'Test pause stream',
 
                 'Initialize the test': function() {
-                    console.log("[TEST_PAUSE] stream: " + stream);
+                    console.log('[TEST_PAUSE] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_PAUSE] current time = " + videoCurrentTime);
+                        console.log('[TEST_PAUSE] current time = ' + videoCurrentTime);
                     });
                 },
 
@@ -60,7 +60,7 @@ define([
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log("[TEST_PAUSE] current time = " + time);
+                        console.log('[TEST_PAUSE] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
@@ -72,9 +72,9 @@ define([
                     return command.execute(pause)
                     .execute(isPaused)
                     .then(function (resu) {
-                        console.log("[TEST_PAUSE] pause state = " + resu);
+                        console.log('[TEST_PAUSE] pause state = ' + resu);
                         assert.ok(resu === true);
-                        console.log("[TEST_PAUSE] restart ");
+                        console.log('[TEST_PAUSE] restart ');
                         command.execute(play);
                     });
                 },
@@ -86,7 +86,7 @@ define([
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log("[TEST_PAUSE] current time = " + time);
+                        console.log('[TEST_PAUSE] current time = ' + time);
                     });
                 },
 
@@ -96,9 +96,9 @@ define([
                     return command.sleep(2000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log("[TEST_PAUSE] current time = " + time);
+                        console.log('[TEST_PAUSE] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
-                        console.log("[TEST_PAUSE] after pause command, stream is always playing");
+                        console.log('[TEST_PAUSE] after pause command, stream is always playing');
                     });
                 }
             });

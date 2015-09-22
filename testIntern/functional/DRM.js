@@ -17,10 +17,10 @@ define([
     ], function(registerSuite, assert,pollUntil, require, config){
 
         var playDetection = function(){
-            var videoNode = document.querySelector("video"),
-            body = document.querySelector("body"),
-            div = document.createElement("div"),
-            playerTime = document.createElement("div");
+            var videoNode = document.querySelector('video'),
+            body = document.querySelector('body'),
+            div = document.createElement('div'),
+            playerTime = document.createElement('div');
 
             playerTime.id = 'playerTimeTest';
             div.id = 'functionalTestStatus';
@@ -30,10 +30,10 @@ define([
             body.appendChild(playerTime);
 
             var onContentPlay = function(){
-                document.getElementById("functionalTestStatus").innerHTML = "playing";
+                document.getElementById('functionalTestStatus').innerHTML = 'playing';
             };
 
-            videoNode.addEventListener("play", onContentPlay);
+            videoNode.addEventListener('play', onContentPlay);
             videoNode.loop = true;
 
         };
@@ -42,7 +42,7 @@ define([
 
         var tests = function(i) {
 
-            var url = "../../samples/DemoPlayer/index.html?url=" + config.DRM[i];
+            var url = '../../samples/DemoPlayer/index.html?url=' + config.DRM[i];
 
             registerSuite({
                 name: 'Sequence of playing a DRM stream',
@@ -51,8 +51,8 @@ define([
                     console.log('INIT');
                     command = this.remote.get(require.toUrl(url));
 
-                    return command.execute(playDetection).findById("functionalTestStatus").getVisibleText(function(text){
-                        assert.equal(text, "not playing");
+                    return command.execute(playDetection).findById('functionalTestStatus').getVisibleText(function(text){
+                        assert.equal(text, 'not playing');
                     });
 
                 },
@@ -62,14 +62,14 @@ define([
                     return command.sleep(20000)
                     .then(
                         pollUntil(function(){
-                            var time = document.querySelector("video").currentTime;
+                            var time = document.querySelector('video').currentTime;
                             document.getElementById('playerTimeTest').innerHTML = time;
 
-                            var div = document.getElementById("functionalTestStatus");
+                            var div = document.getElementById('functionalTestStatus');
                             return div.innerHTML;
                         },null,60000))
                     .then(function(isOk){
-                        return assert.equal(isOk, "playing");
+                        return assert.equal(isOk, 'playing');
                     });
                 },
 
@@ -78,13 +78,13 @@ define([
                     return command.sleep(10000)
                     .then(
                         pollUntil(function(){
-                            var currentTime = document.querySelector("video").currentTime,
+                            var currentTime = document.querySelector('video').currentTime,
                                 storedTime = parseInt(document.getElementById('playerTimeTest').innerHTML);
 
                             return currentTime>=(storedTime+8);
                         },null,100000))
                     .then(function(test){
-                        return assert.ok(test,"the content is still playing after 10 seconds");
+                        return assert.ok(test,'the content is still playing after 10 seconds');
                     });
                 }
 
