@@ -121,6 +121,23 @@ module.exports = {
         ]
     },
 
+    orangeHasPlayerConfigPath: {
+        options: {
+            patterns: [
+            {
+                match: /loadHasPlayerConfig\("json\/hasplayer_config.json"\);/,
+                replacement: 'loadHasPlayerConfig("hasplayer_config.json");'
+            }, {
+                match: /reqMA.open\("GET", ".\/json\/metricsagent_config.json", true\);/,
+                replacement: 'reqMA.open("GET", "metricsagent_config.json", true);'
+            }
+            ]
+        },
+        files: [
+            {expand: true, flatten: true, src: ['<%= path %>/orangeHasplayer.js', '<%= path %>/orangeHasPlayerApp.js'], dest: '<%= path %>'}
+        ]
+    },
+
     copyright: {
         options: {
             patterns: [

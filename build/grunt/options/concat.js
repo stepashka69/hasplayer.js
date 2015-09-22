@@ -10,10 +10,10 @@ module.exports = {
 
     jsonToOrangeHasPlayer: {
         src: [
-            '<%= path %>/ohp.js',
+            '<%= path %>/orangeHasPlayerApp.js',
             '<%= path %>/json.js'
         ],
-        dest: '<%= path %>/ohp.js'
+        dest: '<%= path %>/orangeHasPlayerApp.js'
     }
 
 };
