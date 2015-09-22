@@ -36,7 +36,7 @@ var server = http.createServer(function(req,res){
                     // });
                     response.headers["Access-Control-Allow-Origin"] = "*";
                     response.headers["Access-Control-Allow-Methods"] ="GET,PUT,POST,DELETE";
-                    response.headers["Access-Control-Allow-Headers"] ="X_WASSUP_PULV,X_WASSUP_DSN,X_WASSUP_PULO,X_WASSUP_SAU,X_WASSUP_SAI,X_WASSUP_NAT,X_WASSUP_ROAMING,X_WASSUP_MSISDN,X_WASSUP_PUIT,X_WASSUP_BEARER,X_WASSUP_SPR,Client-IP,X-Forwarded-For";
+                    response.headers["Access-Control-Allow-Headers"] ="content-type,soapaction,X_WASSUP_PULV,X_WASSUP_DSN,X_WASSUP_PULO,X_WASSUP_SAU,X_WASSUP_SAI,X_WASSUP_NAT,X_WASSUP_ROAMING,X_WASSUP_MSISDN,X_WASSUP_PUIT,X_WASSUP_BEARER,X_WASSUP_SPR,Client-IP,X-Forwarded-For";
                     response.headers["Access-Control-Allow-Credential"] =true;
                 });
                 serverRequest.on("error", function(e){
