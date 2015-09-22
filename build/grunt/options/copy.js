@@ -11,7 +11,7 @@ module.exports = {
 
     orangeHasplayer: {
         files: [
-            {src: '<%= orangeHasPlayer %>/index.html', dest: '<%= path %>/orangeHasplayer.html'},
+            {src: '<%= orangeHasPlayer %>/index.html', dest: '<%= path %>/index.html'},
             {src: '<%= orangeHasPlayer %>/json/hasplayer_config.json', dest: '<%= path %>/hasplayer_config.json'}
         ]
     }

@@ -22,7 +22,7 @@ module.exports = {
             minifyJS: false
         },
         files: {
-            '<%= path %>/orangeHasplayer.html': '<%= path %>/orangeHasplayer.html'
+            '<%= path %>/index.html': '<%= path %>/index.html'
         }
     }
 

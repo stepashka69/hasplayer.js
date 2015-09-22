@@ -21,6 +21,6 @@ module.exports = {
             assetsDirs : ['<%= path %>'],
             type: 'html'
         },
-        files: {src: ['<%= orangeHasPlayer %>/orangeHasplayer.html', '<%= path %>/orangeHasplayer.html']}
+        files: {src: ['<%= path %>/index.html']}
     }
 };

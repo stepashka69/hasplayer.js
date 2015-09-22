@@ -13,7 +13,7 @@ module.exports = {
     },
 
     orangeHasplayerDist: {
-        src: '<%= path %>/orangeHasplayer.html',
+        src: '<%= path %>/index.html',
         dest: '<%= path %>',
         options: {
             beautify: true,

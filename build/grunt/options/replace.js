@@ -117,7 +117,7 @@ module.exports = {
             ]
         },
         files: [
-            {expand: true, flatten: true, src: ['<%= path %>/orangeHasplayer.html'], dest: '<%= path %>'}
+            {expand: true, flatten: true, src: ['<%= path %>/index.html'], dest: '<%= path %>'}
         ]
     },
 

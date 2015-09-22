@@ -14,7 +14,7 @@ module.exports = {
 
 	orangeHasplayer: {
 		files: {
-			'<%= path %>/orangeHasplayer.html': '<%= path %>/orangeHasplayer.html'
+			'<%= path %>/index.html': '<%= path %>/index.html'
 		}
 	}
 };
