@@ -12,6 +12,18 @@ module.exports = {
             '<%= path %>/dashif.html': '<%= path %>/dashif.html',
             '<%= path %>/player.html': '<%= path %>/player.html'
         }
+    },
+
+    orangeHasplayer: {
+        options: {
+            removeComments: true,
+            collapseWhitespace: false,
+            minifyCSS: true,
+            minifyJS: false
+        },
+        files: {
+            '<%= path %>/index.html': '<%= path %>/index.html'
+        }
     }
 
 };
