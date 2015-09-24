@@ -11,8 +11,15 @@ define([
         var audioTracks = null;
 
         var getAudioTracks = function () {
-            audioTracks = window.player.getAudioTracks();
-            return audioTracks;
+            var tmpTracks = window.player.getAudioTracks();
+            var tracks = [];
+
+            for(var i = 0; i < tmpTracks.length; ++i) {
+                tracks.push({ id: tmpTracks[i].id,
+                              lang: tmpTracks[i].lang})
+            }
+
+            return tracks;
         };
 
         var setAudioTrack = function (track) {
@@ -35,18 +42,21 @@ define([
 
                     command = this.remote.get(require.toUrl(url));
 
-                    return command.execute(getVideoCurrentTime)
+                    return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function(time) {
                         videoCurrentTime = time;
+                        assert.ok(videoCurrentTime > 0, 'Test if video has began to play')
                         console.log('[TEST_MULTI-AUDIO] current time = ' + videoCurrentTime);
-                        //console.log('Before getAudioTracks call '+new Date().toLocaleTimeString());
                     })
                     .execute(getAudioTracks)
                     .then(function (tracks) {
                         if (tracks) {
-                            //console.log('After getAudioTracks call '+new Date().toLocaleTimeString());
-                            for (var i = 0; i < tracks.length; i++) {
-                                console.log('[TEST_MULTI-AUDIO] audioTrack['+i+'].id = ' + tracks[i].id);
+                            console.log('[TEST_MULTI-AUDIO] tracks count: ' + tracks.length)
+
+                            if (stream === 'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest') {
+                                assert.equal(tracks.length, 2, 'Test tracks count for ' + stream);
+                            } else if (stream === 'http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest') {
+                                assert.equal(tracks.length, 3, 'Test tracks count for ' + stream);
                             }
                         }
                     });
@@ -59,7 +69,7 @@ define([
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         console.log('[TEST_MULTI-AUDIO] current time = ' + time);
-                        assert.ok(time > videoCurrentTime);
+                        assert.ok(time > videoCurrentTime, 'Test if video is still playing');
                         videoCurrentTime = time;
                     });
                 }
@@ -70,7 +80,7 @@ define([
         var test_setAudioTrack = function(track) {
 
             registerSuite({
-                name: 'Test multi audio functionnality',
+                name: 'Test set multi audio functionnality',
 
                 'Set audio track': function() {
 
