@@ -65,8 +65,8 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
         "X-Forwarded-For":"217.128.115.221, 10.162.249.55",
     };
     
-    var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
-    //var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
+    //var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
+    var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
     var CHANNEL_IDS = [192, 118, 119];
     var CHANNEL_NAMES = ['TF1', 'M6', 'W9'];
 
