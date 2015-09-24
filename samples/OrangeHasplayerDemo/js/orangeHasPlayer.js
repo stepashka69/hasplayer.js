@@ -1,5 +1,6 @@
     var orangeHasPlayer = null,
         config = null,
+        video = null,
         configMetrics = {
             'name': 'Prisme (local)',
             'activationUrl': '',
@@ -23,11 +24,16 @@
      **********************************************************************************************************************/
     function createHasPlayer() {
         orangeHasPlayer = new OrangeHasPlayer();
+        video = document.getElementById('player');
         orangeHasPlayer.init(video);
         orangeHasPlayer.setInitialQualityFor('video', 0);
         orangeHasPlayer.setInitialQualityFor('audio', 0);
+
+        /* hasPlayerConfig_dev */
         loadHasPlayerConfig('json/hasplayer_config.json');
+        /* hasPlayerConfig_dev */
         //orangeHasPlayer.loadMetricsAgent(configMetrics);
+
 
         orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
@@ -45,8 +51,6 @@
         orangeHasPlayer.addEventListener('play', onPlay);
         orangeHasPlayer.addEventListener('pause', onPause);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
-        video.addEventListener('waiting', onWaiting);
-        video.addEventListener('playing', onPlaying);
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -80,9 +84,9 @@
     function onload() {
         //handle onload events to get audio, subtitles tracks, etc...
         //init audio tracks
-        handleAudioDatas(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
+        handleAudioData(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
         //init subtitle tracks
-        handleSubtitleDatas(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
+        handleSubtitleData(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
         //init duration value for VOD content
         handleDuration(orangeHasPlayer.getDuration());
         //init bitrates graph
@@ -112,7 +116,6 @@
      */
     function onPlayBitrateChanged(e) {
         if (e.detail.type === 'video') {
-            hideLoadingElement();
             handlePlayBitrate(e.detail.bitrate, e.detail.time);
         }
     }
@@ -135,14 +138,6 @@
         handlePlayState(false);
     }
 
-    function onWaiting() {
-        showLoadingElement();
-    }
-
-    function onPlaying() {
-        hideLoadingElement();
-    }
-
     function onTimeUpdate() {
         //update progress bar in GUI.
         if (!orangeHasPlayer.isLive()) {
@@ -157,7 +152,7 @@
      *
      *
      **********************************************************************************************************************/
-    function loadStream(streamInfos) {
+    function loadStream(streamInfos, optimizedZappingEnabled) {
         if (!optimizedZappingEnabled) {
             orangeHasPlayer.setInitialQualityFor('video', 0);
             orangeHasPlayer.setInitialQualityFor('audio', 0);
@@ -165,12 +160,12 @@
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
-    function changeAudio(index) {
-        orangeHasPlayer.setAudioTrack(audioTracks[index]);
+    function changeAudio(track) {
+        orangeHasPlayer.setAudioTrack(track);
     }
 
-    function changeSubtitle() {
-        orangeHasPlayer.setSubtitleTrack(subtitleTracks[subtitleList.selectedIndex]);
+    function changeSubtitle(track) {
+        orangeHasPlayer.setSubtitleTrack(track);
     }
 
     function setPlayerMute() {

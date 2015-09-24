@@ -46,6 +46,113 @@ var app = angular.module('DashPlayer', [
     'angularTreeview'
     ]);
 
+
+app.factory("SourceTVM",["$http", "$q",function($http, $q){
+
+    var TVM_HEADERS = {
+        "X_WASSUP_PULV":"71251608781a0001000083af",
+        "X_WASSUP_DSN":"vodpc client a",
+        "X_WASSUP_PULO":"vodpcclienta@orange.fr",
+        "X_WASSUP_SAU":"3",
+        "X_WASSUP_SAI":"020970106",
+        "X_WASSUP_NAT":"1",
+        "X_WASSUP_ROAMING":"0",
+        "X_WASSUP_MSISDN":"UNAVAILABLE",
+        "X_WASSUP_PUIT":"1",
+        "X_WASSUP_BEARER":"WIFI",
+        "X_WASSUP_SPR":"8388608",
+        "Client-IP":"217.128.115.221",
+        "X-Forwarded-For":"217.128.115.221, 10.162.249.55",
+    };
+    
+    //var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
+    var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
+    var CHANNEL_IDS = [192, 118, 119];
+    var CHANNEL_NAMES = ['TF1', 'M6', 'W9'];
+
+    var formatData = function(response, channelId, channelName) {
+        if (!Array.prototype.find) {
+         var find = function(predicate) {
+            if (this === null) {
+                throw new TypeError('Array.prototype.find a été appelé sur null ou undefined');
+            }
+            if (typeof predicate !== 'function') {
+                throw new TypeError('predicate doit être une fonction');
+            }
+            var list = Object(this);
+            var length = list.length >>> 0;
+            var thisArg = arguments[1];
+            var value;
+
+            for (var i = 0; i < length; i++) {
+                value = list[i];
+                if (predicate.call(thisArg, value, i, list)) {
+                    return value;
+                }
+            }
+            return undefined;
+          };
+
+          // to avoid iteration in for ... in on array
+          Object.defineProperty(Array.prototype,"find",{
+            value:find,
+            enumerable: false,
+          });
+        }
+
+        var formattedSource = {
+            'type': 'MSS',
+            'name': 'Widevine TVM live-int ' + channelId + ' (' + channelName + ')',
+            'url': response.url,
+            'browsers': 'cdsbi',
+            'protData' : {
+                'com.widevine.alpha':{
+                    'laURL' : response.protectionData.find(function(element){
+                        return element.keySystem ==='com.widevine.alpha';
+                    }).laUrl
+                },
+                'com.microsoft.playready':{
+                    'laURL': response.protectionData.find(function(element){
+                        return element.keySystem ==='com.microsoft.playready';
+                    }).laUrl
+                }
+            }
+        };
+        return formattedSource;
+    };
+
+    var getSource = function(channelId, channelName) {
+        var url = {
+            method: "GET",
+            url: TVM_SERVER + 'channels/' + channelId + "/url",
+            headers: TVM_HEADERS
+        };
+        return $http(url).then(function(response) {
+            if(response.data && response.data.response) {
+                return formatData(response.data.response, channelId, channelName);
+            } else {
+                return null;
+            }
+        }, function(err) {
+            return null;
+        });
+    };
+  
+
+
+    var getSources = function(){
+        var promises = [];
+        for(var i = 0; i < CHANNEL_IDS.length; i++) {
+            promises.push(getSource(CHANNEL_IDS[i], CHANNEL_NAMES[i]));
+        }
+        return $q.all(promises);
+    };
+
+    return {
+            getTVMSources: getSources
+        };
+}]);
+
 app.directive('chart', function() {
     return {
         restrict: 'E',
@@ -123,8 +230,8 @@ app.directive('chart2', function() {
     };
 });
 
-app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
-    function($scope, $window, Sources, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
+app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'Notes','Contributors','PlayerLibraries','ShowcaseLibraries',
+    function($scope, $window, Sources, SourceTVM, Notes, Contributors, PlayerLibraries, ShowcaseLibraries) {
 
     var player,
         video,
@@ -144,6 +251,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.chromecast = {};
     $scope.chromecast.apiOk = false;
+
+
 
     ////////////////////////////////////////
     //
@@ -871,8 +980,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     if(window.jsonData === undefined) {
         Sources.query(function (data) {
-            $scope.streams = data.items;
-            $scope.selectStreams();
+             SourceTVM.getTVMSources().then(function(results){
+                for(var i=0; i<results.length;i++){
+                    if(results[i]){
+                        data.items.unshift(results[i]);
+                    }
+                }
+                $scope.streams = data.items;
+                $scope.selectStreams();
+             }, function(){
+                $scope.streams = data.items;
+                $scope.selectStreams();
+             });
+
+             
+            
         });
 
         Notes.query(function (data) {
@@ -909,8 +1031,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
 
     $scope.setStream = function (item) {
         $scope.selectedItem = item;
-        $scope.laURL = (item.protData && item.protData['com.microsoft.playready']) ? item.protData['com.microsoft.playready'].laURL : "";
-        $scope.customData = (item.protData && item.protData['com.microsoft.playready']) ? item.protData['com.microsoft.playready'].customData : "";
+        $scope.laURL = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].laURL : "";
+        $scope.customData = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].customData : "";
     };
 
     function resetBitratesSlider () {
@@ -943,11 +1065,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources', 'Notes','Contr
             if (!$scope.selectedItem.protData) {
                 $scope.selectedItem.protData = {};
             }
-            if (!$scope.selectedItem.protData['com.microsoft.playready']) {
-                $scope.selectedItem.protData['com.microsoft.playready'] = {};
+            if (!$scope.selectedItem.protData['com.widevine.alpha']) {
+                $scope.selectedItem.protData['com.widevine.alpha'] = {};
             }
-            $scope.selectedItem.protData['com.microsoft.playready'].laURL = $scope.laURL;
-            $scope.selectedItem.protData['com.microsoft.playready'].customData = $scope.customData;
+            $scope.selectedItem.protData['com.widevine.alpha'].laURL = $scope.laURL;
+            $scope.selectedItem.protData['com.widevine.alpha'].customData = $scope.customData;
         }
 
         resetBitratesSlider();
