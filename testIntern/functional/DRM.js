@@ -42,7 +42,7 @@ define([
 
         var tests = function(i) {
 
-            var url = '../../samples/DemoPlayer/index.html?url=' + config.DRM[i];
+            var url = config.testPage + '?url=' + config.DRM[i].stream;
 
             registerSuite({
                 name: 'Sequence of playing a DRM stream',
