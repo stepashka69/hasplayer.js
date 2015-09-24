@@ -66,13 +66,13 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
     };
     
     var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
-    var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
+    //var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
     var CHANNEL_IDS = [192, 118, 119];
     var CHANNEL_NAMES = ['TF1', 'M6', 'W9'];
 
     var formatData = function(response, channelId, channelName) {
         if (!Array.prototype.find) {
-          Array.prototype.find = function(predicate) {
+         var find = function(predicate) {
             if (this === null) {
                 throw new TypeError('Array.prototype.find a été appelé sur null ou undefined');
             }
@@ -92,6 +92,12 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
             }
             return undefined;
           };
+
+          // to avoid iteration in for ... in on array
+          Object.defineProperty(Array.prototype,"find",{
+            value:find,
+            enumerable: false,
+          });
         }
 
         var formattedSource = {
