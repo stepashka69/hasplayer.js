@@ -1,0 +1,12 @@
+{
+  "name": "bypasscors",
+  "version": "1.0.0",
+  "description": "proxy to bypass cors",
+  "main": "proxy.js",
+  "private": true,
+  "author": "@mbrechet",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.62.0"
+  }
+}
