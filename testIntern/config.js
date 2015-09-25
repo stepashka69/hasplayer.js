@@ -1,7 +1,7 @@
 define({
     //Test page url
     testPage: [
-        'http://tv-has.orange-labs.fr/hasplayer_orange/1.2.2_dev/player.html'
+        'http://tv-has.orange-labs.fr/hasplayer_orange/1.2.3_dev/player.html'
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     play: [
