@@ -16,27 +16,13 @@ define([
     'testIntern/config'
     ], function(registerSuite, assert,pollUntil, require, config){
 
-        var playDetection = function(){
-            var videoNode = document.querySelector('video'),
-            body = document.querySelector('body'),
-            div = document.createElement('div'),
-            playerTime = document.createElement('div');
+        var getCurrentTime = function() {
+            return document.querySelector('video').currentTime;
+        }
 
-            playerTime.id = 'playerTimeTest';
-            div.id = 'functionalTestStatus';
-            div.innerHTML = 'not playing';
-
-            body.appendChild(div);
-            body.appendChild(playerTime);
-
-            var onContentPlay = function(){
-                document.getElementById('functionalTestStatus').innerHTML = 'playing';
-            };
-
-            videoNode.addEventListener('play', onContentPlay);
-            videoNode.loop = true;
-
-        };
+        var isPaused = function() {
+            return document.querySelector('video').paused;
+        }
 
         var command = null;
 
@@ -48,55 +34,46 @@ define([
                 name: 'Sequence of playing a DRM stream',
 
                 'initTest': function() {
-                    console.log('INIT');
+                    console.log('[TEST_DRM] INIT');
                     command = this.remote.get(require.toUrl(url));
 
-                    return command.execute(playDetection).findById('functionalTestStatus').getVisibleText(function(text){
-                        assert.equal(text, 'not playing');
-                    });
-
-                },
-
-                'contentPlaying': function(){
-                    console.log('PLAYING');
-                    return command.sleep(20000)
-                    .then(
-                        pollUntil(function(){
-                            var time = document.querySelector('video').currentTime;
-                            document.getElementById('playerTimeTest').innerHTML = time;
-
-                            var div = document.getElementById('functionalTestStatus');
-                            return div.innerHTML;
-                        },null,60000))
-                    .then(function(isOk){
-                        return assert.equal(isOk, 'playing');
+                    return command.execute(getCurrentTime)
+                    .then(function(time) {
+                        console.log('[TEST_DRM] Time is: ' + time);
+                        return assert.equal(time, 0);
+                    }).execute(isPaused)
+                    .then(function(paused) {
+                        console.log('[TEST_DRM] Video is ' + (paused ? 'paused' : 'playing'));
+                        return assert.ok(isPaused, 'Video should be paused');
                     });
                 },
 
-                'currentTimeDifferent':function(){
-                    console.log('STILL PLAYING AFTER 10 SECONDS');
-                    return command.sleep(10000)
-                    .then(
-                        pollUntil(function(){
-                            var currentTime = document.querySelector('video').currentTime,
-                                storedTime = parseInt(document.getElementById('playerTimeTest').innerHTML);
+                'contentPlaying': function() {
+                    return command.sleep(5000)
+                    .execute(getCurrentTime)
+                    .then(function(time) {
+                        console.log('[TEST_DRM] Time is: ' + time);
+                        return assert.ok(time > 0, 'playing');
+                    });
+                },
 
-                            return currentTime>=(storedTime+8);
-                        },null,100000))
-                    .then(function(test){
-                        return assert.ok(test,'the content is still playing after 10 seconds');
+                'contentStillPlaying': function() {
+
+                    return command.sleep(5000)
+                    .execute(getCurrentTime)
+                    .then(function(time) {
+                        console.log('[TEST_DRM] Time is: ' + time);
+                        return assert.ok(time > 5, 'playing');
                     });
                 }
-
             });
-};
+        };
 
-var i = 0,
-len = config.DRM.length;
+        var i = 0,
+        len = config.DRM.length;
 
-for(i; i<len; i++) {
-    tests(i);
-}
-
-
-});
+        for (i; i < len; i++) {
+            tests(i);
+        }
+    }
+);
