@@ -607,12 +607,23 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
+        if (!audioTrack || !audioTrack.id || !audioTrack.lang) {
+            throw new Error('OrangeHasPlayer.setAudioTrack(): audioTrack parameter is unknown');
+        }
+
+        if (selectedAudioTrack && ((audioTrack.id === selectedAudioTrack.id) ||
+            (audioTrack.lang === selectedAudioTrack.lang))) {
+            console.log("[OrangeHasPlayer] " + audioTrack.lang + " is already selected");
+            return;
+        }
+
         mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
         if (mediaPlayerAudioTracks) {
             for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
                 if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
+                    selectedAudioTrack = audioTrack;
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
                     return;
                 }
@@ -718,6 +729,16 @@ OrangeHasPlayer = function() {
         var i = 0,
             mediaPlayerSubtitleTracks;
 
+        if (!subtitleTrack || !subtitleTrack.id || !subtitleTrack.lang) {
+            throw new Error('OrangeHasPlayer.setSubtitleTrack(): subtitleTrack parameter is unknown');
+        }
+
+        if (selectedSubtitleTrack && ((subtitleTrack.id === selectedSubtitleTrack.id) ||
+            (subtitleTrack.lang === selectedSubtitleTrack.lang))) {
+            console.log("[OrangeHasPlayer] " + subtitleTrack.lang + " is already selected");
+            return;
+        }
+
         _isPlayerInitialized();
 
         mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
@@ -726,6 +747,7 @@ OrangeHasPlayer = function() {
             for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
                 if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
+                    selectedSubtitleTrack = subtitleTrack;
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
                     return;
                 }
