@@ -75,7 +75,7 @@ define([
                     .then(pollUntil(
                         function (seekTime) {
                             var time = document.querySelector('video').currentTime;
-                            return (time > seekTime) ? true : null;
+                            return (time >= seekTime) ? true : null;
                         }, [seekTime], 10000))
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
@@ -94,13 +94,110 @@ define([
                     return command.sleep(2000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        var delay = time - videoCurrentTime;
-                        console.log('[TEST_SEEK] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
-                        assert.ok(delay >= 1.5);
+                        console.log('[TEST_SEEK] current time = ' + time);
+                        assert.ok(time >= videoCurrentTime);
+                        videoCurrentTime = time;
+                    });
+                },
+
+
+            });
+        };
+
+        var test_seek_over_duration = function(stream, streamDuration) {
+            var url = config.testPage + '?url=' + stream;
+
+            registerSuite({
+                name: 'Test seek over duration',
+                'Init': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
+
+                    command = this.remote.get(require.toUrl(url));
+
+                    return command.execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        videoCurrentTime = time;
+                        console.log('[TEST_SEEK] current time = ' + videoCurrentTime);
+                    });
+                },
+
+                'Seek over duration': function() {
+                    console.log("[TEST_SEEK] Seek over duration");
+
+                    return command.sleep(2000).execute(seek, [1000])
+                    .execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        var delay = time - streamDuration;
+                        console.log("[TEST_SEEK] time: " + time)
+                        videoCurrentTime = time;
+                        assert.ok(delay < 1);
                     });
                 }
             });
-        };
+        }
+
+        var test_seek_to_zero = function(stream) {
+            var url = config.testPage + '?url=' + stream;
+
+            registerSuite({
+                name: 'Test seek over duration',
+                'Init': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
+
+                    command = this.remote.get(require.toUrl(url));
+
+                    return command.execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        videoCurrentTime = time;
+                        console.log('[TEST_SEEK] current time = ' + videoCurrentTime);
+                    });
+                },
+
+                'Seek to zero': function() {
+                    console.log("[TEST_SEEK] Seek to zero");
+
+                    return command.sleep(2000).execute(seek, [0])
+                    .execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        var delay = time;
+                        console.log("[TEST_SEEK] time: " + time)
+                        videoCurrentTime = time;
+                        assert.ok(delay < 1);
+                    });
+                }
+            });
+        }
+
+        var test_seek_under_zero = function(stream) {
+            var url = config.testPage + '?url=' + stream;
+
+            registerSuite({
+                name: 'Test seek over duration',
+                'Init': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
+
+                    command = this.remote.get(require.toUrl(url));
+
+                    return command.execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        videoCurrentTime = time;
+                        console.log('[TEST_SEEK] current time = ' + videoCurrentTime);
+                    });
+                },
+
+                'Seek under zero': function() {
+                    console.log("[TEST_SEEK] Seek under zero");
+
+                    return command.sleep(2000).execute(seek, [-1])
+                    .execute(getVideoCurrentTime)
+                    .then(function(time) {
+                        console.log("[TEST_SEEK] time: " + time)
+                        videoCurrentTime = time;
+                        assert.ok(time < 1 && time >= 0);
+                    });
+                }
+            });
+        }
 
         var test_repeat_seek_nodelay = function(seekTime) {
 
@@ -115,13 +212,14 @@ define([
                     .then(pollUntil(
                         function (seekTime) {
                             var time = document.querySelector('video').currentTime;
-                            return (time > seekTime) ? true : null;
+                            return (time >= seekTime) ? true : null;
                         }, [seekTime], 10000))
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
-                            console.log('[TEST_SEEK] current time = ' + time);
-                            assert.ok((time - seekTime) < 0.5);
+                            var delay = time - seekTime
+                            console.log('[TEST_SEEK] current time = ' + time + ', delay: ' + delay);
+                            assert.ok(delay < 0.5);
                             videoCurrentTime = time;
                         });
                     }, function (error) {
@@ -136,7 +234,7 @@ define([
             registerSuite({
                 name: 'Test seeking functionnality',
 
-                'Do seek with no delay': function() {
+                'Do seek with delay': function() {
 
                     console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
 
@@ -150,7 +248,7 @@ define([
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
                             console.log('[TEST_SEEK] current time = ' + time);
-                            assert.ok((time - seekTime) < 0.5);
+                            assert.ok((time - seekTime) < 1);
                             videoCurrentTime = time;
                             return true;
                         });
@@ -175,17 +273,21 @@ define([
             for (j = 0; j < config.seek[i].seekCount; j++) {
                 // Generate a random seek time
                 randomSeekPosition = Math.round(Math.random() * config.seek[i].duration * 100) / 100;
-                test_seek(randomSeekPosition);
+                test_seek(randomSeekPosition, config.seek[i].duration);
             }
 
-            randomSeekPosition = Math.round(Math.random() * config.seek[i].duration * 100) / 100;
+            /*randomSeekPosition = Math.round(Math.random() * config.seek[i].duration * 100) / 100;
             for (j = 0; j < config.seek[i].seekCount; j++) {
                 test_repeat_seek_nodelay(randomSeekPosition);
-            }
+            }*/
 
-            randomSeekPosition = Math.round(Math.random() * config.seek[i].duration * 100) / 100;
+            randomSeekPosition = Math.round(Math.random() * (config.seek[i].duration - 5) * 100) / 100;
             for (j = 0; j < config.seek[i].seekCount; j++) {
                 test_repeat_seek_delay(randomSeekPosition);
             }
+
+            test_seek_over_duration(config.seek[i].stream, config.seek[i].duration);
+            test_seek_to_zero(config.seek[i].stream);
+            test_seek_under_zero(config.seek[i].stream);
         }
 });

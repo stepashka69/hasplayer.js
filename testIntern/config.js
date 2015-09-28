@@ -16,13 +16,13 @@ define({
     seek: [
         {
             stream: 'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest',
-            duration: 550,
+            duration: 596,
             seekCount:10
         },
         //{stream: 'http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest'},
         {
-            stream: 'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest',
-            duration: 540,
+            stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest',
+            duration: 121,
             seekCount:10
         }
     ],
