@@ -639,19 +639,27 @@ MediaPlayer.dependencies.BufferController = function () {
 
         onBytesError = function (e) {
             var msgError = type + ": Failed to load a request at startTime = "+e.startTime,
+                manifest = this.manifestModel.getValue(),
                 data = {};
 
             //if request.status = 0, it's an aborted request : do not load chunk from another bitrate, do not send
             // error.
             if (e.status !== undefined && e.status === 0 && !isRunning.call(this)) {
                 return;
+            }else{
+                if (e.status !== undefined && e.status === 0 ) {
+                    this.debug.log("[BufferController]["+type+"][onBytesError] Requests have been aborted!!!!!!!!!!!!");
+                }
             }
-
             //if it's the first download error, try to load the same segment for a the lowest quality...
             if(this.ChunkMissingState === false)
             {
                 this.ChunkMissingState = true;
                 if (e.quality !== 0) {
+                    this.debug.log("[BufferController]["+type+"][onBytesError] load Fragment at the first resolution");
+                    if (manifest.name === "M3U"){
+                        currentSequenceNumber -= 1;
+                    }
                     return bufferFragment.call(this);
                 }
             }
@@ -752,7 +760,7 @@ MediaPlayer.dependencies.BufferController = function () {
         onFragmentRequest = function (request) {
             var self = this,
                 manifest = self.manifestModel.getValue();
-
+            
             // Check if current request signals end of stream
             if ((request !== null) && (request.action === request.ACTION_COMPLETE)) {
                 signalStreamComplete.call(self);
@@ -938,7 +946,6 @@ MediaPlayer.dependencies.BufferController = function () {
                         defer = self.abrController.getPlaybackQuality(type, data);
                     }
                     defer.then(
-
                         function (result) {
 
                             quality = result.quality;
@@ -1090,7 +1097,7 @@ MediaPlayer.dependencies.BufferController = function () {
         onFragmentLoadProgress = function(evt) {
             var self = this,
                 i = 0,
-                len = 0;
+                len = 0,
                 type = evt.data.request.streamType,
                 rules = null;
 
@@ -1104,7 +1111,7 @@ MediaPlayer.dependencies.BufferController = function () {
                             currentQuality = self.abrController.getQualityFor(type);
                 
                         if (newQuality < currentQuality){
-                            self.debug.log("[BufferController]["+type+"] need to abandon");
+                            self.debug.log("[BufferController]["+type+"] NEED TO ABANDON ************************** for "+evt.data.request.url);
                             self.fragmentController.abortRequestsForModel(fragmentModel);
                         }else{
                             self.debug.log("[BufferController]["+type+"] No need to abandon");
