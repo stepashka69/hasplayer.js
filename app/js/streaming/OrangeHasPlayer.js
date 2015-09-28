@@ -54,6 +54,10 @@ OrangeHasPlayer = function() {
     };
 
     var _onloaded = function( /*e*/ ) {
+        this.getAudioTracks();
+        this.getSubtitleTracks();
+        this.getSelectedAudioTrack();
+        this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
         }
