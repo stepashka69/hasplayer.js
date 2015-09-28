@@ -25,8 +25,8 @@ OrangeHasPlayer = function() {
         video,
         isFullScreen = false,
         isSubtitleVisible = true,
-        audiotracks = [],
-        subtitletracks = [],
+        audioTracks = [],
+        subtitleTracks = [],
         videoQualityChanged = [],
         audioQualityChanged = [],
         videoBitrates = null,
@@ -570,13 +570,13 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (audiotracks.length === 0) {
+        if (audioTracks.length === 0) {
 
             mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
             if (mediaPlayerAudioTracks) {
                 for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
-                    audiotracks.push({
+                    audioTracks.push({
                         id: mediaPlayerAudioTracks[i].id,
                         lang: mediaPlayerAudioTracks[i].lang
                     });
@@ -586,7 +586,7 @@ OrangeHasPlayer = function() {
             }
         }
 
-        return audiotracks;
+        return audioTracks;
     };
 
     /**
@@ -634,10 +634,10 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedAudioTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < audiotracks.length; i++) {
-                if (audiotracks[i].id === selectedTrack.id ||
-                    audiotracks[i].lang === selectedTrack.lang) {
-                    selectedAudioTrack = audiotracks[i];
+            for (i = 0; i < audioTracks.length; i++) {
+                if (audioTracks[i].id === selectedTrack.id ||
+                    audioTracks[i].lang === selectedTrack.lang) {
+                    selectedAudioTrack = audioTracks[i];
                     return selectedAudioTrack;
                 }
             }
@@ -683,13 +683,13 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (subtitletracks.length === 0) {
+        if (subtitleTracks.length === 0) {
 
             mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
             if (mediaPlayerSubtitleTracks) {
                 for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
-                    subtitletracks.push({
+                    subtitleTracks.push({
                         id: mediaPlayerSubtitleTracks[i].id,
                         lang: mediaPlayerSubtitleTracks[i].lang
                     });
@@ -699,7 +699,7 @@ OrangeHasPlayer = function() {
             }
         }
 
-        return subtitletracks;
+        return subtitleTracks;
     };
 
     /**
@@ -746,10 +746,10 @@ OrangeHasPlayer = function() {
 
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
 
-        for (i = 0; i < subtitletracks.length; i++) {
-            if (subtitletracks[i].id === selectedTrack.id ||
-                subtitletracks[i].lang === selectedTrack.lang) {
-                selectedSubtitleTrack = subtitletracks[i];
+        for (i = 0; i < subtitleTracks.length; i++) {
+            if (subtitleTracks[i].id === selectedTrack.id ||
+                subtitleTracks[i].lang === selectedTrack.lang) {
+                selectedSubtitleTrack = subtitleTracks[i];
                 return selectedSubtitleTrack;
             }
 
