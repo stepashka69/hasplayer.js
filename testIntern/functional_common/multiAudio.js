@@ -3,7 +3,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/functional_common/config'
     ], function(registerSuite, assert, pollUntil, require, config){
 
         var command = null;

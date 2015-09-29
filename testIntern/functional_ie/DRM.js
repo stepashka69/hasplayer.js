@@ -13,7 +13,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/functional_ie/config'
     ], function(registerSuite, assert,pollUntil, require, config){
 
         var getCurrentTime = function() {
