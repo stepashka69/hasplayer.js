@@ -29,6 +29,7 @@ define({
     // capabilities options specified for an environment will be copied as-is
     environments: [
 
+        { browserName: 'chrome', /*version: '2.11', */platform: 'WIN8_1' },
         { browserName: 'internet explorer', /*version: '11', */platform: 'WIN8_1' }
 
     ],
@@ -40,7 +41,11 @@ define({
 
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
-        'testIntern/functional_ie/DRM'
+    'testIntern/demoPlayer/functional_common/startTime',
+    'testIntern/demoPlayer/functional_common/play',
+    'testIntern/demoPlayer/functional_common/pause',
+    'testIntern/demoPlayer/functional_common/seek',
+    'testIntern/demoPlayer/functional_common/multiAudio'
     ],
 
     // A regular expression matching URLs to files that should not be included in code coverage analysis
