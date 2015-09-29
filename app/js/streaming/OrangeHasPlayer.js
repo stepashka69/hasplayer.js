@@ -771,14 +771,16 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
 
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
+        
+        if (selectedTrack) {
+            for (i = 0; i < subtitleTracks.length; i++) {
+                if (subtitleTracks[i].id === selectedTrack.id ||
+                    subtitleTracks[i].lang === selectedTrack.lang) {
+                    selectedSubtitleTrack = subtitleTracks[i];
+                    return selectedSubtitleTrack;
+                }
 
-        for (i = 0; i < subtitleTracks.length; i++) {
-            if (subtitleTracks[i].id === selectedTrack.id ||
-                subtitleTracks[i].lang === selectedTrack.lang) {
-                selectedSubtitleTrack = subtitleTracks[i];
-                return selectedSubtitleTrack;
             }
-
         }
         return null;
     };
