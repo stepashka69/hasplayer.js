@@ -209,11 +209,7 @@ define([
                     console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
 
                     return command.execute(seek, [seekTime])
-                    .then(pollUntil(
-                        function (seekTime) {
-                            var time = document.querySelector('video').currentTime;
-                            return (time >= seekTime) ? true : null;
-                        }, [seekTime], 10000))
+                    .sleep(100)
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
@@ -239,11 +235,7 @@ define([
                     console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
 
                     return command.execute(seek, [seekTime])
-                    .then(pollUntil(
-                        function (seekTime) {
-                            var time = document.querySelector('video').currentTime;
-                            return (time > seekTime) ? true : null;
-                        }, [seekTime], 10000))
+                    .sleep(100)
                     .then(function () {
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
@@ -254,10 +246,10 @@ define([
                         });
                     }, function (error) {
                         assert.ok(false, '[TEST_SEEK] Failed to seek');
-                    }).sleep(2000).execute(getVideoCurrentTime)
+                    }).sleep(3000).execute(getVideoCurrentTime)
                     .then(function (time) {
                         console.log('[TEST_SEEK] current time = ' + time);
-                        assert.ok((time - videoCurrentTime) > 1.5, 'Test if video plays after seek');
+                        assert.ok(time > videoCurrentTime, 'Test if video plays after seek');
                         videoCurrentTime = time;
                         return true;
                     });
