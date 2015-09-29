@@ -25,8 +25,8 @@ OrangeHasPlayer = function() {
         video,
         isFullScreen = false,
         isSubtitleVisible = true,
-        audiotracks = [],
-        subtitletracks = [],
+        audioTracks = [],
+        subtitleTracks = [],
         videoQualityChanged = [],
         audioQualityChanged = [],
         videoBitrates = null,
@@ -54,6 +54,10 @@ OrangeHasPlayer = function() {
     };
 
     var _onloaded = function( /*e*/ ) {
+        this.getAudioTracks();
+        this.getSubtitleTracks();
+        this.getSelectedAudioTrack();
+        this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
         }
@@ -570,13 +574,13 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (audiotracks.length === 0) {
+        if (audioTracks.length === 0) {
 
             mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
             if (mediaPlayerAudioTracks) {
                 for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
-                    audiotracks.push({
+                    audioTracks.push({
                         id: mediaPlayerAudioTracks[i].id,
                         lang: mediaPlayerAudioTracks[i].lang
                     });
@@ -586,7 +590,7 @@ OrangeHasPlayer = function() {
             }
         }
 
-        return audiotracks;
+        return audioTracks;
     };
 
     /**
@@ -603,12 +607,23 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
+        if (!audioTrack || !audioTrack.id || !audioTrack.lang) {
+            throw new Error('OrangeHasPlayer.setAudioTrack(): audioTrack parameter is unknown');
+        }
+
+        if (selectedAudioTrack && ((audioTrack.id === selectedAudioTrack.id) ||
+            (audioTrack.lang === selectedAudioTrack.lang))) {
+            console.log("[OrangeHasPlayer] " + audioTrack.lang + " is already selected");
+            return;
+        }
+
         mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
         if (mediaPlayerAudioTracks) {
             for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
                 if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
+                    selectedAudioTrack = audioTrack;
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
                     return;
                 }
@@ -634,10 +649,10 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedAudioTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < audiotracks.length; i++) {
-                if (audiotracks[i].id === selectedTrack.id ||
-                    audiotracks[i].lang === selectedTrack.lang) {
-                    selectedAudioTrack = audiotracks[i];
+            for (i = 0; i < audioTracks.length; i++) {
+                if (audioTracks[i].id === selectedTrack.id ||
+                    audioTracks[i].lang === selectedTrack.lang) {
+                    selectedAudioTrack = audioTracks[i];
                     return selectedAudioTrack;
                 }
             }
@@ -683,13 +698,13 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (subtitletracks.length === 0) {
+        if (subtitleTracks.length === 0) {
 
             mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
             if (mediaPlayerSubtitleTracks) {
                 for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
-                    subtitletracks.push({
+                    subtitleTracks.push({
                         id: mediaPlayerSubtitleTracks[i].id,
                         lang: mediaPlayerSubtitleTracks[i].lang
                     });
@@ -699,7 +714,7 @@ OrangeHasPlayer = function() {
             }
         }
 
-        return subtitletracks;
+        return subtitleTracks;
     };
 
     /**
@@ -714,6 +729,16 @@ OrangeHasPlayer = function() {
         var i = 0,
             mediaPlayerSubtitleTracks;
 
+        if (!subtitleTrack || !subtitleTrack.id || !subtitleTrack.lang) {
+            throw new Error('OrangeHasPlayer.setSubtitleTrack(): subtitleTrack parameter is unknown');
+        }
+
+        if (selectedSubtitleTrack && ((subtitleTrack.id === selectedSubtitleTrack.id) ||
+            (subtitleTrack.lang === selectedSubtitleTrack.lang))) {
+            console.log("[OrangeHasPlayer] " + subtitleTrack.lang + " is already selected");
+            return;
+        }
+
         _isPlayerInitialized();
 
         mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
@@ -722,6 +747,7 @@ OrangeHasPlayer = function() {
             for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
                 if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
+                    selectedSubtitleTrack = subtitleTrack;
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
                     return;
                 }
@@ -745,14 +771,16 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
 
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
+        
+        if (selectedTrack) {
+            for (i = 0; i < subtitleTracks.length; i++) {
+                if (subtitleTracks[i].id === selectedTrack.id ||
+                    subtitleTracks[i].lang === selectedTrack.lang) {
+                    selectedSubtitleTrack = subtitleTracks[i];
+                    return selectedSubtitleTrack;
+                }
 
-        for (i = 0; i < subtitletracks.length; i++) {
-            if (subtitletracks[i].id === selectedTrack.id ||
-                subtitletracks[i].lang === selectedTrack.lang) {
-                selectedSubtitleTrack = subtitletracks[i];
-                return selectedSubtitleTrack;
             }
-
         }
         return null;
     };
