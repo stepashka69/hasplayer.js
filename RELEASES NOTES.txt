@@ -1,6 +1,6 @@
 ### Release Notes v1.2.2 (2015/09/24)
-* EME support updated from dash.js ()
-* Add MediaKeySession persistance within MediaPlayer instance (useful for chrome that do not support persitance natively)
+* EME support updated from dash.js (with EME session asynchronous teardown handling)
+* Add MediaKeySession persistance within MediaPlayer instance (useful for chrome that do not support persistance natively)
 * Bugs fixing (MSS 412 precondition failed error, ...)
 
 ### Release Notes v1.2.1 (2015/09/14)
