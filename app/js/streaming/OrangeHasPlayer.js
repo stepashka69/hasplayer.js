@@ -874,7 +874,7 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @param {json} params - a json object containing parameters values to set.
-     * @param {number} params.BufferController.minBufferTimeForPlaying - Minimum buffer level before playing, in seconds (default value = 2)
+     * @param {number} params.BufferController.minBufferTimeForPlaying - Minimum buffer level before playing, in seconds (default value = 0)
      * @param {number} params.BufferController.minBufferTime - Minimum buffer size, in seconds (default value = 16)
      * @param {number} params.ABR.minBandwidth - Minimum bandwidth to be playbacked (default value = -1)
      * @param {number} params.ABR.maxBandwidth - Maximum bandwidth to be playbacked (default value = -1)
