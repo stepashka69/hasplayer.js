@@ -41,12 +41,11 @@ define({
 
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
-    'testIntern/functional/startTime',
-    'testIntern/functional/play',
-    'testIntern/functional/pause',
-    'testIntern/functional/seek',
-    'testIntern/functional/multiAudio',
-    'testIntern/functional/DRM'
+    'testIntern/demoPlayer/functional_common/startTime',
+    'testIntern/demoPlayer/functional_common/play',
+    'testIntern/demoPlayer/functional_common/pause',
+    'testIntern/demoPlayer/functional_common/seek',
+    'testIntern/demoPlayer/functional_common/multiAudio'
     ],
 
     // A regular expression matching URLs to files that should not be included in code coverage analysis

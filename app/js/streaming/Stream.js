@@ -69,8 +69,13 @@ MediaPlayer.dependencies.Stream = function() {
 
         // Encrypted Media Extensions
         onProtectionError = function(event) {
+            if(protectionController && event && event.data && event.data.data && event.data.data.sessionToken){
+                var sessionToken = event.data.data.sessionToken;
+                protectionController.closeKeySession(sessionToken);
+            }
             this.errHandler.sendError(event.data.code, event.data.message, event.data.data);
             this.debug.error("[Stream] protection error: " + event.data.code + " - " + event.data.message);
+            // if the errors give the session token in params we close the current session
             this.reset();
         },
 
@@ -1040,26 +1045,32 @@ MediaPlayer.dependencies.Stream = function() {
                 // Get data index corresponding to new audio track
                 self.manifestExt.getDataIndex(audioTrack, manifest, periodInfo.index).then(
                     function(index) {
-                        audioTrackIndex = index;
+                        // check if we are not in the same track
+                        if(audioTrackIndex !== -1 && index !== audioTrackIndex){
 
-                        // Update manifest
-                        url = manifest.mpdUrl;
+                            audioTrackIndex = index;
 
-                        if (manifest.hasOwnProperty("Location")) {
-                            url = manifest.Location;
-                        }
+                            // Update manifest
+                            url = manifest.mpdUrl;
 
-                        self.debug.log("### Refresh manifest @ " + url);
-
-                        self.manifestLoader.load(url).then(
-                            function(manifestResult) {
-                                self.manifestModel.setValue(manifestResult);
-                                self.debug.log("### Manifest has been refreshed.");
-                                deferredAudioUpdate.resolve();
+                            if (manifest.hasOwnProperty("Location")) {
+                                url = manifest.Location;
                             }
-                        );
-                    }
-                );
+
+                            self.debug.log("### Refresh manifest @ " + url);
+
+                            self.manifestLoader.load(url).then(
+                                function(manifestResult) {
+                                    self.manifestModel.setValue(manifestResult);
+                                    self.debug.log("### Manifest has been refreshed.");
+                                    deferredAudioUpdate.resolve();
+                                }
+                            );
+                        }else{
+                            // we are on the same index so do nothing
+                            deferredAudioUpdate.resolve();
+                        }
+                });
             } else {
                 deferredAudioUpdate.reject();
             }
@@ -1128,7 +1139,6 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         initProtection: function(protectionCtrl) {
-
             protectionController = protectionCtrl;
 
             // Protection error handler

@@ -31,6 +31,11 @@ window.onload = function() {
     createHasPlayer();
 
     displayVersion();
+
+    var urlParam = getURLParameter('url');
+    if (urlParam) {
+        onStreamClicked({url: urlParam, protData: undefined});
+    }
 };
 
 var getDOMElements = function() {
@@ -40,6 +45,10 @@ var getDOMElements = function() {
 var displayVersion = function() {
     var title = document.getElementById('app-title');
     title.innerHTML += ' ' + orangeHasPlayer.getVersionFull();
+};
+
+var getURLParameter = function (name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 };
 
 /********************************************************************************************************************
