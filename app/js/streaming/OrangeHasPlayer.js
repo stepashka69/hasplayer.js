@@ -286,8 +286,8 @@ OrangeHasPlayer = function() {
             }
         };
 
-        audiotracks = [];
-        subtitletracks = [];
+        audioTracks = [];
+        subtitleTracks = [];
 
         videoDownloadedBdthValue = undefined;
         audioDownloadedBdthValue = undefined;
