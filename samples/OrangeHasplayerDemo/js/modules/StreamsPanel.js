@@ -118,7 +118,7 @@ StreamsPanel.prototype.loadStreamList = function() {
         self.buildStreamsList(window.jsonData.sources);
     } else {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', document.location + '/../json/sources.json');
+        xhr.open('GET', document.location.pathname + '/../json/sources.json');
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 self.buildStreamsList(JSON.parse(xhr.responseText));
