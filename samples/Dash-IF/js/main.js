@@ -67,8 +67,8 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
     
     //var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
     var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
-    var CHANNEL_IDS = [192, 118, 119];
-    var CHANNEL_NAMES = ['TF1', 'M6', 'W9'];
+    var CHANNEL_IDS = [192, 118, 119, 34, 444];
+    var CHANNEL_NAMES = ['TF1', 'M6', 'W9', 'C+', 'NRJ12'];
 
     var formatData = function(response, channelId, channelName) {
         if (!Array.prototype.find) {
@@ -100,24 +100,31 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
           });
         }
 
+        var protDataWV = response.protectionData.find(function(element){
+                        return element.keySystem ==='com.widevine.alpha';
+                    });
+
+        var protDataPR = response.protectionData.find(function(element){
+                        return element.keySystem ==='com.microsoft.playready';
+                    });
+
         var formattedSource = {
             'type': 'MSS',
             'name': 'Widevine TVM live-int ' + channelId + ' (' + channelName + ')',
             'url': response.url,
-            'browsers': 'cdsbi',
-            'protData' : {
+            'browsers': 'cdsbi'
+        };
+
+        if (response.protectionData.length > 0) {
+            formattedSource.protData =  {
                 'com.widevine.alpha':{
-                    'laURL' : response.protectionData.find(function(element){
-                        return element.keySystem ==='com.widevine.alpha';
-                    }).laUrl
+                    'laURL' : protDataWV ? protDataWV.laUrl : ''
                 },
                 'com.microsoft.playready':{
-                    'laURL': response.protectionData.find(function(element){
-                        return element.keySystem ==='com.microsoft.playready';
-                    }).laUrl
+                    'laURL' : protDataPR ? protDataPR.laUrl : '',
                 }
-            }
-        };
+            };
+        }
         return formattedSource;
     };
 
