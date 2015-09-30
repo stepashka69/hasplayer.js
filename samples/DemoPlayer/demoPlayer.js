@@ -15,7 +15,7 @@ var chartXaxisWindow = 30;
 // the number of plots
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
-var serviceNetBalancerEnabled = true;
+var serviceNetBalancerEnabled = false;
 var netBalancerLimitValue = 0;
 var netBalancerLimitSetted = true;
 
@@ -54,25 +54,28 @@ function hideNetworkLimiter() {
 }
 
 function sendNetBalancerLimit(activate, limit) {
-    var http = new XMLHttpRequest(),
-        data = {'NetBalancerLimit':{'activate':activate, 'upLimit':limit}};
+    if(serviceNetBalancerEnabled){
+
+        var http = new XMLHttpRequest(),
+            data = {'NetBalancerLimit':{'activate':activate, 'upLimit':limit}};
 
 
-    http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
-    http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    http.timeout = 2000;
-    var stringJson = JSON.stringify(data);
+        http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
+        http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        http.timeout = 2000;
+        var stringJson = JSON.stringify(data);
 
-    http.onload = function () {
-        if (http.status < 200 || http.status > 299) {
-            hideNetworkLimiter();
-            serviceNetBalancerEnabled = false;
-        } else {
-            document.getElementById('networkToToggle').style.visibility="visible";
-        }
-    };
+        http.onload = function () {
+            if (http.status < 200 || http.status > 299) {
+                hideNetworkLimiter();
+                serviceNetBalancerEnabled = false;
+            } else {
+                document.getElementById('networkToToggle').style.visibility="visible";
+            }
+        };
 
-    http.send(stringJson);
+        http.send(stringJson);
+    }
 }
 
 function initNetBalancerSlider() {
