@@ -37,16 +37,15 @@ define({
     // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
     maxConcurrency: 1,
 
-    reporters: [ 'runner'],
+    reporters: ['runner'],
 
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
-    //'testIntern/functional/play',
-    //'testIntern/functional/DRM',
-    //'testIntern/functional/seek',
-    //'testIntern/functional/startTime',
-    'testIntern/functional/multiAudio',
-    //'testIntern/functional/pause'
+        'testIntern/orangeHasPlayer/functional_common/startTime',
+        'testIntern/orangeHasPlayer/functional_common/play',
+        'testIntern/orangeHasPlayer/functional_common/pause',
+        'testIntern/orangeHasPlayer/functional_common/seek',
+        'testIntern/orangeHasPlayer/functional_common/multiAudio'
     ],
 
     // A regular expression matching URLs to files that should not be included in code coverage analysis

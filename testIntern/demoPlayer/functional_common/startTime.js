@@ -5,7 +5,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/demoPlayer/functional_common/config'
     ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
@@ -31,6 +31,7 @@ define([
                     return command.execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
+                        assert.equal(time, 0, 'The player should not have began to play yet.')
                         console.log('[TEST_START-TIME] current time = ' + videoCurrentTime);
                     });
                 },
@@ -47,6 +48,7 @@ define([
                         return command.execute(getVideoCurrentTime)
                         .then(function (time) {
                             console.log('[TEST_START-TIME] current time = ' + time);
+                            assert.ok(time > videoCurrentTime, 'Test if player has played');
                             videoCurrentTime = time;
                         });
                     }, function (error) {

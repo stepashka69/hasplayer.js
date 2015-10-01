@@ -13,7 +13,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/orangeHasPlayer/functional_common/config'
     ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
@@ -30,12 +30,12 @@ define([
             registerSuite({
                 name: 'Test playing streams',
 
-                'Initialize the test': function() {
+                setup: function() {
                     console.log('[TEST_PLAY] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
-                    return command.execute(getVideoCurrentTime)
+                    return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
                         console.log('[TEST_PLAY] current time = ' + videoCurrentTime);
@@ -72,6 +72,7 @@ define([
             len = config.play.length;
 
         for (i; i < len; i++) {
+            console.log("[TEST_PLAY] Test stream: " + config.play[i].stream);
             tests(config.play[i].stream);
         }
 });

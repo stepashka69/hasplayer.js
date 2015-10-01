@@ -3,7 +3,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/demoPlayer/functional_common/config'
     ], function(registerSuite, assert, pollUntil, require, config){
 
         var command = null;
@@ -117,8 +117,7 @@ define([
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
                         console.log('[TEST_MULTI-AUDIO] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
-                        //assert.ok(delay >= 4.5);
-                        assert.ok(time > videoCurrentTime);
+                        assert.ok(time > videoCurrentTime, 'Test if video is still playing');
                     });
                 }
             });

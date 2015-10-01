@@ -13,7 +13,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/config'
+    'testIntern/demoPlayer/functional_common/config'
     ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
@@ -33,6 +33,20 @@ define([
 
         var isPaused = function () {
             return document.querySelector('video').paused;
+        };
+
+        var doPlayPause = function(pauseDuration, playDuration) {
+            return command.execute(pause).sleep(pauseDuration)
+                    .execute(isPaused)
+                    .then(function (paused) {
+                        console.log("[TEST_PAUSE] is paused: " + paused);
+                        return assert.ok(paused === true);
+                    }).execute(play).sleep(playDuration)
+                    .execute(isPaused)
+                    .then(function (paused) {
+                        console.log("[TEST_PAUSE] is paused: " + paused);
+                        return assert.ok(paused === false);
+                    });
         };
 
         var tests = function(stream) {
@@ -102,6 +116,45 @@ define([
                     });
                 }
             });
+
+        };
+
+        var test_multiple_play_pause = function(stream, pauseDuration, playDuration) {
+
+            var url = config.testPage + '?url=' + stream;
+
+            registerSuite({
+                name: 'Test multiple pause stream',
+
+                'Initialize the test': function() {
+                    console.log('[TEST_PAUSE] stream: ' + stream);
+
+                    command = this.remote.get(require.toUrl(url));
+
+                    return command.sleep(2000).execute(getVideoCurrentTime)
+                    .then(function (time) {
+                        assert.ok(time > 0);
+                        videoCurrentTime = time;
+                        console.log('[TEST_PAUSE] current time = ' + videoCurrentTime);
+                    });
+                },
+
+                'Do multiple play pause': function() {
+                    var result = null;
+
+                    for (var i = 0; i < 5; ++i) {
+                        if (result === null) {
+                            result = doPlayPause(pauseDuration, playDuration);
+                        } else {
+                            result = result.then(function() {
+                                return doPlayPause(pauseDuration, playDuration);
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+            });
         };
 
         var i = 0,
@@ -109,5 +162,9 @@ define([
 
         for (i; i < len; i++) {
             tests(config.seek[i].stream);
+            test_multiple_play_pause(config.seek[i].stream, 1000, 2000);
+            test_multiple_play_pause(config.seek[i].stream, 250, 250);
+            test_multiple_play_pause(config.seek[i].stream, 50, 50);
+            test_multiple_play_pause(config.seek[i].stream, 0, 0);
         }
 });
