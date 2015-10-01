@@ -4,13 +4,13 @@ define({
         'http://tv-has.orange-labs.fr/orangehasplayer/dev/index.html'
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
-    play: [
+    playLive: [
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'},
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'}
     ],
-    //Test DRM stream play (on IE only)
-    DRM: [
-        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest'}
+    //Test VOD stream play (playing after 10 seconds with buffering margin of 2 seconds)
+    playVod: [
+        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest'}
     ],
     //Test Playing, Seek and Loop
     seek: [
@@ -41,11 +41,11 @@ define({
             tracks: [
                 {
                     id: 'audio102_deu',
-                    urlPattern: 'audio102_deu'
+                    lang: 'audio102_deu'
                 },
                 {
                     id: 'audio101_fra',
-                    urlPattern: 'audio101_fra'
+                    lang: 'audio101_fra'
                 }
             ]
         },
@@ -54,11 +54,11 @@ define({
             tracks: [
                 {
                     id: 'audio102_deu',
-                    urlPattern: 'audio102_deu'
+                    lang: 'deu'
                 },
                 {
                     id: 'audio101_fra',
-                    urlPattern: 'audio101_fra'
+                    lang: 'fra'
                 }
             ]
         }

@@ -4,14 +4,14 @@ define([
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
     'testIntern/orangeHasPlayer/functional_common/config'
-    ], function(registerSuite, assert, pollUntil, require, config){
+    ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
         var videoCurrentTime = 0;
         var audioTracks = null;
 
         var getAudioTracks = function () {
-            var tmpTracks = window.player.getAudioTracks();
+            var tmpTracks = orangeHasPlayer.getAudioTracks();
             var tracks = [];
 
             for(var i = 0; i < tmpTracks.length; ++i) {
@@ -22,8 +22,12 @@ define([
             return tracks;
         };
 
+        var getAudioSelectedTrackId = function () {
+            return orangeHasPlayer.getSelectedAudioTrack().id;
+        };
+
         var setAudioTrack = function (track) {
-            window.player.setAudioTrack(track);
+            orangeHasPlayer.setAudioTrack(track);
         };
 
         var getVideoCurrentTime = function () {
@@ -37,7 +41,7 @@ define([
             registerSuite({
                 name: 'Test multi-audio functionnality',
 
-                'Initialize the test': function() {
+                setup: function() {
                     console.log('[TEST_MULTI-AUDIO] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
@@ -87,25 +91,10 @@ define([
                     console.log('[TEST_MULTI-AUDIO] set audio track ' + track.id);
 
                     return command.execute(setAudioTrack, [track])
-                    .then(pollUntil(
-                        function (urlPattern) {
-                            // Check if new track has been activated
-                            // 1 - Get the metrics for audio track
-                            // 2 - Check if last audio segment url contains the provided pattern
-                            var metrics = window.player.getMetricsFor('audio'),
-                                metricsExt = window.player.getMetricsExt(),
-                                httpRequests = metricsExt.getHttpRequests(metrics);
-
-                            if (httpRequests.length === 0) {
-                                return false;
-                            }
-
-                            return httpRequests[httpRequests.length-1].url.indexOf(urlPattern) > 0 ? true : null;
-                        }, [track.urlPattern], 10000, 1000))
-                    .then(function () {
-                        assert.ok(true, '');
-                    }, function (error) {
-                        assert.ok(false, '[TEST_MULTI-AUDIO] Failed to change audio track');
+                    .sleep(100)
+                    .execute(getAudioSelectedTrackId)
+                    .then(function (trackId) {
+                        assert.equal(trackId, track.id);
                     });
                 },
 
