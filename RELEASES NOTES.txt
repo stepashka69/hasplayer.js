@@ -1,3 +1,12 @@
+### Release Notes v1.2.3 (2015/10/01)
+* Enhance playback startup time (zapping time)
+* MSS to DASH manifest transcoding do not use anymore repetition functionality for segment timeline, in order to reduce processing time
+* Bugs fixing:
+* - Close/remove Media Keys session from when an error occured
+* - Avoid manifest reloading in case of track switch on same track (i.e. same id/language)
+* - Correct resetting process by resetting streams only once the protection controller and media keys have been closed/resetted
+* - Correct distinction between aborted request and error requests
+
 ### Release Notes v1.2.2 (2015/09/24)
 * EME support updated from dash.js (with EME session asynchronous teardown handling)
 * Add MediaKeySession persistance within MediaPlayer instance (useful for chrome that do not support persistance natively)
