@@ -75,7 +75,6 @@ define([
             len = config.playLive.length;
 
         for (i; i < len; i++) {
-            console.log("[TEST_PLAYLIVE] Test stream: " + config.playLive[i].stream);
             tests(config.playLive[i].stream);
         }
 });
