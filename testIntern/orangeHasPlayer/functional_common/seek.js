@@ -20,11 +20,15 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function () {
-            return document.querySelector('video').currentTime;
+            return orangeHasPlayer.getPosition();
         };
 
         var seek = function (time) {
-            orangeHasPlayer.seek(time);
+            try {
+                orangeHasPlayer.seek(time);
+            } catch(err) {
+                return err.message;
+            }
         };
 
         var test_init = function(stream) {
@@ -60,7 +64,6 @@ define([
             });
         };
 
-
         var test_seek = function(seekTime) {
 
             registerSuite({
@@ -71,6 +74,7 @@ define([
                     console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
 
                     return command.execute(seek, [seekTime])
+                    .execute(getVideoCurrentTime)
                     // Wait for current time > 30, i.e. seek has been done and video is playing
                     .then(pollUntil(
                         function (seekTime) {
@@ -109,7 +113,7 @@ define([
 
             registerSuite({
                 name: 'Test seek over duration',
-                'Init': function() {
+                setup: function() {
                     console.log('[TEST_SEEK] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
@@ -125,6 +129,9 @@ define([
                     console.log("[TEST_SEEK] Seek over duration");
 
                     return command.sleep(2000).execute(seek, [1000])
+                    .then(function(errMsg) {
+                        return assert.equal(errMsg, 'OrangeHasPlayer.seek(): seek value not correct');
+                    })
                     .execute(getVideoCurrentTime)
                     .then(function(time) {
                         var delay = time - streamDuration;
@@ -140,7 +147,7 @@ define([
             var url = config.testPage + '?url=' + stream;
 
             registerSuite({
-                name: 'Test seek over duration',
+                name: 'Test seek to zero',
                 'Init': function() {
                     console.log('[TEST_SEEK] stream: ' + stream);
 
@@ -172,7 +179,7 @@ define([
             var url = config.testPage + '?url=' + stream;
 
             registerSuite({
-                name: 'Test seek over duration',
+                name: 'Test seek under zero',
                 'Init': function() {
                     console.log('[TEST_SEEK] stream: ' + stream);
 
@@ -188,7 +195,10 @@ define([
                 'Seek under zero': function() {
                     console.log("[TEST_SEEK] Seek under zero");
 
-                    return command.sleep(2000).execute(seek, [-1])
+                    return command.execute(seek, [-1])
+                    .then(function(errMsg) {
+                        return assert.equal(errMsg, 'OrangeHasPlayer.seek(): seek value not correct');
+                    })
                     .execute(getVideoCurrentTime)
                     .then(function(time) {
                         console.log("[TEST_SEEK] time: " + time)

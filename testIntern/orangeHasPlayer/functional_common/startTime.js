@@ -12,7 +12,7 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoCurrentTime = function() {
-            return document.querySelector('video').currentTime;
+            return orangeHasPlayer.getPosition();
         };
 
         var tests = function(stream, startTime) {

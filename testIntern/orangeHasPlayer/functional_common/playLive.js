@@ -23,45 +23,48 @@ define([
             return document.querySelector('video').currentTime;
         };
 
-        var tests = function(stream) {
+        var getPlayerTimePosition = function() {
+            return orangeHasPlayer.getPosition();
+        };
 
+        var tests = function(stream) {
             var url = config.testPage + '?url=' + stream;
 
             registerSuite({
                 name: 'Test playing streams',
 
                 setup: function() {
-                    console.log('[TEST_PLAY] stream: ' + stream);
+                    console.log('[TEST_PLAYLIVE] stream: ' + stream);
 
                     command = this.remote.get(require.toUrl(url));
 
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log('[TEST_PLAY] current time = ' + videoCurrentTime);
+                        console.log('[TEST_PLAYLIVE] current time = ' + videoCurrentTime);
                     });
                 },
 
                 'Check if playing': function() {
-                    console.log('[TEST_PLAY] Wait 5s ...');
+                    console.log('[TEST_PLAYLIVE] Wait 5s ...');
 
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log('[TEST_PLAY] current time = ' + time);
+                        console.log('[TEST_PLAYLIVE] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
                 },
 
                 'Check playing time after 10 sec.': function() {
-                    console.log('[TEST_PLAY] Wait 10s ...');
+                    console.log('[TEST_PLAYLIVE] Wait 10s ...');
 
                     return command.sleep(10000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
-                        console.log('[TEST_PLAY] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
+                        console.log('[TEST_PLAYLIVE] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
                         assert.ok(delay >= 9); // 9 for sleep precision
                     });
                 }
@@ -69,10 +72,10 @@ define([
         };
 
         var i = 0,
-            len = config.play.length;
+            len = config.playLive.length;
 
         for (i; i < len; i++) {
-            console.log("[TEST_PLAY] Test stream: " + config.play[i].stream);
-            tests(config.play[i].stream);
+            console.log("[TEST_PLAYLIVE] Test stream: " + config.playLive[i].stream);
+            tests(config.playLive[i].stream);
         }
 });

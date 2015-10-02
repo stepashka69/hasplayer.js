@@ -28,10 +28,8 @@ define({
     // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
     // capabilities options specified for an environment will be copied as-is
     environments: [
-
         { browserName: 'chrome', /*version: '2.11', */platform: 'WIN8_1' },
         { browserName: 'internet explorer', /*version: '11', */platform: 'WIN8_1' }
-
     ],
 
     // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
@@ -41,8 +39,9 @@ define({
 
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
-        'testIntern/orangeHasPlayer/functional_common/startTime',
-        'testIntern/orangeHasPlayer/functional_common/play',
+        //'testIntern/orangeHasPlayer/functional_common/startTime',
+        'testIntern/orangeHasPlayer/functional_common/playLive',
+        'testIntern/orangeHasPlayer/functional_common/playVod',
         'testIntern/orangeHasPlayer/functional_common/pause',
         'testIntern/orangeHasPlayer/functional_common/seek',
         'testIntern/orangeHasPlayer/functional_common/multiAudio'
