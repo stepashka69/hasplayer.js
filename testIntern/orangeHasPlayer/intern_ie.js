@@ -28,9 +28,7 @@ define({
     // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
     // capabilities options specified for an environment will be copied as-is
     environments: [
-
         { browserName: 'internet explorer', /*version: '11', */platform: 'WIN8_1' }
-
     ],
 
     // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service

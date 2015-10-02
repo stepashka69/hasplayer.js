@@ -17,7 +17,7 @@ define([
     ], function(registerSuite, assert,pollUntil, require, config){
 
         var getCurrentTime = function() {
-            return document.querySelector('video').currentTime;
+            return orangeHasPlayer.getPosition();
         }
 
         var isPaused = function() {
@@ -33,7 +33,7 @@ define([
             registerSuite({
                 name: 'Sequence of playing a DRM stream',
 
-                'initTest': function() {
+                setup: function() {
                     console.log('[TEST_DRM] INIT');
                     command = this.remote.get(require.toUrl(url));
 
