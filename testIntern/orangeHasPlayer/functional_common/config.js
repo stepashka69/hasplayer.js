@@ -16,6 +16,10 @@ define({
     stopVod: [
         {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest'}
     ],
+    //Test Live stream stop
+    stopLive: [
+        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'}
+    ],
     //Test Playing, Seek and Loop
     seek: [
         {

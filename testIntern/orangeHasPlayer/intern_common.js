@@ -45,6 +45,7 @@ define({
         'testIntern/orangeHasPlayer/functional_common/playVod',
         'testIntern/orangeHasPlayer/functional_common/pause',
         'testIntern/orangeHasPlayer/functional_common/stopVod',
+        'testIntern/orangeHasPlayer/functional_common/stopLive',
         'testIntern/orangeHasPlayer/functional_common/seek',
         'testIntern/orangeHasPlayer/functional_common/multiAudio'
     ],
