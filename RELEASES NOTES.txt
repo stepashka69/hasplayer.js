@@ -1,5 +1,7 @@
 ### Release Notes v1.2.4 (2015/10/02)
-* Correct debug level setting
+* Bugs fixing:
+* - Correct missing (failing to download) fragment management 
+* - Correct debug level setting
 * Disable all debug messages at build
 
 ### Release Notes v1.2.3 (2015/10/01)
