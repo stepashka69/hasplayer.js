@@ -41,6 +41,7 @@ define({
     functionalSuites: [
         'testIntern/orangeHasPlayer/functional_common/buildinfos',
         //'testIntern/orangeHasPlayer/functional_common/startTime',
+        'testIntern/orangeHasPlayer/functional_common/liveOrVod',
         'testIntern/orangeHasPlayer/functional_common/playLive',
         'testIntern/orangeHasPlayer/functional_common/playVod',
         'testIntern/orangeHasPlayer/functional_common/pause',
