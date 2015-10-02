@@ -12,6 +12,10 @@ define({
     playVod: [
         {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest'}
     ],
+    //Test VOD stream stop
+    stopVod: [
+        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest'}
+    ],
     //Test Playing, Seek and Loop
     seek: [
         {
