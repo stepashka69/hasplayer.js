@@ -40,7 +40,9 @@ define({
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
         'testIntern/orangeHasPlayer/functional_common/buildinfos',
+        'testIntern/orangeHasPlayer/functional_common/videoBitrates',
         //'testIntern/orangeHasPlayer/functional_common/startTime',
+        'testIntern/orangeHasPlayer/functional_common/liveOrVod',
         'testIntern/orangeHasPlayer/functional_common/playLive',
         'testIntern/orangeHasPlayer/functional_common/playVod',
         'testIntern/orangeHasPlayer/functional_common/pause',

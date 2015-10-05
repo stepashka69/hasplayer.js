@@ -3,6 +3,24 @@ define({
     testPage: [
         'http://tv-has.orange-labs.fr/orangehasplayer/dev/index.html'
     ],
+    videoBitrates: [
+        {
+            stream: 'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest',
+            bitrates: [320000, 680000, 1100000, 1600000, 2100000]
+        },
+        {
+            stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest',
+            bitrates: [226000, 400000, 680000, 1200000, 2100000]
+        },
+        {
+            stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest',
+            bitrates: [226000, 416000, 680000, 1200000]
+        },
+        {
+            stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest',
+            bitrates: [230000, 331000, 477000, 688000, 991000, 1427000, 2056000, 2962000]
+        },
+    ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     playLive: [
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'},
@@ -19,6 +37,11 @@ define({
     //Test Live stream stop
     stopLive: [
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'}
+    ],
+    //Test live and VoD detection and specific methods behavior
+    liveOrVod: [
+        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'},
+        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest'}
     ],
     //Test Playing, Seek and Loop
     seek: [
