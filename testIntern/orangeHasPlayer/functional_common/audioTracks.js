@@ -20,12 +20,7 @@ define([
         var videoCurrentTime = 0;
 
         var getAudioTracks = function() {
-            var tmpTracks = orangeHasPlayer.getAudioTracks();
-            var tracks = [];
-            for (var i = 0; i < tmpTracks.length; ++i) {
-                tracks.push(tmpTracks[i]);
-            }
-            return tracks;
+            return orangeHasPlayer.getAudioTracks();
         };
 
         var equal = function(x, y) {
@@ -43,7 +38,7 @@ define([
             return true;
         };
 
-        var test_videobitrates = function(stream, tracks) {
+        var test_audioTracks = function(stream, tracks) {
             var url = config.testPage + '?url=' + stream;
 
             registerSuite({
@@ -59,7 +54,7 @@ define([
                     .execute(getAudioTracks)
                     .then(function (audioTracks) {
                         var equality = equal(audioTracks.sort(), tracks.sort());
-                        return assert.ok(equality, 'Bitrates should match: ' + audioTracks + ' != ' + tracks);
+                        return assert.ok(equality, 'Bitrates should match.');
                     });
                 }
             });
@@ -69,6 +64,6 @@ define([
         len = config.audioTracks.length;
 
         for (i; i < len; i++) {
-            test_videobitrates(config.audioTracks[i].stream, config.audioTracks[i].audioTracks);
+            test_audioTracks(config.audioTracks[i].stream, config.audioTracks[i].audioTracks);
         }
 });

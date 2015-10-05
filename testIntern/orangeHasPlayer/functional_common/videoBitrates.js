@@ -20,12 +20,7 @@ define([
         var videoCurrentTime = 0;
 
         var getVideoBitrates = function() {
-            var tmpBitrates = orangeHasPlayer.getVideoBitrates();
-            var bitrates = [];
-            for (var i = 0; i < tmpBitrates.length; ++i) {
-                bitrates.push(tmpBitrates[i]);
-            }
-            return bitrates;
+            return orangeHasPlayer.getVideoBitrates();
         };
 
         var equalsArray = function(a, b) {
@@ -48,6 +43,7 @@ define([
                 },
 
                 'Check bitrates': function() {
+                    console.log('[TEST_VIDEO_BITRATES] check video bitrates');
                     return command.sleep(3000)
                     .execute(getVideoBitrates)
                     .then(function (videoBitrates) {
