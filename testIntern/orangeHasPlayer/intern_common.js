@@ -49,7 +49,8 @@ define({
         'testIntern/orangeHasPlayer/functional_common/stopVod',
         'testIntern/orangeHasPlayer/functional_common/stopLive',
         'testIntern/orangeHasPlayer/functional_common/seek',
-        'testIntern/orangeHasPlayer/functional_common/multiAudio'
+        'testIntern/orangeHasPlayer/functional_common/multiAudio',
+        'testIntern/orangeHasPlayer/functional_common/audioTracks'
     ],
 
     // A regular expression matching URLs to files that should not be included in code coverage analysis
