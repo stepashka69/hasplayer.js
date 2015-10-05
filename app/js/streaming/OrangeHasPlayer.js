@@ -75,7 +75,7 @@ OrangeHasPlayer = function() {
         });
         video.dispatchEvent(event);
     };
-    
+
     var _cleanStreamTab = function(streamTab, idToRemove){
         var i = 0;
 
@@ -98,7 +98,7 @@ OrangeHasPlayer = function() {
                 idToRemove.push(i);
             }
         }
-        
+
         _cleanStreamTab(streamTab, idToRemove);
     };
 
@@ -771,7 +771,7 @@ OrangeHasPlayer = function() {
         _isPlayerInitialized();
 
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
-        
+
         if (selectedTrack) {
             for (i = 0; i < subtitleTracks.length; i++) {
                 if (subtitleTracks[i].id === selectedTrack.id ||
@@ -835,7 +835,7 @@ OrangeHasPlayer = function() {
      */
     this.setVolume = function(volume) {
         _isPlayerInitialized();
-        if ((typeof volume !== 'number') || (volume < 0 && volume > 1)) {
+        if ((typeof volume !== 'number') || volume < 0 || volume > 1) {
             throw new Error('OrangeHasPlayer.setVolume(): Invalid Arguments');
         }
 
