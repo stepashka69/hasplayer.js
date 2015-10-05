@@ -50,8 +50,8 @@ define({
         'testIntern/orangeHasPlayer/functional_common/stopLive',
         'testIntern/orangeHasPlayer/functional_common/seek',
         'testIntern/orangeHasPlayer/functional_common/multiAudio',
-        'testIntern/orangeHasPlayer/functional_common/audioTracks'
-        'testIntern/orangeHasPlayer/functional_common/subtitles'
+        'testIntern/orangeHasPlayer/functional_common/audioTracks',
+        'testIntern/orangeHasPlayer/functional_common/subtitles',
         'testIntern/orangeHasPlayer/functional_common/volume'
     ],
 
