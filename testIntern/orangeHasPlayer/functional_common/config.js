@@ -126,5 +126,9 @@ define({
                 }
             ]
         }
-    ]
+    ],
+    volume: [
+        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'},
+        {stream: 'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest'}
+    ],
 });
