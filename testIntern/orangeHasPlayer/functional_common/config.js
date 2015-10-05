@@ -111,5 +111,20 @@ define({
                 }
             ]
         }
+    ],
+    subtitles: [
+        {
+            stream: 'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest',
+            tracks: [
+                {
+                    id: 'textstream_fra',
+                    lang: 'fra'
+                },
+                {
+                    id: 'textstream_fre',
+                    lang: 'fre'
+                }
+            ]
+        }
     ]
 });
