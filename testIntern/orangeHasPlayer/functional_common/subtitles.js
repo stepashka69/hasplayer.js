@@ -17,7 +17,6 @@ define([
     ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
-        var videoCurrentTime = 0;
 
         var getSubtitleTracks = function() {
            return orangeHasPlayer.getSubtitleTracks();
@@ -33,6 +32,18 @@ define([
 
         var setDefaultSubtitleTrack = function(track) {
             orangeHasPlayer.setDefaultSubtitleLang(track.lang);
+        };
+
+        var getSubtitleVisibility = function() {
+            return orangeHasPlayer.getSubtitleVisibility();
+        };
+
+        var getVideoSubtitleVisibility = function() {
+            return document.querySelector('video').textTracks[0].mode;
+        };
+
+        var setSubtitleVisibility = function (visible) {
+            orangeHasPlayer.setSubtitleVisibility(visible);
         };
 
         var equal = function(x, y) {
@@ -61,7 +72,7 @@ define([
                 },
 
                 'Check subtitle tracks': function() {
-                    console.log('[TEST_SUBTITLE_TRACKS] check subtitle tracks');
+                    console.log('[TEST_SUBTITLE_TRACKS] Check subtitle tracks');
                     return command.sleep(3000)
                     .execute(getSubtitleTracks)
                     .then(function (subtitleTracks) {
@@ -71,7 +82,7 @@ define([
                 },
 
                 'Check selected subtitle track': function() {
-                    console.log('[TEST_SUBTITLE_TRACKS] check selected subtitle track');
+                    console.log('[TEST_SUBTITLE_TRACKS] Check selected subtitle track');
                     return command
                     .execute(getSelectedSubtitleTrack)
                     .then(function (subtitleTrack) {
@@ -81,7 +92,7 @@ define([
                 },
 
                 'Set subtitle tracks': function() {
-                    console.log('[TEST_SUBTITLE_TRACKS] set subtitle track');
+                    console.log('[TEST_SUBTITLE_TRACKS] Set subtitle track');
                     return command
                     .execute(setSubtitleTrack, [tracks[0]])
                     .then(function () {
@@ -106,7 +117,7 @@ define([
                 },
 
                 'Set default subtitles': function() {
-                    console.log('[TEST_SUBTITLE_TRACKS] check selected subtitle track');
+                    console.log('[TEST_SUBTITLE_TRACKS] Check selected subtitle track');
                     return command
                     .execute(setDefaultSubtitleTrack, [tracks[0]])
                     .then(function () {
@@ -126,11 +137,71 @@ define([
             });
         };
 
+        var test_subtitles_visibility = function(stream) {
+            var url = config.testPage + '?url=' + stream;
+
+            registerSuite({
+                name: 'Test set default subtitles',
+
+                setup: function() {
+                    command = this.remote.get(require.toUrl(url));
+                },
+
+                'Get initial subtitles visibility': function() {
+                    console.log('[TEST_SUBTITLE_TRACKS] Get initial subtitles visibility');
+                    return command
+                    .sleep(10000)
+                    .execute(getVideoSubtitleVisibility)
+                    .then(function (visibility) {
+                        assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
+                        return command.execute(getSubtitleVisibility);
+                    })
+                    .then(function(visibility) {
+                        return assert.ok(visibility, 'The subtitles should be shown (proxy).');
+                    });
+                },
+
+                'Set subtitles visibility to false': function() {
+                    console.log('[TEST_SUBTITLE_TRACKS] Set subtitles visibility to false');
+                    return command
+                    .execute(setSubtitleVisibility, [false])
+                    .sleep(3000)
+                    .then(function () {
+                        return command.execute(getVideoSubtitleVisibility);
+                    })
+                    .then(function(visibility) {
+                        assert.equal(visibility, 'hidden', 'The subtitles should be shown (video tag).')
+                        return command.execute(getSubtitleVisibility);
+                    })
+                    .then(function(visibility) {
+                        return assert.ok(!visibility, 'The subtitles should be shown (proxy).');
+                    });
+                },
+
+                'Set subtitles visibility to true': function() {
+                    console.log('[TEST_SUBTITLE_TRACKS] Set subtitles visibility to true');
+                    return command
+                    .execute(setSubtitleVisibility, [true])
+                    .then(function () {
+                        return command.execute(getVideoSubtitleVisibility);
+                    })
+                    .then(function(visibility) {
+                        assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
+                        return command.execute(getSubtitleVisibility);
+                    })
+                    .then(function(visibility) {
+                        return assert.ok(visibility, 'The subtitles should be shown (proxy).');
+                    });
+                }
+            });
+        };
+
         var i = 0,
         len = config.subtitles.length;
 
         for (i; i < len; i++) {
             test_subtitleTracks(config.subtitles[i].stream, config.subtitles[i].tracks);
             test_defaultsubtitleTracks(config.subtitles[i].stream, config.subtitles[i].tracks);
+            test_subtitles_visibility(config.subtitles[i].stream);
         }
 });
