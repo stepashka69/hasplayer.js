@@ -15,7 +15,7 @@ var chartXaxisWindow = 30;
 // the number of plots
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
-var serviceNetBalancerEnabled = false;
+var enableNetBalancer = false
 var netBalancerLimitValue = 0;
 var netBalancerLimitSetted = true;
 
@@ -54,32 +54,37 @@ function hideNetworkLimiter() {
 }
 
 function sendNetBalancerLimit(activate, limit) {
-    if(serviceNetBalancerEnabled){
-
-        var http = new XMLHttpRequest(),
-            data = {'NetBalancerLimit':{'activate':activate, 'upLimit':limit}};
-
-
-        http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
-        http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        http.timeout = 2000;
-        var stringJson = JSON.stringify(data);
-
-        http.onload = function () {
-            if (http.status < 200 || http.status > 299) {
-                hideNetworkLimiter();
-                serviceNetBalancerEnabled = false;
-            } else {
-                document.getElementById('networkToToggle').style.visibility="visible";
-            }
-        };
-
-        http.send(stringJson);
+    if (enableNetBalancer === false) {
+        return;
     }
+
+    var http = new XMLHttpRequest(),
+        data = {'NetBalancerLimit':{'activate':activate, 'upLimit':limit}};
+
+
+    http.open("POST", "http://localhost:8081/NetBalancerLimit", true);
+    http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    http.timeout = 2000;
+    var stringJson = JSON.stringify(data);
+
+    http.onload = function () {
+        if (http.status < 200 || http.status > 299) {
+            hideNetworkLimiter();
+            serviceNetBalancerEnabled = false;
+        } else {
+            document.getElementById('networkToToggle').style.visibility="visible";
+        }
+    };
+
+    http.send(stringJson);
 }
 
 function initNetBalancerSlider() {
     var initBW = 5000;
+
+    if (enableNetBalancer === false) {
+        return;
+    }
 
     $('#sliderNetworkBandwidth').labeledslider({
         max: 5000,
@@ -584,6 +589,8 @@ function parseUrlParams () {
                 enableMetrics = true;
             } else if ((name === 'debug') && (value !== 'false')) {
                 document.getElementById('debugInfos').style.visibility="visible";
+            } else if (name === 'netBalancer') {
+                enableNetBalancer = true;
             } else {
                 streamSource += '&' + params[i];
             }
@@ -596,7 +603,7 @@ function metricUpdated(e) {
 
     if (e.data.stream == "video" && e.data.metric == "HttpRequestTrace") {
         metric = e.data.value;
-        if (metric.tfinish != null && !netBalancerLimitSetted) {
+        if (metric.tfinish != null && enableNetBalancer && !netBalancerLimitSetted) {
             console.log("Set NetBalancer Limit"+netBalancerLimitValue);
             sendNetBalancerLimit(true, (netBalancerLimitValue * 1000));
             netBalancerLimitSetted = true;
