@@ -317,32 +317,6 @@ MediaPlayer.dependencies.Stream = function() {
                                                 }
 
                                                 return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
-
-                                                /*return self.manifestExt.getContentProtectionData(specificAudioData).then(
-                                                    function(contentProtectionData) {
-                                                        self.debug.log("[Stream] Audio contentProtection");
-
-                                                        if (!!contentProtectionData && !self.capabilities.supportsMediaKeys()) {
-                                                            self.debug.error("[Stream] mediakeys not supported!");
-                                                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS);
-                                                            return Q.when(null);
-                                                        }
-
-                                                        contentProtection = contentProtectionData;
-
-                                                        //kid = self.protectionController.selectKeySystem(videoCodec, contentProtection);
-                                                        //self.protectionController.ensureKeySession(kid, videoCodec, null);
-
-                                                        if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                                            var msg = "Audio Codec (" + codec + ") is not supported.";
-                                                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
-                                                            self.debug.error("[Stream] ", msg);
-                                                            return Q.when(null);
-                                                        }
-
-                                                        return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
-                                                    }
-                                                );*/
                                             }
                                         ).then(
                                             function(buffer) {
@@ -354,10 +328,9 @@ MediaPlayer.dependencies.Stream = function() {
                                                     audioController = self.system.getObject("bufferController");
                                                     audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource, eventController);
                                                     //self.debug.log("Audio is ready!");
+                                                    audioReady = true;
+                                                    checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
                                                 }
-
-                                                audioReady = true;
-                                                checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
                                             },
                                             function() {
                                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer.");
