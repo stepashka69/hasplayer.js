@@ -284,9 +284,12 @@ MediaPlayer.dependencies.Stream = function() {
                                     }
                                 );
                             } else {
-                                self.debug.log("[Stream] No video data.");
-                                videoReady = true;
-                                checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
+                                var msg = "No Video Data in manifest.";
+                                self.debug.error("[Stream]"+msg);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                                return Q.when(null);
+                                //videoReady = true;
+                                //checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
                             }
 
                             return self.manifestExt.getAudioDatas(manifest, periodInfo.index);
