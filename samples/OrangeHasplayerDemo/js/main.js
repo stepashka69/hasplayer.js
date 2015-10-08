@@ -127,6 +127,14 @@ var handlePlayBitrate = function(bitrate, time) {
     playerPanel.setCurrentBitrate(bitrate);
 };
 
+var handleBufferLevelUpdated = function(type, level) {
+    if (type === "video") {
+        settingsPanel.videoBufferLength.innerHTML = level +" s";
+    }else if (type === "audio") {
+        settingsPanel.audioBufferLength.innerHTML = level +" s";
+    }
+}
+
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById('canvas').getContext('2d');
     graphPanel.init(ctx, bitrates);

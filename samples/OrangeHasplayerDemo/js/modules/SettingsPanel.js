@@ -18,6 +18,8 @@ var SettingsPanel = function() {
     this.defaultSubtitleLangCombobox = null;
     this.optimizedZappingEnabled = true;
     this.metricsConfig = null;
+    this.videoBufferLength = null;
+    this.audioBufferLength = null;
 };
 
 SettingsPanel.prototype.init = function() {
@@ -30,6 +32,8 @@ SettingsPanel.prototype.init = function() {
     this.defaultAudioLangCombobox = document.getElementById('default_audio_language');
     this.defaultSubtitleLangCombobox = document.getElementById('default_subtitle_language');
     this.enableOptimzedZappingCheckbox = document.getElementById('enable-optimized-zapping');
+    this.videoBufferLength = document.getElementById('video_buffer_Length');
+    this.audioBufferLength = document.getElementById('audio_buffer_Length');
 
     this.setupEventListeners();
     this.initMetricsAgentOptions();
