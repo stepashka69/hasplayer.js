@@ -205,16 +205,21 @@ Hls.dependencies.HlsParser = function () {
             media,
             i,
             self = this;
+        
+        // Check playlist header
+        if (!data || (data && data.length < 0)){
+            deferred.reject();
+            return;
+        }
 
         self.debug.log(data);
 
         data = _splitLines(data);
 
-        // Check playlist header
-        if (data && data.length && data[0].trim() !== TAG_EXTM3U) {
-            deferred.resolve();
+        if (data[0].trim() !== TAG_EXTM3U){
+            deferred.reject();
             return;
-        }
+        }      
 
         // Intitilaize SegmentList
         segmentList = {
@@ -626,6 +631,9 @@ Hls.dependencies.HlsParser = function () {
                         postProcess.call(self, mpd, result.quality).then(function() {
                             deferred.resolve(mpd);
                         });
+                    },
+                    function (param) {
+                        deferred.reject(param);
                     }
                 );
             }

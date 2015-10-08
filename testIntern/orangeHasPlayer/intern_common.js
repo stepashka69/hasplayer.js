@@ -40,13 +40,21 @@ define({
     // Functional test suite(s) to run in each browser once non-functional tests are completed
     functionalSuites: [
         'testIntern/orangeHasPlayer/functional_common/buildinfos',
+        'testIntern/orangeHasPlayer/functional_common/videoBitrates',
         //'testIntern/orangeHasPlayer/functional_common/startTime',
+        'testIntern/orangeHasPlayer/functional_common/liveOrVod',
         'testIntern/orangeHasPlayer/functional_common/playLive',
         'testIntern/orangeHasPlayer/functional_common/playVod',
         'testIntern/orangeHasPlayer/functional_common/pause',
         'testIntern/orangeHasPlayer/functional_common/stopVod',
+        'testIntern/orangeHasPlayer/functional_common/stopLive',
         'testIntern/orangeHasPlayer/functional_common/seek',
-        'testIntern/orangeHasPlayer/functional_common/multiAudio'
+        'testIntern/orangeHasPlayer/functional_common/multiAudio',
+        'testIntern/orangeHasPlayer/functional_common/audioTracks',
+        'testIntern/orangeHasPlayer/functional_common/subtitles',
+        'testIntern/orangeHasPlayer/functional_common/volume',
+        'testIntern/orangeHasPlayer/functional_common/events',
+        'testIntern/orangeHasPlayer/functional_common/errors'
     ],
 
     // A regular expression matching URLs to files that should not be included in code coverage analysis
