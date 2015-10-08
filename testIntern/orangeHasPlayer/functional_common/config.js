@@ -133,5 +133,47 @@ define({
     ],
     events: [
         {stream: 'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest'}
+    ],
+    errors: [
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/bad url',
+            error: 'DOWNLOAD_ERR_MANIFEST',
+            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/bad url no retry attempts left'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Manifest Error/Manifest',
+            error: 'MANIFEST_ERR_PARSE',
+            msg: 'parsing the manifest failed : [MssParser] Failed to parse manifest!!'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2- Unknown Manifest type/Manifest',
+            error: 'MANIFEST_ERR_PARSE',
+            msg: 'parsing the manifest failed : manifest cannot be parsed, protocol is unsupported!'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Audio Quality Not Available Error/Manifest',
+            error: 'DOWNLOAD_ERR_CONTENT',
+            msg: 'audio: Failed to load a request at startTime = 2246462.6478438'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Audio Unsupported Codec/Manifest',
+            error: 'MEDIA_ERR_SRC_NOT_SUPPORTED',
+            msg: ''
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Video FourCC Unsupported/Manifest',
+            error: 'MANIFEST_ERR_CODEC',
+            msg: 'Video Codec (video/mp4;codecs="undefined") is not supported.'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - No Stream/Manifest',
+            error: 'MANIFEST_ERR_NOSTREAM',
+            msg: 'No streams to play.'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - No Stream/Manifest',
+            error: 'MANIFEST_ERR_NOSTREAM',
+            msg: 'No streams to play.'
+        }
     ]
 });
