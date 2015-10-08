@@ -39,6 +39,7 @@ OrangeHasPlayer = function() {
         selectedSubtitleTrack = null,
         metricsAgent = {
             ref: null,
+            deferInit : null,
             isActivated: false
         },
         initialQuality = {
@@ -245,9 +246,11 @@ OrangeHasPlayer = function() {
         if (typeof(MetricsAgent) !== 'undefined') {
             metricsAgent.ref = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
 
+            metricsAgent.deferInit = Q.defer();
             metricsAgent.ref.init(function(activated) {
                 console.log("Metrics agent state: ", activated);
                 metricsAgent.isActivated = activated;
+                metricsAgent.deferInit.resolve();
             });
         } else {
             throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
@@ -275,7 +278,8 @@ OrangeHasPlayer = function() {
         </pre>
      */
     this.load = function(url, protData) {
-        var config = {
+        var self = this,
+            config = {
             video: {
                 "ABR.keepBandwidthCondition": true
             },
@@ -306,25 +310,29 @@ OrangeHasPlayer = function() {
             initialQuality.audio = -1;
         }
 
-        if (metricsAgent.ref && metricsAgent.isActivated && url) {
-            metricsAgent.ref.createSession();
-        }
+        // Wait for MetricsAgent completely intialized before starting a new session
+        Q.when(metricsAgent.ref ? metricsAgent.deferInit.promise : true).then(function() {
 
-        // Set config to set 'keepBandwidthCondition' parameter
-        mediaPlayer.setConfig(config);
+            if (metricsAgent.ref && metricsAgent.isActivated && url) {
+                metricsAgent.ref.createSession();
+            }
 
-        // Reset the player
-        this.reset(0);
+            // Set config to set 'keepBandwidthCondition' parameter
+            mediaPlayer.setConfig(config);
 
-        //init default audio language
-        mediaPlayer.setDefaultAudioLang(defaultAudioLang);
-        //init default subtitle language
-        mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+            // Reset the player
+            self.reset(0);
 
-        mediaPlayer.attachSource(url, protData);
-        if (mediaPlayer.getAutoPlay()) {
-            state = 'PLAYER_RUNNING';
-        }
+            //init default audio language
+            mediaPlayer.setDefaultAudioLang(defaultAudioLang);
+            //init default subtitle language
+            mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+
+            mediaPlayer.attachSource(url, protData);
+            if (mediaPlayer.getAutoPlay()) {
+                state = 'PLAYER_RUNNING';
+            }
+        });
     };
 
     /**
