@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVideoCurrentTime = function() {
             return document.querySelector('video').currentTime;
         };
@@ -28,16 +32,18 @@ define([
         };
 
         var tests = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test playing streams',
 
                 setup: function() {
-                    console.log('[TEST_PLAYLIVE] stream: ' + stream);
-
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
+                },
 
+                'Get current time': function() {
+                    console.log('[TEST_PLAYLIVE] stream: ' + stream);
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;

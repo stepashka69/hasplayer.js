@@ -18,6 +18,10 @@ define([
 
         var command = null;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getErrorType = function() {
             return document.getElementById('titleError').innerHTML;
         };
@@ -27,13 +31,14 @@ define([
         };
 
         var test_errors = function(stream, errorType, errorMsg) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test errors',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Test error type': function() {

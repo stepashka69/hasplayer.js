@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVideoCurrentTime = function() {
             return document.querySelector('video').currentTime;
         };
@@ -74,13 +78,14 @@ define([
         };
 
         var tests = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Stop in VoD',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Check playing': function() {
@@ -106,7 +111,7 @@ define([
         };
 
         var test_multiple_stops = function(stream, stopDuration, playDuration) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Stop in VoD',
@@ -114,6 +119,7 @@ define([
                 setup: function() {
                     console.log('[TEST_STOP_LIVE] Init multipe stops test (stop duration: ' + stopDuration + 'ms, play duration: ' + playDuration + 'ms).')
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Check playing': function() {

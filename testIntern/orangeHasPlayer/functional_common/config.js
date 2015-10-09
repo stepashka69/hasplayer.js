@@ -136,14 +136,14 @@ define({
     ],
     errors: [
         {
-            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/bad url',
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/bad_url',
             error: 'DOWNLOAD_ERR_MANIFEST',
-            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/bad url no retry attempts left'
+            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/bad_url no retry attempts left'
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1 - Manifest missing/Manifest',
             error: 'DOWNLOAD_ERR_MANIFEST',
-            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1 - Manifest missing/ no retry attempts leftt'
+            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1 - Manifest missing/Manifest no retry attempts left'
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Manifest Error/Manifest',
