@@ -141,6 +141,11 @@ define({
             msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/bad url no retry attempts left'
         },
         {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1 - Manifest missing/Manifest',
+            error: 'DOWNLOAD_ERR_MANIFEST',
+            msg: 'Failed loading manifest: http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1 - Manifest missing/ no retry attempts leftt'
+        },
+        {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Manifest Error/Manifest',
             error: 'MANIFEST_ERR_PARSE',
             msg: 'parsing the manifest failed : [MssParser] Failed to parse manifest!!'
@@ -157,8 +162,8 @@ define({
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Audio Unsupported Codec/Manifest',
-            error: 'MEDIA_ERR_SRC_NOT_SUPPORTED',
-            msg: ''
+            error: 'MANIFEST_ERR_CODEC',
+            msg: 'Audio Codec (audio/mp4;codecs="mp4a.40.0") is not supported.'
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Video FourCC Unsupported/Manifest',
@@ -171,9 +176,9 @@ define({
             msg: 'No streams to play.'
         },
         {
-            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - No Stream/Manifest',
-            error: 'MANIFEST_ERR_NOSTREAM',
-            msg: 'No streams to play.'
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Truncated segment/Manifest',
+            error: 'MEDIA_ERR_DECODE',
+            msg: ''
         }
     ]
 });
