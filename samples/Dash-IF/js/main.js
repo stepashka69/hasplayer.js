@@ -66,9 +66,9 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
     };
     
     //var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
-    var TVM_SERVER = "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/";
-    var CHANNEL_IDS = [192, 118, 119, 34, 444];
-    var CHANNEL_NAMES = ['TF1', 'M6', 'W9', 'C+', 'NRJ12'];
+    var TVM_SERVER = "http://lpc-ihm-portal-qualif2-iep.orange.fr/live-webapp/v2/PC/";
+    var CHANNEL_IDS = [192, 118, 119, 34, 444,4,80];
+    var CHANNEL_NAMES = ['TF1', 'M6', 'W9', 'C+', 'NRJ12', 'France 2','France 3'];
 
     var formatData = function(response, channelId, channelName) {
         if (!Array.prototype.find) {
@@ -663,7 +663,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                     console.error("message :\""+e.event.message+"\"");
                  }
                  break;
-        };
+        }
 
         if (e.event.code != "HASPLAYER_INIT_ERROR") {
             //stop
@@ -759,7 +759,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.buildDate = player.getBuildDate();
 
     $scope.laURL = "";
-    $scope.customData = "";
+    $scope.cdmData = "";
 
     player.startup();
     player.addEventListener("error", onError.bind(this));
@@ -1039,7 +1039,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.setStream = function (item) {
         $scope.selectedItem = item;
         $scope.laURL = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].laURL : "";
-        $scope.customData = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].customData : "";
+        $scope.cmdData = (item.protData && item.protData['com.widevine.alpha']) ? item.protData['com.widevine.alpha'].cdmData : "";
     };
 
     function resetBitratesSlider () {
@@ -1064,11 +1064,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
         function DRMParams() {
             this.backUrl = null;
-            this.customData = null;
+            this.cdmData = null;
         }
 
         // Update PR protection data
-        if (($scope.laURL.length > 0) || (($scope.customData.length > 0))) {
+        if (($scope.laURL.length > 0) || (($scope.cdmData.length > 0))) {
             if (!$scope.selectedItem.protData) {
                 $scope.selectedItem.protData = {};
             }
@@ -1076,7 +1076,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 $scope.selectedItem.protData['com.widevine.alpha'] = {};
             }
             $scope.selectedItem.protData['com.widevine.alpha'].laURL = $scope.laURL;
-            $scope.selectedItem.protData['com.widevine.alpha'].customData = $scope.customData;
+            $scope.selectedItem.protData['com.widevine.alpha'].cdmData = $scope.cdmData;
         }
 
         resetBitratesSlider();
