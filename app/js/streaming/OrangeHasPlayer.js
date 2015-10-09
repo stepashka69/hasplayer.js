@@ -39,6 +39,7 @@ OrangeHasPlayer = function() {
         selectedSubtitleTrack = null,
         metricsAgent = {
             ref: null,
+            deferInit : null,
             isActivated: false
         },
         initialQuality = {
@@ -111,52 +112,64 @@ OrangeHasPlayer = function() {
     };
 
     var _metricAdded = function(e) {
-        if (e.data.metric === "RepresentationSwitch"){
-            _isPlayerInitialized();
-            var metricsExt = mediaPlayer.getMetricsExt();
-            if (e.data.stream == "video") {
-                videoBitrates = metricsExt.getBitratesForType(e.data.stream);
-                _dispatchBitrateEvent('download_bitrate', {
-                    streamType: e.data.stream,
-                    switchedQuality: videoBitrates[e.data.value.lto],
-                    representationId: e.data.value.to,
-                    width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                    height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+        switch(e.data.metric){
+            case "RepresentationSwitch":
+                _isPlayerInitialized();
+                var metricsExt = mediaPlayer.getMetricsExt();
+                if (e.data.stream == "video") {
+                    videoBitrates = metricsExt.getBitratesForType(e.data.stream);
+                    _dispatchBitrateEvent('download_bitrate', {
+                        streamType: e.data.stream,
+                        switchedQuality: videoBitrates[e.data.value.lto],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                    });
+                    console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                } else if (e.data.stream == "audio") {
+                    audioBitrates = metricsExt.getBitratesForType(e.data.stream);
+                    _dispatchBitrateEvent('download_bitrate', {
+                        streamType: e.data.stream,
+                        switchedQuality: audioBitrates[e.data.value.to],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                    });
+                    console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                }
+                break;
+            case "BufferedSwitch" : 
+                _isPlayerInitialized();
+                var metricsExt = mediaPlayer.getMetricsExt();
+                if (e.data.stream == "video") {
+                    videoQualityChanged.push({
+                                streamType: e.data.stream,
+                                mediaStartTime: e.data.value.mt,
+                                switchedQuality: videoBitrates[e.data.value.lto],
+                                representationId: e.data.value.to,
+                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                    });
+                } else if (e.data.stream == "audio") {
+                    audioQualityChanged.push({
+                                 streamType: e.data.stream,
+                                mediaStartTime: e.data.value.mt,
+                                switchedQuality: audioBitrates[e.data.value.lto],
+                                representationId: e.data.value.to,
+                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                    });
+                }
+                break;
+            case "BufferLevel" :
+                console.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
+                var event = document.createEvent("CustomEvent");
+                event.initCustomEvent('bufferLevel_updated', false, false, {
+                    type: e.data.stream,
+                    level: e.data.value.level.toFixed(3)
                 });
-                console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
-            } else if (e.data.stream == "audio") {
-                audioBitrates = metricsExt.getBitratesForType(e.data.stream);
-                _dispatchBitrateEvent('download_bitrate', {
-                    streamType: e.data.stream,
-                    switchedQuality: audioBitrates[e.data.value.to],
-                    representationId: e.data.value.to,
-                    width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                    height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
-                });
-                console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
-            }
-        }else if (e.data.metric === "BufferedSwitch") {
-            _isPlayerInitialized();
-            var metricsExt = mediaPlayer.getMetricsExt();
-            if (e.data.stream == "video") {
-                videoQualityChanged.push({
-                            streamType: e.data.stream,
-                            mediaStartTime: e.data.value.mt,
-                            switchedQuality: videoBitrates[e.data.value.lto],
-                            representationId: e.data.value.to,
-                            width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                            height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
-                });
-            } else if (e.data.stream == "audio") {
-                audioQualityChanged.push({
-                             streamType: e.data.stream,
-                            mediaStartTime: e.data.value.mt,
-                            switchedQuality: audioBitrates[e.data.value.lto],
-                            representationId: e.data.value.to,
-                            width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                            height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
-                });
-            }
+                video.dispatchEvent(event);
+                break;
         }
     };
 
@@ -245,9 +258,11 @@ OrangeHasPlayer = function() {
         if (typeof(MetricsAgent) !== 'undefined') {
             metricsAgent.ref = new MetricsAgent(mediaPlayer, video, parameters, mediaPlayer.getDebug());
 
+            metricsAgent.deferInit = Q.defer();
             metricsAgent.ref.init(function(activated) {
                 console.log("Metrics agent state: ", activated);
                 metricsAgent.isActivated = activated;
+                metricsAgent.deferInit.resolve();
             });
         } else {
             throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
@@ -275,7 +290,8 @@ OrangeHasPlayer = function() {
         </pre>
      */
     this.load = function(url, protData) {
-        var config = {
+        var self = this,
+            config = {
             video: {
                 "ABR.keepBandwidthCondition": true
             },
@@ -306,25 +322,29 @@ OrangeHasPlayer = function() {
             initialQuality.audio = -1;
         }
 
-        if (metricsAgent.ref && metricsAgent.isActivated && url) {
-            metricsAgent.ref.createSession();
-        }
+        // Wait for MetricsAgent completely intialized before starting a new session
+        Q.when(metricsAgent.ref ? metricsAgent.deferInit.promise : true).then(function() {
 
-        // Set config to set 'keepBandwidthCondition' parameter
-        mediaPlayer.setConfig(config);
+            if (metricsAgent.ref && metricsAgent.isActivated && url) {
+                metricsAgent.ref.createSession();
+            }
 
-        // Reset the player
-        this.reset(0);
+            // Set config to set 'keepBandwidthCondition' parameter
+            mediaPlayer.setConfig(config);
 
-        //init default audio language
-        mediaPlayer.setDefaultAudioLang(defaultAudioLang);
-        //init default subtitle language
-        mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+            // Reset the player
+            self.reset(0);
 
-        mediaPlayer.attachSource(url, protData);
-        if (mediaPlayer.getAutoPlay()) {
-            state = 'PLAYER_RUNNING';
-        }
+            //init default audio language
+            mediaPlayer.setDefaultAudioLang(defaultAudioLang);
+            //init default subtitle language
+            mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+
+            mediaPlayer.attachSource(url, protData);
+            if (mediaPlayer.getAutoPlay()) {
+                state = 'PLAYER_RUNNING';
+            }
+        });
     };
 
     /**
@@ -503,6 +523,7 @@ OrangeHasPlayer = function() {
                 break;
             case "play_bitrate":
             case "download_bitrate":
+            case "bufferLevel_updated":
                 video.addEventListener(type, listener, useCapture);
                 break;
             default:
@@ -527,6 +548,7 @@ OrangeHasPlayer = function() {
                 break;
             case "play_bitrate":
             case "download_bitrate":
+            case "bufferLevel_updated":
                 video.removeEventListener(type, listener);
                 break;
             default:
