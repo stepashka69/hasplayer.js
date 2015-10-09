@@ -283,7 +283,7 @@ OrangeHasPlayer = function() {
             "[key_system_name]": {
                 laURL: "[licenser url (optionnal)]",
                 pssh: "[base64 pssh box (optionnal)]"
-                customData: "[custom data (optionnal)]"
+                cdmData: "[custom data (optionnal)]"
             },
             ...
         };

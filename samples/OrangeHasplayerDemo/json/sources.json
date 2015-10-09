@@ -36,7 +36,7 @@
             "browsers": "cdsbi"
         },
         {
-            "name": "Smooth + PlayReady DRM + CustomData",
+            "name": "Smooth + PlayReady DRM + cdmData",
             "type": "VOD",
             "protocol": "MSS",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
@@ -44,7 +44,7 @@
             "protData": {
                 "com.microsoft.playready": {
                     "laURL": "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
-                    "customData": "B2C99B73-CA41-4003-84A3AA16CE92B304"
+                    "cdmData": "B2C99B73-CA41-4003-84A3AA16CE92B304"
                 }
             }
         },
@@ -57,7 +57,7 @@
             "protData": {
                 "com.microsoft.playready": {
                     "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
-                    "customData": "7146A3D4-1AE8-4FA5-B209242420EAAF3F"
+                    "cdmData": "7146A3D4-1AE8-4FA5-B209242420EAAF3F"
                 }
             }
         },
@@ -70,7 +70,7 @@
             "protData": {
                 "com.microsoft.playready": {
                     "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
-                    "customData": "A820A4C5-B7D6-4C76-9F722AF55CDBEA94"
+                    "cdmData": "A820A4C5-B7D6-4C76-9F722AF55CDBEA94"
                 }
             }
         },
@@ -83,7 +83,7 @@
             "protData": {
                 "com.microsoft.playready": {
                     "laURL": "http://licenserpp.purpledrm.com/pp/StandardPlayReadyAquireLicenseByContent.cfm?distrib=ofnewtv",
-                    "customData": "395E71B7-F659-4FE5-A60A64C4B2CDF6E0"
+                    "cdmData": "395E71B7-F659-4FE5-A60A64C4B2CDF6E0"
                 }
             }
         },
