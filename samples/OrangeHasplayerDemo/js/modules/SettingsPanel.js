@@ -221,4 +221,6 @@ SettingsPanel.prototype.reset = function() {
 
     this.currentaudioTrack = null;
     this.currentsubtitleTrack = null;
+    this.videoBufferLength.innerHTML = "";
+    this.audioBufferLength.innerHTML = "";
 };
