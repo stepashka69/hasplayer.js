@@ -799,6 +799,12 @@ MediaPlayer.dependencies.BufferController = function () {
                 //the end of the createdSegment list has been reached, recall checkIfSufficientBuffer to update the list and get the next segment
                 self.debug.log("[BufferController]["+type+"] loadNextFragment failed");
 
+                if (deferredFragmentBuffered) {
+                    self.debug.log("[BufferController]["+type+"] deferredFragmentBuffered has to be resolved");
+                    deferredFragmentBuffered.resolve();
+                    deferredFragmentBuffered = null;
+                };
+
                 // HLS use case => download playlist for new representation
                 if ((manifest.name === "M3U") && isDynamic) {
                     updatePlayListForRepresentation.call(self, currentQuality).then(
@@ -936,6 +942,10 @@ MediaPlayer.dependencies.BufferController = function () {
                 playlistUpdated = null,
                 defer = null;
             
+            if (deferredFragmentBuffered !== null) {
+                self.debug.error("[BufferController]["+type+"] deferredFragmentBuffered has not been resolved, create a new one is not correct.");
+            }
+
             deferredFragmentBuffered = Q.defer();
 
             // Check if data has changed
