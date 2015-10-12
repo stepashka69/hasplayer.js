@@ -49,7 +49,7 @@ define([
                     })
                     .then(function (fullVersion) {
                         console.log('[TEST_BUILD_INFOS] version: ' + fullVersion);
-                        var regex = /\d\.\d\.\d_dev_[a-f0-9]{7}/;
+                        var regex = /\d\.\d\.\d_[a-f0-9]{7}/;
                         var matches = fullVersion.match(regex);
                         assert.ok(matches, 'Build version must match the pattern X.X.X_dev_abcdef0');
                         assert.equal(matches.length, 1, 'Build version pattern must match only once.');

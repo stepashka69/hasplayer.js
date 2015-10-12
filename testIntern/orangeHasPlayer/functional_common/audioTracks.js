@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getAudioTracks = function() {
             return orangeHasPlayer.getAudioTracks();
         };
@@ -39,13 +43,14 @@ define([
         };
 
         var test_audioTracks = function(stream, tracks) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Get audio tracks',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Check audio tracks': function() {

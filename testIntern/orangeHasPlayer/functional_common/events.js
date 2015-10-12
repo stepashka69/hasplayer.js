@@ -18,6 +18,10 @@ define([
 
         var command = null;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var addEventListener = function(type, listener, useCapture) {
            if(!document.events_spy) {
                document.events_spy = [];
@@ -41,13 +45,14 @@ define([
         };
 
         var test_control_events = function(stream, tracks) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test events',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Test pause event': function() {
@@ -134,13 +139,14 @@ define([
         };
 
         var test_playbitrate_event = function(stream, tracks) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test play_bitrate events',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Test play_bitrate event': function() {
@@ -159,13 +165,14 @@ define([
         };
 
         var test_downloadbitrate_event = function(stream, tracks) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test download_bitrate events',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Test play_bitrate event': function() {
