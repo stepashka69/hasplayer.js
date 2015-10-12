@@ -74,12 +74,11 @@ define([
             }).sleep(200)
             .execute(getVideoCurrentTime)
             .then(function(time) {
-                assert.ok(time > videoCurrentTime, 'Video time should increase.');
-                return videoCurrentTime = time;
+                return assert.ok(time > videoCurrentTime, 'Video time should increase (current time: ' + time + ', previous time: ' + videoCurrentTime + ').');
             })
             .execute(getPlayerTimePosition)
             .then(function(time) {
-                return assert.ok(time > videoCurrentTime, 'Player time should increase.');
+                return assert.ok(time > videoCurrentTime, 'Player time should increase (current time: ' + time + ', previous time: ' + videoCurrentTime + ').');
             });
         };
 
