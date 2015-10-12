@@ -935,7 +935,7 @@ MediaPlayer.dependencies.BufferController = function () {
                 quality,
                 playlistUpdated = null,
                 defer = null;
-
+            
             deferredFragmentBuffered = Q.defer();
 
             // Check if data has changed
