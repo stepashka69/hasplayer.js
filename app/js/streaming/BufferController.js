@@ -644,6 +644,11 @@ MediaPlayer.dependencies.BufferController = function () {
                 manifest = this.manifestModel.getValue(),
                 data = {};
 
+            if (deferredFragmentBuffered) {
+                deferredFragmentBuffered.resolve();
+                deferredFragmentBuffered = null;
+            }
+
             //if request.status = 0, it's an aborted request : do not load chunk from another bitrate, do not send
             // error.
             if (e.status !== undefined && e.status === 0 && !isRunning.call(this)) {
@@ -669,9 +674,6 @@ MediaPlayer.dependencies.BufferController = function () {
             this.debug.log(msgError);
             this.stallTime = e.startTime;
             
-            if (deferredFragmentBuffered) {
-                deferredFragmentBuffered.resolve();
-            }
             
             data.url = e.url;
             data.request = e;
@@ -1119,8 +1121,10 @@ MediaPlayer.dependencies.BufferController = function () {
                 len = 0,
                 type = evt.data.request.streamType,
                 rules = null,
+                metricsHttp = evt.data.httpRequestMetrics,
+                lastTraceTime = evt.data.lastTraceTime,
+                currentTime,
                 metrics = self.metricsModel.getMetricsFor(type);
-
 
                 self.debug.log("[BufferController]["+type+"] Download request "+evt.data.request.url+" is in progress");
 
@@ -1133,6 +1137,17 @@ MediaPlayer.dependencies.BufferController = function () {
                 
                         if (newQuality < currentQuality){
                             self.debug.log("[BufferController]["+type+"] NEED TO ABANDON ************************** for "+evt.data.request.url);
+                            
+                            currentTime = new Date();
+
+                            metricsHttp.tfinish = currentTime;
+                            metricsHttp.bytesLength = evt.data.request.bytesLoaded;                            
+
+                            self.metricsModel.appendHttpTrace(metricsHttp,
+                                currentTime,
+                                currentTime.getTime() - lastTraceTime.getTime(),
+                                [evt.data.request.bytesLoaded ? evt.data.request.bytesLoaded : 0]);
+                
                             self.fragmentController.abortRequestsForModel(fragmentModel);
                         }else{
                             self.debug.log("[BufferController]["+type+"] No need to abandon");
