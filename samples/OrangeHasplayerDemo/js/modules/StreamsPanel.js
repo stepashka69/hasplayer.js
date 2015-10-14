@@ -85,6 +85,7 @@ StreamsPanel.prototype.loadTVMSource =  function(channel){
     for( var header in window.TVM_SOURCES_CONFIG.headers){
         xhr.setRequestHeader(header, window.TVM_SOURCES_CONFIG.headers[header]);
     }
+    xhr.withCredentials=true;
     xhr.onreadystatechange = (function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var source = JSON.parse(xhr.responseText);
