@@ -19,21 +19,29 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
+
         var getVideoCurrentTime = function() {
             return orangeHasPlayer.getPosition();
         };
 
         var tests = function(stream) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test playing streams',
 
                 setup: function() {
-                    console.log('[TEST_PLAYVOD] stream: ' + stream);
-
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Get current time': function() {
+                    console.log('[TEST_PLAYVOD] stream: ' + stream);
 
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {

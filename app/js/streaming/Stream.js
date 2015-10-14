@@ -139,44 +139,52 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         tearDownMediaSource = function() {
-            var self = this;
+            var self = this,
+                funcs = [],
+                deferred = Q.defer();
 
             if (!!videoController) {
-                videoController.reset(errored);
-                videoController = undefined;
+                funcs.push(videoController.reset(errored));
             }
             if (!!audioController) {
-                audioController.reset(errored);
-                audioController = undefined;
-            }
-            if (!!textController) {
-                textController.reset(errored);
-                textController = undefined;
-            }
-            if (!!eventController) {
-                eventController.reset();
-                eventController = undefined;
+                funcs.push(audioController.reset(errored));
             }
 
-            if (!!mediaSource) {
-                self.mediaSourceExt.detachMediaSource(self.videoModel);
-            }
+            Q.all(funcs).then(
+                function(){
+                    if (!!textController) {
+                        textController.reset(errored);
+                        textController = undefined;
+                    }
+                    if (!!eventController) {
+                        eventController.reset();
+                        eventController = undefined;
+                    }
 
-            initialized = false;
+                    if (!!mediaSource) {
+                        self.mediaSourceExt.detachMediaSource(self.videoModel);
+                    }
 
-            kid = null;
-            initData = [];
-            contentProtection = null;
+                    initialized = false;
 
-            videoController = null;
-            audioController = null;
-            textController = null;
+                    kid = null;
+                    initData = [];
+                    contentProtection = null;
 
-            videoCodec = null;
-            audioCodec = null;
+                    videoController = null;
+                    audioController = null;
+                    textController = null;
 
-            mediaSource = null;
-            manifest = null;
+                    videoCodec = null;
+                    audioCodec = null;
+
+                    mediaSource = null;
+                    manifest = null;
+
+                    deferred.resolve();
+            });
+
+            return deferred.promise;
         },
 
         checkIfInitialized = function(videoReady, audioReady, textTrackReady, deferred) {
@@ -404,7 +412,7 @@ MediaPlayer.dependencies.Stream = function() {
                                 textTrackReady = true;
                                 checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
                             }
-                       
+
                             return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                         }
                     ).then(
@@ -450,8 +458,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] Starting playback at offset: " + initialSeekTime);
             // ORANGE: performs a programmatical seek only if initial seek time is different
             // from current time (live use case)
-            
-            isPaused = this.videoModel.isPaused(); 
+
+            isPaused = this.videoModel.isPaused();
             if (initialSeekTime !== this.videoModel.getCurrentTime()) {
                 // ORANGE: we start the <video> element at the real start time got from the video buffer
                 // once the first fragment has been appended (see onBufferUpdated)
@@ -493,7 +501,7 @@ MediaPlayer.dependencies.Stream = function() {
             //if a pause command was detected just before this onPlay event, startBuffering again
             //if it was a pause, follow by a seek (in reality just a seek command), don't startBuffering, it's done in onSeeking event
             // we can't, each time, startBuffering in onPlay event (for seek and pause commands) because onPlay event is not fired on IE after a seek command. :-(
-            if (isPaused && !isSeeked) {       
+            if (isPaused && !isSeeked) {
                 startBuffering();
             }
 
@@ -611,15 +619,15 @@ MediaPlayer.dependencies.Stream = function() {
         updateBuffer = function() {
 
             if (videoController) {
-                videoController.updateBufferState();
+                videoController.updateBufferLevel(true);
             }
 
             if (audioController) {
-                audioController.updateBufferState();
+                audioController.updateBufferLevel(true);
             }
 
             if (textController) {
-                textController.updateBufferState();
+                textController.updateBufferLevel(true);
             }
         },
 
@@ -1155,6 +1163,8 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         reset: function() {
+            var deferred = Q.defer(),
+                self = this;
 
             this.debug.info("[Stream] Reset");
 
@@ -1187,27 +1197,21 @@ MediaPlayer.dependencies.Stream = function() {
             this.system.unmapHandler("bufferingCompleted");
             this.system.unmapHandler("segmentLoadingFailed");
 
-            tearDownMediaSource.call(this);
+            tearDownMediaSource.call(this).then(
+                function(){
+                    if (protectionController) {
+                        protectionController.unsubscribe(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, self);
+                    }
 
-            if (protectionController) {
-                protectionController.unsubscribe(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, this);
-                /*protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.SERVER_CERTIFICATE_UPDATED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.KEY_ADDED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED, boundProtectionErrorHandler);
-                protectionController.removeEventListener(MediaPlayer.dependencies.ProtectionController.events.LICENSE_REQUEST_COMPLETE, boundProtectionErrorHandler);*/
-            }
+                    protectionController = undefined;
+                    self.fragmentController = undefined;
+                    self.requestScheduler = undefined;
 
-            protectionController = undefined;
-            this.fragmentController = undefined;
-            this.requestScheduler = undefined;
+                    load = Q.defer();
+                    deferred.resolve();
+            });
 
-            // streamcontroller expects this to be valid
-            //this.videoModel = null;
-
-            load = Q.defer();
+            return deferred.promise;
         },
 
         getDuration: function() {

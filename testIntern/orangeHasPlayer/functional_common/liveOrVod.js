@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getPlayerTimePosition = function() {
             return orangeHasPlayer.getPosition();
         };
@@ -33,13 +37,14 @@ define([
         };
 
         var test_live = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Stop in VoD',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check is live': function() {
@@ -71,13 +76,14 @@ define([
         };
 
         var test_vod = function(stream, stopDuration, playDuration) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Stop in VoD',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check is VOD': function() {

@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVideoBitrates = function() {
             return orangeHasPlayer.getVideoBitrates();
         };
@@ -33,13 +37,14 @@ define([
         };
 
         var test_videobitrates = function(stream, bitrates) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Get video bitrates',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check bitrates': function() {

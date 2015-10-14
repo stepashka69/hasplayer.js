@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVideoCurrentTime = function () {
             return orangeHasPlayer.getPosition();
         };
@@ -33,15 +37,18 @@ define([
 
         var test_init = function(stream) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test seeking functionnality',
 
+                setup: function() {
+                    command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
                 'Initialize the test': function() {
                     console.log('[TEST_SEEK] stream: ' + stream);
-
-                    command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {
@@ -109,14 +116,18 @@ define([
         };
 
         var test_seek_over_duration = function(stream, streamDuration) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test seek over duration',
-                setup: function() {
-                    console.log('[TEST_SEEK] stream: ' + stream);
 
+                setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Get current time': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {
@@ -144,14 +155,18 @@ define([
         }
 
         var test_seek_to_zero = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test seek to zero',
-                'Init': function() {
-                    console.log('[TEST_SEEK] stream: ' + stream);
 
+                setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Get current time': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {
@@ -176,14 +191,18 @@ define([
         }
 
         var test_seek_under_zero = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test seek under zero',
-                'Init': function() {
-                    console.log('[TEST_SEEK] stream: ' + stream);
 
+                setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Get current time': function() {
+                    console.log('[TEST_SEEK] stream: ' + stream);
 
                     return command.execute(getVideoCurrentTime)
                     .then(function(time) {

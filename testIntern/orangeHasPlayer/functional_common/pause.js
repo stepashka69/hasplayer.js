@@ -19,6 +19,10 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVideoCurrentTime = function() {
             return orangeHasPlayer.getPosition();
         };
@@ -51,15 +55,18 @@ define([
 
         var tests = function(stream) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test pause stream',
 
+                setup: function() {
+                    command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
                 'Initialize the test': function() {
                     console.log('[TEST_PAUSE] stream: ' + stream);
-
-                    command = this.remote.get(require.toUrl(url));
 
                     return command.execute(getVideoCurrentTime)
                     .then(function (time) {
@@ -121,15 +128,18 @@ define([
 
         var test_multiple_play_pause = function(stream, pauseDuration, playDuration) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test multiple pause stream',
 
+                setup: function() {
+                    command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
                 'Initialize the test': function() {
                     console.log('[TEST_PAUSE] stream: ' + stream);
-
-                    command = this.remote.get(require.toUrl(url));
 
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {

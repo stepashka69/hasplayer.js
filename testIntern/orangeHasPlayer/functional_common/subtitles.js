@@ -18,6 +18,10 @@ define([
 
         var command = null;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getSubtitleTracks = function() {
            return orangeHasPlayer.getSubtitleTracks();
         };
@@ -62,13 +66,14 @@ define([
         };
 
         var test_subtitleTracks = function(stream, tracks) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test subtitles',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check subtitle tracks': function() {
@@ -114,6 +119,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Set default subtitles': function() {
@@ -138,13 +144,14 @@ define([
         };
 
         var test_subtitles_visibility = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test set default subtitles',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Get initial subtitles visibility': function() {

@@ -10,6 +10,10 @@ define([
         var videoCurrentTime = 0;
         var audioTracks = null;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getAudioTracks = function () {
             var tmpTracks = orangeHasPlayer.getAudioTracks();
             var tracks = [];
@@ -36,15 +40,18 @@ define([
 
         var test_init = function(stream) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test multi-audio functionnality',
 
                 setup: function() {
-                    console.log('[TEST_MULTI-AUDIO] stream: ' + stream);
-
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Start playing': function() {
+                    console.log('[TEST_MULTI-AUDIO] stream: ' + stream);
 
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function(time) {

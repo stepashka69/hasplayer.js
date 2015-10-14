@@ -20,6 +20,10 @@ define([
         var videoVolume = 0;
         var videoMuted = null;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
         var getVolume = function() {
             return orangeHasPlayer.getVolume();
         };
@@ -50,14 +54,14 @@ define([
         };
 
         var test_volume = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test volume',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    command.sleep(3000);
+                    return command.sleep(500).execute(loadStream, [stream]).sleep(3000);
                 },
 
                 'Check initial video volume': function() {
@@ -169,14 +173,14 @@ define([
         };
 
         var test_mute = function(stream) {
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test volume',
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    command.sleep(3000);
+                    return command.sleep(500).execute(loadStream, [stream]).sleep(3000);
                 },
 
                 'Check initial video mute': function() {
