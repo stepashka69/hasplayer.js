@@ -62,7 +62,7 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
         "X_WASSUP_BEARER":"WIFI",
         "X_WASSUP_SPR":"8388608",
         "Client-IP":"217.128.115.221",
-        "X-Forwarded-For":"217.128.115.221, 10.162.249.55",
+        "X-Forwarded-For":"217.128.115.221, 10.162.249.55"
     };
     
     //var TVM_SERVER = "http://live-qualif-ott.dev.orange.fr/live-trunk-int/v2/PC/";
