@@ -85,7 +85,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check playing': function() {
@@ -119,7 +119,7 @@ define([
                 setup: function() {
                     console.log('[TEST_STOP_LIVE] Init multipe stops test (stop duration: ' + stopDuration + 'ms, play duration: ' + playDuration + 'ms).')
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check playing': function() {

@@ -21,12 +21,11 @@ process.on('uncaughtException', logError);
 // server initialisation
 var server = http.createServer(function(req,res){
                 'use strict';
-                console.info("req.url", req.url);
                 var options = {};
                 options.url = url.parse(req.url);
                 options.method = req.method;
                 options.headers = req.headers;
-                //options.proxy = proxy.protocol+"://"+proxy.host+":"+proxy.port;
+                options.proxy = proxy.protocol+"://"+proxy.host+":"+proxy.port;
                 var serverRequest = request(options);
                 serverRequest.on("response", function(response){
                     //  res.writeHead(200,{
@@ -34,10 +33,13 @@ var server = http.createServer(function(req,res){
                     //    "Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE",
                     //    "Access-Control-Allow-Credential":true
                     // });
-                    response.headers["Access-Control-Allow-Origin"] = "*";
-                    response.headers["Access-Control-Allow-Methods"] ="GET,PUT,POST,DELETE";
-                    response.headers["Access-Control-Allow-Headers"] ="content-type,soapaction,X_WASSUP_PULV,X_WASSUP_DSN,X_WASSUP_PULO,X_WASSUP_SAU,X_WASSUP_SAI,X_WASSUP_NAT,X_WASSUP_ROAMING,X_WASSUP_MSISDN,X_WASSUP_PUIT,X_WASSUP_BEARER,X_WASSUP_SPR,Client-IP,X-Forwarded-For";
-                    // response.headers["Access-Control-Allow-Credential"] =true;
+                    var origin = req.headers.origin;
+                    if(origin){
+                        response.headers["Access-Control-Allow-Origin"] = origin;
+                        response.headers["Access-Control-Allow-Methods"] ="GET,PUT,POST,DELETE";
+                        response.headers["Access-Control-Allow-Headers"] ="content-type,soapaction,X_WASSUP_PULV,X_WASSUP_DSN,X_WASSUP_PULO,X_WASSUP_SAU,X_WASSUP_SAI,X_WASSUP_NAT,X_WASSUP_ROAMING,X_WASSUP_MSISDN,X_WASSUP_PUIT,X_WASSUP_BEARER,X_WASSUP_SPR,Client-IP,X-Forwarded-For";
+                        response.headers["Access-Control-Allow-Credentials"] =true;
+                    }
                 });
                 serverRequest.on("error", function(e){
                     console.error(e);

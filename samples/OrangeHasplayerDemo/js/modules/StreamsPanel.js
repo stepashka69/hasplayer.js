@@ -50,6 +50,120 @@ StreamsPanel.prototype.buildStreamsList = function(streamsList) {
             tableNode.appendChild(streamItem);
         }
     }
+    this.loadTVMConfig();
+};
+
+
+StreamsPanel.prototype.loadTVMConfig = function(){
+    if(!window.TVM_SOURCES_CONFIG){
+        var xhr  = new XMLHttpRequest();
+        xhr.open('GET', document.location.pathname + '/../json/tvm_sources_config.json');
+        xhr.onreadystatechange = (function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                window.TVM_SOURCES_CONFIG = JSON.parse(xhr.responseText);
+                this.loadTVMSources();
+            }
+        }).bind(this);
+        xhr.send();
+    }else{
+     this.loadTVMSources();
+    }
+
+};
+
+StreamsPanel.prototype.loadTVMSources = function(){
+    var channels = window.TVM_SOURCES_CONFIG.channels;
+    for(var i=0; i< channels.length; i++){
+        this.loadTVMSource(channels[i]);
+    }
+};
+
+
+StreamsPanel.prototype.loadTVMSource =  function(channel){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', window.TVM_SOURCES_CONFIG.server+'channels/'+channel.id+'/url');
+    for( var header in window.TVM_SOURCES_CONFIG.headers){
+        xhr.setRequestHeader(header, window.TVM_SOURCES_CONFIG.headers[header]);
+    }
+    xhr.withCredentials=true;
+    xhr.onreadystatechange = (function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var source = JSON.parse(xhr.responseText);
+            if(!source.error){
+                this.appendTVMSource(source.response, channel);
+            }
+        }
+    }).bind(this);
+    xhr.send();
+
+};
+
+StreamsPanel.prototype._formatTVMData = function(response, channelId, channelName) {
+    if (!Array.prototype.find) {
+     var find = function(predicate) {
+        if (this === null) {
+            throw new TypeError('Array.prototype.find a été appelé sur null ou undefined');
+        }
+        if (typeof predicate !== 'function') {
+            throw new TypeError('predicate doit être une fonction');
+        }
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        var value;
+
+        for (var i = 0; i < length; i++) {
+            value = list[i];
+            if (predicate.call(thisArg, value, i, list)) {
+                return value;
+            }
+        }
+        return undefined;
+      };
+
+      // to avoid iteration in for ... in on array
+      Object.defineProperty(Array.prototype,"find",{
+        value:find,
+        enumerable: false,
+      });
+    }
+
+
+
+    var formattedSource = {
+        'type': 'Live',
+        'protocol': 'MSS',
+        'name': channelId +' - '+ channelName +' G8PC QUALIF',
+        'url': response.url,
+        'browsers': 'cdsbi'
+    };
+
+    if (response.protectionData.length > 0) {
+        var protDataWV = response.protectionData.find(function(element){
+                        return element.keySystem ==='com.widevine.alpha';
+                    });
+
+        var protDataPR = response.protectionData.find(function(element){
+                        return element.keySystem ==='com.microsoft.playready';
+                    });
+        formattedSource.protData =  {
+            'com.widevine.alpha':{
+                'laURL' : protDataWV ? protDataWV.laUrl : ''
+            },
+            'com.microsoft.playready':{
+                'laURL' : protDataPR ? protDataPR.laUrl : '',
+            }
+        };
+    }
+    return formattedSource;
+};
+
+
+StreamsPanel.prototype.appendTVMSource = function(response, channel){
+    var tableNode = document.getElementById('streams-table');
+    var stream = this._formatTVMData(response, channel.id, channel.name);
+    var streamItem = this.createStreamEntry(stream);
+    tableNode.appendChild(streamItem);
 };
 
 StreamsPanel.prototype.createStreamEntry = function(stream) {

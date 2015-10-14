@@ -13,7 +13,7 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/orangeHasPlayer/functional_common/config'
+    'testIntern/orangeHasPlayer/functional_chrome/config'
     ], function(registerSuite, assert, pollUntil, require, config) {
 
         var command = null;
@@ -38,7 +38,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.sleep(500).execute(loadStream, [stream]);
+                    return command.execute(loadStream, [stream]);
                 },
 
                 'Test error type': function() {

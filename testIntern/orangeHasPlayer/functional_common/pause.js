@@ -62,7 +62,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Initialize the test': function() {
@@ -135,7 +135,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Initialize the test': function() {
