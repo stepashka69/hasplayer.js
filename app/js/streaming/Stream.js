@@ -412,7 +412,7 @@ MediaPlayer.dependencies.Stream = function() {
                                 textTrackReady = true;
                                 checkIfInitialized.call(self, videoReady, audioReady, textTrackReady, initialize);
                             }
-                       
+
                             return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                         }
                     ).then(
@@ -458,8 +458,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] Starting playback at offset: " + initialSeekTime);
             // ORANGE: performs a programmatical seek only if initial seek time is different
             // from current time (live use case)
-            
-            isPaused = this.videoModel.isPaused(); 
+
+            isPaused = this.videoModel.isPaused();
             if (initialSeekTime !== this.videoModel.getCurrentTime()) {
                 // ORANGE: we start the <video> element at the real start time got from the video buffer
                 // once the first fragment has been appended (see onBufferUpdated)
@@ -501,7 +501,7 @@ MediaPlayer.dependencies.Stream = function() {
             //if a pause command was detected just before this onPlay event, startBuffering again
             //if it was a pause, follow by a seek (in reality just a seek command), don't startBuffering, it's done in onSeeking event
             // we can't, each time, startBuffering in onPlay event (for seek and pause commands) because onPlay event is not fired on IE after a seek command. :-(
-            if (isPaused && !isSeeked) {       
+            if (isPaused && !isSeeked) {
                 startBuffering();
             }
 
@@ -1163,7 +1163,7 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         reset: function() {
-            var deferred = Q.defer()
+            var deferred = Q.defer(),
                 self = this;
 
             this.debug.info("[Stream] Reset");
