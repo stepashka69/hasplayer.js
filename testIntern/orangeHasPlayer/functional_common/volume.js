@@ -61,7 +61,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]).sleep(3000);
+                    return command.sleep(500).execute(loadStream, [stream]).sleep(3000);
                 },
 
                 'Check initial video volume': function() {
@@ -180,7 +180,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]).sleep(3000);
+                    return command.sleep(500).execute(loadStream, [stream]).sleep(3000);
                 },
 
                 'Check initial video mute': function() {

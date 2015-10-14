@@ -73,7 +73,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Check subtitle tracks': function() {
@@ -119,7 +119,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Set default subtitles': function() {
@@ -151,7 +151,7 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.execute(loadStream, [stream]);
+                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Get initial subtitles visibility': function() {
