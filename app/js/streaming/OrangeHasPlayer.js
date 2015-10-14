@@ -170,6 +170,15 @@ OrangeHasPlayer = function() {
                 });
                 video.dispatchEvent(event);
                 break;
+            case "State" :
+                console.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
+                var event = document.createEvent("CustomEvent");
+                event.initCustomEvent('state_changed', false, false, {
+                    type: e.data.stream,
+                    state: e.data.value.current
+                });
+                video.dispatchEvent(event);
+                break;
         }
     };
 
@@ -524,6 +533,7 @@ OrangeHasPlayer = function() {
             case "play_bitrate":
             case "download_bitrate":
             case "bufferLevel_updated":
+            case "state_changed":
                 video.addEventListener(type, listener, useCapture);
                 break;
             default:
@@ -549,6 +559,7 @@ OrangeHasPlayer = function() {
             case "play_bitrate":
             case "download_bitrate":
             case "bufferLevel_updated":
+            case "state_changed":
                 video.removeEventListener(type, listener);
                 break;
             default:
