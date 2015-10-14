@@ -1,0 +1,36 @@
+{
+    "server": "http://lpc-ihm-portal-qualif-iep.orange.fr/live-webapp/v2/PC/",
+    "headers":  {
+        "X_WASSUP_PULV":"71251608781a0001000083af",
+        "X_WASSUP_DSN":"vodpc client a",
+        "X_WASSUP_PULO":"vodpcclienta@orange.fr",
+        "X_WASSUP_SAU":"3",
+        "X_WASSUP_SAI":"020970106",
+        "X_WASSUP_NAT":"1",
+        "X_WASSUP_ROAMING":"0",
+        "X_WASSUP_MSISDN":"UNAVAILABLE",
+        "X_WASSUP_PUIT":"1",
+        "X_WASSUP_BEARER":"WIFI",
+        "X_WASSUP_SPR":"8388608",
+        "Client-IP":"217.128.115.221",
+        "X-Forwarded-For":"217.128.115.221, 10.162.249.55"
+    },
+    "channels":[
+        {
+            "id":192,
+            "name":"TF1"
+        },
+        {
+            "id":118,
+            "name":"M6"
+        },
+        {
+            "id":119,
+            "name":"W9"
+        },
+        {
+            "id":4,
+            "name":"France 2"
+        }
+    ]
+}
