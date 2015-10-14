@@ -106,6 +106,14 @@ var handlePlayState = function(state) {
     }
 };
 
+var handleBuffering = function(show){
+    if (show === true) {
+        playerPanel.showLoadingElement();
+    }else{
+        playerPanel.hideLoadingElement();
+    }
+}
+
 var handleVolumeChange = function(volumeLevel) {
     playerPanel.onVolumeChange(volumeLevel);
 };
