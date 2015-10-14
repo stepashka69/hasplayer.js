@@ -76,7 +76,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.errHandler.sendError(event.data.code, event.data.message, event.data.data);
             this.debug.error("[Stream] protection error: " + event.data.code + " - " + event.data.message);
             // if the errors give the session token in params we close the current session
-            this.reset();
+            //this.reset();
         },
 
         play = function() {
