@@ -19,7 +19,7 @@ define({
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             bitrates: [230000, 331000, 477000, 688000, 991000, 1427000, 2056000, 2962000]
-        },
+        }
     ],
     audioTracks: [
         {
@@ -37,7 +37,7 @@ define({
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             audioTracks: [{id: 'audio', lang: null}]
-        },
+        }
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     playLive: [
@@ -47,6 +47,13 @@ define({
     //Test VOD stream play (playing after 10 seconds with buffering margin of 2 seconds)
     playVod: [
         {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest'}
+    ],
+    zapping: [
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest'},
+        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Big Buck Bunny/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte/manifest'}
     ],
     //Test VOD stream stop
     stopVod: [
