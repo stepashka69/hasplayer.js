@@ -13,8 +13,12 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/demoPlayer/functional_ie/config'
+    'testIntern/orangeHasPlayer/functional_ie/config'
     ], function(registerSuite, assert,pollUntil, require, config){
+
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
 
         var getCurrentTime = function() {
             return orangeHasPlayer.getPosition();
@@ -26,16 +30,20 @@ define([
 
         var command = null;
 
-        var tests = function(i) {
+        var tests = function(stream) {
 
-            var url = config.testPage + '?url=' + config.DRM[i].stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Sequence of playing a DRM stream',
 
                 setup: function() {
-                    console.log('[TEST_DRM] INIT');
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Init': function() {
+                    console.log('[TEST_DRM] INIT');
 
                     return command.execute(getCurrentTime)
                     .then(function(time) {
@@ -44,7 +52,7 @@ define([
                     }).execute(isPaused)
                     .then(function(paused) {
                         console.log('[TEST_DRM] Video is ' + (paused ? 'paused' : 'playing'));
-                        return assert.ok(isPaused, 'Video should be paused');
+                        return assert.ok(isPaused, 'Video should be paused before start.');
                     });
                 },
 
@@ -73,7 +81,7 @@ define([
         len = config.DRM.length;
 
         for (i; i < len; i++) {
-            tests(i);
+            tests(config.DRM[i].stream);
         }
     }
 );
