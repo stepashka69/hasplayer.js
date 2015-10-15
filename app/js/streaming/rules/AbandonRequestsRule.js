@@ -108,7 +108,7 @@ MediaPlayer.rules.AbandonRequestsRule = function () {
                                 fragmentInfo.estimatedTimeOfDownload = +(fragmentInfo.bytesTotal*8*0.001/fragmentInfo.measuredBandwidthInKbps).toFixed(2);
                                 self.debug.log("[AbandonRequestsRule]["+mediaType+"] id: "+fragmentInfo.id+" Bytes Loaded = "+(fragmentInfo.bytesLoaded)+", Measured bandwidth : "+fragmentInfo.measuredBandwidthInKbps+" kbps estimated Time of download : "+fragmentInfo.estimatedTimeOfDownload+" secondes, elapsed time : "+fragmentInfo.elapsedTime/1000+" secondes.");
 
-                                 if ((fragmentInfo.elapsedTime)/1000 > (fragmentInfo.segmentDuration*ABANDON_MULTIPLIER) || (bufferLevel.level < switchLowerBufferTime)) {
+                                 if ((fragmentInfo.elapsedTime)/1000 > (fragmentInfo.segmentDuration*ABANDON_MULTIPLIER) || (bufferLevel && bufferLevel.level < switchLowerBufferTime)) {
                                     switchRequest = new MediaPlayer.rules.SwitchRequest(0, MediaPlayer.rules.SwitchRequest.prototype.STRONG);
                                     abandonDict[fragmentInfo.id] = fragmentInfo;
                                     self.debug.log("[AbandonRequestsRule]["+mediaType+"] frag id"+fragmentInfo.id+" is asking to abandon and switch to initial quality measured bandwidth was"+fragmentInfo.measuredBandwidthInKbps);
