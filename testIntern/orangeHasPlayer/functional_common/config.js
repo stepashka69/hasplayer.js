@@ -97,7 +97,7 @@ define({
                     lang: 'audio101_fra'
                 }
             ]
-        },
+        }/*,
         {
             stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest',
             tracks: [
@@ -110,7 +110,7 @@ define({
                     lang: 'fra'
                 }
             ]
-        }
+        }*/
     ],
     subtitles: [
         {
@@ -162,6 +162,11 @@ define({
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2 - Audio Unsupported Codec/Manifest',
+            error: 'MANIFEST_ERR_CODEC',
+            msg: 'Audio Codec (audio/mp4;codecs="mp4a.40.0") is not supported.'
+        },
+        {
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte - Wrong audio codec data/manifest',
             error: 'MANIFEST_ERR_CODEC',
             msg: 'Audio Codec (audio/mp4;codecs="mp4a.40.0") is not supported.'
         },

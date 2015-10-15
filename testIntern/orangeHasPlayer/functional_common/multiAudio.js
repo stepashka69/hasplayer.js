@@ -64,11 +64,11 @@ define([
                         if (tracks) {
                             console.log('[TEST_MULTI-AUDIO] tracks count: ' + tracks.length)
 
-                            if (stream === 'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest') {
+                            if (stream === 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte/manifest') {
                                 assert.equal(tracks.length, 2, 'Test tracks count for ' + stream);
-                            } else if (stream === 'http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest') {
+                            } /*else if (stream === 'http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest') {
                                 assert.equal(tracks.length, 3, 'Test tracks count for ' + stream);
-                            }
+                            }*/
                         }
                     });
                 },
