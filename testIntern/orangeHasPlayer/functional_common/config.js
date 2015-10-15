@@ -48,6 +48,13 @@ define({
     playVod: [
         {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest'}
     ],
+    zapping: [
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest'},
+        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Big Buck Bunny/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte/manifest'}
+    ],
     //Test VOD stream stop
     stopVod: [
         {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest'}
