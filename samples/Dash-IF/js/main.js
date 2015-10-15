@@ -524,7 +524,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                     $scope.videoRatio = metrics.movingRatio['video'].low.toFixed(3) + " < " + metrics.movingRatio['video'].average.toFixed(3) + " < " + metrics.movingRatio['video'].high.toFixed(3);
                 }
 
-                if ($('#sliderBitrate').labeledslider( "option", "max" ) === 0) {
+                if ($('#sliderBitrate').labeledslider( "option", "max" ) === 0 && metrics.numBitratesValue>0) {
                     var labels = [];
                     for (var i = 0; metrics.bitrateValues!= null && i < metrics.bitrateValues.length; i++) {
                         labels.push(Math.round(metrics.bitrateValues[i] / 1000) + "k");
