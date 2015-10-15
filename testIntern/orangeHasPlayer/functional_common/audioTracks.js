@@ -59,7 +59,7 @@ define([
                     .execute(getAudioTracks)
                     .then(function (audioTracks) {
                         var equality = equal(audioTracks.sort(), tracks.sort());
-                        return assert.ok(equality, 'Bitrates should match.');
+                        return assert.ok(equality, 'Audio tracks should match.');
                     });
                 }
             });

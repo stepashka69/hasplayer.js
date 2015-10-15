@@ -28,7 +28,7 @@ define({
         },
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest',
-            audioTracks: [{id: 'audio102_qad', lang: 'qad'}, {id: 'audio101_fra', lang: 'fra'}]
+            audioTracks: [{id: 'audio101_fra', lang: 'fra'}]
         },
         {
             stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest',
