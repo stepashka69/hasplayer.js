@@ -58,7 +58,7 @@ define([
                 },
 
                 'Check playing': function() {
-                    console.log('[TEST_SEEK] Wait 5s ...');
+                    console.log('[TEST_SEEK] Check playing (wait 5s ...)');
 
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
@@ -78,7 +78,7 @@ define([
 
                 'Do seek': function() {
 
-                    console.log('[TEST_SEEK] Seek to ' + seekTime + 's...');
+                    console.log('[TEST_SEEK] Do seek to ' + seekTime + 's...');
 
                     return command.execute(seek, [seekTime])
                     .execute(getVideoCurrentTime)
@@ -100,7 +100,7 @@ define([
                 },
 
                 'Check playing': function() {
-                    console.log('[TEST_SEEK] Wait 2s ...');
+                    console.log('[TEST_SEEK] Check playing (wait 2s ...)');
 
                     return command.sleep(2000)
                     .execute(getVideoCurrentTime)
