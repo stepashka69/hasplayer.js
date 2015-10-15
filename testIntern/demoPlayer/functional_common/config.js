@@ -5,23 +5,23 @@ define({
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     play: [
-        {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest'},
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest'},
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'}
     ],
     //Test DRM stream play (on IE only)
     DRM: [
-        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest'}
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway PR/Manifest'}
     ],
     //Test Playing, Seek and Loop
     seek: [
         {
-            stream: 'http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest',
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Big Buck Bunny/Manifest',
             duration: 596,
             seekCount:10
         },
         //{stream: 'http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest'},
         {
-            stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest',
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             duration: 121,
             seekCount:10
         }
@@ -29,7 +29,7 @@ define({
     //Test startTime param: seek at start
     startTime: [
         {
-            stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest',
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             time: 50
         }
     ],
@@ -37,7 +37,7 @@ define({
     //Params correspond to first and second audio tracks (regex that match the audio fragments url for)
     multiAudio: [
         {
-            stream: 'http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest',
+            stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte/manifest',
             tracks: [
                 {
                     id: 'audio102_deu',
@@ -48,7 +48,7 @@ define({
                     urlPattern: 'audio101_fra'
                 }
             ]
-        },
+        }/*,
         {
             stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest',
             tracks: [
@@ -61,6 +61,6 @@ define({
                     urlPattern: 'audio101_fra'
                 }
             ]
-        }
+        }*/
     ]
 });

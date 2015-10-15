@@ -19,7 +19,7 @@ define({
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             bitrates: [230000, 331000, 477000, 688000, 991000, 1427000, 2056000, 2962000]
-        },
+        }
     ],
     audioTracks: [
         {
@@ -37,7 +37,7 @@ define({
         {
             stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway/Manifest',
             audioTracks: [{id: 'audio', lang: null}]
-        },
+        }
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     playLive: [
