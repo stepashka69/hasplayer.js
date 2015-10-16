@@ -22,6 +22,14 @@ define([
             orangeHasPlayer.load(stream);
         };
 
+        var pause = function() {
+            orangeHasPlayer.pause();
+        };
+
+        var play = function() {
+            orangeHasPlayer.play();
+        };
+
         var addEventListener = function(type, listener, useCapture) {
            if(!document.events_spy) {
                document.events_spy = [];
@@ -31,7 +39,7 @@ define([
            document.events_spy[type] = 0;
            document.events_listeners[type] = function() {
                 document.events_spy[type]++;
-           }
+           };
 
            orangeHasPlayer.addEventListener(type, document.events_listeners[type]);
         };
@@ -60,14 +68,8 @@ define([
                     return command
                     .sleep(5000)
                     .execute(addEventListener, ['pause'])
-                    .then(function () {
-                        return command.execute(function() {
-                            orangeHasPlayer.pause();
-                        })
-                        .then(function() {
-                            return command.execute(getEventsCount, ['pause']);
-                        });
-                    })
+                    .execute(pause)
+                    .execute(getEventsCount, ['pause'])
                     .then(function(eventCount) {
                         assert.ok(eventCount === 1, 'Proxy should have raised exactly 1 pause event.')
                     });
@@ -78,14 +80,8 @@ define([
                     return command
                     .sleep(1000)
                     .execute(addEventListener, ['play'])
-                    .then(function () {
-                        return command.execute(function() {
-                            orangeHasPlayer.play();
-                        })
-                        .then(function() {
-                            return command.execute(getEventsCount, ['play']);
-                        });
-                    })
+                    .execute(play)
+                    .execute(getEventsCount, ['play'])
                     .then(function(eventCount) {
                         assert.ok(eventCount === 1, 'Proxy should have raised exactly 1 play event.')
                     });
@@ -95,24 +91,15 @@ define([
                     console.log('[TEST_EVENTS] Remove events listeners...');
                     return command
                     .execute(removeEventListener, ['play'])
-                    .then(function () {
-                        return command.execute(removeEventListener, ['pause']);
-                    });
+                    .execute(removeEventListener, ['pause']);
                 },
 
                 'Test removed pause event listener': function() {
                     console.log('[TEST_EVENTS] Test removed pause event listener');
                     return command
                     .sleep(5000)
-                    .execute(addEventListener, ['pause'])
-                    .then(function () {
-                        return command.execute(function() {
-                            orangeHasPlayer.pause();
-                        })
-                        .then(function() {
-                            return command.execute(getEventsCount, ['pause']);
-                        });
-                    })
+                    .execute(pause)
+                    .execute(getEventsCount, ['pause'])
                     .then(function(eventCount) {
                         assert.ok(eventCount === 1, 'Proxy should not have raised any more pause event.')
                     });
@@ -122,15 +109,8 @@ define([
                     console.log('[TEST_EVENTS] Test removed play event listener');
                     return command
                     .sleep(1000)
-                    .execute(addEventListener, ['play'])
-                    .then(function () {
-                        return command.execute(function() {
-                            orangeHasPlayer.play();
-                        })
-                        .then(function() {
-                            return command.execute(getEventsCount, ['play']);
-                        });
-                    })
+                    .execute(play)
+                    .execute(getEventsCount, ['play'])
                     .then(function(eventCount) {
                         assert.ok(eventCount === 1, 'Proxy should note have raised any more play event.')
                     });
@@ -154,9 +134,7 @@ define([
                     return command
                     .execute(addEventListener, ['play_bitrate'])
                     .sleep(5000)
-                    .then(function () {
-                        return command.execute(getEventsCount, ['play_bitrate']);
-                    })
+                    .execute(getEventsCount, ['play_bitrate'])
                     .then(function(eventCount) {
                         assert.ok(eventCount > 1, 'Proxy should have raised at least 1 play_bitrate event.')
                     });
@@ -180,9 +158,7 @@ define([
                     return command
                     .execute(addEventListener, ['download_bitrate'])
                     .sleep(5000)
-                    .then(function () {
-                        return command.execute(getEventsCount, ['download_bitrate']);
-                    })
+                    .execute(getEventsCount, ['download_bitrate'])
                     .then(function(eventCount) {
                         assert.ok(eventCount > 1, 'Proxy should have raised at least 1 download_bitrate event.')
                     });
