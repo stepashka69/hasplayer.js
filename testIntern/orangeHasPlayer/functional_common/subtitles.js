@@ -132,9 +132,7 @@ define([
                         }, [stream]);
                     })
                     .sleep(5000)
-                    .then(function() {
-                        return command.execute(getSelectedSubtitleTrack);
-                    })
+                    .execute(getSelectedSubtitleTrack)
                     .then(function (subtitleTrack) {
                         var equality = equal(subtitleTrack, tracks[0]);
                         return assert.ok(equality, 'Selected subtitle should be "fre".');
