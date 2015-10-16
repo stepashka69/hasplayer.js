@@ -96,8 +96,7 @@ define([
                         console.log('[TEST_PAUSE] pause state = ' + resu);
                         assert.ok(resu === true);
                         console.log('[TEST_PAUSE] restart ');
-                        command.execute(play);
-                    });
+                    }).execute(play);
                 },
 
                 'Check playing time after 20 sec.': function() {

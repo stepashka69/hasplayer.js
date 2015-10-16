@@ -100,9 +100,7 @@ define([
                     console.log('[TEST_SUBTITLE_TRACKS] Set subtitle track');
                     return command
                     .execute(setSubtitleTrack, [tracks[0]])
-                    .then(function () {
-                        return command.execute(getSelectedSubtitleTrack);
-                    })
+                    .execute(getSelectedSubtitleTrack)
                     .then(function (subtitleTrack) {
                         var equality = equal(subtitleTrack, tracks[0]);
                         return assert.ok(equality, 'Selected subtitles should be "fre".');
@@ -119,18 +117,13 @@ define([
 
                 setup: function() {
                     command = this.remote.get(require.toUrl(url));
-                    return command.sleep(500).execute(loadStream, [stream]);
                 },
 
                 'Set default subtitles': function() {
                     console.log('[TEST_SUBTITLE_TRACKS] Check selected subtitle track');
                     return command
                     .execute(setDefaultSubtitleTrack, [tracks[0]])
-                    .then(function () {
-                        return command.execute(function(s) {
-                            orangeHasPlayer.load(s);
-                        }, [stream]);
-                    })
+                    .execute(loadStream, [stream])
                     .sleep(5000)
                     .execute(getSelectedSubtitleTrack)
                     .then(function (subtitleTrack) {
@@ -155,12 +148,12 @@ define([
                 'Get initial subtitles visibility': function() {
                     console.log('[TEST_SUBTITLE_TRACKS] Get initial subtitles visibility');
                     return command
-                    .sleep(10000)
+                    .sleep(2000)
                     .execute(getVideoSubtitleVisibility)
                     .then(function (visibility) {
-                        assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
-                        return command.execute(getSubtitleVisibility);
+                        return assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
                     })
+                    .execute(getSubtitleVisibility)
                     .then(function(visibility) {
                         return assert.ok(visibility, 'The subtitles should be shown (proxy).');
                     });
@@ -170,14 +163,12 @@ define([
                     console.log('[TEST_SUBTITLE_TRACKS] Set subtitles visibility to false');
                     return command
                     .execute(setSubtitleVisibility, [false])
-                    .sleep(3000)
-                    .then(function () {
-                        return command.execute(getVideoSubtitleVisibility);
-                    })
+                    .sleep(2000)
+                    .execute(getVideoSubtitleVisibility)
                     .then(function(visibility) {
-                        assert.equal(visibility, 'hidden', 'The subtitles should be shown (video tag).')
-                        return command.execute(getSubtitleVisibility);
+                        return assert.equal(visibility, 'hidden', 'The subtitles should be shown (video tag).')
                     })
+                    .execute(getSubtitleVisibility)
                     .then(function(visibility) {
                         return assert.ok(!visibility, 'The subtitles should be shown (proxy).');
                     });
@@ -187,13 +178,11 @@ define([
                     console.log('[TEST_SUBTITLE_TRACKS] Set subtitles visibility to true');
                     return command
                     .execute(setSubtitleVisibility, [true])
-                    .then(function () {
-                        return command.execute(getVideoSubtitleVisibility);
-                    })
+                    .execute(getVideoSubtitleVisibility)
                     .then(function(visibility) {
-                        assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
-                        return command.execute(getSubtitleVisibility);
+                        return assert.equal(visibility, 'showing', 'The subtitles should be shown (video tag).')
                     })
+                    .execute(getSubtitleVisibility)
                     .then(function(visibility) {
                         return assert.ok(visibility, 'The subtitles should be shown (proxy).');
                     });

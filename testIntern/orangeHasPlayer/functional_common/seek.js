@@ -109,9 +109,7 @@ define([
                         assert.ok(time >= videoCurrentTime);
                         videoCurrentTime = time;
                     });
-                },
-
-
+                }
             });
         };
 
