@@ -87,13 +87,11 @@ define([
                     console.log('[TEST_VOLUME] Set volume to valid level 0.42');
                     return command
                     .execute(setVolume, [0.42])
-                    .then(function() {
-                        return command.execute(getVideoVolume);
-                    })
+                    .execute(getVideoVolume)
                     .then(function(volume) {
                         videoVolume = volume;
-                        return command.execute(getVolume);
                     })
+                    .execute(getVolume)
                     .then(function (volume) {
                         assert.equal(volume, 0.42, 'The proxy volume level should be 0.42');
                         return assert.equal(volume, videoVolume, 'Video tag volume and proxy volume should match.');
@@ -104,13 +102,11 @@ define([
                     console.log('[TEST_VOLUME] Set volume to max level 1');
                     return command
                     .execute(setVolume, [1])
-                    .then(function() {
-                        return command.execute(getVideoVolume);
-                    })
+                    .execute(getVideoVolume)
                     .then(function(volume) {
                         videoVolume = volume;
-                        return command.execute(getVolume);
                     })
+                    .execute(getVolume)
                     .then(function (volume) {
                         assert.equal(volume, 1, 'The proxy volume level should be 1');
                         return assert.equal(volume, videoVolume, 'Video tag volume and proxy volume should match.');
@@ -121,13 +117,11 @@ define([
                     console.log('[TEST_VOLUME] Set volume to min level 0');
                     return command
                     .execute(setVolume, [0])
-                    .then(function() {
-                        return command.execute(getVideoVolume);
-                    })
+                    .execute(getVideoVolume)
                     .then(function(volume) {
                         videoVolume = volume;
-                        return command.execute(getVolume);
                     })
+                    .execute(getVolume)
                     .then(function (volume) {
                         assert.equal(volume, 0, 'The proxy volume level should be 0');
                         return assert.equal(volume, videoVolume, 'Video tag volume and proxy volume should match.');
@@ -140,12 +134,12 @@ define([
                     .execute(setVolume, [1337])
                     .then(function(errMsg) {
                         assert.ok(errMsg === 'OrangeHasPlayer.setVolume(): Invalid Arguments', 'Message is: ' + errMsg);
-                        return command.execute(getVideoVolume);
                     })
+                    .execute(getVideoVolume)
                     .then(function(volume) {
                         videoVolume = volume;
-                        return command.execute(getVolume);
                     })
+                    .execute(getVolume)
                     .then(function (volume) {
                         assert.equal(volume, 0, 'The proxy volume level should be 0');
                         return assert.equal(volume, videoVolume, 'Video tag volume and proxy volume should match.');
@@ -158,12 +152,12 @@ define([
                     .execute(setVolume, [-1])
                     .then(function(errMsg) {
                         assert.ok(errMsg === 'OrangeHasPlayer.setVolume(): Invalid Arguments', 'Message is: ' + errMsg);
-                        return command.execute(getVideoVolume);
                     })
+                    .execute(getVideoVolume)
                     .then(function(volume) {
                         videoVolume = volume;
-                        return command.execute(getVolume);
                     })
+                    .execute(getVolume)
                     .then(function (volume) {
                         assert.equal(volume, 0, 'The proxy volume level should be 0');
                         return assert.equal(volume, videoVolume, 'Video tag volume and proxy volume should match.');
@@ -205,13 +199,11 @@ define([
                     console.log('[TEST_VOLUME] Mute');
                     return command
                     .execute(setMute, [true])
-                    .then(function() {
-                        return command.execute(getVideoMute);
-                    })
+                    .execute(getVideoMute)
                     .then(function(muted) {
                         videoMuted = muted;
-                        return command.execute(getMute);
                     })
+                    .execute(getMute)
                     .then(function (muted) {
                         assert.equal(muted, true, 'The proxy should be muted');
                         return assert.equal(muted, videoMuted, 'Video tag and proxy volume should say "muted".');
@@ -222,13 +214,11 @@ define([
                     console.log('[TEST_VOLUME] Unmute');
                     return command
                     .execute(setMute, [false])
-                    .then(function() {
-                        return command.execute(getVideoMute);
-                    })
+                    .execute(getVideoMute)
                     .then(function(muted) {
                         videoMuted = muted;
-                        return command.execute(getMute);
                     })
+                    .execute(getMute)
                     .then(function (muted) {
                         assert.equal(muted, false, 'The proxy should not be muted');
                         return assert.equal(muted, videoMuted, 'Video tag and proxy volume should not say "muted".');
