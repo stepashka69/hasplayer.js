@@ -663,6 +663,7 @@ MediaPlayer.dependencies.BufferController = function () {
                     this.debug.log("[BufferController]["+type+"][onBytesError] Requests have been aborted!!!!!!!!!!!!");
                 }
             }
+
             //if it's the first download error, try to load the same segment for a the lowest quality...
             if(this.chunkAborted === true)
             {
@@ -1492,12 +1493,12 @@ MediaPlayer.dependencies.BufferController = function () {
                     
                     if (fragmentModel) {
                         fragmentModel.fragmentLoader.unsubscribe(MediaPlayer.dependencies.FragmentLoader.eventList.ENAME_LOADING_PROGRESS, self.abrController);
+                        self.fragmentController.abortRequestsForModel(fragmentModel);
+                        self.fragmentController.detachBufferController(fragmentModel);
+                        fragmentModel = null;
                     }
 
                     self.clearMetrics();
-                    self.fragmentController.abortRequestsForModel(fragmentModel);
-                    self.fragmentController.detachBufferController(fragmentModel);
-                    fragmentModel = null;
                     initializationData = [];
                     initialPlayback = true;
                     isQuotaExceeded = false;
