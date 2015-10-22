@@ -233,118 +233,118 @@ MediaPlayer.dependencies.Stream = function() {
             //self.debug.log("Gathering information for buffers. (1)");
             self.manifestExt.getVideoData(manifest, periodInfo.index).then(
                 function(videoData) {
-                    if (videoData !== null) {
-                        //self.debug.log("Create video buffer.");
-                        self.manifestExt.getDataIndex(videoData, manifest, periodInfo.index).then(
-                            function(index) {
-                                videoTrackIndex = index;
-                                //self.debug.log("Save video track: " + videoTrackIndex);
+                    //self.debug.log("Create video buffer.");
+                    self.manifestExt.getDataIndex(videoData, manifest, periodInfo.index).then(
+                        function(index) {
+                            videoTrackIndex = index;
+                            //self.debug.log("Save video track: " + videoTrackIndex);
+                        }
+                    );
+
+                    self.manifestExt.getCodec(videoData).then(
+                        function(codec) {
+                            self.debug.info("[Stream] Video codec: " + codec);
+                            videoCodec = codec;
+
+                            if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
+                                var msg = "Video Codec (" + codec + ") is not supported.";
+                                self.debug.error("[Stream] ", msg);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                                videoState = "error";
+                                return Q.reject();
                             }
-                        );
 
-                        self.manifestExt.getCodec(videoData).then(
-                            function(codec) {
-                                self.debug.info("[Stream] Video codec: " + codec);
-                                videoCodec = codec;
+                            return self.manifestExt.getContentProtectionData(videoData).then(
+                                function(contentProtectionData) {
+                                    contentProtection = contentProtectionData;
 
-                                if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                    var msg = "Video Codec (" + codec + ") is not supported.";
-                                    self.debug.error("[Stream] ", msg);
-                                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
-                                    videoState = "error";
-                                    return Q.when(null);
-                                }
-
-                                return self.manifestExt.getContentProtectionData(videoData).then(
-                                    function(contentProtectionData) {
-                                        contentProtection = contentProtectionData;
-
-                                        if (mediaSource) {
-                                            return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
-                                        } else {
-                                            return;
-                                        }
+                                    if (mediaSource) {
+                                        return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
+                                    } else {
+                                        return Q.reject();
                                     }
-                                );
-                            }
-                        ).then(
-                            function(buffer) {
-                                if (buffer === null) {
-                                    self.debug.log("No buffer was created, skipping video stream.");
-                                } else {
-                                    // TODO : How to tell index handler live/duration?
-                                    // TODO : Pass to controller and then pass to each method on handler?
-                                    videoController = self.system.getObject("bufferController");
-                                    videoController.initialize("video", periodInfo, videoData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource, eventController);
-                                    videoState = "ready";
-                                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
                                 }
-                            },
-                            function( /*error*/ ) {
+                            );
+                        }
+                    ).then(
+                        function(buffer) {
+                            // TODO : How to tell index handler live/duration?
+                            // TODO : Pass to controller and then pass to each method on handler?
+                            videoController = self.system.getObject("bufferController");
+                            videoController.initialize("video", periodInfo, videoData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            videoState = "ready";
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        },
+                        function( /*error*/ ) {
+                            if (videoState !== "error") {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating video source buffer.");
                                 videoState = "error";
-                                checkIfInitialized.call(self, videoState, audioState, textTrackState);
                             }
-                        );
-                    } else {
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        }
+                    );
+                    return self.manifestExt.getSpecificAudioData(manifest, periodInfo.index, defaultAudioLang);
+                }, function() {
+                    if (videoState !== "error") {
                         var msg = "No Video Data in manifest.";
                         self.debug.error("[Stream]" + msg);
                         self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
                         videoState = "error";
-                        checkIfInitialized.call(self, videoState, audioState, textTrackState);
                     }
-                    return self.manifestExt.getSpecificAudioData(manifest, periodInfo.index, defaultAudioLang);
+                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                    //no video, so don't analyse audio datas....
+                    return Q.reject();
                 }
             ).then(
                 function(specificAudioData) {
-                    if (specificAudioData !== null) {
-                        self.manifestExt.getDataIndex(specificAudioData, manifest, periodInfo.index).then(
-                            function(index) {
-                                audioTrackIndex = index;
-                                //self.debug.log("Save audio track: " + audioTrackIndex);
-                            }
-                        );
+                    self.manifestExt.getDataIndex(specificAudioData, manifest, periodInfo.index).then(
+                        function(index) {
+                            audioTrackIndex = index;
+                            //self.debug.log("Save audio track: " + audioTrackIndex);
+                        }
+                    );
 
-                        self.manifestExt.getCodec(specificAudioData).then(
-                            function(codec) {
-                                self.debug.info("[Stream] Audio codec: " + codec);
-                                audioCodec = codec;
-                                if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                    var msg = "Audio Codec (" + codec + ") is not supported.";
-                                    self.debug.error("[Stream] ", msg);
-                                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
-                                    audioState = "error";
-                                    return;
-                                }
-
-                                if (mediaSource) {
-                                    return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
-                                }
+                    self.manifestExt.getCodec(specificAudioData).then(
+                        function(codec) {
+                            self.debug.info("[Stream] Audio codec: " + codec);
+                            audioCodec = codec;
+                            if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
+                                var msg = "Audio Codec (" + codec + ") is not supported.";
+                                self.debug.error("[Stream] ", msg);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                                audioState = "error";
+                                return Q.reject();
                             }
-                        ).then(
-                            function(buffer) {
-                                if (buffer != null && audioState != "error") {
-                                    // TODO : How to tell index handler live/duration?
-                                    // TODO : Pass to controller and then pass to each method on handler?
-                                    audioController = self.system.getObject("bufferController");
-                                    audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource, eventController);
-                                    //self.debug.log("Audio is ready!");
-                                    audioState = "ready";
-                                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
-                                }
-                            },
-                            function() {
+
+                            if (mediaSource) {
+                                return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
+                            } else {
+                                return Q.reject();
+                            }
+                        }
+                    ).then(
+                        function(buffer) {
+                            // TODO : How to tell index handler live/duration?
+                            // TODO : Pass to controller and then pass to each method on handler?
+                            audioController = self.system.getObject("bufferController");
+                            audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            //self.debug.log("Audio is ready!");
+                            audioState = "ready";
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        },
+                        function() {
+                            if (audioState !== "error") {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer.");
                                 audioState = "error";
-                                checkIfInitialized.call(self, videoState, audioState, textTrackState);
                             }
-                        );
-
-                    } else {
-                        self.debug.log("[Stream] No audio streams.");
-                        audioState = "ready";
-                        checkIfInitialized.call(self, videoState, audioState, textTrackState);
-                    }
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        }
+                    );
+                    return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
+                }, function() {
+                    self.debug.log("[Stream] No audio streams.");
+                    audioState = "ready";
+                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
 
                     return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
                 }
@@ -354,50 +354,46 @@ MediaPlayer.dependencies.Stream = function() {
                 //         (fragmented subtitles are used by MSS and live streams)
                 function(specificSubtitleData) {
                     var mimeType;
-                    if (specificSubtitleData !== null) {
-                        self.manifestExt.getDataIndex(specificSubtitleData, manifest, periodInfo.index).then(
-                            function(index) {
-                                textTrackIndex = index;
-                                self.debug.log("Save text track: " + textTrackIndex);
-                            });
+                    self.manifestExt.getDataIndex(specificSubtitleData, manifest, periodInfo.index).then(
+                        function(index) {
+                            textTrackIndex = index;
+                            self.debug.log("Save text track: " + textTrackIndex);
+                        });
 
-                        self.manifestExt.getMimeType(specificSubtitleData).then(
-                            function(type) {
-                                mimeType = type;
-                                if (mediaSource) {
-                                    return self.sourceBufferExt.createSourceBuffer(mediaSource, mimeType);
-                                } else {
-                                    return;
-                                }
-                            }).then(
-                            function(buffer) {
-                                if (buffer === null) {
-                                    self.debug.log("Source buffer was not created for text track");
-                                } else {
-                                    textController = self.system.getObject("bufferController");
-                                    textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource);
-
-                                    if (buffer.hasOwnProperty('initialize')) {
-                                        buffer.initialize(mimeType, textController, specificSubtitleData);
-                                    }
-                                    //self.debug.log("Text is ready!");
-                                    textTrackState = "ready";
-                                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
-                                }
-                            },
-                            function(error) {
-                                self.debug.log("Error creating text source buffer:");
-                                self.debug.log(error);
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating text source buffer.");
-                                textTrackState = "error";
-                                checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                    self.manifestExt.getMimeType(specificSubtitleData).then(
+                        function(type) {
+                            mimeType = type;
+                            if (mediaSource) {
+                                return self.sourceBufferExt.createSourceBuffer(mediaSource, mimeType);
+                            } else {
+                                return Q.reject();
                             }
-                        );
-                    } else {
-                        self.debug.log("[Stream] No text tracks.");
-                        textTrackState = "ready";
-                        checkIfInitialized.call(self, videoState, audioState, textTrackState);
-                    }
+                        }).then(
+                        function(buffer) {
+                            textController = self.system.getObject("bufferController");
+                            textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.videoModel, self.requestScheduler, self.fragmentController, mediaSource);
+
+                            if (buffer.hasOwnProperty('initialize')) {
+                                buffer.initialize(mimeType, textController, specificSubtitleData);
+                            }
+                            //self.debug.log("Text is ready!");
+                            textTrackState = "ready";
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        },
+                        function(error) {
+                            self.debug.log("Error creating text source buffer:");
+                            self.debug.log(error);
+                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating text source buffer.");
+                            textTrackState = "error";
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                        }
+                    );
+
+                    return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
+                }, function() {
+                    self.debug.log("[Stream] No text tracks.");
+                    textTrackState = "ready";
+                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
 
                     return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                 }
