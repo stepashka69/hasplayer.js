@@ -638,7 +638,7 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
-        if (!audioTrack || !audioTrack.id || !audioTrack.lang) {
+        if (!audioTrack || !(audioTrack.id || audioTrack.lang)) {
             throw new Error('OrangeHasPlayer.setAudioTrack(): audioTrack parameter is unknown');
         }
 
@@ -654,8 +654,8 @@ OrangeHasPlayer = function() {
             for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
                 if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
-                    selectedAudioTrack = audioTrack;
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
+                    selectedAudioTrack = mediaPlayerAudioTracks[i];
                     return;
                 }
             }
