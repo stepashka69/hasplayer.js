@@ -183,6 +183,7 @@
 
     function changeSubtitle(track) {
         orangeHasPlayer.setSubtitleTrack(track);
+        orangeHasPlayer.setDefaultSubtitleLang(track.lang);
     }
 
     function setPlayerMute() {

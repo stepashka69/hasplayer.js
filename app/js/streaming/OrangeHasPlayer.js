@@ -760,7 +760,7 @@ OrangeHasPlayer = function() {
         var i = 0,
             mediaPlayerSubtitleTracks;
 
-        if (!subtitleTrack || !subtitleTrack.id || !subtitleTrack.lang) {
+        if (!subtitleTrack || !(subtitleTrack.id || subtitleTrack.lang)) {
             throw new Error('OrangeHasPlayer.setSubtitleTrack(): subtitleTrack parameter is unknown');
         }
 
@@ -778,8 +778,8 @@ OrangeHasPlayer = function() {
             for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
                 if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
-                    selectedSubtitleTrack = subtitleTrack;
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
+                    selectedSubtitleTrack = mediaPlayerSubtitleTracks[i];
                     return;
                 }
             }
