@@ -23,6 +23,7 @@ var server = http.createServer(function(req,res){
                 'use strict';
                 var options = {};
                 options.url = url.parse(req.url);
+                console.info("url : ", req.url);
                 options.method = req.method;
                 options.headers = req.headers;
                 options.proxy = proxy.protocol+"://"+proxy.host+":"+proxy.port;
@@ -50,28 +51,28 @@ var server = http.createServer(function(req,res){
             }).listen(PORT);
 
 // enable HTTPS threw socket communication
-server.on("connect",function(req,socket, reqHead){
-    'use strict';
+// server.on("connect",function(req,socket, reqHead){
+//     'use strict';
     
-    //open a TCP connection to the remote host
-    var options = {
-        port:proxy.port,
-        host:proxy.host,
-        strictSSL: false
-    };
-    //options.proxy = proxy;
-    var conn = net.connect(options, function() {
-        // respond to the client that the connection was made
-        socket.write('HTTP/' + req.httpVersion + ' 200 Connection Established\r\n' +'Proxy-agent: Node-Proxy\r\n' + '\r\n');
-        conn.write(reqHead);
-        //socket.write("HTTP/1.1 200 OK\r\n\r\n");
-        // create a tunnel between the two hosts
-        socket.pipe(conn);
-        conn.pipe(socket);
+//     //open a TCP connection to the remote host
+//     var options = {
+//         port:proxy.port,
+//         host:proxy.host,
+//         strictSSL: false
+//     };
+//     //options.proxy = proxy;
+//     var conn = net.connect(options, function() {
+//         // respond to the client that the connection was made
+//         socket.write('HTTP/' + req.httpVersion + ' 200 Connection Established\r\n' +'Proxy-agent: Node-Proxy\r\n' + '\r\n');
+//         conn.write(reqHead);
+//         //socket.write("HTTP/1.1 200 OK\r\n\r\n");
+//         // create a tunnel between the two hosts
+//         socket.pipe(conn);
+//         conn.pipe(socket);
 
-    });
-})
-.on("error", function(){
+//     });
+// })
+server.on("error", function(){
     'use strict';
     console.info("error on connect", arguments.length, this);
 }.bind(this));
