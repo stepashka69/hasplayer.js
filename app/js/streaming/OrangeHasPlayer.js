@@ -160,10 +160,16 @@ OrangeHasPlayer = function() {
     };
 
     var _metricAdded = function(e) {
-        switch(e.data.metric){
+        var metricsExt = mediaPlayer.getMetricsExt(),
+            event;
+
+        switch (e.data.metric) {
+            case "ManifestReady":
+                _isPlayerInitialized();
+                videoBitrates = metricsExt.getBitratesForType('video');
+                break;
             case "RepresentationSwitch":
                 _isPlayerInitialized();
-                var metricsExt = mediaPlayer.getMetricsExt();
                 if (e.data.stream == "video") {
                     videoBitrates = metricsExt.getBitratesForType(e.data.stream);
                     _dispatchBitrateEvent('download_bitrate', {
@@ -186,9 +192,8 @@ OrangeHasPlayer = function() {
                     console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
                 }
                 break;
-            case "BufferedSwitch" : 
+            case "BufferedSwitch" :
                 _isPlayerInitialized();
-                var metricsExt = mediaPlayer.getMetricsExt();
                 if (e.data.stream == "video") {
                     videoQualityChanged.push({
                                 streamType: e.data.stream,
@@ -211,7 +216,7 @@ OrangeHasPlayer = function() {
                 break;
             case "BufferLevel" :
                 console.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
-                var event = document.createEvent("CustomEvent");
+                event = document.createEvent("CustomEvent");
                 event.initCustomEvent('bufferLevel_updated', false, false, {
                     type: e.data.stream,
                     level: e.data.value.level.toFixed(3)
@@ -220,7 +225,7 @@ OrangeHasPlayer = function() {
                 break;
             case "State" :
                 console.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
-                var event = document.createEvent("CustomEvent");
+                event = document.createEvent("CustomEvent");
                 event.initCustomEvent('state_changed', false, false, {
                     type: e.data.stream,
                     state: e.data.value.current
