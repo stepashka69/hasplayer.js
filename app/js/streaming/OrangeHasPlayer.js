@@ -46,6 +46,12 @@ OrangeHasPlayer = function() {
             video: -1,
             audio: -1
         },
+
+        debugData ={
+            isInDebug:false,
+            level:4,
+            loggerType:'console'
+        },
         state = 'UNINITIALIZED';
 
     var _isPlayerInitialized = function() {
@@ -61,6 +67,47 @@ OrangeHasPlayer = function() {
         this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
+        }
+    };
+
+    var _handleKeyPressedEvent = function(e){
+        // if we press ctrl + alt + maj + z we activate debug mode
+        if(e.altKey === true && e.ctrlKey=== true && e.shiftKey === true && e.keyCode ===90){
+            if(debugData.isInDebug){
+                debugData.isInDebug = false;
+                console.log("debug mode desactivated");
+                _isPlayerInitialized();
+                _downloadDebug(mediaPlayer.getDebug().getLogger().getLogs());
+                mediaPlayer.getDebug().setLevel(debugData.level);
+                mediaPlayer.getDebug().setLogger(debugData.loggerType);
+            }else{
+                debugData.isInDebug = true;
+                console.log("debug mode activated");
+                _isPlayerInitialized();
+                mediaPlayer.getDebug().setLevel(3);
+                mediaPlayer.getDebug().setLogger('memory');
+                
+            }
+        }
+    };
+
+    var _downloadDebug = function(array){
+        if(array && array.length > 0){  
+            var filename = 'hasplayer_log.txt',
+                data = JSON.stringify(array, null, '\r\n'),
+                blob = new Blob([data], {type: 'text/json'});
+
+            if(navigator.msSaveBlob){ // For IE10+ and edge
+                navigator.msSaveBlob(blob,filename);
+            }else{
+                var e    = document.createEvent('MouseEvents'),
+                    a    = document.createElement('a');
+                a.download = filename;
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            }
         }
     };
 
@@ -209,6 +256,7 @@ OrangeHasPlayer = function() {
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
         video.addEventListener("timeupdate", _onUpdate);
+        window.addEventListener("keydown",_handleKeyPressedEvent);
     };
 
     /**
@@ -969,8 +1017,10 @@ OrangeHasPlayer = function() {
             throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
         }
         if (value === true) {
+            debugData.level = 4;
             mediaPlayer.getDebug().setLevel(4);
         } else {
+            debugData.level = 0;
             mediaPlayer.getDebug().setLevel(0);
         }
     };
