@@ -854,8 +854,6 @@ MediaPlayer.dependencies.BufferController = function () {
                 time = seekTarget;
             }
 
-            this.debug.log("Working time is video time: " + time);
-
             return time;
         },
 

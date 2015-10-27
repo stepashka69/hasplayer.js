@@ -22,6 +22,7 @@ OrangeHasPlayer = function() {
     ////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
     var context,
         mediaPlayer,
+        debug,
         video,
         isFullScreen = false,
         isSubtitleVisible = true,
@@ -143,7 +144,7 @@ OrangeHasPlayer = function() {
             currentSwitch = streamTab[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
                 _dispatchBitrateEvent('play_bitrate', currentSwitch);
-                console.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate event for time = "+currentSwitch.mediaStartTime);
+                debug.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate event for time = "+currentSwitch.mediaStartTime);
                 // And remove when it's played
                 idToRemove.push(i);
             }
@@ -179,7 +180,7 @@ OrangeHasPlayer = function() {
                         width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                         height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
-                    console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
                 } else if (e.data.stream == "audio") {
                     audioBitrates = metricsExt.getBitratesForType(e.data.stream);
                     _dispatchBitrateEvent('download_bitrate', {
@@ -189,7 +190,7 @@ OrangeHasPlayer = function() {
                         width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                         height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
-                    console.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
                 }
                 break;
             case "BufferedSwitch" :
@@ -215,7 +216,7 @@ OrangeHasPlayer = function() {
                 }
                 break;
             case "BufferLevel" :
-                console.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
+                //debug.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('bufferLevel_updated', false, false, {
                     type: e.data.stream,
@@ -224,7 +225,7 @@ OrangeHasPlayer = function() {
                 video.dispatchEvent(event);
                 break;
             case "State" :
-                console.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
+                //debug.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('state_changed', false, false, {
                     type: e.data.stream,
@@ -258,6 +259,8 @@ OrangeHasPlayer = function() {
         mediaPlayer.startup();
         mediaPlayer.attachView(video);
         state = 'PLAYER_CREATED';
+
+        debug = mediaPlayer.getDebug();
 
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
@@ -323,7 +326,7 @@ OrangeHasPlayer = function() {
 
             metricsAgent.deferInit = Q.defer();
             metricsAgent.ref.init(function(activated) {
-                console.log("Metrics agent state: ", activated);
+                debug.log("Metrics agent state: ", activated);
                 metricsAgent.isActivated = activated;
                 metricsAgent.deferInit.resolve();
             });
@@ -698,7 +701,7 @@ OrangeHasPlayer = function() {
 
         if (selectedAudioTrack && ((audioTrack.id === selectedAudioTrack.id) ||
             (audioTrack.lang === selectedAudioTrack.lang))) {
-            console.log("[OrangeHasPlayer] " + audioTrack.lang + " is already selected");
+            debug.log("[OrangeHasPlayer] " + audioTrack.lang + " is already selected");
             return;
         }
 
@@ -820,7 +823,7 @@ OrangeHasPlayer = function() {
 
         if (selectedSubtitleTrack && ((subtitleTrack.id === selectedSubtitleTrack.id) ||
             (subtitleTrack.lang === selectedSubtitleTrack.lang))) {
-            console.log("[OrangeHasPlayer] " + subtitleTrack.lang + " is already selected");
+            debug.log("[OrangeHasPlayer] " + subtitleTrack.lang + " is already selected");
             return;
         }
 
