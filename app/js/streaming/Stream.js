@@ -74,7 +74,6 @@ MediaPlayer.dependencies.Stream = function() {
                 protectionController.closeKeySession(sessionToken);
             }
             this.errHandler.sendError(event.data.code, event.data.message, event.data.data);
-            this.debug.error("[Stream] protection error: " + event.data.code + " - " + event.data.message);
             // if the errors give the session token in params we close the current session
             //this.reset();
         },
@@ -200,9 +199,7 @@ MediaPlayer.dependencies.Stream = function() {
             if (videoState !== null && audioState !== null && textTrackState !== null) {
                 if (videoState === "ready" && audioState === "ready" && textTrackState === "ready") {
                     if (videoController === null && audioController === null && textController === null) {
-                        var msg = "No streams to play.";
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, msg, manifest);
-                        this.debug.log(msg);
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No streams to play (" + msg + ")", manifest);
                         initializedeferred.reject();
                     } else {
                         //this.debug.log("MediaSource initialized!");
@@ -247,9 +244,7 @@ MediaPlayer.dependencies.Stream = function() {
                             videoCodec = codec;
 
                             if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                var msg = "Video Codec (" + codec + ") is not supported.";
-                                self.debug.error("[Stream] ", msg);
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "Video Codec (" + codec + ") is not supported", manifest);
                                 videoState = "error";
                                 return Q.reject();
                             }
@@ -275,9 +270,9 @@ MediaPlayer.dependencies.Stream = function() {
                             videoState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function( /*error*/ ) {
+                        function(/*error*/) {
                             if (videoState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating video source buffer.");
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating video source buffer");
                                 videoState = "error";
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
@@ -286,9 +281,7 @@ MediaPlayer.dependencies.Stream = function() {
                     return self.manifestExt.getSpecificAudioData(manifest, periodInfo.index, defaultAudioLang);
                 }, function() {
                     if (videoState !== "error") {
-                        var msg = "No Video Data in manifest.";
-                        self.debug.error("[Stream]" + msg);
-                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "No Video Data in manifest", manifest);
                         videoState = "error";
                     }
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
@@ -309,9 +302,7 @@ MediaPlayer.dependencies.Stream = function() {
                             self.debug.info("[Stream] Audio codec: " + codec);
                             audioCodec = codec;
                             if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                var msg = "Audio Codec (" + codec + ") is not supported.";
-                                self.debug.error("[Stream] ", msg);
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, msg, manifest);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "Audio Codec (" + codec + ") is not supported", manifest);
                                 audioState = "error";
                                 return Q.reject();
                             }
@@ -332,9 +323,9 @@ MediaPlayer.dependencies.Stream = function() {
                             audioState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function() {
+                        function(/*error*/) {
                             if (audioState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer.");
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer");
                                 audioState = "error";
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
@@ -380,10 +371,8 @@ MediaPlayer.dependencies.Stream = function() {
                             textTrackState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function(error) {
-                            self.debug.log("Error creating text source buffer:");
-                            self.debug.log(error);
-                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating text source buffer.");
+                        function(/*error*/) {
+                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating text source buffer");
                             textTrackState = "error";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
@@ -522,10 +511,8 @@ MediaPlayer.dependencies.Stream = function() {
 
         onError = function(event) {
             var error = event.srcElement.error,
-                code,
-                msgError = "<video> error event";
+                code;
 
-            this.debug.info(msgError);
             if (error.code === -1) {
                 // not an error!
                 return;
@@ -551,9 +538,7 @@ MediaPlayer.dependencies.Stream = function() {
 
             errored = true;
 
-            this.debug.log("Video Element Error: " + code);
-            this.debug.log(error);
-            this.errHandler.sendError(code, msgError);
+            this.errHandler.sendError(code, "<video> error event");
             this.reset();
         },
 
