@@ -46,7 +46,7 @@ MediaPlayer.rules.o.InsufficientBufferRule = function () {    "use strict";
                 return Q.when(new MediaPlayer.rules.SwitchRequest());
             }
 
-            self.debug.log("[InsufficientBufferRule]["+data.type+"] Checking buffer level ... (current = " + current + ", buffer level = " + bufferLevel.level + ")");
+            self.debug.info("[InsufficientBufferRule]["+data.type+"] Checking buffer level ... (current = " + current + ", buffer level = " + bufferLevel.level + ")");
 
             deferred = Q.defer();
 
@@ -80,7 +80,7 @@ MediaPlayer.rules.o.InsufficientBufferRule = function () {    "use strict";
                                         p = MediaPlayer.rules.SwitchRequest.prototype.DEFAULT;
                                     }
 
-                                    self.debug.log("[InsufficientBufferRule]["+data.type+"] SwitchRequest(" + q + ", " + p + ")");
+                                    self.debug.info("[InsufficientBufferRule]["+data.type+"] SwitchRequest: q=" + q + ", p=" + p);
                                     deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p));
                                 }
                             );
