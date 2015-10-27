@@ -26,7 +26,7 @@ module.exports = function() {
             options: {
                 compress:{
                     pure_funcs: debugFuncs,
-                    drop_console : true,
+                    drop_console : false,
                     drop_debugger: true,
                     warnings: false
                 },
