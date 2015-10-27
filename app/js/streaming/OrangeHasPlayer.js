@@ -49,7 +49,7 @@ OrangeHasPlayer = function() {
 
         debugData ={
             isInDebug:false,
-            level:4,
+            level:0,
             loggerType:'console'
         },
         state = 'UNINITIALIZED';
@@ -84,6 +84,7 @@ OrangeHasPlayer = function() {
                 debugData.isInDebug = true;
                 console.log("debug mode activated");
                 _isPlayerInitialized();
+                debugData.level =  mediaPlayer.getDebug().getLevel();
                 mediaPlayer.getDebug().setLevel(3);
                 mediaPlayer.getDebug().setLogger('memory');
                 
@@ -93,7 +94,7 @@ OrangeHasPlayer = function() {
 
     var _downloadDebug = function(array){
         if(array && array.length > 0){  
-            var filename = 'hasplayer_log.txt',
+            var filename = 'hasplayer_logs.txt',
                 data = JSON.stringify(array, null, '\r\n'),
                 blob = new Blob([data], {type: 'text/json'});
 
