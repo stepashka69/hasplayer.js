@@ -414,6 +414,17 @@ OrangeHasPlayer = function() {
     };
 
     /**
+     * refresh manifest url
+     * @method refeshManifest
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * param {string} url - the video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
+     */
+    this.refreshManifest = function(url){
+        _isPlayerInitialized();
+        mediaPlayer.refreshManifest(url);
+    };
+    /**
      * Plays/resumes playback of the media.
      * @method play
      * @access public
@@ -585,6 +596,7 @@ OrangeHasPlayer = function() {
         switch (type) {
             case "error":
             case "subtitlesStyleChanged":
+            case "manifestUrlUpdate":
                 mediaPlayer.addEventListener(type, listener, useCapture);
                 break;
             case "play_bitrate":
