@@ -497,6 +497,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         setSubtitlesCSSStyle(subtitlesCSSStyle);
     }
 
+    function onManifestUrlUpdate(){
+        player.refreshManifest($scope.selectedItem.url);
+    }
+
     function metricChanged(e) {
         var metrics,
         point;
@@ -765,6 +769,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
+    player.addEventListener("manifestUrlUpdate", onManifestUrlUpdate.bind(this));
     video.addEventListener("loadeddata", onload.bind(this));
     video.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
     video.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));

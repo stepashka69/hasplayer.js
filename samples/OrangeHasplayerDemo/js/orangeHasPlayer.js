@@ -1,6 +1,7 @@
     var orangeHasPlayer = null,
         config = null,
         video = null,
+        currentStreamInfos = null,
         configMetrics = {
             'name': 'Prisme (local)',
             'activationUrl': '',
@@ -53,6 +54,8 @@
         orangeHasPlayer.addEventListener('pause', onPause);
         orangeHasPlayer.addEventListener('state_changed', onStateChanged);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
+        orangeHasPlayer.addEventListener('manifestUrlUpdate',onManifestUrlUpdate);
+
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -161,6 +164,12 @@
         }
     }
 
+    function onManifestUrlUpdate(){
+        if(currentStreamInfos){
+            orangeHasPlayer.refreshManifest(currentStreamInfos.url);
+        }
+    }
+
     /********************************************************************************************************************
      *
      *
@@ -173,6 +182,7 @@
             orangeHasPlayer.setInitialQualityFor('video', 0);
             orangeHasPlayer.setInitialQualityFor('audio', 0);
         }
+        currentStreamInfos = streamInfos;
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
