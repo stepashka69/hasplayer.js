@@ -144,7 +144,7 @@ OrangeHasPlayer = function() {
             currentSwitch = streamTab[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
                 _dispatchBitrateEvent('play_bitrate', currentSwitch);
-                debug.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate event for time = "+currentSwitch.mediaStartTime);
+                debug.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate event for time = "+currentSwitch.mediaStartTime+" for "+currentSwitch.switchedQuality);
                 // And remove when it's played
                 idToRemove.push(i);
             }
@@ -180,7 +180,7 @@ OrangeHasPlayer = function() {
                         width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                         height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
-                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event for "+videoBitrates[e.data.value.lto]);
                 } else if (e.data.stream == "audio") {
                     audioBitrates = metricsExt.getBitratesForType(e.data.stream);
                     _dispatchBitrateEvent('download_bitrate', {
@@ -190,7 +190,7 @@ OrangeHasPlayer = function() {
                         width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                         height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
-                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event");
+                    debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate event for "+videoBitrates[e.data.value.lto]);
                 }
                 break;
             case "BufferedSwitch" :
