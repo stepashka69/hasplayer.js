@@ -35,7 +35,7 @@
         /* hasPlayerConfig_dev */
         //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
-
+        orangeHasPlayer.setDebug(true);
         orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
