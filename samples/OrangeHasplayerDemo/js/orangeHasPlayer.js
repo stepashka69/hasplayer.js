@@ -38,7 +38,8 @@
 
         orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
-        orangeHasPlayer.setDebug(true);
+        orangeHasPlayer.setDefaultSubtitleLang('fre');
+        orangeHasPlayer.setSubtitleVisibility(false);
         registerHasPlayerEvents();
     }
 

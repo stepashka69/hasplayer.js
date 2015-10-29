@@ -111,13 +111,6 @@ SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track) {
 SettingsPanel.prototype.onEnableSubtitles = function() {
     this.subtitleListCombobox.disabled = !this.enableSubtitlesCheckbox.checked;
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
-    /*if (this.enableSubtitlesCheckbox.checked) {
-        this.subtitleListCombobox.disabled = false;
-        enableSubtitles(true);
-    } else {
-        this.subtitleListCombobox.disabled = true;
-        enableSubtitles(false);
-    }*/
 };
 
 SettingsPanel.prototype.onSubtitleChangedFromPlayer = function(track) {
