@@ -191,6 +191,10 @@
         orangeHasPlayer.setDefaultAudioLang(track.lang);
     }
 
+    function enableSubtitles(enable) {
+        orangeHasPlayer.setSubtitleVisibility(enable);
+    }
+
     function changeSubtitle(track) {
         orangeHasPlayer.setSubtitleTrack(track);
         orangeHasPlayer.setDefaultSubtitleLang(track.lang);
