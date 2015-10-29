@@ -1129,8 +1129,7 @@ MediaPlayer.dependencies.BufferController = function () {
                 rules = null,
                 metricsHttp = evt.data.httpRequestMetrics,
                 lastTraceTime = evt.data.lastTraceTime,
-                currentTime,
-                metrics = self.metricsModel.getMetricsFor(type);
+                currentTime;
 
                 //self.debug.log("[BufferController]["+type+"] Download request " + evt.data.request.url + " is in progress");
 
@@ -1159,7 +1158,7 @@ MediaPlayer.dependencies.BufferController = function () {
                     };
 
                     for (i = 0, len = rules.length; i < len; i += 1) {
-                        rules[i].execute(evt.data.request, self.abrController, metrics, callback);
+                        rules[i].execute(evt.data.request, callback);
                     }
                 });
         };
