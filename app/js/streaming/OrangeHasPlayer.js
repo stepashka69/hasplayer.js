@@ -506,6 +506,7 @@ OrangeHasPlayer = function() {
      * @method reset
      * @access public
      * @memberof OrangeHasPlayer#
+     * @param {number} reason - 0 : a stop during streaming (ex: browser has been closed), 1 : a stop because all the stream has been watched and 2 : a stop, after an error. 
      */
     this.reset = function(reason) {
         _isPlayerInitialized();
