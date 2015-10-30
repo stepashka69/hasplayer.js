@@ -72,37 +72,39 @@ OrangeHasPlayer = function() {
         }
     };
 
-    var _handleKeyPressedEvent = function(e){
+    var _handleKeyPressedEvent = function(e) {
         // if we press ctrl + alt + maj + z we activate debug mode
-        if(e.altKey === true && e.ctrlKey=== true && e.shiftKey === true && e.keyCode ===90){
-            if(debugData.isInDebug){
+        if ((e.altKey === true) && (e.ctrlKey === true) && (e.shiftKey === true) &&
+            ((e.keyCode === 68) || (e.keyCode === 90))) {
+            if (debugData.isInDebug) {
                 debugData.isInDebug = false;
                 console.log("debug mode desactivated");
                 _isPlayerInitialized();
-                _downloadDebug(mediaPlayer.getDebug().getLogger().getLogs());
+                if ((e.keyCode === 90)) {
+                    _downloadDebug(mediaPlayer.getDebug().getLogger().getLogs());
+                }
                 mediaPlayer.getDebug().setLevel(debugData.level);
                 mediaPlayer.getDebug().setLogger(debugData.loggerType);
-            }else{
+            } else {
                 debugData.isInDebug = true;
                 console.log("debug mode activated");
                 _isPlayerInitialized();
                 debugData.level =  mediaPlayer.getDebug().getLevel();
-                mediaPlayer.getDebug().setLevel(3);
-                mediaPlayer.getDebug().setLogger('memory');
-                
+                mediaPlayer.getDebug().setLevel((e.keyCode === 68) ? 4 : 3);
+                mediaPlayer.getDebug().setLogger((e.keyCode === 68) ? 'console' : 'memory');
             }
         }
     };
 
-    var _downloadDebug = function(array){
-        if(array && array.length > 0){  
+    var _downloadDebug = function(array) {
+        if (array && array.length > 0) {
             var filename = 'hasplayer_logs.txt',
                 data = JSON.stringify(array, null, '\r\n'),
                 blob = new Blob([data], {type: 'text/json'});
 
-            if(navigator.msSaveBlob){ // For IE10+ and edge
+            if (navigator.msSaveBlob) { // For IE10+ and edge
                 navigator.msSaveBlob(blob,filename);
-            }else{
+            } else {
                 var e    = document.createEvent('MouseEvents'),
                     a    = document.createElement('a');
                 a.download = filename;
