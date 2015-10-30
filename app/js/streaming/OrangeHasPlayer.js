@@ -62,6 +62,7 @@ OrangeHasPlayer = function() {
     };
 
     var _onloaded = function( /*e*/ ) {
+        debug.log("[OrangeHasPlayer] loadeddata");
         this.getAudioTracks();
         this.getSubtitleTracks();
         this.getSelectedAudioTrack();
@@ -167,7 +168,9 @@ OrangeHasPlayer = function() {
         switch (e.data.metric) {
             case "ManifestReady":
                 _isPlayerInitialized();
+                debug.log("[OrangeHasPlayer] ManifestReady");
                 videoBitrates = metricsExt.getBitratesForType('video');
+                debug.log("[OrangeHasPlayer] video bitrates: " + JSON.stringify(videoBitrates));
                 break;
             case "RepresentationSwitch":
                 _isPlayerInitialized();
