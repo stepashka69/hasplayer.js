@@ -691,8 +691,6 @@ OrangeHasPlayer = function() {
                         lang: mediaPlayerAudioTracks[i].lang
                     });
                 }
-            } else {
-                throw new Error('OrangeHasPlayer.getAudioTracks(): no audio tracks found');
             }
         }
 
@@ -815,8 +813,6 @@ OrangeHasPlayer = function() {
                         lang: mediaPlayerSubtitleTracks[i].lang
                     });
                 }
-            } else {
-                throw new Error('OrangeHasPlayer.getSubtitleTracks(): no subtitle tracks found');
             }
         }
 
