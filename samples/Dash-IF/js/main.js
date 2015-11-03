@@ -132,7 +132,8 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
         var url = {
             method: "GET",
             url: TVM_SERVER + 'channels/' + channelId + "/url",
-            headers: TVM_HEADERS
+            headers: TVM_HEADERS, 
+            timeout: 1000
         };
         return $http(url).then(function(response) {
             if(response.data && response.data.response) {
@@ -464,13 +465,17 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 
-    function onload(e){
+    function onload(/*e*/) {
         //init audio tracks
         $scope.audioTracks = player.getAudioTracks();
-        $scope.audioData = $scope.audioTracks[0];
+        if ($scope.audioTracks !== null) {
+            $scope.audioData = $scope.audioTracks[0];
+        }
         //init subtitles tracks
         $scope.textTracks = player.getSubtitleTracks();
-        $scope.textData = $scope.textTracks[0];
+        if ($scope.textTracks !== null) {
+            $scope.textTracks = $scope.textTracks[0];
+        }
     }
 
     //if video size change, player has to update subtitles size
