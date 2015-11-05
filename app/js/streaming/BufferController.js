@@ -198,7 +198,6 @@ MediaPlayer.dependencies.BufferController = function () {
         },
 
         doStop = function () {
-            //if (state === WAITING) return;
             if (!started) {
                 return;
             }
@@ -360,7 +359,7 @@ MediaPlayer.dependencies.BufferController = function () {
 
             //self.debug.log("Push (" + type + ") bytes: " + data.byteLength);
 
-            if (playListTraceMetricsClosed === true /*&& state !== WAITING*/) {
+            if (playListTraceMetricsClosed === true) {
                 playListTraceMetricsClosed = false;
                 playListTraceMetrics = self.metricsModel.appendPlayListTrace(playListMetrics, currentRepresentation.id, null, currentTime, currentVideoTime, null, 1.0, null);
             }
