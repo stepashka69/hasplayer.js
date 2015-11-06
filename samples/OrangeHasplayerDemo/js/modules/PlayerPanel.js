@@ -543,6 +543,5 @@ PlayerPanel.prototype.reset = function() {
     this.resetLanguageLines();
 
     this.hideErrorModule();
-    this.showLoadingElement();
     this.showBarsTimed();
 };

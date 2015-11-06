@@ -125,7 +125,7 @@ var cast = window.cast || {};
 		console.info("receiving play message",message);
 		var drmParams = {};
 		drmParams.backUrl = message.backUrl || null;
-		drmParams.customData = message.customData || null;
+		drmParams.cdmData = message.cdmData || null;
 		this.player.attachSource(message.url, drmParams);
 		// to update controlbar set firstAccess to true
 		firstAccess = true;

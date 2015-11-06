@@ -1,6 +1,7 @@
     var orangeHasPlayer = null,
         config = null,
         video = null,
+        currentStreamInfos = null,
         configMetrics = {
             'name': 'Prisme (local)',
             'activationUrl': '',
@@ -34,10 +35,11 @@
         /* hasPlayerConfig_dev */
         //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
-
+        orangeHasPlayer.setDebug(true);
         orangeHasPlayer.setDefaultAudioLang('fra');
         orangeHasPlayer.setDefaultSubtitleLang('fre');
-
+        orangeHasPlayer.setDefaultSubtitleLang('fre');
+        orangeHasPlayer.setSubtitleVisibility(false);
         registerHasPlayerEvents();
     }
 
@@ -47,10 +49,15 @@
         orangeHasPlayer.addEventListener('loadeddata', onload);
         orangeHasPlayer.addEventListener('play_bitrate', onPlayBitrateChanged);
         orangeHasPlayer.addEventListener('download_bitrate', onDownloadBitrateChanged);
+        orangeHasPlayer.addEventListener('bufferLevel_updated', onBufferLevelUpdated);
         orangeHasPlayer.addEventListener('volumechange', onVolumeChange);
         orangeHasPlayer.addEventListener('play', onPlay);
         orangeHasPlayer.addEventListener('pause', onPause);
+        orangeHasPlayer.addEventListener('ended', onEnd);
+        orangeHasPlayer.addEventListener('state_changed', onStateChanged);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
+        orangeHasPlayer.addEventListener('manifestUrlUpdate',onManifestUrlUpdate);
+
     }
 
     function loadHasPlayerConfig(fileUrl) {
@@ -126,6 +133,10 @@
         }
     }
 
+    function onBufferLevelUpdated(e) {
+        handleBufferLevelUpdated(e.detail.type, e.detail.level);
+    }
+
     function onVolumeChange() {
         handleVolumeChange(orangeHasPlayer.getVolume());
     }
@@ -138,10 +149,30 @@
         handlePlayState(false);
     }
 
+    function onEnd() {
+        handleVideoEnd();
+    }
+
+    function onStateChanged(e){
+        if (e.detail.type === 'video') {
+            if (e.detail.state === 'buffering') {
+                handleBuffering(true);
+            }else if(e.detail.state === 'playing') {
+                handleBuffering(false);
+            }
+        }
+    }
+
     function onTimeUpdate() {
         //update progress bar in GUI.
         if (!orangeHasPlayer.isLive()) {
             handleTimeUpdate(video.currentTime);
+        }
+    }
+
+    function onManifestUrlUpdate(){
+        if(currentStreamInfos){
+            orangeHasPlayer.refreshManifest(currentStreamInfos.url);
         }
     }
 
@@ -157,15 +188,22 @@
             orangeHasPlayer.setInitialQualityFor('video', 0);
             orangeHasPlayer.setInitialQualityFor('audio', 0);
         }
+        currentStreamInfos = streamInfos;
         orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
     }
 
     function changeAudio(track) {
         orangeHasPlayer.setAudioTrack(track);
+        orangeHasPlayer.setDefaultAudioLang(track.lang);
+    }
+
+    function enableSubtitles(enable) {
+        orangeHasPlayer.setSubtitleVisibility(enable);
     }
 
     function changeSubtitle(track) {
         orangeHasPlayer.setSubtitleTrack(track);
+        orangeHasPlayer.setDefaultSubtitleLang(track.lang);
     }
 
     function setPlayerMute() {

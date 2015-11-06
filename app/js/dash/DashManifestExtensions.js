@@ -13,7 +13,7 @@
  */
 
 
-Dash.dependencies.DashManifestExtensions = function () {
+Dash.dependencies.DashManifestExtensions = function() {
     "use strict";
     this.timelineConverter = undefined;
 };
@@ -21,105 +21,113 @@ Dash.dependencies.DashManifestExtensions = function () {
 Dash.dependencies.DashManifestExtensions.prototype = {
     constructor: Dash.dependencies.DashManifestExtensions,
 
-    getIsAudio: function (adaptation) {
+    getIsAudio: function(adaptation) {
         "use strict";
         var i,
             len,
-            col = adaptation.ContentComponent_asArray,
+            col,
             representation,
             result = false,
             found = false;
 
-        if (col) {
-            for (i = 0, len = col.length; i < len; i += 1) {
-                if (col[i].contentType === "audio") {
-                    result = true;
-                    found = true;
+        if (adaptation) {
+            col = adaptation.ContentComponent_asArray;
+
+            if (col) {
+                for (i = 0, len = col.length; i < len; i += 1) {
+                    if (col[i].contentType === "audio") {
+                        result = true;
+                        found = true;
+                    }
                 }
             }
-        }
 
-        if (adaptation.hasOwnProperty("mimeType")) {
-            result = adaptation.mimeType.indexOf("audio") !== -1;
-            found = true;
-        }
-
-        // couldn't find on adaptationset, so check a representation
-        if (!found) {
-            i = 0;
-            len = adaptation.Representation_asArray.length;
-            while (!found && i < len) {
-                representation = adaptation.Representation_asArray[i];
-
-                if (representation.hasOwnProperty("mimeType")) {
-                    result = representation.mimeType.indexOf("audio") !== -1;
-                    found = true;
-                }
-
-                i += 1;
+            if (adaptation.mimeType) {
+                result = adaptation.mimeType.indexOf("audio") !== -1;
+                found = true;
             }
-        }
 
-        // TODO : Add the type here so that somebody who has access to the adapatation set can check it.
-        // THIS IS A HACK for a bug in DashMetricsExtensions.
-        // See the note in DashMetricsExtensions.adaptationIsType().
-        if (result) {
-            adaptation.type = "audio";
+            // couldn't find on adaptationset, so check a representation
+            if (!found) {
+                i = 0;
+                len = adaptation.Representation_asArray.length;
+                while (!found && i < len) {
+                    representation = adaptation.Representation_asArray[i];
+
+                    if (representation.mimeType) {
+                        result = representation.mimeType.indexOf("audio") !== -1;
+                        found = true;
+                    }
+
+                    i += 1;
+                }
+            }
+
+            // TODO : Add the type here so that somebody who has access to the adapatation set can check it.
+            // THIS IS A HACK for a bug in DashMetricsExtensions.
+            // See the note in DashMetricsExtensions.adaptationIsType().
+            if (result) {
+                adaptation.type = "audio";
+            }
         }
 
         return Q.when(result);
     },
 
-    getIsVideo: function (adaptation) {
+    getIsVideo: function(adaptation) {
         "use strict";
         var i,
             len,
-            col = adaptation.ContentComponent_asArray,
+            col,
             representation,
             result = false,
             found = false;
 
-        if (col) {
-            for (i = 0, len = col.length; i < len; i += 1) {
-                if (col[i].contentType === "video") {
-                    result = true;
-                    found = true;
+        if (adaptation) {
+            col = adaptation.ContentComponent_asArray;
+
+            if (col) {
+                for (i = 0, len = col.length; i < len; i += 1) {
+                    if (col[i].contentType === "video") {
+                        result = true;
+                        found = true;
+                    }
                 }
             }
-        }
 
-        if (adaptation.hasOwnProperty("mimeType")) {
-            result = adaptation.mimeType.indexOf("video") !== -1;
-            found = true;
-        }
-
-        // couldn't find on adaptationset, so check a representation
-        if (!found) {
-            i = 0;
-            len = adaptation.Representation_asArray.length;
-            while (!found && i < len) {
-                representation = adaptation.Representation_asArray[i];
-
-                if (representation.hasOwnProperty("mimeType")) {
-                    result = representation.mimeType.indexOf("video") !== -1;
-                    found = true;
-                }
-
-                i += 1;
+            if (adaptation.mimeType) {
+                result = adaptation.mimeType.indexOf("video") !== -1;
+                found = true;
             }
-        }
 
-        // TODO : Add the type here so that somebody who has access to the adapatation set can check it.
-        // THIS IS A HACK for a bug in DashMetricsExtensions.
-        // See the note in DashMetricsExtensions.adaptationIsType().
-        if (result) {
-            adaptation.type = "video";
+            // couldn't find on adaptationset, so check a representation
+            if (!found) {
+                i = 0;
+                len = adaptation.Representation_asArray.length;
+                while (!found && i < len) {
+                    representation = adaptation.Representation_asArray[i];
+
+                    if (representation.mimeType) {
+                        result = representation.mimeType.indexOf("video") !== -1;
+                        found = true;
+                    }
+
+                    i += 1;
+                }
+            }
+
+            // TODO : Add the type here so that somebody who has access to the adapatation set can check it.
+            // THIS IS A HACK for a bug in DashMetricsExtensions.
+            // See the note in DashMetricsExtensions.adaptationIsType().
+            if (result) {
+                adaptation.type = "video";
+            }
         }
 
         return Q.when(result);
     },
 
-    getIsText: function (adaptation) {
+    getIsText: function(adaptation) {
         "use strict";
         var i,
             len,
@@ -137,7 +145,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             }
         }
 
-        if (adaptation.hasOwnProperty("mimeType")) {
+        if (adaptation.mimeType) {
             result = (adaptation.mimeType.indexOf("vtt") !== -1) || (adaptation.mimeType.indexOf("ttml") !== -1);
             found = true;
         }
@@ -149,7 +157,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             while (!found && i < len) {
                 representation = adaptation.Representation_asArray[i];
 
-                if (representation.hasOwnProperty("mimeType")) {
+                if (representation.mimeType) {
                     result = (representation.mimeType.indexOf("vtt") !== -1) || (representation.mimeType.indexOf("ttml") !== -1);
                     found = true;
                 }
@@ -166,14 +174,14 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return (type === "text/vtt" || type === "application/ttml+xml" || type === "application/ttml+xml+mp4");
     },
 
-    getIsMain: function (/*adaptation*/) {
+    getIsMain: function( /*adaptation*/ ) {
         "use strict";
         // TODO : Check "Role" node.
         // TODO : Use this somewhere.
         return Q.when(false);
     },
 
-    processAdaptation: function (adaptation) {
+    processAdaptation: function(adaptation) {
         "use strict";
         if (adaptation.Representation_asArray !== undefined && adaptation.Representation_asArray !== null) {
             adaptation.Representation_asArray.sort(function(a, b) {
@@ -184,7 +192,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return adaptation;
     },
 
-    getDataForId: function (id, manifest, periodIndex) {
+    getDataForId: function(id, manifest, periodIndex) {
         "use strict";
         var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
             i,
@@ -199,40 +207,53 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(null);
     },
 
-    getDataForIndex: function (index, manifest, periodIndex) {
+    getDataForIndex: function(index, manifest, periodIndex) {
         "use strict";
         var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
 
         return Q.when(adaptations[index]);
     },
 
-    getDataForIndex_: function (index, manifest, periodIndex) {
+    getDataForIndex_: function(index, manifest, periodIndex) {
         "use strict";
-        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+        var adaptations;
 
-        return adaptations[index];
+        if (manifest && periodIndex >= 0) {
+            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+
+            if (adaptations && adaptations.length > 0 && !isNaN(index)) {
+                return adaptations[index];
+            }
+        }
+
+        return [];
     },
 
-    getDataIndex: function (data, manifest, periodIndex) {
+    getDataIndex: function(data, manifest, periodIndex) {
         "use strict";
 
-        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations,
             i,
             len;
-        // ORANGE : compare data with id or string representation to avoid reference error due to manifest refresh
-        if (data.id) {
-            for (i = 0, len = adaptations.length; i < len; i += 1) {
-                if (adaptations[i].id  && adaptations[i].id === data.id) {
-                    return Q.when(i);
+
+        if (manifest && periodIndex >= 0) {
+            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+
+            // ORANGE : compare data with id or string representation to avoid reference error due to manifest refresh
+            if (data.id) {
+                for (i = 0, len = adaptations.length; i < len; i += 1) {
+                    if (adaptations[i].id && adaptations[i].id === data.id) {
+                        return Q.when(i);
+                    }
                 }
-            }
-        } else {
-            var strData = JSON.stringify(data);
-            var strAdapt;
-            for (i = 0, len = adaptations.length; i < len; i += 1) {
-                strAdapt = JSON.stringify(adaptations[i]);
-                if (strAdapt === strData) {
-                    return Q.when(i);
+            } else {
+                var strData = JSON.stringify(data);
+                var strAdapt;
+                for (i = 0, len = adaptations.length; i < len; i += 1) {
+                    strAdapt = JSON.stringify(adaptations[i]);
+                    if (strAdapt === strData) {
+                        return Q.when(i);
+                    }
                 }
             }
         }
@@ -240,95 +261,111 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(-1);
     },
 
-    getVideoData: function (manifest, periodIndex) {
+    getVideoData: function(manifest, periodIndex) {
         "use strict";
         //return Q.when(null);
         //------------------------------------
-        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations,
             i,
             len,
             deferred = Q.defer(),
             funcs = [];
 
-        for (i = 0, len = adaptations.length; i < len; i += 1) {
-            funcs.push(this.getIsVideo(adaptations[i]));
-        }
-        Q.all(funcs).then(
-            function (results) {
-                var found = false;
-                for (i = 0, len = results.length; i < len; i += 1) {
-                    if (results[i] === true) {
-                        found = true;
-                        deferred.resolve(adaptations[i]);
+        if (manifest && periodIndex >= 0) {
+            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+
+            for (i = 0, len = adaptations.length; i < len; i += 1) {
+                funcs.push(this.getIsVideo(adaptations[i]));
+            }
+            Q.all(funcs).then(
+                function(results) {
+                    var found = false;
+                    for (i = 0, len = results.length; i < len; i += 1) {
+                        if (results[i] === true) {
+                            found = true;
+                            deferred.resolve(adaptations[i]);
+                        }
+                    }
+                    if (!found) {
+                        deferred.reject();
                     }
                 }
-                if (!found) {
-                    deferred.resolve(null);
-                }
-            }
-        );
+            );
+        } else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     },
 
-    getTextDatas: function (manifest, periodIndex) {
+    getTextDatas: function(manifest, periodIndex) {
         "use strict";
         //return Q.when(null);
         //------------------------------------
-        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
+        var adaptations,
             i,
             len,
             deferred = Q.defer(),
             funcs = [];
 
-        for (i = 0, len = adaptations.length; i < len; i += 1) {
-            funcs.push(this.getIsText(adaptations[i]));
-        }
-        Q.all(funcs).then(
-            function (results) {
-                var datas = [];
-                for (i = 0, len = results.length; i < len; i += 1) {
-                    if (results[i] === true) {
-                        datas.push(adaptations[i]);
+        if (manifest && periodIndex >= 0) {
+            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+            for (i = 0, len = adaptations.length; i < len; i += 1) {
+                funcs.push(this.getIsText(adaptations[i]));
+            }
+            Q.all(funcs).then(
+                function(results) {
+                    var datas = [];
+                    for (i = 0, len = results.length; i < len; i += 1) {
+                        if (results[i] === true) {
+                            datas.push(adaptations[i]);
+                        }
+                        deferred.resolve(datas);
+                    }
                 }
+            );
+        } else {
+            deferred.reject();
+        }
+
+        return deferred.promise;
+    },
+
+    getAudioDatas: function(manifest, periodIndex) {
+        "use strict";
+        //return Q.when(null);
+        //------------------------------------
+        var adaptations,
+            i,
+            len,
+            deferred = Q.defer(),
+            funcs = [];
+
+        if (manifest && periodIndex >= 0) {
+            adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray;
+            for (i = 0, len = adaptations.length; i < len; i += 1) {
+                funcs.push(this.getIsAudio(adaptations[i]));
+            }
+
+            Q.all(funcs).then(
+                function(results) {
+                    var datas = [];
+                    for (i = 0, len = results.length; i < len; i += 1) {
+                        if (results[i] === true) {
+                            datas.push(adaptations[i]);
+                        }
+                    }
                     deferred.resolve(datas);
                 }
-            }
-        );
-
-        return deferred.promise;
-    },
-
-    getAudioDatas: function (manifest, periodIndex) {
-        "use strict";
-        //return Q.when(null);
-        //------------------------------------
-        var adaptations = manifest.Period_asArray[periodIndex].AdaptationSet_asArray,
-            i,
-            len,
-            deferred = Q.defer(),
-            funcs = [];
-
-        for (i = 0, len = adaptations.length; i < len; i += 1) {
-            funcs.push(this.getIsAudio(adaptations[i]));
+            );
+        } else {
+            deferred.reject();
         }
 
-        Q.all(funcs).then(
-            function (results) {
-                var datas = [];
-                for (i = 0, len = results.length; i < len; i += 1) {
-                    if (results[i] === true) {
-                        datas.push(adaptations[i]);
-                    }
-                }
-                deferred.resolve(datas);
-            }
-        );
-
         return deferred.promise;
     },
-    
-    getSpecificAudioData: function (manifest, periodIndex, language) {
+
+    getSpecificAudioData: function(manifest, periodIndex, language) {
         "use strict";
         var i,
             len,
@@ -336,30 +373,35 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             found = false,
             self = this;
 
-        this.getAudioDatas(manifest, periodIndex).then(
-            function (datas) {
-                if (!datas || datas.length === 0) {
-                    deferred.resolve(null);
-                }
+        if (manifest && periodIndex >= 0) {
+            this.getAudioDatas(manifest, periodIndex).then(
+                function(datas) {
+                    if (!datas || datas.length === 0) {
+                        deferred.reject();
+                        return;
+                    }
 
-                for (i = 0, len = datas.length; i < len && found !== true; i += 1) {
-                    if (datas[i].lang === language) {
-                        found = true;
-                        deferred.resolve(self.processAdaptation(datas[i]));
+                    for (i = 0, len = datas.length; i < len && found !== true; i += 1) {
+                        if (datas[i].lang === language) {
+                            found = true;
+                            deferred.resolve(self.processAdaptation(datas[i]));
+                        }
+                    }
+
+                    if (!found) {
+                        //if the specific language has not been found, return the first one.
+                        deferred.resolve(datas[0]);
                     }
                 }
-
-                if (!found) {
-                    //if the specific language has not been found, return the first one.
-                    deferred.resolve(datas[0]);
-                }
-            }
-        );
+            );
+        } else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     },
 
-    getPrimaryAudioData: function (manifest, periodIndex) {
+    getPrimaryAudioData: function(manifest, periodIndex) {
         "use strict";
         var i,
             len,
@@ -367,38 +409,43 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             funcs = [],
             self = this;
 
-        this.getAudioDatas(manifest, periodIndex).then(
-            function (datas) {
-                if (!datas || datas.length === 0) {
-                    deferred.resolve(null);
-                }
+        if (manifest && periodIndex >= 0) {
+            this.getAudioDatas(manifest, periodIndex).then(
+                function(datas) {
+                    if (!datas || datas.length === 0) {
+                        deferred.reject();
+                        return;
+                    }
 
-                for (i = 0, len = datas.length; i < len; i += 1) {
-                    funcs.push(self.getIsMain(datas[i]));
-                }
+                    for (i = 0, len = datas.length; i < len; i += 1) {
+                        funcs.push(self.getIsMain(datas[i]));
+                    }
 
-                Q.all(funcs).then(
-                    function (results) {
-                        var found = false;
-                        for (i = 0, len = results.length; i < len; i += 1) {
-                            if (results[i] === true) {
-                                found = true;
-                                deferred.resolve(self.processAdaptation(datas[i]));
+                    Q.all(funcs).then(
+                        function(results) {
+                            var found = false;
+                            for (i = 0, len = results.length; i < len; i += 1) {
+                                if (results[i] === true) {
+                                    found = true;
+                                    deferred.resolve(self.processAdaptation(datas[i]));
+                                }
+                            }
+                            if (!found) {
+                                //if the specific language has not been found, return the first one.
+                                deferred.resolve(datas[0]);
                             }
                         }
-                        if (!found) {
-                            //if the specific language has not been found, return the first one.
-                            deferred.resolve(datas[0]);
-                        }
-                    }
-                );
-            }
-        );
+                    );
+                }
+            );
+        } else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     },
 
-    getPrimaryTextData: function (manifest, periodIndex) {
+    getPrimaryTextData: function(manifest, periodIndex) {
         "use strict";
         var i,
             len,
@@ -406,85 +453,94 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             funcs = [],
             self = this;
 
-        this.getTextDatas(manifest, periodIndex).then(
-            function (datas) {
-                if (!datas || datas.length === 0) {
-                    deferred.resolve(null);
-                }
+        if (manifest && periodIndex >= 0) {
+            this.getTextDatas(manifest, periodIndex).then(
+                function(datas) {
+                    if (!datas || datas.length === 0) {
+                        deferred.reject();
+                        return;
+                    }
 
-                for (i = 0, len = datas.length; i < len; i += 1) {
-                    funcs.push(self.getIsMain(datas[i]));
-                }
+                    for (i = 0, len = datas.length; i < len; i += 1) {
+                        funcs.push(self.getIsMain(datas[i]));
+                    }
 
-                Q.all(funcs).then(
-                    function (results) {
-                        var found = false;
-                        for (i = 0, len = results.length; i < len; i += 1) {
-                            if (results[i] === true) {
-                                found = true;
-                                deferred.resolve(self.processAdaptation(datas[i]));
+                    Q.all(funcs).then(
+                        function(results) {
+                            var found = false;
+                            for (i = 0, len = results.length; i < len; i += 1) {
+                                if (results[i] === true) {
+                                    found = true;
+                                    deferred.resolve(self.processAdaptation(datas[i]));
+                                }
+                            }
+                            if (!found) {
+                                deferred.resolve(datas[0]);
                             }
                         }
-                        if (!found) {
-                            deferred.resolve(datas[0]);
-                        }
-                    }
-                );
-            }
-        );
+                    );
+                }
+            );
+        } else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     },
 
-    getSpecificTextData: function (manifest, periodIndex, language) {
+    getSpecificTextData: function(manifest, periodIndex, language) {
         "use strict";
         var i,
             len,
             deferred = Q.defer(),
             found = false,
             self = this;
-
-        this.getTextDatas(manifest, periodIndex).then(
-            function (datas) {
-                if (!datas || datas.length === 0) {
-                    deferred.resolve(null);
-                }
-
-                for (i = 0, len = datas.length; i < len && found !== true; i += 1) {
-                    if (datas[i].lang === language) {
-                        found = true;
-                        deferred.resolve(self.processAdaptation(datas[i]));
+        if (manifest && periodIndex >= 0) {
+            this.getTextDatas(manifest, periodIndex).then(
+                function(datas) {
+                    if (!datas || datas.length === 0) {
+                        deferred.reject();
+                        return;
                     }
-                }
-        
-                if (!found) {
-                    deferred.resolve(datas[0]);
-                }
-            });
+
+                    for (i = 0, len = datas.length; i < len && found !== true; i += 1) {
+                        if (datas[i].lang === language) {
+                            found = true;
+                            deferred.resolve(self.processAdaptation(datas[i]));
+                        }
+                    }
+
+                    if (!found) {
+                        deferred.resolve(datas[0]);
+                    }
+                });
+        } else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     },
 
-    getCodec: function (data) {
+    getCodec: function(data) {
         "use strict";
         var representation = data.Representation_asArray[0],
             codec = (representation.mimeType + ';codecs="' + representation.codecs + '"');
         return Q.when(codec);
     },
 
-    getCodec_: function (data) {
+    getCodec_: function(data) {
         "use strict";
         var representation = data.Representation_asArray[0],
             codec = (representation.mimeType + ';codecs="' + representation.codecs + '"');
         return codec;
     },
 
-    getMimeType: function (data) {
+    getMimeType: function(data) {
         "use strict";
         return Q.when(data.Representation_asArray[0].mimeType);
     },
 
-    getKID: function (data) {
+    getKID: function(data) {
         "use strict";
 
         if (!data || !data.hasOwnProperty("cenc:default_KID")) {
@@ -493,7 +549,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return data["cenc:default_KID"];
     },
 
-    getContentProtectionData: function (data) {
+    getContentProtectionData: function(data) {
         "use strict";
         if (!data || !data.hasOwnProperty("ContentProtection_asArray") || data.ContentProtection_asArray.length === 0) {
             return Q.when(null);
@@ -501,19 +557,19 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(data.ContentProtection_asArray);
     },
 
-    getIsDynamic: function (manifest) {
+    getIsDynamic: function(manifest) {
         "use strict";
         var isDynamic = false,
             LIVE_TYPE = "dynamic";
 
-        if (manifest.hasOwnProperty("type")) {
+        if (manifest && manifest.hasOwnProperty("type")) {
             isDynamic = (manifest.type === LIVE_TYPE);
         }
 
         return isDynamic;
     },
 
-    getIsDVR: function (manifest) {
+    getIsDVR: function(manifest) {
         "use strict";
         var isDynamic = this.getIsDynamic(manifest),
             containsDVR,
@@ -525,7 +581,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(isDVR);
     },
 
-    getIsOnDemand: function (manifest) {
+    getIsOnDemand: function(manifest) {
         "use strict";
         var isOnDemand = false;
 
@@ -536,12 +592,12 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(isOnDemand);
     },
 
-    getDuration: function (manifest) {
+    getDuration: function(manifest) {
         var mpdDuration;
 
         //@mediaPresentationDuration specifies the duration of the entire Media Presentation.
         //If the attribute is not present, the duration of the Media Presentation is unknown.
-        if (manifest.hasOwnProperty("mediaPresentationDuration")) {
+        if (manifest && manifest.hasOwnProperty("mediaPresentationDuration")) {
             mpdDuration = manifest.mediaPresentationDuration;
         } else {
             mpdDuration = Number.POSITIVE_INFINITY;
@@ -550,12 +606,12 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(mpdDuration);
     },
 
-    getBandwidth: function (representation) {
+    getBandwidth: function(representation) {
         "use strict";
         return Q.when(representation.bandwidth);
     },
 
-    getRefreshDelay: function (manifest) {
+    getRefreshDelay: function(manifest) {
         "use strict";
         var delay = NaN,
             minDelay = 2;
@@ -567,19 +623,23 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(delay);
     },
 
-    getRepresentationCount: function (adaptation) {
+    getRepresentationCount: function(adaptation) {
         "use strict";
-        return Q.when(adaptation.Representation_asArray.length);
+        if (adaptation) {
+            return Q.when(adaptation.Representation_asArray.length);
+        }
+
+        return Q.when(null);
     },
 
-    getRepresentationFor: function (index, data) {
+    getRepresentationFor: function(index, data) {
         "use strict";
         return Q.when(data.Representation_asArray[index]);
     },
 
     getRepresentationsForAdaptation: function(manifest, adaptation) {
         var self = this,
-            a = self.processAdaptation(manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index]),
+            a,
             representations = [],
             deferred = Q.defer(),
             representation,
@@ -587,79 +647,81 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             segmentInfo,
             r;
 
-        for (var i = 0; i < a.Representation_asArray.length; i += 1) {
-            r = a.Representation_asArray[i];
-            representation = new Dash.vo.Representation();
-            representation.index = i;
-            representation.adaptation = adaptation;
+        if (manifest && adaptation) {
+            a = self.processAdaptation(manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index]);
 
-            if (r.hasOwnProperty("id")) {
-                representation.id = r.id;
-            }
+            for (var i = 0; i < a.Representation_asArray.length; i += 1) {
+                r = a.Representation_asArray[i];
+                representation = new Dash.vo.Representation();
+                representation.index = i;
+                representation.adaptation = adaptation;
 
-            if (r.hasOwnProperty("SegmentBase")) {
-                segmentInfo = r.SegmentBase;
-                representation.segmentInfoType = "SegmentBase";
-            }
-            else if (r.hasOwnProperty("SegmentList")) {
-                segmentInfo = r.SegmentList;
-                representation.segmentInfoType = "SegmentList";
-                representation.useCalculatedLiveEdgeTime = true;
-            }
-            else if (r.hasOwnProperty("SegmentTemplate")) {
-                segmentInfo = r.SegmentTemplate;
+                if (r.hasOwnProperty("id")) {
+                    representation.id = r.id;
+                }
 
-                if (segmentInfo.hasOwnProperty("SegmentTimeline")) {
-                    representation.segmentInfoType = "SegmentTimeline";
+                if (r.hasOwnProperty("SegmentBase")) {
+                    segmentInfo = r.SegmentBase;
+                    representation.segmentInfoType = "SegmentBase";
+                } else if (r.hasOwnProperty("SegmentList")) {
+                    segmentInfo = r.SegmentList;
+                    representation.segmentInfoType = "SegmentList";
+                    representation.useCalculatedLiveEdgeTime = true;
+                } else if (r.hasOwnProperty("SegmentTemplate")) {
+                    segmentInfo = r.SegmentTemplate;
+
+                    if (segmentInfo.hasOwnProperty("SegmentTimeline")) {
+                        representation.segmentInfoType = "SegmentTimeline";
+                    } else {
+                        representation.segmentInfoType = "SegmentTemplate";
+                    }
+
+                    if (segmentInfo.hasOwnProperty("initialization")) {
+                        representation.initialization = segmentInfo.initialization.split("$Bandwidth$")
+                            .join(r.bandwidth).split("$RepresentationID$").join(r.id);
+                    }
                 } else {
-                    representation.segmentInfoType = "SegmentTemplate";
+                    segmentInfo = r.BaseURL;
+                    representation.segmentInfoType = "BaseURL";
                 }
 
-                if (segmentInfo.hasOwnProperty("initialization")) {
-                    representation.initialization = segmentInfo.initialization.split("$Bandwidth$")
-                        .join(r.bandwidth).split("$RepresentationID$").join(r.id);
-                }
-            } else {
-                segmentInfo = r.BaseURL;
-                representation.segmentInfoType = "BaseURL";
-            }
-
-            if (segmentInfo.hasOwnProperty("Initialization")) {
-                initialization = segmentInfo.Initialization;
-                if (initialization.hasOwnProperty("sourceURL")) {
-                    representation.initialization = initialization.sourceURL;
-                } else if (initialization.hasOwnProperty("range")) {
+                if (segmentInfo.hasOwnProperty("Initialization")) {
+                    initialization = segmentInfo.Initialization;
+                    if (initialization.hasOwnProperty("sourceURL")) {
+                        representation.initialization = initialization.sourceURL;
+                    } else if (initialization.hasOwnProperty("range")) {
+                        representation.initialization = r.BaseURL;
+                        representation.range = initialization.range;
+                    }
+                } else if (r.hasOwnProperty("mimeType") && self.getIsTextTrack(r.mimeType)) {
                     representation.initialization = r.BaseURL;
-                    representation.range = initialization.range;
+                    representation.range = 0;
                 }
-            } else if (r.hasOwnProperty("mimeType") && self.getIsTextTrack(r.mimeType)) {
-                representation.initialization = r.BaseURL;
-                representation.range = 0;
-            }
 
-            if (segmentInfo.hasOwnProperty("timescale")) {
-                representation.timescale = segmentInfo.timescale;
-            }
-            if (segmentInfo.hasOwnProperty("duration")) {
-                // TODO according to the spec @maxSegmentDuration specifies the maximum duration of any Segment in any Representation in the Media Presentation
-                // It is also said that for a SegmentTimeline any @d value shall not exceed the value of MPD@maxSegmentDuration, but nothing is said about
-                // SegmentTemplate @duration attribute. We need to find out if @maxSegmentDuration should be used instead of calculated duration if the the duration
-                // exceeds @maxSegmentDuration
-                //representation.segmentDuration = Math.min(segmentInfo.duration / representation.timescale, adaptation.period.mpd.maxSegmentDuration);
-                representation.segmentDuration = segmentInfo.duration / representation.timescale;
-            }
-            if (segmentInfo.hasOwnProperty("startNumber")) {
-                representation.startNumber = segmentInfo.startNumber;
-            }
-            if (segmentInfo.hasOwnProperty("indexRange")) {
-                representation.indexRange = segmentInfo.indexRange;
-            }
-            if (segmentInfo.hasOwnProperty("presentationTimeOffset")) {
-                representation.presentationTimeOffset = segmentInfo.presentationTimeOffset / representation.timescale;
-            }
+                if (segmentInfo.hasOwnProperty("timescale")) {
+                    representation.timescale = segmentInfo.timescale;
+                }
+                if (segmentInfo.hasOwnProperty("duration")) {
+                    // TODO according to the spec @maxSegmentDuration specifies the maximum duration of any Segment in any Representation in the Media Presentation
+                    // It is also said that for a SegmentTimeline any @d value shall not exceed the value of MPD@maxSegmentDuration, but nothing is said about
+                    // SegmentTemplate @duration attribute. We need to find out if @maxSegmentDuration should be used instead of calculated duration if the the duration
+                    // exceeds @maxSegmentDuration
+                    //representation.segmentDuration = Math.min(segmentInfo.duration / representation.timescale, adaptation.period.mpd.maxSegmentDuration);
+                    representation.segmentDuration = segmentInfo.duration / representation.timescale;
+                }
+                if (segmentInfo.hasOwnProperty("startNumber")) {
+                    representation.startNumber = segmentInfo.startNumber;
+                }
+                if (segmentInfo.hasOwnProperty("indexRange")) {
+                    representation.indexRange = segmentInfo.indexRange;
+                }
+                if (segmentInfo.hasOwnProperty("presentationTimeOffset")) {
+                    representation.presentationTimeOffset = segmentInfo.presentationTimeOffset / representation.timescale;
+                }
 
-            representation.MSETimeOffset = self.timelineConverter.calcMSETimeOffset(representation);
-            representations.push(representation);
+                representation.MSETimeOffset = self.timelineConverter.calcMSETimeOffset(representation);
+                representations.push(representation);
+            }
         }
 
         deferred.resolve(representations);
@@ -668,21 +730,22 @@ Dash.dependencies.DashManifestExtensions.prototype = {
     },
 
     getAdaptationsForPeriod: function(manifest, period) {
-        var p = manifest.Period_asArray[period.index],
+        var p = manifest === null ? null : manifest.Period_asArray[period.index],
             adaptations = [],
             adaptationSet;
-
-        for (var i = 0; i < p.AdaptationSet_asArray.length; i += 1) {
-            adaptationSet = new Dash.vo.AdaptationSet();
-            adaptationSet.index = i;
-            adaptationSet.period = period;
-            adaptations.push(adaptationSet);
+        if (p) {
+            for (var i = 0; i < p.AdaptationSet_asArray.length; i += 1) {
+                adaptationSet = new Dash.vo.AdaptationSet();
+                adaptationSet.index = i;
+                adaptationSet.period = period;
+                adaptations.push(adaptationSet);
+            }
         }
 
         return Q.when(adaptations);
     },
 
-    getRegularPeriods: function (manifest, mpd) {
+    getRegularPeriods: function(manifest, mpd) {
         var self = this,
             deferred = Q.defer(),
             periods = [],
@@ -700,7 +763,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             // If the attribute @start is present in the Period, then the
             // Period is a regular Period and the PeriodStart is equal
             // to the value of this attribute.
-            if (p.hasOwnProperty("start")){
+            if (p.hasOwnProperty("start")) {
                 vo = new Dash.vo.Period();
                 vo.start = p.start;
             }
@@ -710,7 +773,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             // Period PeriodStart is the sum of the start time of the previous
             // Period PeriodStart and the value of the attribute @duration
             // of the previous Period.
-            else if (p1 !== null && p.hasOwnProperty("duration")){
+            else if (p1 !== null && p.hasOwnProperty("duration")) {
                 vo = new Dash.vo.Period();
                 vo.start = vo1.start + vo1.duration;
                 vo.duration = p.duration;
@@ -726,20 +789,19 @@ Dash.dependencies.DashManifestExtensions.prototype = {
             // The Period extends until the PeriodStart of the next Period.
             // The difference between the PeriodStart time of a Period and
             // the PeriodStart time of the following Period.
-            if (vo1 !== null && isNaN(vo1.duration))
-            {
+            if (vo1 !== null && isNaN(vo1.duration)) {
                 vo1.duration = vo.start - vo1.start;
             }
 
-            if (vo !== null && p.hasOwnProperty("id")){
+            if (vo !== null && p.hasOwnProperty("id")) {
                 vo.id = p.id;
             }
 
-            if (vo !== null && p.hasOwnProperty("duration")){
+            if (vo !== null && p.hasOwnProperty("duration")) {
                 vo.duration = p.duration;
             }
 
-            if (vo !== null){
+            if (vo !== null) {
                 vo.index = i;
                 vo.mpd = mpd;
                 periods.push(vo);
@@ -781,31 +843,35 @@ Dash.dependencies.DashManifestExtensions.prototype = {
     getMpd: function(manifest) {
         var mpd = new Dash.vo.Mpd();
 
-        mpd.manifest = manifest;
+        if (manifest) {
+            mpd.manifest = manifest;
 
-        if (manifest.hasOwnProperty("availabilityStartTime")) {
-            mpd.availabilityStartTime = new Date(manifest.availabilityStartTime.getTime());
-        } else {
-            mpd.availabilityStartTime = new Date(manifest.mpdLoadedTime.getTime());
+            if (manifest.hasOwnProperty("availabilityStartTime")) {
+                mpd.availabilityStartTime = new Date(manifest.availabilityStartTime.getTime());
+            } else {
+                mpd.availabilityStartTime = new Date(manifest.mpdLoadedTime.getTime());
+            }
+
+            if (manifest.hasOwnProperty("availabilityEndTime")) {
+                mpd.availabilityEndTime = new Date(manifest.availabilityEndTime.getTime());
+            }
+
+            if (manifest.hasOwnProperty("suggestedPresentationDelay")) {
+                mpd.suggestedPresentationDelay = manifest.suggestedPresentationDelay;
+            }
+
+            if (manifest.hasOwnProperty("timeShiftBufferDepth")) {
+                mpd.timeShiftBufferDepth = manifest.timeShiftBufferDepth;
+            }
+
+            if (manifest.hasOwnProperty("maxSegmentDuration")) {
+                mpd.maxSegmentDuration = manifest.maxSegmentDuration;
+            }
+
+            return Q.when(mpd);
         }
 
-        if (manifest.hasOwnProperty("availabilityEndTime")) {
-            mpd.availabilityEndTime = new Date(manifest.availabilityEndTime.getTime());
-        }
-
-        if (manifest.hasOwnProperty("suggestedPresentationDelay")) {
-            mpd.suggestedPresentationDelay = manifest.suggestedPresentationDelay;
-        }
-
-        if (manifest.hasOwnProperty("timeShiftBufferDepth")) {
-            mpd.timeShiftBufferDepth = manifest.timeShiftBufferDepth;
-        }
-
-        if (manifest.hasOwnProperty("maxSegmentDuration")) {
-            mpd.maxSegmentDuration = manifest.maxSegmentDuration;
-        }
-
-        return Q.when(mpd);
+        return Q.when(null);
     },
 
     getFetchTime: function(manifest, period) {
@@ -828,7 +894,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         // i.e. CheckTime = FetchTime + MPD@minimumUpdatePeriod.
         if (manifest.hasOwnProperty("minimumUpdatePeriod")) {
             self.getFetchTime(manifest, period).then(
-                function (fetchTime) {
+                function(fetchTime) {
                     checkTime = fetchTime + manifest.minimumUpdatePeriod;
                     deferred.resolve(checkTime);
                 }
@@ -860,41 +926,40 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(periodEnd);
     },
 
-    getEventsForPeriod: function(manifest,period) {
-
-        var periodArray = manifest.Period_asArray,
-            eventStreams = periodArray[period.index].EventStream_asArray,
+    getEventsForPeriod: function(manifest, period) {
+        var periodArray = manifest === null ? null : manifest.Period_asArray,
+            eventStreams = periodArray === null ? null : periodArray[period.index].EventStream_asArray,
             events = [];
 
-        if(eventStreams) {
-            for(var i = 0; i < eventStreams.length; i += 1) {
+        if (eventStreams) {
+            for (var i = 0; i < eventStreams.length; i += 1) {
                 var eventStream = new Dash.vo.EventStream();
                 eventStream.period = period;
                 eventStream.timescale = 1;
 
-                if(eventStreams[i].hasOwnProperty("schemeIdUri")) {
+                if (eventStreams[i].hasOwnProperty("schemeIdUri")) {
                     eventStream.schemeIdUri = eventStreams[i].schemeIdUri;
                 } else {
                     throw "Invalid EventStream. SchemeIdUri has to be set";
                 }
-                if(eventStreams[i].hasOwnProperty("timescale")) {
+                if (eventStreams[i].hasOwnProperty("timescale")) {
                     eventStream.timescale = eventStreams[i].timescale;
                 }
-                if(eventStreams[i].hasOwnProperty("value")) {
+                if (eventStreams[i].hasOwnProperty("value")) {
                     eventStream.value = eventStreams[i].value;
                 }
-                for(var j = 0; j < eventStreams[i].Event_asArray.length; j += 1) {
+                for (var j = 0; j < eventStreams[i].Event_asArray.length; j += 1) {
                     var event = new Dash.vo.Event();
                     event.presentationTime = 0;
                     event.eventStream = eventStream;
 
-                    if(eventStreams[i].Event_asArray[j].hasOwnProperty("presentationTime")) {
+                    if (eventStreams[i].Event_asArray[j].hasOwnProperty("presentationTime")) {
                         event.presentationTime = eventStreams[i].Event_asArray[j].presentationTime;
                     }
-                    if(eventStreams[i].Event_asArray[j].hasOwnProperty("duration")) {
+                    if (eventStreams[i].Event_asArray[j].hasOwnProperty("duration")) {
                         event.duration = eventStreams[i].Event_asArray[j].duration;
                     }
-                    if(eventStreams[i].Event_asArray[j].hasOwnProperty("id")) {
+                    if (eventStreams[i].Event_asArray[j].hasOwnProperty("id")) {
                         event.id = eventStreams[i].Event_asArray[j].id;
                     }
                     events.push(event);
@@ -905,70 +970,81 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return Q.when(events);
     },
 
-    getEventStreamForAdaptationSet : function (data) {
+    getEventStreamForAdaptationSet: function(data) {
 
         var eventStreams = [],
+            inbandStreams;
+
+        if (data) {
             inbandStreams = data.InbandEventStream_asArray;
 
-        if(inbandStreams) {
-            for(var i = 0; i < inbandStreams.length ; i += 1 ) {
-                var eventStream = new Dash.vo.EventStream();
-                eventStream.timescale = 1;
+            if (inbandStreams) {
+                for (var i = 0; i < inbandStreams.length; i += 1) {
+                    var eventStream = new Dash.vo.EventStream();
+                    eventStream.timescale = 1;
 
-                if(inbandStreams[i].hasOwnProperty("schemeIdUri")) {
-                    eventStream.schemeIdUri = inbandStreams[i].schemeIdUri;
-                } else {
-                    throw "Invalid EventStream. SchemeIdUri has to be set";
+                    if (inbandStreams[i].hasOwnProperty("schemeIdUri")) {
+                        eventStream.schemeIdUri = inbandStreams[i].schemeIdUri;
+                    } else {
+                        throw "Invalid EventStream. SchemeIdUri has to be set";
+                    }
+                    if (inbandStreams[i].hasOwnProperty("timescale")) {
+                        eventStream.timescale = inbandStreams[i].timescale;
+                    }
+                    if (inbandStreams[i].hasOwnProperty("value")) {
+                        eventStream.value = inbandStreams[i].value;
+                    }
+                    eventStreams.push(eventStream);
                 }
-                if(inbandStreams[i].hasOwnProperty("timescale")) {
-                    eventStream.timescale = inbandStreams[i].timescale;
-                }
-                if(inbandStreams[i].hasOwnProperty("value")) {
-                    eventStream.value = inbandStreams[i].value;
-                }
-                eventStreams.push(eventStream);
             }
         }
+
         return eventStreams;
     },
 
-    getEventStreamForRepresentation : function (data,representation) {
+    getEventStreamForRepresentation: function(data, representation) {
 
         var eventStreams = [],
+            inbandStreams;
+
+        if (data && representation) {
+
             inbandStreams = data.Representation_asArray[representation.index].InbandEventStream_asArray;
 
-        if(inbandStreams) {
-            for(var i = 0; i < inbandStreams.length ; i++ ) {
-                var eventStream = new Dash.vo.EventStream();
-                eventStream.timescale = 1;
-                eventStream.representation = representation;
+            if (inbandStreams) {
+                for (var i = 0; i < inbandStreams.length; i++) {
+                    var eventStream = new Dash.vo.EventStream();
+                    eventStream.timescale = 1;
+                    eventStream.representation = representation;
 
-                if(inbandStreams[i].hasOwnProperty("schemeIdUri")) {
-                    eventStream.schemeIdUri = inbandStreams[i].schemeIdUri;
-                } else {
-                    throw "Invalid EventStream. SchemeIdUri has to be set";
+                    if (inbandStreams[i].hasOwnProperty("schemeIdUri")) {
+                        eventStream.schemeIdUri = inbandStreams[i].schemeIdUri;
+                    } else {
+                        throw "Invalid EventStream. SchemeIdUri has to be set";
+                    }
+                    if (inbandStreams[i].hasOwnProperty("timescale")) {
+                        eventStream.timescale = inbandStreams[i].timescale;
+                    }
+                    if (inbandStreams[i].hasOwnProperty("value")) {
+                        eventStream.value = inbandStreams[i].value;
+                    }
+                    eventStreams.push(eventStream);
                 }
-                if(inbandStreams[i].hasOwnProperty("timescale")) {
-                    eventStream.timescale = inbandStreams[i].timescale;
-                }
-                if(inbandStreams[i].hasOwnProperty("value")) {
-                    eventStream.value = inbandStreams[i].value;
-                }
-                eventStreams.push(eventStream);
             }
         }
+
         return eventStreams;
 
     },
 
-    getRepresentationBandwidth : function (adaptation, index) {
+    getRepresentationBandwidth: function(adaptation, index) {
         var self = this,
             deferred = Q.defer();
 
         self.getRepresentationFor(index, adaptation).then(
             function(rep) {
                 self.getBandwidth(rep).then(
-                    function (bandwidth) {
+                    function(bandwidth) {
                         deferred.resolve(bandwidth);
                     }
                 );

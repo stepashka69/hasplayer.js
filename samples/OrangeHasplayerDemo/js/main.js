@@ -106,6 +106,14 @@ var handlePlayState = function(state) {
     }
 };
 
+var handleBuffering = function(show){
+    if (show === true) {
+        playerPanel.showLoadingElement();
+    }else{
+        playerPanel.hideLoadingElement();
+    }
+}
+
 var handleVolumeChange = function(volumeLevel) {
     playerPanel.onVolumeChange(volumeLevel);
 };
@@ -127,6 +135,14 @@ var handlePlayBitrate = function(bitrate, time) {
     playerPanel.setCurrentBitrate(bitrate);
 };
 
+var handleBufferLevelUpdated = function(type, level) {
+    if (type === "video") {
+        settingsPanel.videoBufferLength.innerHTML = level +" s";
+    }else if (type === "audio") {
+        settingsPanel.audioBufferLength.innerHTML = level +" s";
+    }
+}
+
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById('canvas').getContext('2d');
     graphPanel.init(ctx, bitrates);
@@ -134,6 +150,11 @@ var handleBitrates = function(bitrates) {
 
 var handleError = function(e) {
     playerPanel.displayError(e.event.code, e.event.message);
+};
+
+var handleVideoEnd = function(){
+    playerPanel.reset();
+    handleBuffering(false);
 };
 
 /**********************************************************************************************************************/

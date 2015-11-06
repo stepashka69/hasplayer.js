@@ -18,6 +18,7 @@ MediaPlayer.models.MetricsList = function () {
         TcpList: [],
         HttpList: [],
         RepSwitchList: [],
+        BufferedSwitchList:[],
         BufferLevel: [],
         PlayList: [],
         DroppedFrames: [],

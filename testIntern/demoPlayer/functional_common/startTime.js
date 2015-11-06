@@ -22,18 +22,11 @@ define([
             registerSuite({
                 name: 'Test playing streams with start time',
 
-                'Initialize the test': function() {
+                setup: function() {
                     console.log('[TEST_START-TIME] stream: ' + stream);
                     console.log('[TEST_START-TIME] startTime: ' + startTime);
 
                     command = this.remote.get(require.toUrl(url));
-
-                    return command.execute(getVideoCurrentTime)
-                    .then(function (time) {
-                        videoCurrentTime = time;
-                        assert.equal(time, 0, 'The player should not have began to play yet.')
-                        console.log('[TEST_START-TIME] current time = ' + videoCurrentTime);
-                    });
                 },
 
                 'Check playing time': function() {

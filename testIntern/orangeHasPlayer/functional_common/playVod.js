@@ -19,49 +19,57 @@ define([
         var command = null;
         var videoCurrentTime = 0;
 
+        var loadStream = function(stream) {
+            orangeHasPlayer.load(stream);
+        };
+
+
         var getVideoCurrentTime = function() {
             return orangeHasPlayer.getPosition();
         };
 
         var tests = function(stream) {
 
-            var url = config.testPage + '?url=' + stream;
+            var url = config.testPage;
 
             registerSuite({
                 name: 'Test playing streams',
 
                 setup: function() {
-                    console.log('[TEST_PLAYVOD stream: ' + stream);
-
                     command = this.remote.get(require.toUrl(url));
+                    return command.sleep(500).execute(loadStream, [stream]);
+                },
+
+                'Get current time': function() {
+                    console.log('[TEST_PLAYVOD] stream: ' + stream);
 
                     return command.sleep(2000).execute(getVideoCurrentTime)
                     .then(function (time) {
                         videoCurrentTime = time;
-                        console.log('[TEST_PLAYVOD current time = ' + videoCurrentTime);
+                        console.log('[TEST_PLAYVOD] current time = ' + videoCurrentTime);
                     });
                 },
 
                 'Check if playing': function() {
-                    console.log('[TEST_PLAYVOD Wait 5s ...');
+                    console.log('[TEST_PLAYVOD] Wait 5s ...');
 
                     return command.sleep(5000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
-                        console.log('[TEST_PLAYVOD current time = ' + time);
+                        console.log('[TEST_PLAYVOD] current time = ' + time);
                         assert.ok(time > videoCurrentTime);
                         videoCurrentTime = time;
                     });
                 },
 
                 'Check playing time after 10 sec.': function() {
-                    console.log('[TEST_PLAYVOD Wait 10s ...');
+                    console.log('[TEST_PLAYVOD] Wait 10s ...');
 
                     return command.sleep(10000)
                     .execute(getVideoCurrentTime)
                     .then(function (time) {
                         var delay = time - videoCurrentTime;
-                        console.log('[TEST_PLAYVOD current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
+                        console.log('[TEST_PLAYVOD] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
                         assert.ok(delay >= 9); // 9 for sleep precision
                     });
                 }
@@ -72,7 +80,6 @@ define([
             len = config.playVod.length;
 
         for (i; i < len; i++) {
-            console.log("[TEST_PLAYVOD Test stream: " + config.playVod[i].stream);
             tests(config.playVod[i].stream);
         }
 });

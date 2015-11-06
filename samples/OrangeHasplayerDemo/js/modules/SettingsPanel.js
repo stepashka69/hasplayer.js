@@ -3,6 +3,7 @@ var SettingsPanel = function() {
 
     // Quick settings
     this.audioListCombobox = null,
+    this.enableSubtitlesCheckbox = null;
     this.subtitleListCombobox = null,
     this.audioTracks = [],
     this.subtitleTracks = [],
@@ -18,11 +19,14 @@ var SettingsPanel = function() {
     this.defaultSubtitleLangCombobox = null;
     this.optimizedZappingEnabled = true;
     this.metricsConfig = null;
+    this.videoBufferLength = null;
+    this.audioBufferLength = null;
 };
 
 SettingsPanel.prototype.init = function() {
     this.menuContainer = document.getElementById('menu-container');
     this.audioListCombobox = document.getElementById('audioCombo');
+    this.enableSubtitlesCheckbox = document.getElementById('enable-subtitles');
     this.subtitleListCombobox = document.getElementById('subtitleCombo');
     this.settingsMenuButton = document.getElementById('settingsMenuButton');
     this.metricsAgentCombobox =  document.getElementById('metrics-agent-options');
@@ -30,6 +34,8 @@ SettingsPanel.prototype.init = function() {
     this.defaultAudioLangCombobox = document.getElementById('default_audio_language');
     this.defaultSubtitleLangCombobox = document.getElementById('default_subtitle_language');
     this.enableOptimzedZappingCheckbox = document.getElementById('enable-optimized-zapping');
+    this.videoBufferLength = document.getElementById('video_buffer_Length');
+    this.audioBufferLength = document.getElementById('audio_buffer_Length');
 
     this.setupEventListeners();
     this.initMetricsAgentOptions();
@@ -37,6 +43,7 @@ SettingsPanel.prototype.init = function() {
 
 SettingsPanel.prototype.setupEventListeners = function() {
     this.audioListCombobox.addEventListener('change', this.audioChanged.bind(this));
+    this.enableSubtitlesCheckbox.addEventListener('click', this.onEnableSubtitles.bind(this));
     this.subtitleListCombobox.addEventListener('change', this.subtitleChanged.bind(this));
     this.settingsMenuButton.addEventListener('click', this.onSettingsMenuButtonClicked.bind(this));
     this.enableMetricsCheckbox.addEventListener('click', this.onEnableMetrics.bind(this));
@@ -99,6 +106,11 @@ SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track) {
         changeAudio(this.audioTracks[index]);
         this.audioListCombobox.selectedIndex = index;
     }
+};
+
+SettingsPanel.prototype.onEnableSubtitles = function() {
+    this.subtitleListCombobox.disabled = !this.enableSubtitlesCheckbox.checked;
+    enableSubtitles(this.enableSubtitlesCheckbox.checked);
 };
 
 SettingsPanel.prototype.onSubtitleChangedFromPlayer = function(track) {
@@ -217,4 +229,6 @@ SettingsPanel.prototype.reset = function() {
 
     this.currentaudioTrack = null;
     this.currentsubtitleTrack = null;
+    this.videoBufferLength.innerHTML = "";
+    this.audioBufferLength.innerHTML = "";
 };

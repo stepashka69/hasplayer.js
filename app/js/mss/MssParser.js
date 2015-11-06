@@ -89,24 +89,23 @@ Mss.dependencies.MssParser = function () {
 
         return element;
     };
-    
+
     var createXmlTree = function (xmlDocStr) {
         if (window.DOMParser) {
             // ORANGE: XML parsing management
             try
-        {
+            {
                 var parser=new window.DOMParser();
                 xmlDoc = parser.parseFromString( xmlDocStr, "text/xml" );
                 if(xmlDoc.getElementsByTagName('parsererror').length > 0) {
                       throw new Error('Error parsing XML');
-            }
+                }
             }
             catch (e)
-        {
-                return null;
+            {
+                xmlDoc = null;
             }
         }
-        return this;
     };
 
     var mapPeriod = function () {
@@ -115,7 +114,7 @@ Mss.dependencies.MssParser = function () {
             smoothNode = getChildNode(xmlDoc, "SmoothStreamingMedia"),
             i;
 
-        period.duration = (getAttributeValue(smoothNode, 'Duration')) ? Infinity : parseFloat(getAttributeValue(smoothNode, 'Duration')) / TIME_SCALE_100_NANOSECOND_UNIT;
+        period.duration = (parseFloat(getAttributeValue(smoothNode, 'Duration')) === 0) ? Infinity : parseFloat(getAttributeValue(smoothNode, 'Duration')) / TIME_SCALE_100_NANOSECOND_UNIT;
         period.BaseURL = baseURL;
 
         // For each StreamIndex node, create an AdaptationSet element
@@ -190,10 +189,13 @@ Mss.dependencies.MssParser = function () {
         representation.height = parseInt(getAttributeValue(qualityLevel, "MaxHeight"), 10);
 
         var fourCCValue = getAttributeValue(qualityLevel, "FourCC");
-        
+
+        // Get codecs value according to FourCC field
+        // Note: If empty FourCC (optionnal for audio stream, see https://msdn.microsoft.com/en-us/library/ff728116%28v=vs.95%29.aspx),
+        // then we consider the stream is an audio AAC stream
         if (fourCCValue === "H264" || fourCCValue === "AVC1") {
             representation.codecs = getH264Codec(qualityLevel);
-        } else if (fourCCValue.indexOf("AAC") >= 0){
+        } else if ((fourCCValue.indexOf("AAC") >= 0) || (fourCCValue === "")) {
             representation.codecs = getAACCodec(qualityLevel);
         }
 
@@ -323,13 +325,13 @@ Mss.dependencies.MssParser = function () {
                 if (!segments[segments.length - 1].d) {
                     segments[segments.length - 1].d = t - segments[segments.length - 1].t;
                 }
-                // Set segment absolute timestamp if not set 
+                // Set segment absolute timestamp if not set
                 if (!t) {
                     t = segments[segments.length - 1].t + segments[segments.length - 1].d;
                 }
             }
 
-            // Create new segment 
+            // Create new segment
             segments.push({
                 d: d,
                 r: 0,

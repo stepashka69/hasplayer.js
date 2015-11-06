@@ -5,6 +5,6 @@ define({
     ],
     //Test DRM stream play (on IE only)
     DRM: [
-        {stream: 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest'}
+        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/SuperSpeedway PR/Manifest'}
     ]
 });

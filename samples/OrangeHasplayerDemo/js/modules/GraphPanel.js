@@ -73,8 +73,6 @@ GraphPanel.prototype.init = function(ctx, bitrates) {
         highBitrateSpan.innerHTML = bitrates[bitrates.length - 1]/1000000;
         lowBitrateSpan.innerHTML = bitrates[0]/1000000;
 
-        this.lastPlayedBitrate = null;
-
         this.update = true;
 
         // Init first graph value

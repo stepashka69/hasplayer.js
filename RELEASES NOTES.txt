@@ -1,3 +1,20 @@
+### Release Notes v1.2.5 (2015/11/04)
+* Bugs fixing:
+* - Unable to restart a new stream after a stopping error (Edge)
+* - No error message when EME desactivated (Chrome)
+* - No error message when Widevine plugin desactivated (Chrome)
+* - No error message if invalid license
+* - HTTP code 304 handling for segments
+* - Video bitrates potentially not be available once loadeddata event is raised
+* - Audio/subtitle track not selected if track id is not provided
+* - Empty FourCC field for audio track in SS manifest not supported
+* Add segment dowloading abandonment in case of drop bandwidth
+* Restore custom/CDM data support
+* Restore pssh parameter support for input stream
+* OrangeHasPlayer: Add an event in order to request for an updated manifest (signed) url when manifest refresh is required during the session (e.g. for track switching)
+* OrangeHasPlayer: Add debug mode for retrieving logs
+* OrangeHasPlayer: Add "bufferLevel_updated" and "state_changed" events
+
 ### Release Notes v1.2.4 (2015/10/02)
 * Bugs fixing:
 * - Correct missing (failing to download) fragment management 

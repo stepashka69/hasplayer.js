@@ -195,7 +195,7 @@ angular.module("DashPlayer").controller("ChromecastController", ["$scope", "$win
                 var params = {};
                 params.url = $scope.selectedItem.url;
                 params.backUrl = $scope.selectedItem.backUrl || null;
-                params.customData = $scope.selectedItem.customData || null;
+                params.cdmData = $scope.selectedItem.cdmData || null;
                 if($scope.player.isReady()){
                     var isLive = $scope.player.metricsExt.manifestExt.getIsDynamic($scope.player.metricsExt.manifestModel.getValue());
                     $scope.player.getVideoModel().pause();

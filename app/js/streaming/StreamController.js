@@ -128,12 +128,6 @@
             }
         },
 
-        onReloadManifest = function() {
-            this.debug.log("[StreamController] ### reloadManifest ####");
-            this.reset.call(this);
-            this.load.call(this, this.currentURL);
-        },
-
         /*
          * Called when current playback positon is changed.
          * Used to determine the time current stream is finished and we should switch to the next stream.
@@ -385,6 +379,9 @@
                     // fire event to notify that audiotracks have changed
 
                     self.system.notify("audioTracksUpdated");
+                },function(){
+                    audioTracks = null;
+                    self.system.notify("audioTracksUpdated");
                 });
             }
         },
@@ -396,8 +393,24 @@
                     subtitleTracks = textDatas;
                     // fire event to notify that subtitletracks have changed
                     self.system.notify("subtitleTracksUpdated");
+                },function(){
+                    subtitleTracks = null;
+                    // fire event to notify that subtitletracks have changed
+                    self.system.notify("subtitleTracksUpdated");
                 });
             }
+        },
+
+        manifestUpdate = function(){
+            var manifest = this.manifestModel.getValue(),
+                url = manifest.mpdUrl;
+
+            if (manifest.hasOwnProperty("Location")) {
+                url = manifest.Location;
+            } 
+
+            this.debug.log("### Refresh manifest @ " + url);
+            this.refreshManifest(url, true);
         },
 
         manifestHasUpdated = function() {
@@ -427,8 +440,6 @@
         sourceBufferExt: undefined,
         bufferExt: undefined,
         manifestExt: undefined,
-        fragmentController: undefined,
-        abrController: undefined,
         fragmentExt: undefined,
         capabilities: undefined,
         debug: undefined,
@@ -436,6 +447,7 @@
         metricsExt: undefined,
         videoExt: undefined,
         errHandler: undefined,
+        eventBus: undefined,
         notify: undefined,
         subscribe: undefined,
         unsubscribe: undefined,
@@ -445,15 +457,13 @@
         currentURL: undefined,
 
         setup: function() {
+            this.system.mapHandler("manifestUpdate",undefined, manifestUpdate.bind(this));
             this.system.mapHandler("manifestUpdated", undefined, manifestHasUpdated.bind(this));
             timeupdateListener = onTimeupdate.bind(this);
             progressListener = onProgress.bind(this);
             seekingListener = onSeeking.bind(this);
             pauseListener = onPause.bind(this);
             playListener = onPlay.bind(this);
-
-            //ORANGE
-            this.system.mapHandler("reloadManifest", undefined, onReloadManifest.bind(this));
         },
 
         getManifestExt: function () {
@@ -543,8 +553,32 @@
             );
         },
 
-        reset: function () {
+        refreshManifest: function(url, isIntern){
+            var self = this;
+            this.manifestLoader.load(url,true).then(
+                function(manifestResult) {
+                    self.manifestModel.setValue(manifestResult);
+                    self.debug.log("### Manifest has been refreshed.");
+                },
+                function(){
+                    // here notfiy webapp to refresh url
+                    if(isIntern){
+                        self.eventBus.dispatchEvent({
+                                type: "manifestUrlUpdate",
+                                data: url
+                        });
+                    }else{
+                        self.debug.warn("[StreamController] refreshManifest url : ", url , " is invalid !");
+                    }
+                }
+            );
+        },
 
+        reset: function () {
+            var teardownComplete = {}, 
+                funcs = [],
+                self = this;
+             
             this.debug.info("[StreamController] Reset");
 
             if (!!activeStream) {
@@ -555,18 +589,11 @@
             this.pause();
 
             this.manifestUpdater.stop();
-            this.manifestModel.setValue(null);
+            this.manifestLoader.abort();
             this.metricsModel.clearAllCurrentMetrics();
             isPeriodSwitchingInProgress = false;
 
-            // Teardown the protection system, if necessary
-            if (!protectionController) {
-                this.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
-            }
-            else if (ownProtectionController) {
-                var teardownComplete = {},
-                        self = this;
-                teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE] = function () {
+            teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE] = function () {
 
                     // Complete teardown process
                     ownProtectionController = false;
@@ -576,25 +603,37 @@
                     // Reset the streams
                     for (var i = 0, ln = streams.length; i < ln; i++) {
                         var stream = streams[i];
-                        stream.reset();
+                        funcs.push(stream.reset());
                         // we should not remove the video element for the active stream since it is the element users see at the page
                         if (stream !== activeStream) {
                             removeVideoElement(stream.getVideoModel().getElement());
                         }
                         delete streams[i];
                     }
-                    streams = [];
-                    activeStream = null;
 
-                    self.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+                    // Reset the video model (and controllers stalled states)
+                    self.videoModel.reset();
+
+                    Q.all(funcs).then(
+                        function(){
+                            streams = [];
+                            activeStream = null;
+                            self.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+                        });
+
+                    self.manifestModel.setValue(null);
                 };
+
+            // Teardown the protection system, if necessary
+            if (!protectionController) {
+                teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE]();
+            }
+            else if (ownProtectionController) {
                 protectionController.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE, teardownComplete, undefined, true);
                 protectionController.teardown();
             } else {
                 protectionController.setMediaElement(null);
-                protectionController = null;
-                protectionData = null;
-                this.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
+                teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE]();
             }
         },
 

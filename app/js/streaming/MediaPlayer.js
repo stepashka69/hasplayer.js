@@ -49,7 +49,7 @@ MediaPlayer = function(aContext) {
      *
      */
     var VERSION = "1.2.0",
-        VERSION_HAS = "1.2.4",
+        VERSION_HAS = "1.2.5_dev",
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
@@ -583,11 +583,19 @@ MediaPlayer = function(aContext) {
         },
 
         getSelectedAudioTrack: function() {
-            return streamController.getSelectedAudioTrack();
+            if (streamController) {
+                return streamController.getSelectedAudioTrack();
+            }else{
+                return null;
+            }
         },
 
         getSelectedSubtitleTrack: function() {
-            return streamController.getSelectedSubtitleTrack();
+            if (streamController) {
+                return streamController.getSelectedSubtitleTrack();
+            }else{
+                return null;
+            }
         },
 
         /**
@@ -599,7 +607,7 @@ MediaPlayer = function(aContext) {
         getAudioTracks: function() {
             if (streamController) {
                 return streamController.getAudioTracks();
-            }else{
+            } else {
                 return null;
             }
         },
@@ -625,7 +633,11 @@ MediaPlayer = function(aContext) {
          * @return subtitle tracks array.
          */
         getSubtitleTracks: function() {
-            return streamController.getSubtitleTracks();
+            if (streamController) {
+                return streamController.getSubtitleTracks();
+            } else {
+                return null;
+            }
         },
 
         /**
@@ -706,15 +718,28 @@ MediaPlayer = function(aContext) {
             }*/
         },
 
+         /**
+         * refresh manifest url
+         * @method refeshManifest
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * param {string} url - the video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
+         */
+        refreshManifest: function(url){
+            if(streamController){
+                streamController.refreshManifest(url);
+            }
+        },
+
         /**
          * function used to stop video player, set source value to null and reset stream controller.
          * @access public
          * @memberof MediaPlayer#
          */
         reset: function(reason) {
+            this.metricsModel.addState("video", "stopped", this.getVideoModel().getCurrentTime(), reason);
             this.attachSource(null);
             protectionData = null;
-            this.metricsModel.addState("video", "stopped", this.getVideoModel().getCurrentTime(), reason);
         },
 
         setDefaultAudioLang: function(language) {

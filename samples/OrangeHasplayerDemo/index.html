@@ -76,6 +76,7 @@
 <script src="../../app/js/streaming/Parser.js"></script>
 <script src="../../app/js/streaming/ContextManager.js"></script>
 <script src="../../app/js/streaming/rules/SwitchRequest.js"></script>
+<script src="../../app/js/streaming/rules/AbandonRequestsRule.js"></script>
 <script src="../../app/js/streaming/rules/DownloadRatioRule.js"></script>
 <script src="../../app/js/streaming/rules/InsufficientBufferRule.js"></script>
 <script src="../../app/js/streaming/rules/LimitSwitchesRule.js"></script>
@@ -146,6 +147,7 @@
 <script src="../../app/js/streaming/vo/metrics/ManifestUpdate.js"></script>
 <script src="../../app/js/streaming/vo/metrics/PlayList.js"></script>
 <script src="../../app/js/streaming/vo/metrics/RepresentationSwitch.js"></script>
+<script src="../../app/js/streaming/vo/metrics/BufferedSwitch.js"></script>
 <script src="../../app/js/streaming/vo/metrics/TCPConnection.js"></script>
 <script src="../../app/js/streaming/vo/metrics/BandwidthBoundaries.js"></script>
 <script src="../../app/js/streaming/vo/metrics/RepresentationBoundaries.js"></script>
@@ -438,8 +440,9 @@
                     <div id="audio-container" class="quick-settings-item">Audio :
                         <select name="audioCombo" id="audioCombo"></select>
                     </div>
+                    <input type="checkbox" name="enable-subtitles" id="enable-subtitles"/>
                     <div id="subtitle-container" class="quick-settings-item">Sous-titres :
-                        <select name="subtitleCombo" id="subtitleCombo"></select>
+                        <select name="subtitleCombo" id="subtitleCombo" disabled></select>
                     </div>
                     <button id="settingsMenuButton" class="quick-settings-item">Paramètres avancés</button>
                 </div>
@@ -470,6 +473,10 @@
                         </div>
                         <div class="settings-item">
                             <label for="enable-optimized-zapping">Zapping optimisé</label><input type="checkbox" name="enable-optimized-zapping" id="enable-optimized-zapping" checked/>
+                        </div>
+                        <div class="settings-item">
+                            Video Buffer Length: <label id="video_buffer_Length">0</label><br/>
+                            Audio Buffer Length: <label id="audio_buffer_Length">0</label>
                         </div>
                     </fieldset>
                 </div>

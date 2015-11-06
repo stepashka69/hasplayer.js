@@ -28,7 +28,7 @@
         req.open("HEAD", request.url, true);
 
         req.onload = function () {
-            if (req.status < 200 || req.status > 299) return;
+            if (req.status < 200 || req.status > 399) return;
 
             isSuccessful = true;
 
@@ -49,6 +49,9 @@
         errHandler: undefined,
         debug: undefined,
         tokenAuthentication: undefined,
+        notify: undefined,
+        subscribe: undefined,
+        unsubscribe: undefined,
 
         doLoad: function (request, bytesRange) {
             var d = Q.defer();
@@ -100,22 +103,25 @@
                         httpRequestMetrics.tresponse = currentTime;
                     }
                 }
+                
+                if (event.lengthComputable) {
+                    request.bytesLoaded = event.loaded;
+                    request.bytesTotal = event.total;
+                }
+
                 self.metricsModel.appendHttpTrace(httpRequestMetrics,
                   currentTime,
                   currentTime.getTime() - lastTraceTime.getTime(),
-                  [req.response ? req.response.byteLength : 0]);
-
-                if ((lastTraceTime.getTime() - request.requestStartDate.getTime())/1000 > (httpRequestMetrics.mediaduration*2)) {
-                    self.debug.log("[FragmentLoader]["+request.streamType+"] Load onprogress: it's too long!!!!!!");
-                }
+                  [request.bytesLoaded ? request.bytesLoaded : 0]);
 
                 lastTraceTime = currentTime;
 
-                //self.debug.log("[FragmentLoader]["+request.streamType+"] Load onprogress: " + request.url);
+                self.notify(MediaPlayer.dependencies.FragmentLoader.eventList.ENAME_LOADING_PROGRESS, {request: request, httpRequestMetrics: httpRequestMetrics, lastTraceTime: lastTraceTime});
+
             };
 
             req.onload = function () {
-                if (req.status < 200 || req.status > 299)
+                if (req.status < 200 || req.status > 399)
                 {
                     return;
                 }
@@ -320,15 +326,14 @@
 
         abort: function() {
             var i,
-                req,
-                ln = xhrs.length;
+                req;
 
-            this.debug.log("[FragmentLoader] "+ln+" xhr requests to Abort.");
-            for (i = 0; i < ln; i +=1) {
+
+            //this.debug.log("[FragmentLoader] " + ln + " XHR requests to abort.");
+            for (i = 0; i < xhrs.length; i +=1) {
                 req = xhrs[i];
-                this.debug.log("[FragmentLoader] ### Abort XHR");
+                this.debug.log("[FragmentLoader] Abort XHR " + (req.responseURL ? req.responseURL : ""));
                 req.abort();
-                req = null;
             }
 
             xhrs.length = 0; // Clear array
@@ -351,4 +356,8 @@
 
 MediaPlayer.dependencies.FragmentLoader.prototype = {
     constructor: MediaPlayer.dependencies.FragmentLoader
+};
+
+MediaPlayer.dependencies.FragmentLoader.eventList = {
+    ENAME_LOADING_PROGRESS: "loadingProgress",
 };

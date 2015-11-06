@@ -1,0 +1,33 @@
+{
+    "server": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/",
+    "headers":  {
+        
+    },
+    "channels":[
+        {
+            "id":192,
+            "name":"TF1"
+        },
+        {
+            "id":118,
+            "name":"M6"
+        },
+        {
+            "id":119,
+            "name":"W9"
+        },
+        {
+            "id":4,
+            "name":"France 2"
+        },
+        {
+            "id":446,
+            "name":"NT1"
+        },
+        {   "id":444,
+            "name":"NRJ 12"
+        }
+
+
+    ]
+}
