@@ -53,6 +53,7 @@
         orangeHasPlayer.addEventListener('volumechange', onVolumeChange);
         orangeHasPlayer.addEventListener('play', onPlay);
         orangeHasPlayer.addEventListener('pause', onPause);
+        orangeHasPlayer.addEventListener('ended', onEnd);
         orangeHasPlayer.addEventListener('state_changed', onStateChanged);
         orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
         orangeHasPlayer.addEventListener('manifestUrlUpdate',onManifestUrlUpdate);
@@ -146,6 +147,10 @@
 
     function onPause() {
         handlePlayState(false);
+    }
+
+    function onEnd() {
+        handleVideoEnd();
     }
 
     function onStateChanged(e){

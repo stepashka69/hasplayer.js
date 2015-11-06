@@ -152,6 +152,11 @@ var handleError = function(e) {
     playerPanel.displayError(e.event.code, e.event.message);
 };
 
+var handleVideoEnd = function(){
+    playerPanel.reset();
+    handleBuffering(false);
+};
+
 /**********************************************************************************************************************/
 
 var reset = function() {
