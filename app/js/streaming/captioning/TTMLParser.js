@@ -372,7 +372,7 @@ MediaPlayer.utils.TTMLParser = function () {
                     cssStyle.fontFamily = findParameter(ttml.tt, cue, prefTT, prefStyle, 'fontFamily');
                     var extent = findParameter(ttml.tt, cue, prefTT, prefStyle, 'extent');
 
-                    if (cssStyle.fontSize[cssStyle.fontSize.length-1] ==='%' && extent) {
+                    if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length-1] ==='%' && extent) {
                         extent = extent.split(' ')[1];
                         extent = parseFloat(extent.substr(0, extent.length-1));
                         cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length-1))*extent)/100+"%";

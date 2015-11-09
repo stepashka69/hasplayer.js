@@ -421,7 +421,7 @@ PlayerPanel.prototype.setSubtitlesCSSStyle = function(style) {
 
         var fontSize = style.data.fontSize;
 
-        if (style.data.fontSize[style.data.fontSize.length - 1] === '%') {
+        if (style.data.fontSize && style.data.fontSize[style.data.fontSize.length - 1] === '%') {
             fontSize = (this.video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length - 1)) / 100;
         }
 
