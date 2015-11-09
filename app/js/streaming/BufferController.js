@@ -1162,8 +1162,7 @@ MediaPlayer.dependencies.BufferController = function () {
 
                             self.metricsModel.appendHttpTrace(metricsHttp,
                                 currentTime,
-                                currentTime.getTime() - lastTraceTime.getTime(),
-                                [evt.data.request.bytesLoaded ? evt.data.request.bytesLoaded : 0]);
+                                currentTime.getTime() - lastTraceTime.getTime(), [evt.data.request.bytesLoaded ? evt.data.request.bytesLoaded : 0]);
                 
                             self.fragmentController.abortRequestsForModel(fragmentModel);
                         }
@@ -1447,8 +1446,7 @@ MediaPlayer.dependencies.BufferController = function () {
                         recoveryTime = -1;
                     }
                 }
-            }
-            else if(level > 0 && htmlVideoState !== PLAYING) {
+            } else if (level > 0 && htmlVideoState !== PLAYING) {
                 htmlVideoState = PLAYING;
                 this.debug.log("[BufferController]["+type+"] PLAYING - " + this.videoModel.getCurrentTime());
                 this.metricsModel.addState(type, "playing", this.videoModel.getCurrentTime());
