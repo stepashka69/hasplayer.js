@@ -550,7 +550,7 @@ Mss.dependencies.MssParser = function () {
         {
             // In case of VOD streams, check if start time is greater than 0.
             // Therefore, set period start time to the higher adaptation start time
-            if (mpd.type === "static") {
+            if (mpd.type === "static" && adaptations[i].contentType !== 'text') {
                 var fistSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[0];
                 var adaptationTimeOffset = parseFloat(fistSegment.t) / TIME_SCALE_100_NANOSECOND_UNIT;
                 period.start = (period.start === 0)?adaptationTimeOffset:Math.max(period.start, adaptationTimeOffset);
