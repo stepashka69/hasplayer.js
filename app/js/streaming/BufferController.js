@@ -408,9 +408,12 @@ MediaPlayer.dependencies.BufferController = function () {
                                         // that has not been appended and stop request scheduling. We also need to store
                                         // the promise for this append because the next data can be appended only after
                                         // this promise is resolved.
-                                        if(result.err.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_QUOTA_EXCEEDED )
-                                        {
-                                                rejectedBytes = {data: data, quality: quality, index: index};
+                                    if (result.err.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_QUOTA_EXCEEDED) {
+                                        rejectedBytes = {
+                                            data: data,
+                                            quality: quality,
+                                            index: index
+                                        };
                                                 deferredRejectedDataAppend = deferred;
                                                 isQuotaExceeded = true;
                                                 fragmentsToLoad = 0;
@@ -699,8 +702,10 @@ MediaPlayer.dependencies.BufferController = function () {
                 this.videoModel.getElement().duration = e.startTime + 1000;
             } else {*/
                 this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
-                    "Failed to download " + type + " segment at time = " + e.startTime,
-                    {url: e.url, request: e});
+                "Failed to download " + type + " segment at time = " + e.startTime, {
+                    url: e.url,
+                    request: e
+                });
             //}
         },
 
@@ -815,8 +820,7 @@ MediaPlayer.dependencies.BufferController = function () {
                             sendRequest.call(self);
                     });
                 }
-            }
-            else {
+            } else {
                 //impossible to find a request for the loadNextFragment call
                 //the end of the createdSegment list has been reached, recall updateCheckBufferTimeout to update the list and get the next segment
                 self.debug.log("[BufferController]["+type+"] loadNextFragment failed");
