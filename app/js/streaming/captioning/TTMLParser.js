@@ -35,7 +35,6 @@ MediaPlayer.utils.TTMLParser = function() {
         globalPrefParameterNameSpace = "",
         regionPrefTTNameSpace = "",
         regionPrefStyleNameSpace = "",
-
         // R0028 - A document must not contain a <timeExpression> value that does not conform to the subset of clock-time that
         // matches either of the following patterns: hh:mm:ss.mss or hh:mm:ss:ff, where hh denotes hours (00-23),
         // mm denotes minutes (00-59), ss denotes seconds (00-59), mss denotes milliseconds (000-999), and ff denotes frames (00-frameRate - 1).
@@ -149,95 +148,6 @@ MediaPlayer.utils.TTMLParser = function() {
             // ORANGE: The R0008 requirement is removed in the parser implementation to make it work with non-US profiles
 
             return passed;
-        },
-
-        getDataInfo = function(jsonLayout, jsonArrayName, infoName) {
-            var j = 0;
-            if (jsonLayout) {
-                for (j = 0; j < jsonLayout[jsonArrayName].length; j++) {
-                    var tab = jsonLayout[jsonArrayName][j];
-                    if (tab['xml:id'] === infoName) {
-                        return tab;
-                    }
-                }
-            }
-            return null;
-        },
-
-        getParameterValue = function(json, prefix, parameter) {
-            var j = 0;
-
-            for (j = 0; j < prefix.length; j++) {
-                if (json.hasOwnProperty(prefix[j] === "" ? parameter : prefix[j] + parameter)) {
-                    return json[prefix[j] + parameter];
-                }
-            }
-            return null;
-        },
-
-        findParameterInRegion = function(json, leaf, prefTT, prefStyle, parameter) {
-            var parameterValue = null,
-                localPrefTT = prefTT,
-                localPrefStyle = prefStyle,
-                leafStyle;
-
-            //find parameter in region referenced in the leaf
-            var cueRegion = getDataInfo(json.head.layout, 'region_asArray', getParameterValue(leaf, localPrefTT, 'region'));
-            if (cueRegion) {
-
-                localPrefTT = getLocalNamespace(cueRegion, "ttml");
-                localPrefStyle = getLocalNamespace(cueRegion, "style");
-
-                localPrefStyle = globalPrefStyleNameSpace.concat(localPrefStyle);
-                localPrefTT = globalPrefTTNameSpace.concat(localPrefTT);
-
-                parameterValue = getParameterValue(cueRegion, localPrefStyle, parameter);
-
-                if (!parameterValue) {
-                    //find parameter in style referenced in the region referenced in the leaf
-                    leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(cueRegion, localPrefTT, 'style'));
-                    while (!parameterValue && leafStyle) {
-                        parameterValue = getParameterValue(leafStyle, localPrefStyle, parameter);
-                        if (!parameterValue) {
-                            leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(leafStyle, localPrefTT, 'style'));
-                            //is there another style referenced in this style?
-                            localPrefTT = getLocalNamespace(leafStyle, "ttml");
-                            localPrefStyle = getLocalNamespace(leafStyle, "style");
-
-                            localPrefStyle = globalPrefStyleNameSpace.concat(localPrefStyle);
-                            localPrefTT = globalPrefTTNameSpace.concat(localPrefTT);
-                        }
-                    }
-                }
-            }
-
-            return parameterValue;
-        },
-
-        findParameter = function(json, leaf, prefTT, prefStyle, parameter) {
-            var parameterValue = null,
-                localPrefTT = prefTT,
-                localPrefStyle = prefStyle;
-
-            //find parameter in the leaf
-            parameterValue = getParameterValue(leaf, localPrefStyle, parameter);
-            if (!parameterValue) {
-                //find parameter in style referenced in the leaf
-                var leafStyle = getDataInfo(json.head.styling, 'style_asArray', getParameterValue(leaf, localPrefTT, 'style'));
-                if (leafStyle) {
-                    parameterValue = getParameterValue(leafStyle, localPrefStyle, parameter);
-                    if (!parameterValue) {
-                        //find parameter in region referenced in the leaf
-                        parameterValue = findParameterInRegion(json, leaf, localPrefTT, localPrefStyle, parameter);
-                        if (!parameterValue) {
-                            parameterValue = findParameterInMainDiv(json, localPrefTT, localPrefStyle, parameter);
-                        }
-                    }
-                } else {
-                    parameterValue = findParameterInRegion(json, leaf, localPrefTT, localPrefStyle, parameter);
-                }
-            }
-            return parameterValue;
         },
 
         getAttributeValue = function(node, attrName) {
@@ -494,22 +404,17 @@ MediaPlayer.utils.TTMLParser = function() {
                         return Q.reject(errorMsg);
                     }
 
-                    /******************** Find style informations ***************************************
-                     *   1- in the cue
-                     *   2- in style element referenced in the cue
-                     *   3- in region
-                     *   4- in style referenced in the region referenced in the cue
-                     *   5- in the main div
-                     *   6- in the style of the main div
-                     **************************************************************************************/
-
                     var textDatas = getChildNodes(region, 'span');
                     if (textDatas.length > 0) {
-                        for(j = 0;j<textDatas.length;j++){                         
-                            //search backgroundColor on :
-                            // 1 - span
-                            // 2 - region
-                            // 3 - main div
+                        for(j = 0;j<textDatas.length;j++){       
+                            /******************** Find style informations ***************************************
+                            *   1- in subtitle paragraph ToDo
+                            *   2- in style element referenced in the subtitle paragraph
+                            *   3- in region ToDo
+                            *   4- in style referenced in the region referenced in the subtitle paragraph
+                            *   5- in the main div ToDo
+                            *   6- in the style of the main div
+                            **************************************************************************************/
                             
                             cssStyle.backgroundColor = findStyleElement([textDatas[j],region,divBody], 'backgroundColor');                                              
                             cssStyle.color = findStyleElement([textDatas[j],region,divBody], 'color');
@@ -522,6 +427,9 @@ MediaPlayer.utils.TTMLParser = function() {
                                 extent = extent.split(' ')[1];
                                 extent = parseFloat(extent.substr(0, extent.length - 1));
                                 cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1)) * extent) / 100 + "%";
+                            }else if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === 'c' && extent) {
+                                var cellsSize = cssStyle.fontSize.replace(/\s/g, '').split('c');
+                                //to TO
                             }
                             
                              //line and position element have no effect on IE
@@ -532,7 +440,8 @@ MediaPlayer.utils.TTMLParser = function() {
                                 data: textDatas[j].textContent,
                                 line: 80,
                                 style: cssStyle
-                            };    
+                            };
+                            captionArray.push(caption);
                         }
                     }else{
                         cssStyle.backgroundColor = findStyleElement([region, divBody], 'backgroundColor');               
@@ -556,8 +465,8 @@ MediaPlayer.utils.TTMLParser = function() {
                             line: 80,
                             style: cssStyle
                         };
+                        captionArray.push(caption);
                     }
-                    captionArray.push(caption);
                 }
 
                 return Q.when(captionArray);
