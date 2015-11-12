@@ -381,6 +381,10 @@ OrangeHasPlayer = function() {
 
         _isPlayerInitialized();
 
+        // Reset the player
+        self.reset(0);
+
+        // Set initial quality if first stream
         if (initialQuality.video >= 0) {
             mediaPlayer.setQualityFor('video', initialQuality.video);
             config.video["ABR.keepBandwidthCondition"] = false;
@@ -402,9 +406,6 @@ OrangeHasPlayer = function() {
 
             // Set config to set 'keepBandwidthCondition' parameter
             mediaPlayer.setConfig(config);
-
-            // Reset the player
-            self.reset(0);
 
             //init default audio language
             mediaPlayer.setDefaultAudioLang(defaultAudioLang);
