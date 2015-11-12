@@ -73,6 +73,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
         buffered: buffered,
         textTrackExtensions:undefined,
         ttmlParser:undefined,
+        debug: undefined,
 
         initialize: function (type, bufferController, subtitleData) {
             mimeType = type;
@@ -108,7 +109,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
         append: function (bytes) {
             var self = this;
             var file = mp4lib.deserialize( bytes );
-                    
+
             var moov = file.getBoxByType('moov');
             if (moov) {
 
@@ -173,6 +174,8 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
                                
                                 self.eventBus.dispatchEvent({type:"updateend"});
                             }
+                        }, function(error){
+                            self.debug.error("[TextTTMLXMLMP4SourceBuffer] error parsing TTML "+error);
                         });
                     }
                 );

@@ -74,11 +74,7 @@ MediaPlayer.utils.TextTrackExtensions = function () {
 
                 newCue.snapToLines = false;
 
-                if (i > 0 && currentItem.start <= captionData[i-1].end) {
-                    newCue.line = captionData[i-1].line + parseFloat(currentItem.style.fontSize.substr(0, currentItem.style.fontSize.length-1))+3;
-                }else {
-                    newCue.line = currentItem.line;
-                }
+                newCue.line = currentItem.line;
 
                 if (currentItem.style) {
                     newCue.style = currentItem.style;

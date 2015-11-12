@@ -547,6 +547,13 @@ MediaPlayer.dependencies.Stream = function() {
         onSeeking = function() {
             var time = this.videoModel.getCurrentTime();
             this.debug.info("<video> seeking event: " + time);
+            //test if seek time is less than range start, never seek before range start.
+            var start = this.getStartTime();
+
+            if (time<start) {
+                time = start;
+            }
+
             isSeeked = true;
             startBuffering(time);
         },
