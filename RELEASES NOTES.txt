@@ -1,3 +1,8 @@
+### Release Notes v1.2.5 (2015/11/12)
+* Bug fix for initial bitrate setting
+* Bug fix if protection module is not included
+* Modified abandon request rule
+
 ### Release Notes v1.2.5 (2015/11/06)
 * Bugs fixing:
 * - Unable to restart a new stream after a stopping error (Edge)
