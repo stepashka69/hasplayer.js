@@ -511,6 +511,11 @@ Mss.dependencies.MssParser = function () {
         if (protection !== undefined) {
             /* @if PROTECTION=true */
             protectionHeader = getChildNode(protection, 'ProtectionHeader');
+
+            // Some packagers put newlines into the ProtectionHeader base64 string, which is not good
+            // because this cannot be correctly parsed. Let's just filter out any newlines found in there.
+            protectionHeader.firstChild.data = protectionHeader.firstChild.data.replace(/\n|\r/g, "");
+
             // Get KID (in CENC format) from protection header
             KID = getKIDFromProtectionHeader(protectionHeader);
 

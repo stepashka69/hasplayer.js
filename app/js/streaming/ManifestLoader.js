@@ -20,6 +20,30 @@ MediaPlayer.dependencies.ManifestLoader = function () {
         deferred = null,
         request = null,
 
+        getDecodedResponseText = function (text) {
+            // Some content is not always successfully decoded by every browser.
+            // Known problem case: UTF-16 BE manifests on Internet Explorer 11.
+            // This function decodes any text that the browser failed to decode.
+            if (text.length < 1)
+                return text;
+
+            // The troublesome bit here is that IE still strips off the BOM, despite incorrectly decoding the file.
+            // So we will simply assume that the first character is < (0x3C) and detect its invalid decoding (0x3C00).
+            if (text.charCodeAt(0) !== 0x3C00)
+                return text;
+
+            // We have a problem!
+            var fixedCharCodes = [];
+
+            for (var i = 0; i < text.length; i++) {
+                var charCode = text.charCodeAt(i);
+
+                // Swap around the two bytes that make up the character code.
+                fixedCharCodes.push((charCode & 0xFF) << 8 | (charCode & 0xFF00) >> 8);
+            }
+
+            return String.fromCharCode.apply(null, fixedCharCodes);
+        },
 
         parseBaseUrl = function (url) {
             var base = null;
@@ -90,7 +114,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                                                  null,
                                                  null);
 
-                self.parser.parse(request.responseText, baseUrl).then(
+                self.parser.parse(getDecodedResponseText(request.responseText), baseUrl).then(
                     function (manifest) {
                         manifest.mpdUrl = url;
                         manifest.mpdLoadedTime = mpdLoadedTime;
