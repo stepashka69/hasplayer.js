@@ -146,7 +146,6 @@ MediaPlayer.utils.TTMLParser = function() {
 
             // R0008 - A document must contain a ttp:profile element where the use attribute of that element is specified as http://www.w3.org/ns/ttml/profile/sdp-us.
             // ORANGE: The R0008 requirement is removed in the parser implementation to make it work with non-US profiles
-
             return passed;
         },
 
@@ -267,12 +266,94 @@ MediaPlayer.utils.TTMLParser = function() {
             return null;
         },
 
+        findParameterElement = function(nodeTab, parameterElementName){
+            var parameterValue = null,
+                i = 0;
+
+            for(i = 0;i<nodeTab.length;i++){
+                parameterValue = getAttributeValue(nodeTab[i], globalPrefParameterNameSpace + parameterElementName)
+                if (parameterValue) {
+                    return parameterValue;
+                }
+            }
+
+            return parameterValue;
+        },
+
+        getAllSpecificNodes = function(mainNode, nodeName) {
+            var i = 0,
+                id,
+                querySelectorResult,
+                returnTab = [];
+
+            querySelectorResult = mainNode.querySelectorAll(nodeName);
+            if (querySelectorResult) {
+                for(i = 0;i<querySelectorResult.length;i++){
+                    id = getAttributeValue(querySelectorResult[i],'xml:id');
+                    if (id) {
+                        returnTab[id] = querySelectorResult[i].attributes;
+                    }
+                }
+            }
+
+            return returnTab;
+        },
+
+        getNameSpace = function(node, type){
+            var nameSpace = null,
+                TTAFUrl = null,
+                TTMLUrl = null;
+            
+            switch (type) {
+                case "style" : 
+                    TTAFUrl = TTAF_STYLE_URI;
+                    TTMLUrl = TTML_STYLE_URI;
+                    break;
+                case "parameter" :
+                    TTAFUrl = TTAF_PARAMETER_URI;
+                    TTMLUrl = TTML_PARAMETER_URI;
+                    break;
+                case "main" :
+                    TTAFUrl = TTAF_URI;
+                    TTMLUrl = TTML_URI;
+                    break;
+            }
+            
+            if (TTAFUrl && TTMLUrl) {
+                nameSpace = getAttributeName(node, TTAFUrl);
+
+                if (!nameSpace) {
+                    nameSpace = getAttributeName(node, TTMLUrl);
+                }
+
+                if (nameSpace) {
+                    nameSpace = nameSpace.split(':').length > 1 ? nameSpace.split(':')[1] + ':' : "";
+                }
+            }
+
+            return nameSpace;
+        },
+
+        getTimeValue = function(node, parameter){
+            var returnTime = null;
+            
+            returnTime = parseTimings(getAttributeValue(node, globalPrefTTNameSpace+parameter));
+
+            if (returnTime === null) {
+                returnTime = parseTimings(getAttributeValue(node, regionPrefTTNameSpace+parameter));
+            }
+
+            return returnTime;
+        },
+
         internalParse = function(data) {
             var captionArray = [],
                 errorMsg,
                 regions,
                 region,
                 cue,
+                previousStartTime = null,
+                previousEndTime = null,
                 startTime,
                 endTime,
                 cssStyle = {
@@ -286,7 +367,10 @@ MediaPlayer.utils.TTMLParser = function() {
                 i,
                 styleNodes,
                 regionNodes,
-                j;
+                j,
+                cellsSize,
+                cellResolution,
+                extent;
 
             try {
 
@@ -298,37 +382,11 @@ MediaPlayer.utils.TTMLParser = function() {
                 }
 
                 //define global namespace prefix for TTML
-                globalPrefTTNameSpace = getAttributeName(nodeTt, TTAF_URI);
-
-                if (!globalPrefTTNameSpace) {
-                    globalPrefTTNameSpace = getAttributeName(nodeTt, TTML_URI);
-                }
-                
-                if (globalPrefTTNameSpace) {
-                    globalPrefTTNameSpace = globalPrefTTNameSpace.split(':').length > 1 ? globalPrefTTNameSpace.split(':')[1] + ':' : "";
-                }
+                globalPrefTTNameSpace = getNameSpace(nodeTt, 'main');
                 //define global namespace prefix for parameter
-
-                globalPrefParameterNameSpace = getAttributeName(nodeTt, TTAF_PARAMETER_URI);
-
-                if (!globalPrefParameterNameSpace) {
-                    globalPrefParameterNameSpace = getAttributeName(nodeTt, TTML_PARAMETER_URI);
-                }
-                
-                if (globalPrefParameterNameSpace) {
-                    globalPrefParameterNameSpace = globalPrefParameterNameSpace.split(':').length > 1 ? globalPrefParameterNameSpace.split(':')[1] + ':' : "";
-                }
+                globalPrefParameterNameSpace = getNameSpace(nodeTt, 'parameter');
                 //define global namespace prefix for style
-
-                globalPrefStyleNameSpace = getAttributeName(nodeTt, TTAF_STYLE_URI);
-
-                if (!globalPrefStyleNameSpace) {
-                    globalPrefStyleNameSpace = getAttributeName(nodeTt, TTML_STYLE_URI);
-                }
-
-                if (globalPrefStyleNameSpace) {
-                    globalPrefStyleNameSpace = globalPrefStyleNameSpace.split(':').length > 1 ? globalPrefStyleNameSpace.split(':')[1] + ':' : "";
-                }
+                globalPrefStyleNameSpace = getNameSpace(nodeTt, 'style');
 
                 frameRate = getAttributeValue(nodeTt, globalPrefParameterNameSpace + "frameRate") ? parseInt(frameRate, 10) : null;
 
@@ -345,59 +403,24 @@ MediaPlayer.utils.TTMLParser = function() {
                     errorMsg = "TTML document does not contain any cues";
                     return Q.reject(errorMsg);
                 }
-                
+
                 //get all styles informations
-                styleNodes = nodeTt.querySelectorAll('style');
-                for(i = 0;i<styleNodes.length;i++){
-                    var id = getAttributeValue(styleNodes[i],'xml:id');
-                    if (id) {
-                        tabStyles[id] = styleNodes[i].attributes;
-                    }
-                }
-
+                tabStyles = getAllSpecificNodes(nodeTt, 'style');
+                
                 //get all regions informations
-                regionNodes = nodeTt.querySelectorAll('region');
-                for(i = 0;i<regionNodes.length;i++){
-                    var id = getAttributeValue(regionNodes[i],'xml:id');
-                    if (id) {
-                        tabRegions[id] = regionNodes[i].attributes;
-                    }
-                }
-
+                tabRegions = getAllSpecificNodes(nodeTt, 'region');
+                
                 for (i = 0; i < regions.length; i += 1) {
                     caption = null;
                     region = regions[i];
                     
-                    regionPrefTTNameSpace = getAttributeName(region, TTAF_URI);
+                    regionPrefTTNameSpace = getNameSpace(region, 'main');
 
-                    if (!regionPrefTTNameSpace) {
-                        regionPrefTTNameSpace = getAttributeName(region, TTML_URI);
-                    }
-                    
-                    if (regionPrefTTNameSpace) {
-                        regionPrefTTNameSpace = regionPrefTTNameSpace.split(':').length > 1 ? regionPrefTTNameSpace.split(':')[1] + ':' : "";
-                    }
+                    regionPrefStyleNameSpace = getNameSpace(region, 'style');
 
-                    regionPrefStyleNameSpace = getAttributeName(region, TTAF_STYLE_URI);
+                    startTime = getTimeValue(region, 'begin');
 
-                    if (!regionPrefStyleNameSpace) {
-                        regionPrefStyleNameSpace = getAttributeName(region, TTML_STYLE_URI);
-                    }
-
-                    if (regionPrefStyleNameSpace) {
-                        regionPrefStyleNameSpace = regionPrefStyleNameSpace.split(':').length > 1 ? regionPrefStyleNameSpace.split(':')[1] + ':' : "";
-                    }
-
-                    startTime = parseTimings(getAttributeValue(region, globalPrefTTNameSpace+'begin'));
-
-                    if (startTime === null) {
-                        startTime = parseTimings(getAttributeValue(region, regionPrefTTNameSpace+'begin'));
-                    }
-
-                    endTime = parseTimings(getAttributeValue(region, globalPrefTTNameSpace+'end'));
-                    if (endTime === null) {
-                        endTime = parseTimings(getAttributeValue(region, regionPrefTTNameSpace+'end'));
-                    }
+                    endTime = getTimeValue(region, 'end');
                     
                     if (isNaN(startTime) || isNaN(endTime)) {
                         errorMsg = "TTML document has incorrect timing value";
@@ -405,6 +428,7 @@ MediaPlayer.utils.TTMLParser = function() {
                     }
 
                     var textDatas = getChildNodes(region, 'span');
+                    //subtitles are set in span 
                     if (textDatas.length > 0) {
                         for(j = 0;j<textDatas.length;j++){       
                             /******************** Find style informations ***************************************
@@ -421,35 +445,51 @@ MediaPlayer.utils.TTMLParser = function() {
                             cssStyle.fontSize = findStyleElement([textDatas[j],region,divBody], 'fontSize');
                             cssStyle.fontFamily = findStyleElement([textDatas[j],region,divBody], 'fontFamily');
 
-                            var extent = findStyleElement([textDatas[j],region,divBody], 'extent');
+                            extent = findStyleElement([textDatas[j],region,divBody], 'extent');
 
                             if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
                                 extent = extent.split(' ')[1];
                                 extent = parseFloat(extent.substr(0, extent.length - 1));
                                 cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1)) * extent) / 100 + "%";
                             }else if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === 'c' && extent) {
-                                var cellsSize = cssStyle.fontSize.replace(/\s/g, '').split('c');
-                                //to TO
+                                cellsSize = cssStyle.fontSize.replace(/\s/g, '').split('c');
+                                cellResolution = findParameterElement([textDatas[j], region, divBody, nodeTt], 'cellResolution').split(' ');
+                                if (cellsSize.length > 1) {
+                                    cssStyle.fontSize = cellResolution[1] / cellsSize[1] + 'px';
+                                }else{
+                                    cssStyle.fontSize = cellResolution[1] / cellsSize[0] + 'px';
+                                }
                             }
                             
                              //line and position element have no effect on IE
                             //For Chrome line = 80 is a percentage workaround to reorder subtitles
-                            caption = {
-                                start: startTime,
-                                end: endTime,
-                                data: textDatas[j].textContent,
-                                line: 80,
-                                style: cssStyle
-                            };
-                            captionArray.push(caption);
-                        }
+                           if (j===0) {
+                                caption = {
+                                    start: startTime,
+                                    end: endTime,
+                                    data: textDatas[j].textContent,
+                                    line: 80,
+                                    style: cssStyle
+                                };
+                            }else{
+                                //try to detect multi lines subtitle
+                                caption = {
+                                    start: startTime,
+                                    end: endTime,
+                                    data: textDatas[j-1].textContent+'\n'+textDatas[j].textContent,
+                                    line: 80,
+                                    style: cssStyle
+                                };
+                            }
+                        } 
+                        captionArray.push(caption);
                     }else{
                         cssStyle.backgroundColor = findStyleElement([region, divBody], 'backgroundColor');               
                         cssStyle.color = findStyleElement([region, divBody], 'color');
                         cssStyle.fontSize = findStyleElement([region,divBody], 'fontSize');
                         cssStyle.fontFamily = findStyleElement([region,divBody], 'fontFamily');
                         
-                        var extent = findStyleElement([region,divBody], 'extent');
+                        extent = findStyleElement([region,divBody], 'extent');
 
                         if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
                             extent = extent.split(' ')[1];
@@ -458,13 +498,31 @@ MediaPlayer.utils.TTMLParser = function() {
                         }
                         //line and position element have no effect on IE
                         //For Chrome line = 80 is a percentage workaround to reorder subtitles
-                        caption = {
-                            start: startTime,
-                            end: endTime,
-                            data: region.textContent,
-                            line: 80,
-                            style: cssStyle
-                        };
+                        //try to detect multi lines subtitle
+                        if (i>0) {
+                            previousStartTime = getTimeValue(regions[i-1], 'begin');
+
+                            previousEndTime = getTimeValue(regions[i-1], 'end');
+                        }
+
+                        if (startTime === previousStartTime && endTime === previousEndTime) {
+                            captionArray.pop();
+                            caption = {
+                                start: startTime,
+                                end: endTime,
+                                data: regions[i-1].textContent+'\n'+region.textContent,
+                                line: 80,
+                                style: cssStyle
+                            };
+                        }else{
+                            caption = {
+                                start: startTime,
+                                end: endTime,
+                                data: region.textContent,
+                                line: 80,
+                                style: cssStyle
+                            };
+                        }
                         captionArray.push(caption);
                     }
                 }
