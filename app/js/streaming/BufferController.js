@@ -679,10 +679,10 @@ MediaPlayer.dependencies.BufferController = function() {
             // request.status = 0 (abandonned request) => load segment at lowest quality
             if (e.status !== undefined && e.status === 0) {
                 if (e.quality !== 0) {
-                this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
-                this.abrController.setAutoSwitchBitrate(false);
-                this.abrController.setPlaybackQuality(type, 0);
-                bufferFragment.call(this);
+                    this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
+                    this.abrController.setAutoSwitchBitrate(false);
+                    this.abrController.setPlaybackQuality(type, 0);
+                    bufferFragment.call(this);
                 }
                 return;
             }
@@ -828,7 +828,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment failed");
 
                 signalSegmentBuffered.call(self);
-
+                if (htmlVideoState != BUFFERING) {
                     // HLS use case => download playlist for new representation
                     if ((manifest.name === "M3U") && isDynamic) {
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
@@ -842,6 +842,9 @@ MediaPlayer.dependencies.BufferController = function() {
                     } else {
                         updateCheckBufferTimeout.call(self, 0);
                     }
+                }else if (!isDynamic) {
+                    signalStreamComplete.call(self);
+                }
             }
         },
 
