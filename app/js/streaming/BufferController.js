@@ -677,11 +677,13 @@ MediaPlayer.dependencies.BufferController = function() {
             signalSegmentBuffered.call(this);
 
             // request.status = 0 (abandonned request) => load segment at lowest quality
-            if (e.status !== undefined && e.status === 0 && (e.quality !== 0)) {
+            if (e.status !== undefined && e.status === 0) {
+                if (e.quality !== 0) {
                 this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
                 this.abrController.setAutoSwitchBitrate(false);
                 this.abrController.setPlaybackQuality(type, 0);
                 bufferFragment.call(this);
+                }
                 return;
             }
 
