@@ -163,7 +163,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                     data.request = request;
                     self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, msgError, data);
                     deferred.reject(request);
-                    request = null;
                 }
             };
 
