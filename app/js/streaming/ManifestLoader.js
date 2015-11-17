@@ -88,46 +88,48 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 if (request.status < 200 || request.status > 299) {
                   return;
                 }
-
-                self.debug.log("[ManifestLoader] Manifest downloaded");
                 
-                //ORANGE : Get the redirection URL and use it as base URL
-                if (request.responseURL) {
-                  self.debug.log("[ManifestLoader] Redirect URL: " + request.responseURL);
-                  baseUrl = parseBaseUrl(request.responseURL);
-                }
-
-                needFailureReport = false;
-                mpdLoadedTime = new Date();
-
-                self.tokenAuthentication.checkRequestHeaderForToken(request);
-                self.metricsModel.addHttpRequest("stream",
-                                                 null,
-                                                 "MPD",
-                                                 url,
-                                                 null,
-                                                 null,
-                                                 requestTime,
-                                                 mpdLoadedTime,
-                                                 request.status,
-                                                 null,
-                                                 null);
-
-                self.parser.parse(getDecodedResponseText(request.responseText), baseUrl).then(
-                    function (manifest) {
-                        manifest.mpdUrl = url;
-                        manifest.mpdLoadedTime = mpdLoadedTime;
-                        self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
-                        deferred.resolve(manifest);
-                    },
-                    function (error) {
-                        self.debug.error("[ManifestLoader] Manifest parsing error.");
-                        var data = {};
-                        data.mpdUrl = url;
-                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : "+error, data);
-                        deferred.reject(request);
+                if (request.status === 200 && request.readyState === 4 ){
+                    self.debug.log("[ManifestLoader] Manifest downloaded");
+                    
+                    //ORANGE : Get the redirection URL and use it as base URL
+                    if (request.responseURL) {
+                      self.debug.log("[ManifestLoader] Redirect URL: " + request.responseURL);
+                      baseUrl = parseBaseUrl(request.responseURL);
                     }
-                );
+
+                    needFailureReport = false;
+                    mpdLoadedTime = new Date();
+
+                    self.tokenAuthentication.checkRequestHeaderForToken(request);
+                    self.metricsModel.addHttpRequest("stream",
+                                                     null,
+                                                     "MPD",
+                                                     url,
+                                                     null,
+                                                     null,
+                                                     requestTime,
+                                                     mpdLoadedTime,
+                                                     request.status,
+                                                     null,
+                                                     null);
+
+                    self.parser.parse(getDecodedResponseText(request.responseText), baseUrl).then(
+                        function (manifest) {
+                            manifest.mpdUrl = url;
+                            manifest.mpdLoadedTime = mpdLoadedTime;
+                            self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
+                            deferred.resolve(manifest);
+                        },
+                        function (error) {
+                            self.debug.error("[ManifestLoader] Manifest parsing error.");
+                            var data = {};
+                            data.mpdUrl = url;
+                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : "+error, data);
+                            deferred.reject(request);
+                        }
+                    );
+                }
             };
 
             report = function () {
