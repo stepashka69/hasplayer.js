@@ -1,9 +1,18 @@
-### Release Notes v1.2.5 (2015/11/12)
-* Bug fix for initial bitrate setting
-* Bug fix if protection module is not included
+### Release Notes v1.2.5.2 (2015/11/17)
+* Bugs fixing:
+* - error sent if aborted request 
+* - track switching that raise DOWNLOAD_ERROR_CONTENT
+* OrangeHasPlayer waits for video's loadeddata' event first before sending any 'play_bitrate' event
+* DOWNLOAD_ERR_CONTENT raised once buffer is underflow
+
+### Release Notes v1.2.5.1 (2015/11/12)
+* Bugs fixing:
+* - initial bitrate setting
+* - error if protection module is not included
 * Modified abandon request rule
 
-### Release Notes v1.2.5 (2015/11/06)
+### Release Notes v1.2.5 (2015/11/04)
+>>>>>>> origin/development
 * Bugs fixing:
 * - Unable to restart a new stream after a stopping error (Edge)
 * - No error message when EME desactivated (Chrome)

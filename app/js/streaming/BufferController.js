@@ -677,11 +677,13 @@ MediaPlayer.dependencies.BufferController = function() {
             signalSegmentBuffered.call(this);
 
             // request.status = 0 (abandonned request) => load segment at lowest quality
-            if (e.status !== undefined && e.status === 0 && (e.quality !== 0)) {
-                this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
-                this.abrController.setAutoSwitchBitrate(false);
-                this.abrController.setPlaybackQuality(type, 0);
-                bufferFragment.call(this);
+            if (e.status !== undefined && e.status === 0) {
+                if (e.quality !== 0) {
+                    this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
+                    this.abrController.setAutoSwitchBitrate(false);
+                    this.abrController.setPlaybackQuality(type, 0);
+                    bufferFragment.call(this);
+                }
                 return;
             }
 
@@ -696,17 +698,19 @@ MediaPlayer.dependencies.BufferController = function() {
             // Segment download failed
             // => If first time, then try to recover missing segment (see updateBufferState())
             // => Else raise an error
-            /*if (!segmentDownloadFailed && (bufferLevel !== 0)) {
+            if (!segmentDownloadFailed && (bufferLevel !== 0)) {
                 segmentDownloadFailed = true;
                 recoveryTime = e.startTime + e.duration;
-                this.videoModel.getElement().duration = e.startTime + 1000;
-            } else {*/
+            } /*else {
+
             this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
                 "Failed to download " + type + " segment at time = " + e.startTime, {
                     url: e.url,
                     request: e
                 });
-            //}
+            }*/
+
+            this.debug.warn("Failed to download " + type + " segment at time = " + e.startTime + ", url =  " + e.url);
         },
 
         signalStreamComplete = function( /*request*/ ) {
@@ -826,7 +830,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment failed");
 
                 signalSegmentBuffered.call(self);
-
+                if (htmlVideoState != BUFFERING) {
                     // HLS use case => download playlist for new representation
                     if ((manifest.name === "M3U") && isDynamic) {
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
@@ -840,6 +844,9 @@ MediaPlayer.dependencies.BufferController = function() {
                     } else {
                         updateCheckBufferTimeout.call(self, 0);
                     }
+                }else if (!isDynamic) {
+                    signalStreamComplete.call(self);
+                }
             }
         },
 
@@ -1440,8 +1447,12 @@ MediaPlayer.dependencies.BufferController = function() {
                 // => if VOD, seek to following segment
                 if (recoveryTime !== -1 && segmentDownloadFailed) {
                     if (isDynamic) {
-                        this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => reload manifest");
-                        this.updateManifest();
+                        //this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => reload manifest");
+                        //this.updateManifest();
+
+                        this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => error");
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT, "Failed to download " + type + " segment", null);
+
                     } else {
                         this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => seek to following segment at time " + recoveryTime);
                         this.videoModel.setCurrentTime(recoveryTime);

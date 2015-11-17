@@ -184,6 +184,7 @@
      *
      **********************************************************************************************************************/
     function loadStream(streamInfos, optimizedZappingEnabled) {
+        handleBuffering(true);
         if (!optimizedZappingEnabled) {
             orangeHasPlayer.setInitialQualityFor('video', 0);
             orangeHasPlayer.setInitialQualityFor('audio', 0);

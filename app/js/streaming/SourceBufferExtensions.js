@@ -165,6 +165,11 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
                 buffer.removeEventListener("updateend", updateEndHandler, false);
                 defer.resolve(true);
             };
+
+            if (!buffer.updating) {
+                defer.resolve();
+                return defer.promise;
+            }
         // use updateend event if possible
         if (typeof buffer.addEventListener === "function") {
             try {
@@ -182,28 +187,31 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
     },
 
     append: function (buffer, bytes, sync) {
-        var deferred = Q.defer();
+        var deferred = Q.defer(),
+            self = this;
 
-        try {
-            if ("append" in buffer) {
-                buffer.append(bytes);
-            } else if ("appendBuffer" in buffer) {
-                buffer.appendBuffer(bytes);
-            }
+        self.waitForUpdateEnd(buffer).then(function(){
+            try {
+                if ("append" in buffer) {
+                    buffer.append(bytes);
+                } else if ("appendBuffer" in buffer) {
+                    buffer.appendBuffer(bytes);
+                }
 
-            if (sync) {
-                deferred.resolve();
-            } else {
-                // updating is in progress, we should wait for it to complete before signaling that this operation is done
-                this.waitForUpdateEnd(buffer).then(
-                    function() {
-                        deferred.resolve();
-                    }
-                );
+                if (sync) {
+                    deferred.resolve();
+                } else {
+                    // updating is in progress, we should wait for it to complete before signaling that this operation is done
+                    self.waitForUpdateEnd(buffer).then(
+                        function() {
+                            deferred.resolve();
+                        }
+                    );
+                }
+            } catch (err) {
+                deferred.reject({err: err, data: bytes});
             }
-        } catch (err) {
-            deferred.reject({err: err, data: bytes});
-        }
+        });
 
         return deferred.promise;
     },

@@ -63,7 +63,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 this.debug.log("[ManifestLoader] Manifest download abort.");
                 request.abort();
             }
-            request = null;
         },
 
         doLoad = function (url, remainingAttempts, noRetry) {
@@ -120,7 +119,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                         manifest.mpdLoadedTime = mpdLoadedTime;
                         self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
                         deferred.resolve(manifest);
-                        request = null;
                     },
                     function (error) {
                         self.debug.error("[ManifestLoader] Manifest parsing error.");
@@ -128,7 +126,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                         data.mpdUrl = url;
                         self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : "+error, data);
                         deferred.reject(request);
-                        request = null;
                     }
                 );
             };
@@ -166,7 +163,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                     data.request = request;
                     self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, msgError, data);
                     deferred.reject(request);
-                    request = null;
                 }
             };
 
@@ -176,7 +172,6 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 }
                 needFailureReport = false;
                 deferred.reject();
-                request = null;
             };
 
             try {
