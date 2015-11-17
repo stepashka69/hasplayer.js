@@ -175,7 +175,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function () {
                                 self.eventBus.dispatchEvent({type:"updateend"});
                             }
                         }, function(error){
-                            self.debug.error("[TextTTMLXMLMP4SourceBuffer] error parsing TTML "+error);
+                            //self.debug.error("[TextTTMLXMLMP4SourceBuffer] error parsing TTML "+error);
                         });
                     }
                 );
