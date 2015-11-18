@@ -654,7 +654,7 @@ MediaPlayer.dependencies.BufferController = function() {
             self.debug.info("[BufferController][" + type + "] Remove from " + removeStart + " to " + removeEnd + " (" + self.getVideoModel().getCurrentTime() + ")");
 
             // Wait for buffer update completed, since some data can have been started to pe pushed before calling this method
-            self.sourceBufferExt.waitForUpdateEnd(buffer).then(self.sourceBufferExt.remove(buffer, removeStart, removeEnd, periodInfo.duration, mediaSource, appendSync)).then(
+            self.sourceBufferExt.remove(buffer, removeStart, removeEnd, periodInfo.duration, mediaSource, appendSync).then(
                 function() {
                     // after the data has been removed from the buffer we should remove the requests from the list of
                     // the executed requests for which playback time is inside the time interval that has been removed from the buffer
