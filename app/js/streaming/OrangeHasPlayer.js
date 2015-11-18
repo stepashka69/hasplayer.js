@@ -742,8 +742,6 @@ OrangeHasPlayer = function() {
                 }
             }
         }
-
-        throw new Error('OrangeHasPlayer.setAudioTrack():' + audioTrack.lang + 'is unknown');
     };
 
     /**
