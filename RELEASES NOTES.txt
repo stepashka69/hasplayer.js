@@ -15,7 +15,6 @@
 * Modified abandon request rule
 
 ### Release Notes v1.2.5 (2015/11/04)
->>>>>>> origin/development
 * Bugs fixing:
 * - Unable to restart a new stream after a stopping error (Edge)
 * - No error message when EME desactivated (Chrome)
