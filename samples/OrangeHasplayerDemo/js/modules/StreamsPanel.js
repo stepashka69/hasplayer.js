@@ -158,10 +158,12 @@ StreamsPanel.prototype._formatTVMResponse = function(response, formattedSource){
                     });
         formattedSource.protData =  {
             'com.widevine.alpha':{
-                'laURL' : protDataWV ? protDataWV.laUrl : ''
+                'laURL' : protDataWV ? protDataWV.laUrl : '',
+                'withCredentials':true
             },
             'com.microsoft.playready':{
                 'laURL' : protDataPR ? protDataPR.laUrl : '',
+                'withCredentials': true
             }
         };
     }
