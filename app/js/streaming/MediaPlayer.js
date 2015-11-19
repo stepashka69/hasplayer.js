@@ -627,6 +627,19 @@ MediaPlayer = function(aContext) {
         },
 
         /**
+         * function used to enable/disable subtitle download
+         * @access public
+         * @memberof MediaPlayer#
+         * @param  enabled - boolean true if the download of subtitle need to be enabled
+        */
+        enableSubtitles:function(enabled){
+            if(streamController){
+                streamController.enableSubtitles(enabled);
+            }  
+        },
+
+
+        /**
          * get the subtitle track list
          * @access public
          * @memberof MediaPlayer#

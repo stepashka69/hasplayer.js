@@ -69,6 +69,7 @@ OrangeHasPlayer = function() {
         this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
+            mediaPlayer.enableSubtitles(isSubtitleVisible);
         }
     };
 
@@ -973,6 +974,7 @@ OrangeHasPlayer = function() {
         }
 
         video.textTracks[0].mode = (value === true) ? 'showing' : 'hidden';
+        mediaPlayer.enableSubtitles(value);
     };
 
     /**
