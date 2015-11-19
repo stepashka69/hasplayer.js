@@ -842,11 +842,8 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredVideoData.then(
                     function(data) {
-                        videoController.updateData(data, periodInfo).then(
-                            function() {
-                                deferredVideoUpdate.resolve();
-                            }
-                        );
+                        videoController.updateData(data, periodInfo);
+                        deferredVideoUpdate.resolve();
                     }
                 );
             } else {
@@ -858,11 +855,8 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredAudioData.then(
                     function(data) {
-                        audioController.updateData(data, periodInfo).then(
-                            function() {
-                                deferredAudioUpdate.resolve();
-                            }
-                        );
+                        audioController.updateData(data, periodInfo);
+                        deferredAudioUpdate.resolve();
                     }
                 );
             } else {
@@ -874,11 +868,8 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredTextData.then(
                     function(data) {
-                        textController.updateData(data, periodInfo).then(
-                            function() {
-                                deferredTextUpdate.resolve();
-                            }
-                        );
+                        textController.updateData(data, periodInfo);
+                        deferredTextUpdate.resolve();
                     }
                 );
             }
