@@ -27,6 +27,7 @@ MediaPlayer.dependencies.BufferController = function() {
         //mseSetTime = false,
         seekTarget = -1,
         dataChanged = true,
+        languageChanged = false,
         availableRepresentations,
         currentRepresentation,
         currentBufferedQuality = -1,
@@ -371,55 +372,60 @@ MediaPlayer.dependencies.BufferController = function() {
                     Q.when(deferredBuffersFlatten ? deferredBuffersFlatten.promise : true).then(
                         function() {
                             if (!hasData()) return;
-                            self.debug.log("[BufferController][" + type + "] Buffering segment");
-                            self.sourceBufferExt.append(buffer, data, appendSync).then(
-                                function( /*appended*/ ) {
-                                    self.debug.log("[BufferController][" + type + "] Segment buffered");
-                                    //self.debug.log("[BufferController]["+type+"] Data has been appended for quality = "+quality+" index = "+index);
-                                    if (currentBufferedQuality != quality) {
-                                        isFirstMediaSegment = true;
-                                        self.debug.log("[BufferController][" + type + "] set currentBufferedQuality to " + quality);
-                                        currentBufferedQuality = quality;
-                                    }
+                            // Clear the buffer if required (language track switching)
+                            clearBuffer.call(self).then(
+                                function() {
+                                    self.debug.log("[BufferController][" + type + "] Buffering segment");
+                                    self.sourceBufferExt.append(buffer, data, appendSync).then(
+                                        function( /*appended*/ ) {
+                                            self.debug.log("[BufferController][" + type + "] Segment buffered");
+                                            //self.debug.log("[BufferController]["+type+"] Data has been appended for quality = "+quality+" index = "+index);
+                                            if (currentBufferedQuality != quality) {
+                                                isFirstMediaSegment = true;
+                                                self.debug.log("[BufferController][" + type + "] set currentBufferedQuality to " + quality);
+                                                currentBufferedQuality = quality;
+                                            }
 
-                                    isQuotaExceeded = false;
+                                            isQuotaExceeded = false;
 
-                                    // In case of live streams, remove outdated buffer parts and requests
-                                    if (isDynamic) {
-                                        removeBuffer.call(self, -1, self.videoModel.getCurrentTime() - minBufferTime).then(
-                                            function() {
+                                            // In case of live streams, remove outdated buffer parts and requests
+                                            if (isDynamic) {
+                                                removeBuffer.call(self, -1, self.videoModel.getCurrentTime() - minBufferTime).then(
+                                                    function() {
+                                                        debugBufferRange.call(self);
+                                                        deferred.resolve();
+                                                    }
+                                                );
+                                            } else {
                                                 debugBufferRange.call(self);
                                                 deferred.resolve();
                                             }
-                                        );
-                                    } else {
-                                        debugBufferRange.call(self);
-                                        deferred.resolve();
-                                    }
 
-                                    self.system.notify("bufferUpdated");
-                                },
-                                function(result) {
-                                    var data = {};
-                                    data.currentTime = self.videoModel.getCurrentTime();
+                                            self.system.notify("bufferUpdated");
+                                        },
+                                        function(result) {
+                                            var data = {};
+                                            data.currentTime = self.videoModel.getCurrentTime();
 
-                                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_APPEND_SOURCEBUFFER, result.err.code + ':' + result.err.message, data);
-                                    // if the append has failed because the buffer is full we should store the data
-                                    // that has not been appended and stop request scheduling. We also need to store
-                                    // the promise for this append because the next data can be appended only after
-                                    // this promise is resolved.
-                                    if (result.err.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_QUOTA_EXCEEDED) {
-                                        rejectedBytes = {
-                                            data: data,
-                                            quality: quality,
-                                            index: index
-                                        };
-                                        deferredRejectedDataAppend = deferred;
-                                        isQuotaExceeded = true;
-                                        fragmentsToLoad = 0;
-                                        // stop scheduling new requests
-                                        doStop.call(self);
-                                    }
+                                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_APPEND_SOURCEBUFFER, result.err.code + ':' + result.err.message, data);
+                                            // if the append has failed because the buffer is full we should store the data
+                                            // that has not been appended and stop request scheduling. We also need to store
+                                            // the promise for this append because the next data can be appended only after
+                                            // this promise is resolved.
+                                            if (result.err.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_QUOTA_EXCEEDED) {
+                                                rejectedBytes = {
+                                                    data: data,
+                                                    quality: quality,
+                                                    index: index
+                                                };
+                                                deferredRejectedDataAppend = deferred;
+                                                isQuotaExceeded = true;
+                                                fragmentsToLoad = 0;
+                                                // stop scheduling new requests
+                                                doStop.call(self);
+                                            }
+                                        }
+                                    );
                                 }
                             );
                         }
@@ -628,6 +634,39 @@ MediaPlayer.dependencies.BufferController = function() {
             };
 
             startClearing.call(self);
+
+            return deferred.promise;
+        },
+
+        clearBuffer = function() {
+            var self = this,
+                deferred = Q.defer(),
+                start,
+                end;
+
+            // Clear buffer only if language has changed
+            if (languageChanged === false) {
+                return Q.when(true);
+            }
+
+            if (buffer.buffered.length === 0) {
+                return Q.when(true);
+            }
+
+            start = self.getVideoModel().getCurrentTime();
+            end = buffer.buffered.end(buffer.buffered.length - 1);
+
+            self.debug.log("[BufferController][" + type + "] Language changed => clear buffer");
+            self.sourceBufferExt.remove(buffer, start, end, periodInfo.duration, mediaSource, appendSync).then(
+                function() {
+                    // Remove all requests from the list of the executed requests
+                    self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, end);
+                    languageChanged = false;
+                    deferred.resolve();
+                }/*, function() {
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "impossible to remove data from SourceBuffer");
+                }*/
+            );
 
             return deferred.promise;
         },
@@ -939,8 +978,9 @@ MediaPlayer.dependencies.BufferController = function() {
             var timeToEnd = getTimeToEnd.call(self);
             self.debug.log("[BufferController][" + type + "] time to end = " + timeToEnd);
 
-            if ((bufferLevel < minBufferTime) &&
-                ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted))) {
+            if (languageChanged ||
+                ((bufferLevel < minBufferTime) &&
+                ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)))) {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
                 lastBufferLevel = bufferLevel;
@@ -1342,40 +1382,22 @@ MediaPlayer.dependencies.BufferController = function() {
 
         updateData: function(newData, newPeriodInfo) {
             var self = this,
-                deferred = Q.defer(),
-                languageChanged = (data && (data.lang !== newData.lang)) ? true : false;
+                deferred = Q.defer();
 
             self.debug.log("[BufferController][" + type + "] Update data");
 
             // Set the new data
+            languageChanged = (data && (data.lang !== newData.lang)) ? true : false;
             data = newData;
             periodInfo = newPeriodInfo;
             dataChanged = true;
 
-            // If data language changed (audio or text)
+            // If data language changed (audio or text) then seek to current time
+            // in order to switch to new language as soon as possible (see appendToBuffer())
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
-
-                // => Cancel current requests in order to perform the language switch as soon as possible
-                self.fragmentController.cancelPendingRequestsForModel(fragmentModel);
-                self.fragmentController.abortRequestsForModel(fragmentModel);
-
-                // => Remove past buffered from previous language
-                var currentTime = self.getVideoModel().getCurrentTime();
-                var seekTime = currentTime + 3;
-                removeBuffer.call(self, -1, currentTime).then(
-                    function() {
-                        // => Remove some already buffered in order to perform the language switch before waiting minBufferTime
-                        removeBuffer.call(self, seekTime).then(
-                            function() {
-                                debugBufferRange.call(self);
-                                // => restart
-                                doSeek.call(self, seekTime);
-                                deferred.resolve();
-                            }
-                        );
-                    }
-                );
+                doSeek.call(self, self.getVideoModel().getCurrentTime());
+                deferred.resolve();
             } else if (recoveryTime !== -1 && segmentDownloadFailed) {
                 // TODO: setCurrentTime() does not work since the recovery time is anterior to the current video time,
                 // then it will seek to current time.
