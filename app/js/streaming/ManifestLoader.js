@@ -18,7 +18,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
     var RETRY_ATTEMPTS = 3,
         RETRY_INTERVAL = 500,
         deferred = null,
-        request = null,
+        request = new XMLHttpRequest(),
 
         getDecodedResponseText = function (text) {
             // Some content is not always successfully decoded by every browser.
@@ -58,11 +58,13 @@ MediaPlayer.dependencies.ManifestLoader = function () {
             return base;
         },
 
-        abort = function() {          
-            if (request) {
+        abort = function() {
+            if (request !== null && request.readyState > 0 && request.readyState < 4) {
                 this.debug.log("[ManifestLoader] Manifest download abort.");
                 request.abort();
             }
+
+            this.parser.abort();
         },
 
         doLoad = function (url, remainingAttempts, noRetry) {
@@ -75,11 +77,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 rejectWithoutRetry=null,
                 onabort = null,
                 self = this;
-
-            
-
-            request = new XMLHttpRequest();
-
+         
             onabort = function(){
                 request.aborted = true;
             };
@@ -89,7 +87,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                   return;
                 }
                 
-                if (request.status === 200 && request.readyState === 4 ){
+                if (request.status === 200 && request.readyState === 4) {
                     self.debug.log("[ManifestLoader] Manifest downloaded");
                     
                     //ORANGE : Get the redirection URL and use it as base URL
