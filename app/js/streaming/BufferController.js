@@ -740,14 +740,16 @@ MediaPlayer.dependencies.BufferController = function() {
             if (!segmentDownloadFailed && (bufferLevel !== 0)) {
                 segmentDownloadFailed = true;
                 recoveryTime = e.startTime + e.duration;
-            } /*else {
+            } //else {
 
-            this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
-                "Failed to download " + type + " segment at time = " + e.startTime, {
-                    url: e.url,
-                    request: e
-                });
-            }*/
+            // If buffer is empty then raise an error
+            if (bufferLevel === 0) {
+                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
+                    "Failed to download " + type + " segment at time = " + e.startTime, {
+                        url: e.url,
+                        request: e
+                    });
+            }
 
             this.debug.warn("Failed to download " + type + " segment at time = " + e.startTime + ", url =  " + e.url);
         },
