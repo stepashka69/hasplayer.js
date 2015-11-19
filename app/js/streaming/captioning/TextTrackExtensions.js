@@ -38,17 +38,17 @@ MediaPlayer.utils.TextTrackExtensions = function () {
             //add one, only if it's necessary
             //deleteCues will be very efficient in this case
             if (video.textTracks.length === 0) {
-            //TODO: Ability to define the KIND in the MPD - ie subtitle vs caption....
+                //TODO: Ability to define the KIND in the MPD - ie subtitle vs caption....
                 track = video.addTextTrack("subtitles", label, scrlang);
+                // track.default is an object property identifier that is a reserved word
+                // The following jshint directive is used to suppressed the warning "Expected an identifier and instead saw 'default' (a reserved word)"
+                /*jshint -W024 */
+                track.default = isDefaultTrack;
+                track.mode = "showing";
             }else {
                 //this.deleteCues(video);
                 track = video.textTracks[0];
             }
-            // track.default is an object property identifier that is a reserved word
-            // The following jshint directive is used to suppressed the warning "Expected an identifier and instead saw 'default' (a reserved word)"
-            /*jshint -W024 */
-            track.default = isDefaultTrack;
-            track.mode = "showing";
 
             for(i = 0; i < captionData.length; i++) {
                 currentItem = captionData[i];
