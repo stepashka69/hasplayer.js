@@ -47,7 +47,7 @@ MediaPlayer.dependencies.Parser = function() {
         },
 
         reset = function() {
-            //_parser = null;
+            _parser = null;
         };
 
     return {
