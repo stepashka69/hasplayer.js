@@ -44,6 +44,7 @@ Hls.dependencies.HlsParser = function () {
         ATTR_LANGUAGE = "LANGUAGE",
         VAL_YES = "YES";*/
 
+    var playlistRequest = new XMLHttpRequest();
 
     var _splitLines = function(oData) {
         oData = oData.split('\n');
@@ -194,7 +195,7 @@ Hls.dependencies.HlsParser = function () {
         return streamsArray;
     };
 
-    var _parsePlaylist = function(deferred, data, representation) {
+    var _parsePlaylist = function(data, representation) {
         var segmentList,
             segments,
             segment,
@@ -208,18 +209,16 @@ Hls.dependencies.HlsParser = function () {
         
         // Check playlist header
         if (!data || (data && data.length < 0)){
-            deferred.reject();
-            return;
+            return false;
         }
 
         self.debug.log(data);
 
         data = _splitLines(data);
 
-        if (data[0].trim() !== TAG_EXTM3U){
-            deferred.reject();
-            return;
-        }      
+        if (data[0].trim() !== TAG_EXTM3U) {
+            return false;
+        }
 
         // Intitilaize SegmentList
         segmentList = {
@@ -282,7 +281,8 @@ Hls.dependencies.HlsParser = function () {
 
         // PATCH Live = VOD
         //representation.duration = duration;
-        deferred.resolve();
+
+        return true;
     };
 
     /*var mergeSegmentLists = function(_representation, representation) {
@@ -470,6 +470,53 @@ Hls.dependencies.HlsParser = function () {
         }
 
         return base;
+    };
+
+
+    var doUpdatePlaylist = function (representation) {
+        var deferred = Q.defer(),
+            error = true,
+            self = this;
+
+        var onabort = function() {
+            playlistRequest.aborted = true;
+        };
+
+        var onload = function () {
+            if (playlistRequest.status < 200 || playlistRequest.status > 299) {
+                return;
+            }
+            
+            if (playlistRequest.status === 200 && playlistRequest.readyState === 4) {
+                error = false;
+                if (_parsePlaylist.call(self, playlistRequest.response, representation)) {
+                    deferred.resolve();
+                } else {
+                    deferred.reject();
+                }
+            }
+        };
+
+        var onreport = function () {
+            if (!error) {
+                return;
+            }
+            deferred.reject();
+        };
+
+        try {
+            //this.debug.log("Start loading manifest: " + url);
+            playlistRequest.onload = onload;
+            playlistRequest.onloadend = onreport;
+            playlistRequest.onerror = onreport;
+            playlistRequest.onabort = onabort;
+            playlistRequest.open("GET", representation.url, true);
+            playlistRequest.send();
+        } catch(e) {
+            playlistRequest.onerror();
+        }
+
+        return deferred.promise;
     };
 
     var processManifest = function(data, baseUrl) {
@@ -661,8 +708,11 @@ Hls.dependencies.HlsParser = function () {
         return processManifest.call(this, _splitLines(data),baseUrl);
     };
 
-    var doUpdatePlaylist = function (representation) {
-        return MediaPlayer.utils.doRequestWithPromise.call(this, representation.url, _parsePlaylist, representation);
+    var abort = function () {
+        if (playlistRequest !== null && playlistRequest.readyState > 0 && playlistRequest.readyState < 4) {
+            this.debug.log("[HlsParser] Playlist manifest download abort.");
+            playlistRequest.abort();
+        }
     };
 
     return {
@@ -673,7 +723,8 @@ Hls.dependencies.HlsParser = function () {
         hlsDemux: undefined,
 
         parse: internalParse,
-        updatePlaylist: doUpdatePlaylist
+        updatePlaylist: doUpdatePlaylist,
+        abort: abort
     };
 };
 

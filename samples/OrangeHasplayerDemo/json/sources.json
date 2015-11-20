@@ -3,15 +3,29 @@
         {
             "type": "Live",
             "protocol": "HLS",
-            "name": "VIMTV",
-            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
+            "name": "VIMTV1",
+            "url": "http://161.105.253.166/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV2",
-            "url": "http://vimtv2.orange-labs.fr/streaming/1.m3u8",
+            "url": "http://161.105.253.166/streaming/2.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "HLS",
+            "name": "VIMTV3",
+            "url": "http://161.105.253.166/streaming/3.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "HLS",
+            "name": "VIMTV4",
+            "url": "http://161.105.253.166/streaming/4.m3u8",
             "browsers": "cdsbi"
         },
         {

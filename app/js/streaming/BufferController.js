@@ -872,7 +872,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
                 signalSegmentBuffered.call(self);
                 if (htmlVideoState != BUFFERING) {
-                    // HLS use case => download playlist for new representation
+                    // HLS use case => update current representation playlist
                     if ((manifest.name === "M3U") && isDynamic) {
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
                             function() {
@@ -1061,7 +1061,6 @@ MediaPlayer.dependencies.BufferController = function() {
                                             playlistUpdated.resolve();
                                         },
                                         function() {
-                                            self.debug.log("[BufferController][" + type + "] loadNextFragment Error occurs in hls parsing");
                                             playlistUpdated.reject();
                                         }
                                     );
@@ -1094,6 +1093,9 @@ MediaPlayer.dependencies.BufferController = function() {
                                         //        2 - Buffer level is checked once next fragment data has been pushed into buffer (@see checkIfSufficientBuffer())
                                         loadNextFragment.call(self);
                                     }
+                                },
+                                function() {
+                                    signalSegmentBuffered();
                                 }
                             );
                         }
@@ -1383,8 +1385,7 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         updateData: function(newData, newPeriodInfo) {
-            var self = this,
-                deferred = Q.defer();
+            var self = this;
 
             self.debug.log("[BufferController][" + type + "] Update data");
 
@@ -1399,18 +1400,12 @@ MediaPlayer.dependencies.BufferController = function() {
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
                 doSeek.call(self, self.getVideoModel().getCurrentTime());
-                deferred.resolve();
             } else if (recoveryTime !== -1 && segmentDownloadFailed) {
                 // TODO: setCurrentTime() does not work since the recovery time is anterior to the current video time,
                 // then it will seek to current time.
                 // The setCurrentTime has to be done once we have buffered some new segments
                 this.videoModel.setCurrentTime(recoveryTime);
-                deferred.resolve();
-            } else {
-                deferred.resolve();
             }
-
-            return deferred.promise;
         },
 
         getCurrentRepresentation: function() {

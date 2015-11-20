@@ -31,26 +31,27 @@ MediaPlayer.utils.TextTrackExtensions = function () {
 
         addTextTrack: function(video, captionData,  label, scrlang, isDefaultTrack) {
             var track = null,
+                currentItem = null,
                 i;
 
             //no function removeTextTrack is defined
             //add one, only if it's necessary
             //deleteCues will be very efficient in this case
             if (video.textTracks.length === 0) {
-            //TODO: Ability to define the KIND in the MPD - ie subtitle vs caption....
+                //TODO: Ability to define the KIND in the MPD - ie subtitle vs caption....
                 track = video.addTextTrack("subtitles", label, scrlang);
+                // track.default is an object property identifier that is a reserved word
+                // The following jshint directive is used to suppressed the warning "Expected an identifier and instead saw 'default' (a reserved word)"
+                /*jshint -W024 */
+                track.default = isDefaultTrack;
+                track.mode = "showing";
             }else {
                 //this.deleteCues(video);
                 track = video.textTracks[0];
             }
-            // track.default is an object property identifier that is a reserved word
-            // The following jshint directive is used to suppressed the warning "Expected an identifier and instead saw 'default' (a reserved word)"
-            /*jshint -W024 */
-            track.default = isDefaultTrack;
-            track.mode = "showing";
 
             for(i = 0; i < captionData.length; i++) {
-                var currentItem = captionData[i];
+                currentItem = captionData[i];
                 track.addCue(new Cue(currentItem.start, currentItem.end, currentItem.data));
             }
 
@@ -65,35 +66,45 @@ MediaPlayer.utils.TextTrackExtensions = function () {
         //         not only during track initialization
 
         addCues: function(track, captionData) {
+            var i = 0,
+                currentItem = null,
+                newCue = null;
 
-            for(var i = 0; i < captionData.length; i++) {
-                var currentItem = captionData[i];
-                var newCue = new Cue(currentItem.start, currentItem.end, currentItem.data);
+            for(i = 0; i < captionData.length; i++) {
+                currentItem = captionData[i];
+                if (currentItem.start < currentItem.end) {
+                    newCue = new Cue(currentItem.start, currentItem.end, currentItem.data);
 
-                newCue.onenter = this.onCueEnter.bind(this);
+                    newCue.onenter = this.onCueEnter.bind(this);
 
-                newCue.snapToLines = false;
+                    newCue.snapToLines = false;
 
-                newCue.line = currentItem.line;
+                    newCue.line = currentItem.line;
 
-                if (currentItem.style) {
-                    newCue.style = currentItem.style;
+                    if (currentItem.style) {
+                        newCue.style = currentItem.style;
+                    }
+
+                    track.addCue(newCue);
                 }
-
-                track.addCue(newCue);
             }
         },
 
         deleteCues: function(video, disabled) {
+            var track = null,
+                cues = null,
+                lastIdx = null,
+                i = 0;
+
             //when multiple tracks are supported - iterate through and delete all cues from all tracks.
             if (video) {
-                var track = video.textTracks[0];
+                track = video.textTracks[0];
                 if (track) {
-                    var cues = track.cues;
+                    cues = track.cues;
                     if (cues) {
-                        var lastIdx = cues.length - 1;
+                        lastIdx = cues.length - 1;
 
-                        for (var i = lastIdx; i >= 0 ; i -= 1) {
+                        for (i = lastIdx; i >= 0 ; i -= 1) {
                             track.removeCue(cues[i]);
                         }
                     }
