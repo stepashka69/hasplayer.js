@@ -653,10 +653,11 @@ MediaPlayer.dependencies.BufferController = function() {
                 return Q.when(true);
             }
 
-            start = self.getVideoModel().getCurrentTime();
+            start = buffer.buffered.start(0);
             end = buffer.buffered.end(buffer.buffered.length - 1);
 
             self.debug.log("[BufferController][" + type + "] Language changed => clear buffer");
+            self.sourceBufferExt.abort(mediaSource, buffer);
             self.sourceBufferExt.remove(buffer, start, end, periodInfo.duration, mediaSource, appendSync).then(
                 function() {
                     // Remove all requests from the list of the executed requests
@@ -1399,7 +1400,7 @@ MediaPlayer.dependencies.BufferController = function() {
             // in order to switch to new language as soon as possible (see appendToBuffer())
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
-                doSeek.call(self, self.getVideoModel().getCurrentTime());
+                doSeek.call(self, self.getVideoModel().getCurrentTime() - 1); // -1 to avoid playing discontinuity
             } else if (recoveryTime !== -1 && segmentDownloadFailed) {
                 // TODO: setCurrentTime() does not work since the recovery time is anterior to the current video time,
                 // then it will seek to current time.
