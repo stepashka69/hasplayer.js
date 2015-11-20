@@ -556,6 +556,7 @@
 
         refreshManifest: function(url, isIntern){
             var self = this;
+            this.manifestLoader.abort();
             this.manifestLoader.load(url,true).then(
                 function(manifestResult) {
                     self.manifestModel.setValue(manifestResult);
