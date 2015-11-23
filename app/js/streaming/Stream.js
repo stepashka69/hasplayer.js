@@ -25,6 +25,7 @@ MediaPlayer.dependencies.Stream = function() {
         audioController = null,
         audioTrackIndex = -1,
         textController = null,
+        subtitlesEnabled = false,
         textTrackIndex = -1,
         autoPlay = true,
         initialized = false,
@@ -624,8 +625,7 @@ MediaPlayer.dependencies.Stream = function() {
                     audioController.seek(time);
                 }
             }
-
-            if (textController) {
+            if (textController && subtitlesEnabled) {
                 if (time === undefined) {
                     textController.start();
                 } else {
@@ -742,7 +742,7 @@ MediaPlayer.dependencies.Stream = function() {
 
         // ORANGE: 'liveEdgeFound' event raised when live edge has been found on video stream
         // => then seek every BufferController at the found live edge time
-        onLiveEdgeFound = function(liveEdgeTime) {
+        onCurrentTimeFound = function(liveEdgeTime) {
 
             //var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
             this.debug.info("[Stream] ### LiveEdge = " + liveEdgeTime);
@@ -753,7 +753,7 @@ MediaPlayer.dependencies.Stream = function() {
             if (audioController) {
                 audioController.seek(liveEdgeTime);
             }
-            if (textController) {
+            if (textController && subtitlesEnabled) {
                 textController.seek(liveEdgeTime);
             }
         },
@@ -842,8 +842,11 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredVideoData.then(
                     function(data) {
-                        videoController.updateData(data, periodInfo);
-                        deferredVideoUpdate.resolve();
+                        videoController.updateData(data, periodInfo).then(
+                            function() {
+                                deferredVideoUpdate.resolve();
+                            }
+                        );
                     }
                 );
             } else {
@@ -855,8 +858,11 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredAudioData.then(
                     function(data) {
-                        audioController.updateData(data, periodInfo);
-                        deferredAudioUpdate.resolve();
+                        audioController.updateData(data, periodInfo).then(
+                            function() {
+                                deferredAudioUpdate.resolve();
+                            }
+                        );
                     }
                 );
             } else {
@@ -868,8 +874,11 @@ MediaPlayer.dependencies.Stream = function() {
 
                 deferredTextData.then(
                     function(data) {
-                        textController.updateData(data, periodInfo);
-                        deferredTextUpdate.resolve();
+                        textController.updateData(data, periodInfo).then(
+                            function() {
+                                deferredTextUpdate.resolve();
+                            }
+                        );
                     }
                 );
             }
@@ -923,7 +932,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.system.mapHandler("bufferingCompleted", undefined, bufferingCompleted.bind(this));
             this.system.mapHandler("segmentLoadingFailed", undefined, segmentLoadingFailed.bind(this));
             // ORANGE: add event handler "liveEdgeFound"
-            this.system.mapHandler("liveEdgeFound", undefined, onLiveEdgeFound.bind(this));
+            this.system.mapHandler("currentTimeFound", undefined, onCurrentTimeFound.bind(this));
 
             /* @if PROTECTION=true */
             // Protection event handlers
@@ -1161,6 +1170,20 @@ MediaPlayer.dependencies.Stream = function() {
         },
         resetEventController: function() {
             eventController.reset();
+        },
+
+        enableSubtitles: function(enabled){
+            if(enabled !== subtitlesEnabled){
+                subtitlesEnabled  = enabled;
+                if(textController){
+                    if(enabled){
+                        var time = this.videoModel.getCurrentTime();
+                        textController.seek(time);
+                    }else{
+                        textController.stop();
+                    }
+                }    
+            }
         },
 
         updateData: updateData,

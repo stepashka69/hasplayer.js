@@ -648,6 +648,12 @@
             defaultSubtitleLang = language;
         },
 
+        enableSubtitles: function(enabled){
+            if(activeStream){
+                activeStream.enableSubtitles(enabled);
+            }
+        },
+
         play: play,
         seek: seek,
         pause: pause

@@ -25,7 +25,7 @@ OrangeHasPlayer = function() {
         debug,
         video,
         isFullScreen = false,
-        isSubtitleVisible = true,
+        isSubtitleVisible = false,
         audioTracks = [],
         subtitleTracks = [],
         videoQualityChanged = [],
@@ -69,6 +69,7 @@ OrangeHasPlayer = function() {
         this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
+            mediaPlayer.enableSubtitles(isSubtitleVisible);
         }
     };
 
@@ -967,6 +968,7 @@ OrangeHasPlayer = function() {
         }
 
         isSubtitleVisible = value;
+        mediaPlayer.enableSubtitles(value);
 
         if (video.textTracks.length === 0) {
             return;
