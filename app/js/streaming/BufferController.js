@@ -584,7 +584,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
             // If buffering process is running, then we interrupt it
             signalSegmentBuffered.call(self);
-
+            
             return false;
         },
 
@@ -655,14 +655,16 @@ MediaPlayer.dependencies.BufferController = function() {
 
             start = buffer.buffered.start(0);
             end = buffer.buffered.end(buffer.buffered.length - 1);
-
             self.debug.log("[BufferController][" + type + "] Language changed => clear buffer");
             self.sourceBufferExt.abort(mediaSource, buffer);
             self.sourceBufferExt.remove(buffer, start, end, periodInfo.duration, mediaSource, appendSync).then(
                 function() {
                     // Remove all requests from the list of the executed requests
                     self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, end);
+                    self.fragmentController.cancelPendingRequestsForModel(fragmentModel);
                     languageChanged = false;
+                    seeking = true;
+                    seekTarget = self.videoModel.getCurrentTime();
                     deferred.resolve();
                 }/*, function() {
                     self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "impossible to remove data from SourceBuffer");
@@ -1000,8 +1002,17 @@ MediaPlayer.dependencies.BufferController = function() {
 
             clearTimeout(bufferTimeout);
             bufferTimeout = setTimeout(function() {
+                bufferTimeout = null;
                 checkIfSufficientBuffer.call(self);
             }, Math.max((delay * 1000), 2000));
+        },
+
+        cancelCheckBufferTimeout = function() {
+            if (bufferTimeout) {
+                clearTimeout(bufferTimeout);
+                bufferTimeout = null;
+                checkIfSufficientBuffer.call(this);
+            }
         },
 
         bufferFragment = function() {
@@ -1016,7 +1027,7 @@ MediaPlayer.dependencies.BufferController = function() {
             if (deferredFragmentBuffered !== null) {
                 self.debug.error("[BufferController][" + type + "] deferredFragmentBuffered has not been resolved, create a new one is not correct.");
             }
-
+            
             deferredFragmentBuffered = Q.defer();
 
             self.debug.log("[BufferController][" + type + "] Start buffering process...");
@@ -1400,7 +1411,7 @@ MediaPlayer.dependencies.BufferController = function() {
             // in order to switch to new language as soon as possible (see appendToBuffer())
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
-                doSeek.call(self, self.getVideoModel().getCurrentTime() - 1); // -1 to avoid playing discontinuity
+                cancelCheckBufferTimeout.call(this);
             } else if (recoveryTime !== -1 && segmentDownloadFailed) {
                 // TODO: setCurrentTime() does not work since the recovery time is anterior to the current video time,
                 // then it will seek to current time.
