@@ -1264,7 +1264,6 @@ MediaPlayer.dependencies.BufferController = function() {
             self.setScheduler(scheduler);
             self.setFragmentController(fragmentController);
             self.setEventController(eventController);
-
             minBufferTime = self.config.getParamFor(type, "BufferController.minBufferTime", "number", -1);
             minBufferTimeAtStartup = self.config.getParamFor(type, "BufferController.minBufferTimeForPlaying", "number", 0);
 
@@ -1284,36 +1283,33 @@ MediaPlayer.dependencies.BufferController = function() {
                                 fragmentDuration = currentRepresentation.segmentDuration;
 
                                 self.indexHandler.setIsDynamic(isDynamic);
-                                self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer).then(
-                                    function(time) {
-                                        minBufferTime = (minBufferTime === -1) ? time : minBufferTime;
-                                    }
-                                );
-
-                                if (isDynamic) {
-                                    if (type === "video") {
+                                if(minBufferTime === -1){
+                                    minBufferTime = self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer);
+                                }
+                                if (type === "video") {
+                                    if (isDynamic) {
                                         self.indexHandler.updateSegmentList(currentRepresentation).then(
                                             function() {
                                                 getLiveEdgeTime.call(self).then(
                                                     function(time) {
                                                         //self.seek(time);
-                                                        self.system.notify("liveEdgeFound", time);
+                                                        self.system.notify("currentTimeFound", time);
                                                         //ORANGE : used to test Live chunk download failure
                                                         //testTimeLostChunk = time+20;
                                                     }
                                                 );
                                             }
                                         );
-                                    }
-                                } else {
-                                    self.indexHandler.getCurrentTime(currentRepresentation).then(
-                                        function(time) {
-                                            if (time < currentRepresentation.segmentAvailabilityRange.start) {
-                                                time = currentRepresentation.segmentAvailabilityRange.start;
+                                    }else {
+                                        self.indexHandler.getCurrentTime(currentRepresentation).then(
+                                            function(time) {
+                                                if (time < currentRepresentation.segmentAvailabilityRange.start) {
+                                                    time = currentRepresentation.segmentAvailabilityRange.start;
+                                                }
+                                                self.system.notify("currentTimeFound", time);
                                             }
-                                            self.seek(time);
-                                        }
-                                    );
+                                        );
+                                    }
                                 }
                             }
                         }
