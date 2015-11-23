@@ -657,7 +657,10 @@ MediaPlayer.dependencies.BufferController = function() {
             end = buffer.buffered.end(buffer.buffered.length - 1);
 
             self.debug.log("[BufferController][" + type + "] Language changed => clear buffer");
-            self.sourceBufferExt.abort(mediaSource, buffer);
+            if(type !== "text"){
+                // no need to abort for text buffer. remove call do the same thing
+                self.sourceBufferExt.abort(mediaSource, buffer);
+            }
             self.sourceBufferExt.remove(buffer, start, end, periodInfo.duration, mediaSource, appendSync).then(
                 function() {
                     // Remove all requests from the list of the executed requests
