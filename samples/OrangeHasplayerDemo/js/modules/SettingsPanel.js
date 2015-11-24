@@ -174,6 +174,8 @@ SettingsPanel.prototype.updateAudioData = function(_audioTracks, _selectedAudioT
 SettingsPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
     //init subtitles tracks
     this.subtitleTracks = _subtitleTracks;
+    //if no subtitles, disabled subtitle checkbox.
+    this.enableSubtitlesCheckbox.disabled = this.subtitleTracks.length > 0 ? false : true;
     this.currentsubtitleTrack = _selectedSubtitleTrack;
 
     if (this.subtitleTracks && this.currentsubtitleTrack) {
@@ -226,6 +228,9 @@ SettingsPanel.prototype.resetCombo = function(tracks, combo) {
 SettingsPanel.prototype.reset = function() {
     this.resetCombo(this.audioTracks, this.audioListCombobox);
     this.resetCombo(this.subtitleTracks, this.subtitleListCombobox);
+
+    this.subtitleListCombobox.disabled = true;
+    this.enableSubtitlesCheckbox.checked = false;
 
     this.currentaudioTrack = null;
     this.currentsubtitleTrack = null;
