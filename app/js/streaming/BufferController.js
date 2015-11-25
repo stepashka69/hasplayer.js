@@ -392,7 +392,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
                                     // In case of live streams, remove outdated buffer parts and requests
                                     if (isDynamic) {
-                                        removeBuffer.call(self, -1, self.videoModel.getCurrentTime() - minBufferTime).then(
+                                        removeBuffer.call(self, -1, getWorkingTime.call(self) - 2).then(
                                             function() {
                                                 debugBufferRange.call(self);
                                                 deferred.resolve();
@@ -911,13 +911,12 @@ MediaPlayer.dependencies.BufferController = function() {
         getWorkingTime = function() {
             var time = -1;
 
-            time = this.videoModel.getCurrentTime();
-
-            // PATCH: in case of live stream, if live edge has not already been found
-            // then working time is the live edge (= seek target)
-            if (isDynamic && this.videoModel.isPaused()) {
+            if (this.videoModel.isPaused()) {
                 time = seekTarget;
+            } else {
+                time = this.videoModel.getCurrentTime();
             }
+            this.debug.log("[BufferController][" + type + "] Working time: " + time + " (paused = " + this.videoModel.isPaused() + ")");
 
             return time;
         },
