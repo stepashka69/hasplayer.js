@@ -230,8 +230,28 @@ MediaPlayer.dependencies.ProtectionController = function () {
             }
         },
 
+        getSoapError = function(serverResponse){
+            var stringResponse = String.fromCharCode.apply(null, new Uint8Array(serverResponse)),
+                xmlDoc = this.domParser.createXmlTree(stringResponse),
+                enveloppe = xmlDoc !== null ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null, 
+                body = enveloppe !== null ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
+                fault = body !== null ? this.domParser.getChildNode(body, "soap:Fault") : null,
+                faultcode = null,
+                faultstring = null,
+                detail = null;
+
+                if (fault) {
+                    faultcode = this.domParser.getChildNode(fault, "faultcode").firstChild.nodeValue;
+                    faultstring = this.domParser.getChildNode(fault, "faultstring").firstChild.nodeValue;
+                    return {code : faultcode, name : faultstring};
+                }
+                return null;
+        },
+
         onKeyMessage = function(e) {
-            var self = this;
+            var self = this,
+                licenseMessage = null,
+                soapError = null;
 
             if (e.error) {
                 this.debug.log(e.error);
@@ -313,8 +333,14 @@ MediaPlayer.dependencies.ProtectionController = function () {
                 if (this.status == 200) {
                     self.debug.log("[DRM] Received license response");
                     sendEvent(eventData);
-                    self.protectionModel.updateKeySession(sessionToken,
-                            licenseServerData.getLicenseMessage(this.response, keySystemString, messageType));
+                    licenseMessage = licenseServerData.getLicenseMessage(this.response, keySystemString, messageType);
+                    soapError = getSoapError.call(self, licenseMessage);
+                    if(!soapError){
+                        self.protectionModel.updateKeySession(sessionToken,licenseMessage);
+                    }else{
+                        sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
+                            'DRM: ' + keySystemString + ' '+soapError.name+' with error code = '+soapError.code);     
+                    }
                 } else {
                     sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
                             'DRM: ' + keySystemString + ' update, XHR status is "' + this.statusText + '" (' + this.status +
@@ -525,6 +551,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         protectionExt: undefined,
         keySystem: undefined,
         manifestExt: undefined,
+        domParser: undefined,
         sessionType: "temporary",
 
         setup : function () {
