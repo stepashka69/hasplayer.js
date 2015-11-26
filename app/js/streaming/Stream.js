@@ -68,6 +68,8 @@ MediaPlayer.dependencies.Stream = function() {
         protectionController,
         initializedeferred = null,
 
+        isReloading = false,
+
         // Encrypted Media Extensions
         onProtectionError = function(event) {
             if (protectionController && event && event.data && event.data.data && event.data.data.sessionToken) {
@@ -594,6 +596,15 @@ MediaPlayer.dependencies.Stream = function() {
             }
         },
 
+        onReload = function(time) {
+
+            // Ask for manifest refresh
+            // Then, once manifest has been refresh and data updated, we reload session (see updateData())
+            pause.call(this);
+            isReloading = true;
+            this.system.notify("manifestUpdate");
+        },
+
         updateBuffer = function() {
 
             if (videoController) {
@@ -740,21 +751,24 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
 
-        // ORANGE: 'liveEdgeFound' event raised when live edge has been found on video stream
-        // => then seek every BufferController at the found live edge time
-        onCurrentTimeFound = function(liveEdgeTime) {
+        // 'startTimeFound' event raised by video controller when start time has been found
+        // startTime = live edge for live streams
+        // startTime = first video segment time for static streams
+        // => then seek every BufferController at the found start time
+        onStartTimeFound = function(startTime) {
 
-            //var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
-            this.debug.info("[Stream] ### LiveEdge = " + liveEdgeTime);
+            this.debug.info("[Stream] ### Start time = " + startTime);
+
+            initialSeekTime = startTime;
 
             if (videoController) {
-                videoController.seek(liveEdgeTime);
+                videoController.seek(startTime);
             }
             if (audioController) {
-                audioController.seek(liveEdgeTime);
+                audioController.seek(startTime);
             }
             if (textController && subtitlesEnabled) {
-                textController.seek(liveEdgeTime);
+                textController.seek(startTime);
             }
         },
 
@@ -794,7 +808,7 @@ MediaPlayer.dependencies.Stream = function() {
                 }
             }
 
-            self.debug.info("[Stream] Check start time: OK");
+            self.debug.info("[Stream] Check start time: OK => " + startTime);
 
             // Align audio and video buffers
             //self.sourceBufferExt.remove(audioController.getBuffer(), audioRange.start, videoRange.start, Infinity, mediaSource, false);
@@ -808,11 +822,15 @@ MediaPlayer.dependencies.Stream = function() {
                 self.system.notify("setCurrentTime");
                 self.videoModel.setCurrentTime(startTime);
             } else {
+                play.call(self);
                 currentTimeToSet = startTime;
             }
 
             // Resolve load promise in order to start playing (see doLoad)
-            load.resolve(null);
+            if (load !== null) {
+                load.resolve(null);
+                load = null;
+            }
         },
 
         updateData = function(updatedPeriodInfo) {
@@ -887,6 +905,14 @@ MediaPlayer.dependencies.Stream = function() {
                 function() {
                     // ORANGE: unnecessary since seek is performed into each BufferController
                     //updateCurrentTime.call(self);
+
+                    if (isReloading && videoController) {
+                        isReloading = false;
+                        self.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(self));
+                        videoController.load();
+                        //onReload.call(self, self.timelineConverter.calcPresentationStartTime(periodInfo));
+                    }
+
                     deferred.resolve();
                 }
             );
@@ -922,8 +948,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.system.mapHandler("setCurrentTime", undefined, currentTimeChanged.bind(this));
             this.system.mapHandler("bufferingCompleted", undefined, bufferingCompleted.bind(this));
             this.system.mapHandler("segmentLoadingFailed", undefined, segmentLoadingFailed.bind(this));
-            // ORANGE: add event handler "liveEdgeFound"
-            this.system.mapHandler("currentTimeFound", undefined, onCurrentTimeFound.bind(this));
+            this.system.mapHandler("startTimeFound", undefined, onStartTimeFound.bind(this));
+            this.system.mapHandler("needForReload", undefined, onReload.bind(this));
 
             /* @if PROTECTION=true */
             // Protection event handlers
@@ -1119,6 +1145,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.system.unmapHandler("setCurrentTime");
             this.system.unmapHandler("bufferingCompleted");
             this.system.unmapHandler("segmentLoadingFailed");
+            this.system.unmapHandler("needForReload");
 
             tearDownMediaSource.call(this).then(
                 function() {
@@ -1173,7 +1200,7 @@ MediaPlayer.dependencies.Stream = function() {
                     }else{
                         textController.stop();
                     }
-                }    
+                }
             }
         },
 

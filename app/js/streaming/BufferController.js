@@ -73,8 +73,11 @@ MediaPlayer.dependencies.BufferController = function() {
         appendSync = false,
 
         // ORANGE: segment downlaod failed recovery
+        SEGMENT_DOWNLOAD_ERROR_MAX = 5,
         segmentDownloadFailed = false,
+        segmentDownloadErrorCount = 0,
         recoveryTime = -1,
+        reloadTimeout = null,
 
         // ORANGE: HLS chunk sequence number
         currentSequenceNumber = -1,
@@ -212,6 +215,9 @@ MediaPlayer.dependencies.BufferController = function() {
             started = false;
             waitingForBuffer = false;
 
+            // Stop reload timeout
+            clearTimeout(reloadTimeout);
+
             // Stop buffering process and cancel loaded request
             clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.USER_REQUEST_STOP_REASON);
 
@@ -228,9 +234,6 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         onBytesLoaded = function(request, response) {
-
-            // Reset segment failed status
-            segmentDownloadFailed = false;
 
             // Store current segment sequence number for next segment request (HLS use case)
             if (request.sequenceNumber) {
@@ -293,6 +296,10 @@ MediaPlayer.dependencies.BufferController = function() {
             if (!isRunning()) {
                 return;
             }
+
+            // Reset segment download error status
+            segmentDownloadFailed = false;
+            segmentDownloadErrorCount = 0;
 
             self.debug.log("[BufferController][" + type + "] Media loaded ", request.url);
 
@@ -742,23 +749,28 @@ MediaPlayer.dependencies.BufferController = function() {
             }
 
             // Segment download failed
-            // => If first time, then try to recover missing segment (see updateBufferState())
-            // => Else raise an error
-            if (!segmentDownloadFailed && (bufferLevel !== 0)) {
-                segmentDownloadFailed = true;
-                recoveryTime = e.startTime + e.duration;
-            } //else {
-
-            // If buffer is empty then raise an error
-            if (bufferLevel === 0) {
+            segmentDownloadErrorCount += 1;
+            this.debug.warn("(" + segmentDownloadErrorCount + ") Failed to download " + type + " segment at time = " + e.startTime + ", url =  " + e.url);
+            
+            // => If failed SEGMENT_DOWNLOAD_ERROR_MAX times, then raise an error
+            // => Else try to reload session
+            if (segmentDownloadErrorCount === SEGMENT_DOWNLOAD_ERROR_MAX) {
                 this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
                     "Failed to download " + type + " segment at time = " + e.startTime, {
                         url: e.url,
                         request: e
                     });
-            }
+            } else {
+                recoveryTime = e.startTime + (e.duration * 1.5);
 
-            this.debug.warn("Failed to download " + type + " segment at time = " + e.startTime + ", url =  " + e.url);
+                // If already in buffering state (i.e. empty buffer) then reload session now
+                // Else reload session when entering in buffering state (see updateBufferState())
+                if (htmlVideoState === BUFFERING) {
+                    requestForReload.call(this, (e.duration * 1.5));
+                } else {
+                    segmentDownloadFailed = true;
+                }
+            }
         },
 
         signalStreamComplete = function( /*request*/ ) {
@@ -1024,8 +1036,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 currentVideoTime = self.videoModel.getCurrentTime(),
                 manifest = self.manifestModel.getValue(),
                 quality,
-                playlistUpdated = null,
-                defer = null;
+                playlistUpdated = null;
 
             if (deferredFragmentBuffered !== null) {
                 self.debug.error("[BufferController][" + type + "] deferredFragmentBuffered has not been resolved, create a new one is not correct.");
@@ -1237,6 +1248,22 @@ MediaPlayer.dependencies.BufferController = function() {
                         rules[i].execute(evt.data.request, callback);
                     }
                 });
+        },
+
+        requestForReload = function (delay) {
+            var self = this;
+
+            // Check if not already notified
+            if (reloadTimeout !== null) {
+                return;
+            }
+
+            this.debug.info("[BufferController][" + type + "] Reload session in " + delay + " s.");
+            reloadTimeout = setTimeout(function () {
+                reloadTimeout = null;
+                self.debug.info("[BufferController][" + type + "] Reload session");
+                self.system.notify("needForReload");
+            }, delay * 1000);
         };
 
     return {
@@ -1415,11 +1442,6 @@ MediaPlayer.dependencies.BufferController = function() {
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
                 cancelCheckBufferTimeout.call(this);
-            } else if (recoveryTime !== -1 && segmentDownloadFailed) {
-                // TODO: setCurrentTime() does not work since the recovery time is anterior to the current video time,
-                // then it will seek to current time.
-                // The setCurrentTime has to be done once we have buffered some new segments
-                this.videoModel.setCurrentTime(recoveryTime);
             }
         },
 
@@ -1473,25 +1495,13 @@ MediaPlayer.dependencies.BufferController = function() {
             // Detect stalled state (but not in seeking state)
             if (level <= 0 && htmlVideoState !== BUFFERING && this.videoModel.isSeeking() !== true) {
                 htmlVideoState = BUFFERING;
-                this.debug.log("[BufferController][" + type + "] BUFFERING - " + this.videoModel.getCurrentTime());
+                this.debug.log("[BufferController][" + type + "] BUFFERING - " + this.videoModel.getCurrentTime() + " - " + bufferLevel);
                 this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
 
-                // If buffering since a segment download failed
-                // => if live, then reload manifest
-                // => if VOD, seek to following segment
-                if (recoveryTime !== -1 && segmentDownloadFailed) {
-                    if (isDynamic) {
-                        //this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => reload manifest");
-                        //this.updateManifest();
-
-                        this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => error");
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT, "Failed to download " + type + " segment", null);
-
-                    } else {
-                        this.debug.info("[BufferController][" + type + "] BUFFERING - segment download failed => seek to following segment at time " + recoveryTime);
-                        this.videoModel.setCurrentTime(recoveryTime);
-                        recoveryTime = -1;
-                    }
+                // If buffering since a segment download failed, then ask for reloading session
+                if (segmentDownloadFailed > 0) {
+                    segmentDownloadFailed = false;
+                    requestForReload.call(this, recoveryTime - this.videoModel.getCurrentTime());
                 }
             } else if (level > 0 && htmlVideoState !== PLAYING) {
                 htmlVideoState = PLAYING;
