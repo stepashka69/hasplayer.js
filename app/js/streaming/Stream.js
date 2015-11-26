@@ -201,7 +201,7 @@ MediaPlayer.dependencies.Stream = function() {
             if (videoState !== null && audioState !== null && textTrackState !== null) {
                 if (videoState === "ready" && audioState === "ready" && textTrackState === "ready") {
                     if (videoController === null && audioController === null && textController === null) {
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No streams to play (" + msg + ")", manifest);
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No streams to play", manifest);
                         initializedeferred.reject();
                     } else {
                         //this.debug.log("MediaSource initialized!");
@@ -439,11 +439,12 @@ MediaPlayer.dependencies.Stream = function() {
             isPaused = this.videoModel.isPaused();
             if (initialSeekTime !== this.videoModel.getCurrentTime()) {
                 // ORANGE: we start the <video> element at the real start time got from the video buffer
-                // once the first fragment has been appended (see onBufferUpdated)
+                // once the first fragment has been appended (see onBufferUpdated())
                 this.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(self));
 
-            } else {
+            } else if (load !== null) {
                 load.resolve(null);
+                load = null;
             }
         },
 
@@ -470,7 +471,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.log("[Stream] Got play event.");
 
             // set the currentTime here to be sure that videoTag is ready to accept the seek (cause IE fail on set currentTime on BufferUpdate)
-            if ((currentTimeToSet !== 0) && (this.videoModel.getCurrentTime() === 0)) {
+            if (currentTimeToSet !== 0) {
                 this.system.notify("setCurrentTime");
                 this.videoModel.setCurrentTime(currentTimeToSet);
                 currentTimeToSet = 0;
