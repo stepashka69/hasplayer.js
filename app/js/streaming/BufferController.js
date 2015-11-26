@@ -1285,6 +1285,15 @@ MediaPlayer.dependencies.BufferController = function() {
             periodInfo = newPeriodInfo;
             dataChanged = true;
 
+            self.load();
+
+            ready = true;
+        },
+
+        load : function() {
+            var self = this,
+                manifest = self.manifestModel.getValue();
+
             doUpdateData.call(this).then(
                 function() {
                     // Retreive the representation of initial quality to enable some parameters initialization
@@ -1306,21 +1315,18 @@ MediaPlayer.dependencies.BufferController = function() {
                                             function() {
                                                 getLiveEdgeTime.call(self).then(
                                                     function(time) {
-                                                        //self.seek(time);
-                                                        self.system.notify("currentTimeFound", time);
-                                                        //ORANGE : used to test Live chunk download failure
-                                                        //testTimeLostChunk = time+20;
+                                                        self.system.notify("startTimeFound", time);
                                                     }
                                                 );
                                             }
                                         );
-                                    }else {
+                                    } else {
                                         self.indexHandler.getCurrentTime(currentRepresentation).then(
                                             function(time) {
                                                 if (time < currentRepresentation.segmentAvailabilityRange.start) {
                                                     time = currentRepresentation.segmentAvailabilityRange.start;
                                                 }
-                                                self.system.notify("currentTimeFound", time);
+                                                self.system.notify("startTimeFound", time);
                                             }
                                         );
                                     }
@@ -1330,8 +1336,6 @@ MediaPlayer.dependencies.BufferController = function() {
                     );
                 }
             );
-
-            ready = true;
         },
 
         getType: function() {
