@@ -823,14 +823,16 @@ MediaPlayer.dependencies.Stream = function() {
                 self.system.notify("setCurrentTime");
                 self.videoModel.setCurrentTime(startTime);
             } else {
-                play.call(self);
                 currentTimeToSet = startTime;
             }
 
-            // Resolve load promise in order to start playing (see doLoad)
+            // Resolve load promise in order to start playing (see doLoad())
             if (load !== null) {
                 load.resolve(null);
                 load = null;
+            } else {
+                // Else start playing (reload use case)
+                play.call(self);
             }
         },
 
