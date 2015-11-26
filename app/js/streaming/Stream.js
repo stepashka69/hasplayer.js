@@ -106,12 +106,12 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.debug.info("[Stream] Do seek: " + time);
 
-            this.system.notify("setCurrentTime");
-            this.videoModel.setCurrentTime(time);
-
-            updateBuffer.call(this).then(function() {
-                startBuffering(time);
-            });
+            // Performs a programmatical seek:
+            // 1- seeks the buffer controllers at the desired time
+            // 2- once data is present in the buffers, then we can set the current time to the <video> component (see onBufferUpdated()) 
+            initialSeekTime = time;
+            this.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(this));
+            startBuffering(initialSeekTime);
         },
 
         // Media Source

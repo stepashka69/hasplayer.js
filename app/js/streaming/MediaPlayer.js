@@ -190,7 +190,8 @@ MediaPlayer = function(aContext) {
          */
         seek = function(value) {
 
-            videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            //videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            streamController.seek(value);
         },
 
         /**
