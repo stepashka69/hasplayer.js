@@ -70,6 +70,10 @@ MediaPlayer.dependencies.Stream = function() {
 
         isReloading = false,
 
+        startClockTime = -1,
+        startStreamTime = -1,
+        visibilitychangeListener,
+
         // Encrypted Media Extensions
         onProtectionError = function(event) {
             if (protectionController && event && event.data && event.data.data && event.data.data.sessionToken) {
@@ -456,6 +460,10 @@ MediaPlayer.dependencies.Stream = function() {
         onPlaying = function() {
             this.debug.info("<video> playing event");
             this.debug.log("[Stream] Got playing event.");
+
+            // Store start time (clock and stream time) for resynchronization purpose
+            startClockTime = new Date().getTime() / 1000;
+            startStreamTime = this.getVideoModel().getCurrentTime();
         },
 
         onLoadStart = function() {
@@ -512,6 +520,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("<video> pause event");
             //this.debug.log("[Stream] ################################# Got pause event.");
             isPaused = true;
+            startClockTime = -1;
+            startStreamTime = -1;
             this.metricsModel.addPlayList("video", new Date().getTime(), this.videoModel.getCurrentTime(), "pause");
             suspend.call(this);
         },
@@ -568,6 +578,9 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.videoModel.listen("seeking", seekingListener);
             this.videoModel.unlisten("seeked", seekedListener);
+
+            startClockTime = -1;
+            startStreamTime = -1;
         },
 
         onProgress = function() {
@@ -597,7 +610,7 @@ MediaPlayer.dependencies.Stream = function() {
             }
         },
 
-        onReload = function(time) {
+        onReload = function() {
 
             // Ask for manifest refresh
             // Then, once manifest has been refresh and data updated, we reload session (see updateData())
@@ -921,6 +934,24 @@ MediaPlayer.dependencies.Stream = function() {
             );
 
             return deferred.promise;
+        },
+
+        onVisibilitychange = function() {
+
+            if (document.hidden === true || startClockTime === -1) return;
+
+            // If current document get focus back, then check if resynchronization is required
+            var clockTime = new Date().getTime() / 1000,
+                streamTime = this.getVideoModel().getCurrentTime(),
+                elapsedClockTime = clockTime - startClockTime,
+                elapsedStreamTime = streamTime - startStreamTime;
+
+            this.debug.log("[Stream] VisibilityChange: elapsedClockTime = " + elapsedClockTime + ", elapsedStreamTime = " + elapsedStreamTime + " (" + (elapsedClockTime - elapsedStreamTime) + ")");
+
+            if ((elapsedClockTime - elapsedStreamTime) > 1) {
+                onReload.call(this);
+            }
+
         };
 
     return {
@@ -981,6 +1012,7 @@ MediaPlayer.dependencies.Stream = function() {
             // ORANGE : add Ended Event listener
             endedListener = onEnded.bind(this);
 
+            visibilitychangeListener = onVisibilitychange.bind(this);
         },
 
         load: function(manifest, periodInfoValue) {
@@ -1012,6 +1044,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.listenOnParent("webkitfullscreenchange", fullScreenListener);
 
             this.requestScheduler.videoModel = value;
+
+            //document.addEventListener("visibilitychange", visibilitychangeListener);
         },
 
         // ORANGE: add the capability to set audioTrack
@@ -1121,6 +1155,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] Reset");
 
             pause.call(this);
+
+            //document.removeEventListener("visibilityChange");
 
             this.videoModel.unlisten("play", playListener);
             this.videoModel.unlisten("pause", pauseListener);
