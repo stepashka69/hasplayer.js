@@ -766,7 +766,7 @@ MediaPlayer.dependencies.Stream = function() {
 
 
         // 'startTimeFound' event raised by video controller when start time has been found
-        // startTime = live edge for live streams
+        // startTime = video live edge for live streams
         // startTime = first video segment time for static streams
         // => then seek every BufferController at the found start time
         onStartTimeFound = function(startTime) {
@@ -919,14 +919,12 @@ MediaPlayer.dependencies.Stream = function() {
 
             Q.when(deferredVideoUpdate.promise, deferredAudioUpdate.promise, deferredTextUpdate.promise).then(
                 function() {
-                    // ORANGE: unnecessary since seek is performed into each BufferController
-                    //updateCurrentTime.call(self);
-
                     if (isReloading && videoController) {
                         isReloading = false;
+                        self.system.unmapHandler("bufferUpdated");
                         self.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(self));
+                        // Call load on video controller in order to get new stream start time (=live edge for live streams)
                         videoController.load();
-                        //onReload.call(self, self.timelineConverter.calcPresentationStartTime(periodInfo));
                     }
 
                     deferred.resolve();
@@ -1177,7 +1175,6 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.unlisten("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("webkitfullscreenchange", fullScreenListener);
-
 
             this.system.unmapHandler("bufferUpdated");
             this.system.unmapHandler("liveEdgeFound");
