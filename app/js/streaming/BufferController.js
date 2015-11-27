@@ -73,7 +73,7 @@ MediaPlayer.dependencies.BufferController = function() {
         appendSync = false,
 
         // ORANGE: segment downlaod failed recovery
-        SEGMENT_DOWNLOAD_ERROR_MAX = 5,
+        SEGMENT_DOWNLOAD_ERROR_MAX = 3,
         segmentDownloadFailed = false,
         segmentDownloadErrorCount = 0,
         recoveryTime = -1,
@@ -740,26 +740,27 @@ MediaPlayer.dependencies.BufferController = function() {
                 return;
             }
 
-            // For text track, do not raise an error
+            // Send a warning
+            this.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
+                "Failed to download " + type + " segment at time = " + e.startTime, {
+                    url: e.url,
+                    request: e
+                });
+
+            // Ignore in case of text track, this will not stop playing
             if (type === "text") {
-                this.debug.warn("[BufferController][" + type + "] Failed to download segment at time = " + e.startTime);
-                // TODO: the buffering process is stopped here.
-                // We could try to internally seek to following segment
                 return;
             }
 
             // Segment download failed
             segmentDownloadErrorCount += 1;
-            this.debug.warn("(" + segmentDownloadErrorCount + ") Failed to download " + type + " segment at time = " + e.startTime + ", url =  " + e.url);
+
             
             // => If failed SEGMENT_DOWNLOAD_ERROR_MAX times, then raise an error
             // => Else try to reload session
             if (segmentDownloadErrorCount === SEGMENT_DOWNLOAD_ERROR_MAX) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
-                    "Failed to download " + type + " segment at time = " + e.startTime, {
-                        url: e.url,
-                        request: e
-                    });
+                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.STREAM_ERR_BUFFER,
+                    "Failed to download " + type + " segments, buffer is now underflow", null);
             } else {
                 recoveryTime = e.startTime + (e.duration * 1.5);
 
