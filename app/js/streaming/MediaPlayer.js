@@ -138,6 +138,9 @@ MediaPlayer = function(aContext) {
                         playing = false;
 
                         resetting = false;
+
+                        self.debug.log("[MediaPlayer] Player is stopped");
+
                         if (isReady.call(self)) {
                             doAutoPlay.call(self);
                         }
@@ -190,7 +193,8 @@ MediaPlayer = function(aContext) {
          */
         seek = function(value) {
 
-            videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            //videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            streamController.seek(value);
         },
 
         /**

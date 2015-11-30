@@ -562,15 +562,19 @@
                     self.manifestModel.setValue(manifestResult);
                     self.debug.log("### Manifest has been refreshed.");
                 },
-                function(){
-                    // here notfiy webapp to refresh url
-                    if(isIntern){
+                function(reqerror) {
+                    // Check if request has been aborted
+                    if (reqerror.aborted) {
+                        return;
+                    }
+                    // Otherwise notfiy webapp to refresh url
+                    if (isIntern) {
                         self.eventBus.dispatchEvent({
                                 type: "manifestUrlUpdate",
                                 data: url
                         });
-                    }else{
-                        self.debug.warn("[StreamController] refreshManifest url : ", url , " is invalid !");
+                    } else {
+                        self.debug.warn("[StreamController] Failed to refresh manifest at url : " + url);
                     }
                 }
             );

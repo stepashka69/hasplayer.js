@@ -19,6 +19,14 @@ MediaPlayer.dependencies.ErrorHandler = function () {
         eventBus: undefined,
         debug: undefined,
 
+        sendWarning: function (code, message, data) {
+            this.eventBus.dispatchEvent({
+                type: "warning",
+                event: {code : code, message: message, data: data}
+            });
+            this.debug.warn("[Warn] Code: " + code + ", Message:" + message + ", Data: " + data);
+        },
+
         sendError: function (code, message, data) {
             this.eventBus.dispatchEvent({
                 type: "error",
@@ -55,6 +63,8 @@ MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST = "DOWNLOA
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_SIDX = "DOWNLOAD_ERR_SIDX";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT = "DOWNLOAD_ERR_CONTENT";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_INIT = "DOWNLOAD_ERR_INIT";
+
+MediaPlayer.dependencies.ErrorHandler.prototype.STREAM_ERR_BUFFER = "STREAM_ERR_BUFFER";
 
 MediaPlayer.dependencies.ErrorHandler.prototype.CC_ERR_PARSE = "CC_ERR_PARSE";
 

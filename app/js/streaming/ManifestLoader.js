@@ -171,7 +171,7 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                   return;
                 }
                 needFailureReport = false;
-                deferred.reject();
+                deferred.reject(request);
             };
 
             try {
