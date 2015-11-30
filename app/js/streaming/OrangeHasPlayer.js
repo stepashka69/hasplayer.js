@@ -610,6 +610,7 @@ OrangeHasPlayer = function() {
      */
     this.addEventListener = function(type, listener, useCapture) {
         switch (type) {
+            case "warning":
             case "error":
             case "subtitlesStyleChanged":
             case "manifestUrlUpdate":

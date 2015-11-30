@@ -24,7 +24,7 @@ MediaPlayer.dependencies.ErrorHandler = function () {
                 type: "warning",
                 event: {code : code, message: message, data: data}
             });
-            this.debug.warn("[Warn] Code: " + code + ", Message:" + message + ", Data: " + data);
+            this.debug.warn("[Warn] Code: " + code + ", Message: " + message + ", Data: " + data);
         },
 
         sendError: function (code, message, data) {
@@ -32,7 +32,7 @@ MediaPlayer.dependencies.ErrorHandler = function () {
                 type: "error",
                 event: {code : code, message: message, data: data}
             });
-            this.debug.error("[Error] Code: " + code + ", Message:" + message + ", Data: " + data);
+            this.debug.error("[Error] Code: " + code + ", Message: " + message + ", Data: " + data);
         }
     };
 };
