@@ -612,7 +612,6 @@ MediaPlayer.dependencies.Mp4Processor = function() {
                     return createMP4AudioSampleEntry(track);
                 default:
                     throw codec + " not supported";
-                    break;
             }
 
             return null;

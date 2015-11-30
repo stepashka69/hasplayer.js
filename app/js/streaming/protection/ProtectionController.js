@@ -233,12 +233,11 @@ MediaPlayer.dependencies.ProtectionController = function () {
         getSoapError = function(serverResponse){
             var stringResponse = String.fromCharCode.apply(null, new Uint8Array(serverResponse)),
                 xmlDoc = this.domParser.createXmlTree(stringResponse),
-                enveloppe = xmlDoc !== null ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null, 
+                enveloppe = xmlDoc !== null ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null,
                 body = enveloppe !== null ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
                 fault = body !== null ? this.domParser.getChildNode(body, "soap:Fault") : null,
                 faultcode = null,
-                faultstring = null,
-                detail = null;
+                faultstring = null;
 
                 if (fault) {
                     faultcode = this.domParser.getChildNode(fault, "faultcode").firstChild.nodeValue;
@@ -339,7 +338,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
                         self.protectionModel.updateKeySession(sessionToken,licenseMessage);
                     }else{
                         sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
-                            'DRM: ' + keySystemString + ' '+soapError.name+' with error code = '+soapError.code);     
+                            'DRM: ' + keySystemString + ' '+soapError.name+' with error code = '+soapError.code);
                     }
                 } else {
                     sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,

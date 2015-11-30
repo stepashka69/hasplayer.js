@@ -377,13 +377,17 @@ MediaPlayer.dependencies.BufferController = function() {
                 playListTraceMetrics = self.metricsModel.appendPlayListTrace(playListMetrics, currentRepresentation.id, null, currentTime, currentVideoTime, null, 1.0, null);
             }
 
-            if (!hasData()) return;
+            if (!hasData()) {
+                return;
+            }
 
             hasEnoughSpaceToAppend.call(self).then(
                 function() {
                     Q.when(deferredBuffersFlatten ? deferredBuffersFlatten.promise : true).then(
                         function() {
-                            if (!hasData()) return;
+                            if (!hasData()) {
+                                return;
+                            }
                             self.debug.log("[BufferController][" + type + "] Buffering segment");
                             self.sourceBufferExt.append(buffer, data, appendSync).then(
                                 function( /*appended*/ ) {
@@ -591,7 +595,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
             // If buffering process is running, then we interrupt it
             signalSegmentBuffered.call(self);
-            
+
             return false;
         },
 
@@ -663,7 +667,7 @@ MediaPlayer.dependencies.BufferController = function() {
             start = buffer.buffered.start(0);
             end = buffer.buffered.end(buffer.buffered.length - 1);
             self.debug.log("[BufferController][" + type + "] Language changed => clear buffer");
-            if(type !== "text"){
+            if (type !== "text") {
                 // no need to abort for text buffer. remove call do the same thing
                 self.sourceBufferExt.abort(mediaSource, buffer);
             }
@@ -677,7 +681,8 @@ MediaPlayer.dependencies.BufferController = function() {
                     seekTarget = self.videoModel.getCurrentTime();
                     self.debug.log("[BufferController][" + type + "] Seek to " + seekTarget);
                     deferred.resolve();
-                }/*, function() {
+                }
+                /*, function() {
                     self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "impossible to remove data from SourceBuffer");
                 }*/
             );
@@ -755,7 +760,7 @@ MediaPlayer.dependencies.BufferController = function() {
             // Segment download failed
             segmentDownloadErrorCount += 1;
 
-            
+
             // => If failed SEGMENT_DOWNLOAD_ERROR_MAX times, then raise an error
             // => Else try to reload session
             if (segmentDownloadErrorCount === SEGMENT_DOWNLOAD_ERROR_MAX) {
@@ -905,7 +910,7 @@ MediaPlayer.dependencies.BufferController = function() {
                     } else {
                         updateCheckBufferTimeout.call(self, 0);
                     }
-                }else if (!isDynamic) {
+                } else if (!isDynamic) {
                     signalStreamComplete.call(self);
                 }
             }
@@ -1001,7 +1006,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
             if (languageChanged ||
                 ((bufferLevel < minBufferTime) &&
-                ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)))) {
+                    ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)))) {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
                 lastBufferLevel = bufferLevel;
@@ -1042,7 +1047,7 @@ MediaPlayer.dependencies.BufferController = function() {
             if (deferredFragmentBuffered !== null) {
                 self.debug.error("[BufferController][" + type + "] deferredFragmentBuffered has not been resolved, create a new one is not correct.");
             }
-            
+
             deferredFragmentBuffered = Q.defer();
 
             self.debug.log("[BufferController][" + type + "] Start buffering process...");
@@ -1251,7 +1256,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 });
         },
 
-        requestForReload = function (delay) {
+        requestForReload = function(delay) {
             var self = this;
 
             // Check if not already notified
@@ -1260,7 +1265,7 @@ MediaPlayer.dependencies.BufferController = function() {
             }
 
             this.debug.info("[BufferController][" + type + "] Reload session in " + delay + " s.");
-            reloadTimeout = setTimeout(function () {
+            reloadTimeout = setTimeout(function() {
                 reloadTimeout = null;
                 self.debug.info("[BufferController][" + type + "] Reload session");
                 self.system.notify("needForReload");
@@ -1318,7 +1323,7 @@ MediaPlayer.dependencies.BufferController = function() {
             ready = true;
         },
 
-        load : function() {
+        load: function() {
             var self = this,
                 manifest = self.manifestModel.getValue();
 
@@ -1334,7 +1339,7 @@ MediaPlayer.dependencies.BufferController = function() {
                                 fragmentDuration = currentRepresentation.segmentDuration;
 
                                 self.indexHandler.setIsDynamic(isDynamic);
-                                if(minBufferTime === -1){
+                                if (minBufferTime === -1) {
                                     minBufferTime = self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer);
                                 }
                                 if (type === "video") {

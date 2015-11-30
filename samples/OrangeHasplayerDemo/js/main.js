@@ -1,7 +1,6 @@
 var // Main Container
     streamUrl = null,
 
-
     // Modules
     playerPanel = null,
     streamsPanel = null,
@@ -48,7 +47,7 @@ var displayVersion = function() {
 };
 
 var getURLParameter = function (name) {
-  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
 /********************************************************************************************************************
@@ -112,7 +111,7 @@ var handleBuffering = function(show){
     }else{
         playerPanel.hideLoadingElement();
     }
-}
+};
 
 var handleVolumeChange = function(volumeLevel) {
     playerPanel.onVolumeChange(volumeLevel);
@@ -141,7 +140,7 @@ var handleBufferLevelUpdated = function(type, level) {
     }else if (type === "audio") {
         settingsPanel.audioBufferLength.innerHTML = level +" s";
     }
-}
+};
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById('canvas').getContext('2d');

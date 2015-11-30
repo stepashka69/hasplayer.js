@@ -233,7 +233,7 @@ StreamsPanel.prototype.createStreamEntry = function(stream) {
         self.selectedStreamElement = this;
         self.selectedStreamElement.id = 'stream-selected';
         if(stream.tvmUrl){
-            self.loadTVMSource(stream,onStreamClicked);
+            self.loadTVMSource(stream, onStreamClicked);
         }else{
 
             onStreamClicked(stream);

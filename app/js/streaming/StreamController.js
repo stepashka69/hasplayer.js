@@ -407,7 +407,7 @@
 
             if (manifest.hasOwnProperty("Location")) {
                 url = manifest.Location;
-            } 
+            }
 
             this.debug.log("### Refresh manifest @ " + url);
             this.refreshManifest(url, true);

@@ -11,15 +11,14 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.utils.DOMParser = function () {
+MediaPlayer.utils.DOMParser = function() {
     "use strict";
-    
+
     var _parser = null,
         _xmlDoc = null;
 
     return {
-
-        getAllSpecificNodes : function(mainNode, nodeName) {
+        getAllSpecificNodes: function(mainNode, nodeName) {
             var i = 0,
                 id,
                 querySelectorResult,
@@ -27,8 +26,8 @@ MediaPlayer.utils.DOMParser = function () {
 
             querySelectorResult = mainNode.querySelectorAll(nodeName);
             if (querySelectorResult) {
-                for(i = 0;i<querySelectorResult.length;i++){
-                    id = this.getAttributeValue(querySelectorResult[i],'xml:id');
+                for (i = 0; i < querySelectorResult.length; i++) {
+                    id = this.getAttributeValue(querySelectorResult[i], 'xml:id');
                     if (id) {
                         returnTab[id] = querySelectorResult[i].attributes;
                     }
@@ -38,7 +37,7 @@ MediaPlayer.utils.DOMParser = function () {
             return returnTab;
         },
 
-        getAttributeName : function(node, attrValue) {
+        getAttributeName: function(node, attrValue) {
             var returnValue = null,
                 domAttribute = null,
                 i = 0,
@@ -58,13 +57,13 @@ MediaPlayer.utils.DOMParser = function () {
             return returnValue;
         },
 
-        getAttributeValue : function(node, attrName) {
+        getAttributeValue: function(node, attrName) {
             var returnValue = null,
                 domElem = null,
                 attribList = null;
 
             attribList = node.attributes;
-            if(attribList){
+            if (attribList) {
                 domElem = attribList.getNamedItem(attrName);
                 if (domElem) {
                     returnValue = domElem.value;
@@ -75,30 +74,29 @@ MediaPlayer.utils.DOMParser = function () {
             return returnValue;
         },
 
-        getChildNode : function(nodeParent, childName) {
+        getChildNode: function(nodeParent, childName) {
             var i = 0,
                 element;
 
-            if(nodeParent.childNodes){
-                for(i=0;i<nodeParent.childNodes.length;i++){
+            if (nodeParent.childNodes) {
+                for (i = 0; i < nodeParent.childNodes.length; i++) {
                     element = nodeParent.childNodes[i];
                     if (element.nodeName === childName) {
                         return element;
-                    }else{
-                        element = undefined;
                     }
+                    element = undefined;
                 }
             }
 
             return element;
         },
 
-        getChildNodes : function(nodeParent, childName) {
+        getChildNodes: function(nodeParent, childName) {
             var i = 0,
                 element = [];
 
-            if(nodeParent.childNodes){
-                for(i=0;i<nodeParent.childNodes.length;i++){
+            if (nodeParent.childNodes) {
+                for (i = 0; i < nodeParent.childNodes.length; i++) {
                     if (nodeParent.childNodes[i].nodeName === childName) {
                         element.push(nodeParent.childNodes[i]);
                     }
@@ -108,22 +106,19 @@ MediaPlayer.utils.DOMParser = function () {
             return element;
         },
 
-        createXmlTree : function (xmlDocStr) {
+        createXmlTree: function(xmlDocStr) {
             if (window.DOMParser) {
                 // ORANGE: XML parsing management
-                try
-                {
+                try {
                     if (!_parser) {
-                        _parser=new window.DOMParser();
+                        _parser = new window.DOMParser();
                     }
 
-                    _xmlDoc = _parser.parseFromString( xmlDocStr, "text/xml" );
-                    if(_xmlDoc.getElementsByTagName('parsererror').length > 0) {
-                          throw new Error('Error parsing XML');
+                    _xmlDoc = _parser.parseFromString(xmlDocStr, "text/xml");
+                    if (_xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                        throw new Error('Error parsing XML');
                     }
-                }
-                catch (e)
-                {
+                } catch (e) {
                     _xmlDoc = null;
                 }
             }

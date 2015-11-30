@@ -35,7 +35,7 @@ var PlayerPanel = function() {
     this.languagesModule = null;
     this.languagesButton = null;
 
-    this.loadingElement = null,
+    this.loadingElement = null;
 
     this.errorModule = null;
     this.titleError = null;
