@@ -44,6 +44,7 @@
     }
 
     function registerHasPlayerEvents() {
+        orangeHasPlayer.addEventListener('warning', onWarning);
         orangeHasPlayer.addEventListener('error', onError);
         orangeHasPlayer.addEventListener('subtitlesStyleChanged', onSubtitlesStyleChanged);
         orangeHasPlayer.addEventListener('loadeddata', onload);
@@ -106,6 +107,14 @@
      */
     function onSubtitlesStyleChanged(style) {
         handleSubtitleStyleChange(style);
+    }
+
+    /**
+     * [onWarning description]
+     * @param  {[type]} e [description]
+     */
+    function onWarning(e) {
+        handleWarning(e);
     }
 
     /**

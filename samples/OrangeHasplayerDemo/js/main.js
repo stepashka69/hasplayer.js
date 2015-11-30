@@ -148,6 +148,10 @@ var handleBitrates = function(bitrates) {
     graphPanel.init(ctx, bitrates);
 };
 
+var handleWarning = function(e) {
+    console.warn("Code: " + e.event.code + ", message: " + e.event.message);
+};
+
 var handleError = function(e) {
     playerPanel.displayError(e.event.code, e.event.message);
 };
