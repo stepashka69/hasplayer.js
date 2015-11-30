@@ -138,6 +138,9 @@ MediaPlayer = function(aContext) {
                         playing = false;
 
                         resetting = false;
+
+                        self.debug.log("[MediaPlayer] Player is stopped");
+
                         if (isReady.call(self)) {
                             doAutoPlay.call(self);
                         }
