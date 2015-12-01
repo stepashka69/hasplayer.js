@@ -60,10 +60,11 @@ MediaPlayer.dependencies.BufferController = function() {
         inbandEventFound = false,
 
         //ORANGE
+        INIT = -1,
         BUFFERING = 0,
         PLAYING = 1,
-        htmlVideoState = -1,
-        lastBufferLevel = -1,
+        htmlVideoState = INIT,
+        htmlVideoTime = -1,
         deferredFragmentBuffered = null,
         isFirstMediaSegment = false,
         //ORANGE : used to test Live chunk download failure
@@ -153,8 +154,6 @@ MediaPlayer.dependencies.BufferController = function() {
                 playListMetrics = this.metricsModel.addPlayList(type, currentTime, 0, MediaPlayer.vo.metrics.PlayList.INITIAL_PLAY_START_REASON);
             }
 
-            this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
-
             if (isBufferingCompleted) {
                 isBufferingCompleted = false;
             }
@@ -164,6 +163,10 @@ MediaPlayer.dependencies.BufferController = function() {
             self.debug.info("[BufferController][" + type + "] START");
 
             waitingForBuffer = true;
+
+            //Reset htmlVideoState in order to update it after a pause or seek command in UpdateBufferState function
+            htmlVideoState = INIT;
+            htmlVideoTime = -1;
 
             startPlayback.call(self);
         },
@@ -206,9 +209,6 @@ MediaPlayer.dependencies.BufferController = function() {
                 return;
             }
             this.debug.info("[BufferController][" + type + "] STOP");
-
-            //Reset htmlVideoState in order to update it after a pause or seek command in UpdateBufferState function
-            htmlVideoState = -1;
 
             // Stop buffering process
             clearTimeout(bufferTimeout);
@@ -896,7 +896,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment failed");
 
                 signalSegmentBuffered.call(self);
-                if (htmlVideoState != BUFFERING) {
+                if (htmlVideoState !== BUFFERING) {
                     // HLS use case => update current representation playlist
                     if ((manifest.name === "M3U") && isDynamic) {
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
@@ -1009,7 +1009,6 @@ MediaPlayer.dependencies.BufferController = function() {
                     ((minBufferTime < timeToEnd) || (minBufferTime >= timeToEnd && !isBufferingCompleted)))) {
                 // Buffer needs to be filled
                 bufferFragment.call(self);
-                lastBufferLevel = bufferLevel;
             } else {
                 // Determine the timeout delay before checking again the buffer
                 var delay = bufferLevel - minBufferTime;
@@ -1496,25 +1495,52 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         updateBufferState: function() {
-            var level = Math.round(bufferLevel);
+            var currentTime = this.videoModel.getCurrentTime(),
+                previousTime = htmlVideoTime === -1? currentTime : htmlVideoTime,
+                progress = (currentTime - previousTime);
 
-            // Detect stalled state (but not in seeking state)
-            if (level <= 0 && htmlVideoState !== BUFFERING && this.videoModel.isSeeking() !== true) {
-                htmlVideoState = BUFFERING;
-                this.debug.log("[BufferController][" + type + "] BUFFERING - " + this.videoModel.getCurrentTime() + " - " + bufferLevel);
-                this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
-
-                // If buffering since a segment download failed, then ask for reloading session
-                if (segmentDownloadFailed > 0) {
-                    segmentDownloadFailed = false;
-                    requestForReload.call(this, recoveryTime - this.videoModel.getCurrentTime());
-                }
-            } else if (level > 0 && htmlVideoState !== PLAYING) {
-                htmlVideoState = PLAYING;
-                this.debug.log("[BufferController][" + type + "] PLAYING - " + this.videoModel.getCurrentTime());
-                this.metricsModel.addState(type, "playing", this.videoModel.getCurrentTime());
+            if (started === false) {
+                return;
             }
 
+            //this.debug.log("#### [" + type + "] level = " + bufferLevel + ", currentTime = " + currentTime + ", progress = " + progress);
+
+            switch (htmlVideoState) {
+                case INIT:
+                    htmlVideoState = BUFFERING;
+                    this.debug.log("[BufferController][" + type + "] BUFFERING - " + this.videoModel.getCurrentTime() + " - " + bufferLevel);
+                    this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
+                    break;
+
+                case BUFFERING:
+                    if (!this.getVideoModel().isPaused() &&
+                        ((progress > 0) && (bufferLevel >= 1))) {
+                        htmlVideoState = PLAYING;
+                        this.debug.log("[BufferController][" + type + "] PLAYING - " + this.videoModel.getCurrentTime());
+                        this.metricsModel.addState(type, "playing", this.videoModel.getCurrentTime());
+                    }
+                    break;
+
+                case PLAYING:
+                    if (!this.getVideoModel().isPaused() &&
+                        ((progress <= 0 && bufferLevel <= 1) || (bufferLevel === 0))) {
+                        htmlVideoState = BUFFERING;
+                        this.debug.log("[BufferController][" + type + "] BUFFERING - " + this.videoModel.getCurrentTime() + " - " + bufferLevel);
+                        this.metricsModel.addState(type, "buffering", this.videoModel.getCurrentTime());
+
+                        // If buffering since a segment download failed, then ask for reloading session
+                        if (segmentDownloadFailed) {
+                            segmentDownloadFailed = false;
+                            requestForReload.call(this, recoveryTime - this.videoModel.getCurrentTime());
+                        }
+                    }
+                    break;
+            }
+
+            if (currentTime > 0) {
+                htmlVideoTime = currentTime;
+            }
+            
             // if the buffer controller is stopped and the buffer is full we should try to clear the buffer
             // before that we should make sure that we will have enough space to append the data, so we wait
             // until the video time moves forward for a value greater than rejected data duration since the last reject event or since the last seek.
