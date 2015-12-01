@@ -112,7 +112,8 @@ Mss.dependencies.MssParser = function () {
 
     var mapRepresentation = function (qualityLevel) {
 
-        var representation = {};
+        var representation = {},
+            fourCCValue = null;
 
         representation.id = qualityLevel.Id;
         representation.bandwidth = parseInt(this.domParser.getAttributeValue(qualityLevel, "Bitrate"), 10);
@@ -120,7 +121,7 @@ Mss.dependencies.MssParser = function () {
         representation.width = parseInt(this.domParser.getAttributeValue(qualityLevel, "MaxWidth"), 10);
         representation.height = parseInt(this.domParser.getAttributeValue(qualityLevel, "MaxHeight"), 10);
 
-        var fourCCValue = this.domParser.getAttributeValue(qualityLevel, "FourCC");
+        fourCCValue = this.domParser.getAttributeValue(qualityLevel, "FourCC");
 
         // Get codecs value according to FourCC field
         // Note: If empty FourCC (optionnal for audio stream, see https://msdn.microsoft.com/en-us/library/ff728116%28v=vs.95%29.aspx),
@@ -161,7 +162,9 @@ Mss.dependencies.MssParser = function () {
             codecPrivateDataHex,
             fourCCValue = this.domParser.getAttributeValue(qualityLevel, "FourCC"),
             samplingRate = parseInt(this.domParser.getAttributeValue(qualityLevel, "SamplingRate"), 10),
-            arr16;
+            arr16,
+            indexFreq,
+            extensionSamplingFrequencyIndex;
 
         //chrome problem, in implicit AAC HE definition, so when AACH is detected in FourCC
         //set objectType to 5 => strange, it should be 2
@@ -172,13 +175,13 @@ Mss.dependencies.MssParser = function () {
         //if codecPrivateData is empty, build it :
         if (codecPrivateData === undefined || codecPrivateData === "") {
             objectType = 0x02; //AAC Main Low Complexity => object Type = 2
-            var indexFreq = samplingFrequencyIndex[samplingRate];
+            indexFreq = samplingFrequencyIndex[samplingRate];
             if (fourCCValue === "AACH") {
                 // 4 bytes :     XXXXX         XXXX          XXXX             XXXX                  XXXXX      XXX   XXXXXXX
                 //           ' ObjectType' 'Freq Index' 'Channels value'   'Extens Sampl Freq'  'ObjectType'  'GAS' 'alignment = 0'
                 objectType = 0x05; // High Efficiency AAC Profile = object Type = 5 SBR
                 codecPrivateData = new Uint8Array(4);
-                var extensionSamplingFrequencyIndex = samplingFrequencyIndex[samplingRate*2];// in HE AAC Extension Sampling frequence
+                extensionSamplingFrequencyIndex = samplingFrequencyIndex[samplingRate*2];// in HE AAC Extension Sampling frequence
                 // equals to SamplingRate*2
                 //Freq Index is present for 3 bits in the first byte, last bit is in the second
                 codecPrivateData[0] = (objectType << 3) | (indexFreq >> 1);
@@ -266,7 +269,6 @@ Mss.dependencies.MssParser = function () {
             // Create new segment
             segments.push({
                 d: d,
-                r: 0,
                 t: t
             });
 
@@ -416,6 +418,8 @@ Mss.dependencies.MssParser = function () {
             protection = this.domParser.getChildNode(smoothNode, 'Protection'),
             protectionHeader = null,
             KID,
+            firstSegment,
+            adaptationTimeOffset,
             i;
 
         // Set mpd node properties
@@ -488,8 +492,8 @@ Mss.dependencies.MssParser = function () {
             // In case of VOD streams, check if start time is greater than 0.
             // Therefore, set period start time to the higher adaptation start time
             if (mpd.type === "static" && adaptations[i].contentType !== 'text') {
-                var fistSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[0];
-                var adaptationTimeOffset = parseFloat(fistSegment.t) / TIME_SCALE_100_NANOSECOND_UNIT;
+                firstSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[0];
+                adaptationTimeOffset = parseFloat(firstSegment.t) / TIME_SCALE_100_NANOSECOND_UNIT;
                 period.start = (period.start === 0)?adaptationTimeOffset:Math.max(period.start, adaptationTimeOffset);
             }
 
