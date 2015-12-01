@@ -163,7 +163,7 @@ function onEnd() {
 }
 
 function onStateChanged(e) {
-    if (e.detail.type === 'video') {
+    if ((e.detail.type === 'video') || (e.detail.type === 'audio')) {
         if (e.detail.state === 'buffering') {
             handleBuffering(true);
         } else if (e.detail.state === 'playing') {
