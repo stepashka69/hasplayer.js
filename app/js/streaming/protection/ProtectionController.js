@@ -515,11 +515,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                     error: null
                 });
             } else {
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED,
-                    data: null,
-                    error: "DRM: Failed to create key session. -- " + event.error
-                });
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                     new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION, "[DRM] Failed to create key session. -- " + event.error, null));
             }
