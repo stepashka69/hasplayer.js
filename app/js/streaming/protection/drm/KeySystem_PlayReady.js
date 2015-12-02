@@ -238,8 +238,9 @@ MediaPlayer.dependencies.protection.KeySystem_PlayReady = function() {
         notify: undefined,
         subscribe: undefined,
         unsubscribe: undefined,
-        sessionType:"persistent-license",
-
+        /*sessionType:"persistent-license",*/
+        sessionType:"temporary",
+        
         init: function(protectionData){
             protData = protectionData;
         },
