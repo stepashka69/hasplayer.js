@@ -238,12 +238,15 @@ MediaPlayer.dependencies.protection.KeySystem_PlayReady = function() {
         notify: undefined,
         subscribe: undefined,
         unsubscribe: undefined,
+        sessionType:"persistent-license",
 
         init: function(protectionData){
             protData = protectionData;
         },
 
         getInitData: parseInitDataFromContentProtection,
+
+        getKeySystemConfigurations: MediaPlayer.dependencies.protection.CommonEncryption.getKeySystemConfigurations,
 
         getRequestHeadersFromMessage: getRequestHeaders,
 

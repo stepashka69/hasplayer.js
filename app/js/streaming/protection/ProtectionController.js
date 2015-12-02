@@ -96,21 +96,12 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         selectKeySystem = function(supportedKS, fromManifest) {
 
-            var self = this;
+            var self = this,
+                sessionType;
 
             self.debug.log("[DRM] Select key system");
 
             // Build our request object for requestKeySystemAccess
-            var audioCapabilities = [],
-                videoCapabilities = [];
-            if (videoCodec) {
-                videoCapabilities.push(new MediaPlayer.vo.protection.MediaCapability(videoCodec));
-            }
-            if (audioCodec) {
-                audioCapabilities.push(new MediaPlayer.vo.protection.MediaCapability(audioCodec));
-            }
-            var ksConfig = new MediaPlayer.vo.protection.KeySystemConfiguration(
-                audioCapabilities, videoCapabilities, "optional", (self.sessionType === "temporary") ? "optional" : "required", [self.sessionType]);
             var requestedKeySystems = [];
 
             var ksIdx;
@@ -118,10 +109,10 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 // We have a key system
                 for (ksIdx = 0; ksIdx < supportedKS.length; ksIdx++) {
                     if (this.keySystem === supportedKS[ksIdx].ks) {
-
+                        sessionType =supportedKS[ksIdx].ks.sessionType; 
                         requestedKeySystems.push({
                             ks: supportedKS[ksIdx].ks,
-                            configs: [ksConfig]
+                            configs: supportedKS[ksIdx].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
                         });
 
                         // Ensure that we would be granted key system access using the key
@@ -156,9 +147,10 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
                 // Add all key systems to our request list since we have yet to select a key system
                 for (var i = 0; i < supportedKS.length; i++) {
+                    sessionType =supportedKS[i].ks.sessionType; 
                     requestedKeySystems.push({
                         ks: supportedKS[i].ks,
-                        configs: [ksConfig]
+                        configs: supportedKS[i].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
                     });
                 }
 
@@ -600,7 +592,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
         keySystem: undefined,
         manifestExt: undefined,
         domParser: undefined,
-        sessionType: "temporary",
 
         setup: function() {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);
@@ -776,7 +767,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                     }
                 }
                 try {
-                    this.protectionModel.createKeySession(initDataForKS, this.sessionType, cdmData);
+                    this.protectionModel.createKeySession(initDataForKS, this.keySystem.sessionType, cdmData);
                 } catch (error) {
                     this.eventBus.dispatchEvent({
                         type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED,
@@ -880,7 +871,9 @@ MediaPlayer.dependencies.ProtectionController = function() {
          * @instance
          */
         setSessionType: function(sessionType) {
-            this.sessionType = sessionType;
+            if(this.keysystem){
+                this.keySystem.sessionType = sessionType;
+            }
         },
 
         /**
