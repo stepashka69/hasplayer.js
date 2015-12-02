@@ -81,9 +81,9 @@ Mss.dependencies.MssFragmentController = function() {
                     if (segmentId + i < segments.length) {
                         t = segments[segmentId + i].t;
                         if ((t + segments[segmentId + i].d) != entries[i].fragment_absolute_time) {
-                            rslt.debug.log("[MssFragmentController] Correct tfrf time and duration! ********");
                             segments[segmentId + i].t = entries[i].fragment_absolute_time;
                             segments[segmentId + i].d = entries[i].fragment_duration;
+                            rslt.debug.log("[MssFragmentController] Correct tfrf time  = "+entries[i].fragment_absolute_time+"and duration = "+entries[i].fragment_duration+"! ********");
                             segmentsUpdated = true;
                         }
                     }
