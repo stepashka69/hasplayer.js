@@ -144,7 +144,26 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                             self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_STATUSES_CHANGED,
                                     this);
 
-                             event.target.keyStatuses.forEach(function(status, keyId, map) {
+                             event.target.keyStatuses.forEach(function() {
+                                // has Edge and Chrome implement different version of keystatues, param are not on same order
+                                var status, keyId;
+                                if(arguments && arguments.length > 0){
+                                    if(arguments[0]){
+                                        if(typeof arguments[0] === 'string'){
+                                            status = arguments[0];
+                                        }else{
+                                            keyId = arguments[0];
+                                        }
+                                    }
+
+                                    if(arguments[1]){
+                                        if(typeof arguments[1] === 'string'){
+                                            status = arguments[1];
+                                        }else{
+                                            keyId = arguments[1];
+                                        }
+                                    }
+                                }
                                 self.debug.log("[DRM][PM_21Jan2015] status = " + status + " for KID " + MediaPlayer.utils.arrayToHexString(new Uint8Array(keyId)));
                                 switch (status) {
                                     case "expired":
