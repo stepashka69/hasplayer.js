@@ -148,7 +148,7 @@ var handleBitrates = function(bitrates) {
 };
 
 var handleWarning = function(e) {
-    console.warn("Code: " + e.event.code + ", message: " + e.event.message);
+    console.warn("Code: " + e.event.code + ", message: " + e.event.message, e.event.data);
 };
 
 var handleError = function(e) {

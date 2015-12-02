@@ -245,6 +245,8 @@ MediaPlayer.dependencies.FragmentLoader = function() {
                         req.status = 0;
                         deferred.reject(req);
                     } else if (RETRY_ATTEMPTS <= 0) {
+                        // in case of error we set the requestModel status equal to xhr status
+                        req.status = reqerror.status;
                         deferred.reject(req);
                     } else {
                         _retry.call(self, req, deferred);

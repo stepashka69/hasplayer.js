@@ -749,9 +749,10 @@ MediaPlayer.dependencies.BufferController = function() {
 
             // Send a warning
             this.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT,
-                "Failed to download " + type + " segment at time = " + e.startTime, {
+                "Failed to download " + type + " segment at time = " + e.startTime + " HTTP status code = "+e.status, {
                     url: e.url,
-                    request: e
+                    request: e,
+                    status:e.status
                 });
 
             // Ignore in case of text track, this will not stop playing
