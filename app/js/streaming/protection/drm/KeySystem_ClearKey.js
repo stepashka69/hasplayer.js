@@ -42,6 +42,7 @@ MediaPlayer.dependencies.protection.KeySystem_ClearKey = function() {
         schemeIdURI: "urn:uuid:" + keySystemUUID,
         systemString: keySystemStr,
         uuid: keySystemUUID,
+        sessionType:"temporary",
 
         init: function(protectionData){
             protData = protectionData;
