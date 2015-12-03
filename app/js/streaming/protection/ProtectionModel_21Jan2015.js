@@ -513,6 +513,10 @@ MediaPlayer.models.ProtectionModel_21Jan2015.detect = function(videoElement) {
         return false;
     }
 
+    if(window.MSMediaKeys){
+        return false;
+    }
+
     return true;
 };
 

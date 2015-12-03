@@ -404,6 +404,25 @@ MediaPlayer.models.ProtectionModel_3Feb2014 = function () {
 
 // Defines the supported 3Feb2014 API variations
 MediaPlayer.models.ProtectionModel_3Feb2014.APIs = [
+    // MS-prefixed (IE11, Windows 8.1)
+    {
+        // Video Element
+        setMediaKeys: "msSetMediaKeys",
+
+        // MediaKeys
+        MediaKeys: "MSMediaKeys",
+
+        // MediaKeySession
+        release: "close",
+
+        // Events
+        needkey: "msneedkey",
+        error: "mskeyerror",
+        message: "mskeymessage",
+        ready: "mskeyadded",
+        close: "mskeyclose"
+    },
+    
     // Un-prefixed as per spec
     // Chrome 38-39 (and some earlier versions) with chrome://flags -- Enable Encrypted Media Extensions
     {
@@ -422,24 +441,6 @@ MediaPlayer.models.ProtectionModel_3Feb2014.APIs = [
         message: "keymessage",
         ready: "keyadded",
         close: "keyclose"
-    },
-    // MS-prefixed (IE11, Windows 8.1)
-    {
-        // Video Element
-        setMediaKeys: "msSetMediaKeys",
-
-        // MediaKeys
-        MediaKeys: "MSMediaKeys",
-
-        // MediaKeySession
-        release: "close",
-
-        // Events
-        needkey: "msneedkey",
-        error: "mskeyerror",
-        message: "mskeymessage",
-        ready: "mskeyadded",
-        close: "mskeyclose"
     }
 ];
 
