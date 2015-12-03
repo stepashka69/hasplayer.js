@@ -528,7 +528,8 @@ MediaPlayer.dependencies.Stream = function() {
 
         onError = function(event) {
             var error = event.srcElement.error,
-                code;
+                code,
+                message = "<video> error: ";
 
             if (error.code === -1) {
                 // not an error!
@@ -538,24 +539,29 @@ MediaPlayer.dependencies.Stream = function() {
             switch (error.code) {
                 case 1:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ABORTED;
+                    message += "fetching process aborted";
                     break;
                 case 2:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_NETWORK;
+                    message += "network error";
                     break;
                 case 3:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_DECODE;
+                    message += "media decoding error";
                     break;
                 case 4:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_SRC_NOT_SUPPORTED;
+                    message += "media format not supported";
                     break;
                 case 5:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED;
+                    message += "media is encrypted";
                     break;
             }
 
             errored = true;
 
-            this.errHandler.sendError(code, "<video> error event");
+            this.errHandler.sendError(code, message);
         },
 
         onSeeking = function() {
