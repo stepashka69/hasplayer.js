@@ -546,6 +546,7 @@ MediaPlayer.dependencies.BufferController = function() {
             var length = data.length,
                 i = 0,
                 j = 0,
+                l = 0,
                 identifier,
                 size,
                 expTwo = Math.pow(256, 2),
@@ -560,7 +561,7 @@ MediaPlayer.dependencies.BufferController = function() {
 
 
                 if (identifier !== "emsg") {
-                    for (var l = i; l < i + size; l++) {
+                    for (l = i; l < i + size; l++) {
                         modData[j] = data[l];
                         j += 1;
                     }
@@ -829,7 +830,10 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         loadNextFragment = function() {
-            var self = this;
+            var self = this,
+                range,
+                time,
+                segmentTime;
 
             // Check if running state
             if (!isRunning.call(self)) {
@@ -837,10 +841,10 @@ MediaPlayer.dependencies.BufferController = function() {
             }
 
             // Get next segment time and check if already in buffer
-            var time = seeking ? seekTarget : currentSegmentTime;
-            var range = self.sourceBufferExt.getBufferRange(buffer, time);
+            time = seeking ? seekTarget : currentSegmentTime;
+            range = self.sourceBufferExt.getBufferRange(buffer, time);
 
-            var segmentTime = range ? range.end : time;
+            segmentTime = range ? range.end : time;
 
             if ((currentSequenceNumber !== -1) && !seeking) {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment for sequence number: " + currentSequenceNumber);
@@ -943,16 +947,16 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         getLiveEdgeTime = function() {
-
             var self = this,
-                deferred = Q.defer();
+                deferred = Q.defer(),
+                startTime,
+                // Get live edge time from manifest as the last segment time
+                liveEdgeTime = _currentRepresentation.segmentAvailabilityRange.end;
 
-            // Get live edge time from manifest as the last segment time
-            var liveEdgeTime = _currentRepresentation.segmentAvailabilityRange.end;
             self.debug.log("[BufferController][" + type + "] Manifest live edge = " + liveEdgeTime);
 
             // Step back from a found live edge time to be able to buffer some data
-            var startTime = Math.max((liveEdgeTime - minBufferTime), _currentRepresentation.segmentAvailabilityRange.start);
+            startTime = Math.max((liveEdgeTime - minBufferTime), _currentRepresentation.segmentAvailabilityRange.start);
 
             // Get the request corresponding to the start time
             this.indexHandler.getSegmentRequestForTime(_currentRepresentation, startTime).then(
@@ -972,7 +976,9 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         updateBufferLevel = function(sendMetric) {
-            if (!hasData()) return;
+            if (!hasData()) {
+                return;
+            }
 
             var self = this,
                 currentTime = getWorkingTime.call(self);
@@ -986,7 +992,9 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         checkIfSufficientBuffer = function() {
-            var self = this;
+            var self = this,
+                timeToEnd,
+                delay;
 
             // Check if running state
             if (!isRunning.call(self)) {
@@ -1004,7 +1012,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 }
             }
 
-            var timeToEnd = getTimeToEnd.call(self);
+            timeToEnd = getTimeToEnd.call(self);
             self.debug.log("[BufferController][" + type + "] time to end = " + timeToEnd);
 
             if (languageChanged ||
@@ -1014,7 +1022,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 bufferFragment.call(self);
             } else {
                 // Determine the timeout delay before checking again the buffer
-                var delay = bufferLevel - minBufferTime;
+                delay = bufferLevel - minBufferTime;
                 self.debug.log("[BufferController][" + type + "] Check buffer in " + delay + " seconds");
                 updateCheckBufferTimeout.call(self, delay);
             }
@@ -1543,7 +1551,7 @@ MediaPlayer.dependencies.BufferController = function() {
             if (currentTime > 0) {
                 htmlVideoTime = currentTime;
             }
-            
+
             // if the buffer controller is stopped and the buffer is full we should try to clear the buffer
             // before that we should make sure that we will have enough space to append the data, so we wait
             // until the video time moves forward for a value greater than rejected data duration since the last reject event or since the last seek.

@@ -18,89 +18,6 @@ Mss.dependencies.MssHandler = function() {
 
     var isDynamic = false,
 
-        /*getIndex = function (adaptation, manifest) {
-
-            var periods = manifest.Period_asArray,
-                i, j;
-
-            for (i = 0; i < periods.length; i += 1) {
-                var adaptations = periods[i].AdaptationSet_asArray;
-                for (j = 0; j < adaptations.length; j += 1) {
-                    if (adaptations[j] === adaptation) {
-                        return j;
-                    }
-                }
-            }
-
-            return -1;
-        },
-
-        /*getType = function (adaptation) {
-
-            var type = (adaptation.mimeType !== undefined) ? adaptation.mimeType : adaptation.contentType;
-
-            if (type.indexOf("video") != -1)
-            {
-                return "video";
-            }
-            else if (type.indexOf("audio") != -1)
-            {
-                return "audio";
-            }
-            else if (type.indexOf("text") != -1)
-            {
-                return "text";
-            }
-
-            return "und";
-        },
-
-        getRepresentationForQuality = function (quality, adaptation) {
-            var representation = null;
-            if (adaptation && adaptation.Representation_asArray && adaptation.Representation_asArray.length > 0) {
-                representation = adaptation.Representation_asArray[quality];
-            }
-            return representation;
-        },
-
-
-        getTimescale = function (adaptation) {
-            var timescale = 1,
-                segmentInfo;
-
-            // Check for segment information at adaptation level
-            segmentInfo = rslt.manifestExt.getSegmentInfoFor(adaptation);
-
-            // Else get segment information of the first representation
-            if (segmentInfo === null)
-            {
-                segmentInfo = rslt.manifestExt.getSegmentInfoFor(adaptation.Representation_asArray[0]);
-            }
-
-            if (segmentInfo !== null && segmentInfo !== undefined && segmentInfo.hasOwnProperty("timescale"))
-            {
-                timescale = segmentInfo.timescale;
-            }
-
-            return timescale;
-        },
-
-        getDuration = function (manifest, isDynamic) {
-            var duration = NaN;
-
-            if (isDynamic) {
-                duration = Number.POSITIVE_INFINITY;
-            } else {
-                if (manifest.mediaPresentationDuration) {
-                    duration = manifest.mediaPresentationDuration;
-                } else if (manifest.availabilityEndTime && manifest.availabilityStartTime) {
-                    duration = (manifest.availabilityEndTime.getTime() - manifest.availabilityStartTime.getTime());
-                }
-            }
-
-            return duration;
-        },*/
-
         getAudioChannels = function(adaptation, representation) {
             var channels = 1;
 
@@ -126,7 +43,13 @@ Mss.dependencies.MssHandler = function() {
         },
 
         getInitData = function(representation) {
-            var self = this;
+            var self = this,
+                manifest,
+                adaptation,
+                realAdaptation,
+                realRepresentation,
+                track;
+
             // return data in byte format
             // call MP4 lib to generate the init
 
@@ -134,12 +57,12 @@ Mss.dependencies.MssHandler = function() {
             //var representation = getRepresentationForQuality(quality, adaptation);
             if (representation) {
                 if (!representation.initData) {
-                    var manifest = rslt.manifestModel.getValue();
-                    var adaptation = representation.adaptation;
-                    var realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
-                    var realRepresentation = realAdaptation.Representation_asArray[representation.index];
+                    manifest = rslt.manifestModel.getValue();
+                    adaptation = representation.adaptation;
+                    realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
+                    realRepresentation = realAdaptation.Representation_asArray[representation.index];
 
-                    var track = new MediaPlayer.vo.Mp4Track();
+                    track = new MediaPlayer.vo.Mp4Track();
                     track.type = rslt.getType() || 'und';
                     track.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
                     track.timescale = representation.timescale;
@@ -180,20 +103,22 @@ Mss.dependencies.MssHandler = function() {
     rslt.mp4Processor = undefined;
 
     rslt.getInitRequest = function(representation) {
-        var period = null;
-        var self = this;
-        var presentationStartTime = null;
-        var deferred = Q.defer();
+        var period = null,
+            self = this,
+            presentationStartTime = null,
+            manifest,
+            request,
+            deferred = Q.defer();
         //Mss.dependencies.MssHandler.prototype.getInitRequest.call(this,quality,data).then(onGetInitRequestSuccess);
         // get the period and startTime
         if (representation) {
             period = representation.adaptation.period;
             presentationStartTime = period.start;
 
-            var manifest = rslt.manifestModel.getValue();
+            manifest = rslt.manifestModel.getValue();
             isDynamic = rslt.manifestExt.getIsDynamic(manifest);
 
-            var request = new MediaPlayer.vo.SegmentRequest();
+            request = new MediaPlayer.vo.SegmentRequest();
 
             request.streamType = rslt.getType();
             request.type = "Initialization Segment";

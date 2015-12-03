@@ -833,7 +833,9 @@ Dash.dependencies.DashHandler = function() {
         },
 
         getSegmentByIndex = function(index, representation) {
-            if (!representation || !representation.segments) return null;
+            if (!representation || !representation.segments) {
+                return null;
+            }
 
             var ln = representation.segments.length,
                 seg,
@@ -852,7 +854,9 @@ Dash.dependencies.DashHandler = function() {
 
         // ORANGE: HLS use case, get next segment from sequence number
         getNextSegmentBySequenceNumber = function(sn, representation) {
-            if (!representation || !representation.segments) return null;
+            if (!representation || !representation.segments) {
+                return null;
+            }
 
             var ln = representation.segments.length,
                 seg,
@@ -878,7 +882,6 @@ Dash.dependencies.DashHandler = function() {
                 upperIdx,
                 lowerIdx,
                 upperTime;
-
 
             if (!segments || segments.length === 0) {
                 updateRequired = true;

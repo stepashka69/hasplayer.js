@@ -78,11 +78,10 @@ MediaPlayer.utils.TTMLParser = function() {
                 //  - A ttp:frameRate attribute must be present on the tt element.
                 //  - A ttp:frameRateMultiplier attribute may be present on the tt element.
 
-                // ORANGE: removed the restrictions above. 
+                // ORANGE: removed the restrictions above.
                 //         now if no frameRate is defined in tt, the :ff information is ignored.
 
                 if (timeParts[3]) {
-
                     if (frameRate && !isNaN(frameRate)) {
                         parsedTime += parseFloat(timeParts[3]) / frameRate;
                     }
@@ -130,7 +129,7 @@ MediaPlayer.utils.TTMLParser = function() {
         passStructuralConstraints = function() {
             var passed = false;
 
-            nodeTt = this.domParser.getChildNode(xmlDoc, "tt");
+            nodeTt = xmlDoc ? this.domParser.getChildNode(xmlDoc, "tt") : null;
             nodeHead = nodeTt ? this.domParser.getChildNode(nodeTt, "head") : null;
             nodeLayout = nodeHead ? this.domParser.getChildNode(nodeHead, "layout") : null;
             nodeStyling = nodeHead ? this.domParser.getChildNode(nodeHead, "styling") : null;
@@ -343,7 +342,7 @@ MediaPlayer.utils.TTMLParser = function() {
                             if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
                                 extent = extent.split(' ')[1];
                                 extent = parseFloat(extent.substr(0, extent.length - 1));
-                                cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1)) * extent) / 100 + "%";
+                                cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1), 10) * extent) / 100 + "%";
                             } else if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === 'c' && extent) {
                                 cellsSize = cssStyle.fontSize.replace(/\s/g, '').split('c');
                                 cellResolution = findParameterElement.call(this, [textDatas[j], region, divBody, nodeTt], 'cellResolution').split(' ');
@@ -387,14 +386,13 @@ MediaPlayer.utils.TTMLParser = function() {
                         if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
                             extent = extent.split(' ')[1];
                             extent = parseFloat(extent.substr(0, extent.length - 1));
-                            cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1)) * extent) / 100 + "%";
+                            cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1), 10) * extent) / 100 + "%";
                         }
                         //line and position element have no effect on IE
                         //For Chrome line = 80 is a percentage workaround to reorder subtitles
                         //try to detect multi lines subtitle
                         if (i > 0) {
                             previousStartTime = getTimeValue.call(this, regions[i - 1], 'begin');
-
                             previousEndTime = getTimeValue.call(this, regions[i - 1], 'end');
                         }
 
@@ -430,7 +428,6 @@ MediaPlayer.utils.TTMLParser = function() {
 
     return {
         domParser: undefined,
-
         parse: internalParse
 
     };
