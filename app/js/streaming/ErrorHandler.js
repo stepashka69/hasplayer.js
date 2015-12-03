@@ -41,8 +41,6 @@ MediaPlayer.dependencies.ErrorHandler.prototype = {
     constructor: MediaPlayer.dependencies.ErrorHandler
 };
 
-MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR = "HASPLAYER_INIT_ERROR";
-
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ABORTED = "MEDIA_ERR_ABORTED";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_NETWORK = "MEDIA_ERR_NETWORK";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_DECODE = "MEDIA_ERR_DECODE";

@@ -83,17 +83,19 @@ MediaPlayer = function(aContext) {
          */
         play = function() {
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.play(): MediaPlayer not initialized');
+            }
+
+            if (!element) {
+                throw new Error('MediaPlayer.play(): Video element not attached to MediaPlayer');
+            }
+
+            if (!source) {
+                throw new Error('MediaPlayer.play(): Source not attached to MediaPlayer');
             }
 
             if (!this.capabilities.supportsMediaSource()) {
                 this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE);
-                return;
-            }
-
-            if (!element || !source) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "Missing view or source.");
                 return;
             }
 
@@ -664,9 +666,9 @@ MediaPlayer = function(aContext) {
          * @param  view - html5 video element
          */
         attachView: function(view) {
+
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.attachView(): MediaPlayer not initialized');
             }
 
             element = view;
@@ -694,18 +696,14 @@ MediaPlayer = function(aContext) {
          */
         attachSource: function(url, protData) {
             var loop,
-                videoModel;
+                videoModel = this.getVideoModel();
 
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.play(): MediaPlayer not initialized');
             }
 
-            videoModel = this.getVideoModel();
-
             if (!videoModel) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "videoModel not initialized");
-                return;
+                throw new Error('MediaPlayer.play(): Video element not attached to MediaPlayer');
             }
 
             // ORANGE : add metric

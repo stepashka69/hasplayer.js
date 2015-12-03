@@ -57,7 +57,7 @@ OrangeHasPlayer = function() {
 
     var _isPlayerInitialized = function() {
         if (state === 'UNINITIALIZED') {
-            throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
+            throw new Error('OrangeHasPlayer not initialized');
         }
     };
 
