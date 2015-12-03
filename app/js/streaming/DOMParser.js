@@ -24,12 +24,14 @@ MediaPlayer.utils.DOMParser = function() {
                 querySelectorResult,
                 returnTab = [];
 
-            querySelectorResult = mainNode.querySelectorAll(nodeName);
-            if (querySelectorResult) {
-                for (i = 0; i < querySelectorResult.length; i++) {
-                    id = this.getAttributeValue(querySelectorResult[i], 'xml:id');
-                    if (id) {
-                        returnTab[id] = querySelectorResult[i].attributes;
+            if (mainNode) {
+                querySelectorResult = mainNode.querySelectorAll(nodeName);
+                if (querySelectorResult) {
+                    for (i = 0; i < querySelectorResult.length; i++) {
+                        id = this.getAttributeValue(querySelectorResult[i], 'xml:id');
+                        if (id) {
+                            returnTab[id] = querySelectorResult[i].attributes;
+                        }
                     }
                 }
             }
@@ -42,14 +44,16 @@ MediaPlayer.utils.DOMParser = function() {
                 domAttribute = null,
                 i = 0,
                 attribList = null;
-
-            attribList = node.attributes;
-            if (attribList) {
-                for (i = 0; i < attribList.length; i++) {
-                    domAttribute = attribList[i];
-                    if (domAttribute.value === attrValue) {
-                        returnValue = domAttribute.name;
-                        return returnValue;
+            
+            if (node && node.attributes) {
+                attribList = node.attributes;
+                if (attribList) {
+                    for (i = 0; i < attribList.length; i++) {
+                        domAttribute = attribList[i];
+                        if (domAttribute.value === attrValue) {
+                            returnValue = domAttribute.name;
+                            return returnValue;
+                        }
                     }
                 }
             }
@@ -62,12 +66,14 @@ MediaPlayer.utils.DOMParser = function() {
                 domElem = null,
                 attribList = null;
 
-            attribList = node.attributes;
-            if (attribList) {
-                domElem = attribList.getNamedItem(attrName);
-                if (domElem) {
-                    returnValue = domElem.value;
-                    return returnValue;
+            if (node && node.attributes) {
+                attribList = node.attributes;
+                if (attribList) {
+                    domElem = attribList.getNamedItem(attrName);
+                    if (domElem) {
+                        returnValue = domElem.value;
+                        return returnValue;
+                    }
                 }
             }
 
@@ -78,7 +84,7 @@ MediaPlayer.utils.DOMParser = function() {
             var i = 0,
                 element;
 
-            if (nodeParent.childNodes) {
+            if (nodeParent && nodeParent.childNodes) {
                 for (i = 0; i < nodeParent.childNodes.length; i++) {
                     element = nodeParent.childNodes[i];
                     if (element.nodeName === childName) {
@@ -95,7 +101,7 @@ MediaPlayer.utils.DOMParser = function() {
             var i = 0,
                 element = [];
 
-            if (nodeParent.childNodes) {
+            if (nodeParent && nodeParent.childNodes) {
                 for (i = 0; i < nodeParent.childNodes.length; i++) {
                     if (nodeParent.childNodes[i].nodeName === childName) {
                         element.push(nodeParent.childNodes[i]);
