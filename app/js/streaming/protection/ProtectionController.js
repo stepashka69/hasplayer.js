@@ -109,7 +109,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 // We have a key system
                 for (ksIdx = 0; ksIdx < supportedKS.length; ksIdx++) {
                     if (this.keySystem === supportedKS[ksIdx].ks) {
-                        sessionType =supportedKS[ksIdx].ks.sessionType; 
+                        sessionType =supportedKS[ksIdx].ks.sessionType;
                         requestedKeySystems.push({
                             ks: supportedKS[ksIdx].ks,
                             configs: supportedKS[ksIdx].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
@@ -147,7 +147,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
                 // Add all key systems to our request list since we have yet to select a key system
                 for (var i = 0; i < supportedKS.length; i++) {
-                    sessionType =supportedKS[i].ks.sessionType; 
+                    sessionType =supportedKS[i].ks.sessionType;
                     requestedKeySystems.push({
                         ks: supportedKS[i].ks,
                         configs: supportedKS[i].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
@@ -224,70 +224,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                     new MediaPlayer.vo.Error(errorType, errorMesage, data));
             }
-        },
-
-        decodeUtf8 = function(arrayBuffer) {
-            var result = "",
-                i = 0,
-                c = 0,
-                c2 = 0,
-                c3 = 0,
-                data = new Uint8Array(arrayBuffer);
-
-            // If we have a BOM skip it
-            if (data.length >= 3 && data[0] === 0xef && data[1] === 0xbb && data[2] === 0xbf) {
-                i = 3;
-            }
-
-            while (i < data.length) {
-                c = data[i];
-
-                if (c < 128) {
-                    result += String.fromCharCode(c);
-                    i++;
-                } else if (c > 191 && c < 224) {
-                    if (i + 1 >= data.length) {
-                        throw "UTF-8 Decode failed. Two byte character was truncated.";
-                    }
-                    c2 = data[i + 1];
-                    result += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                    i += 2;
-                } else {
-                    if (i + 2 >= data.length) {
-                        throw "UTF-8 Decode failed. Multi byte character was truncated.";
-                    }
-                    c2 = data[i + 1];
-                    c3 = data[i + 2];
-                    result += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                    i += 3;
-                }
-            }
-            return result;
-        },
-
-        getSoapError = function(serverResponse) {
-            var stringResponse = decodeUtf8(serverResponse),
-                xmlDoc = this.domParser.createXmlTree(stringResponse),
-                enveloppe = xmlDoc ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null,
-                body = enveloppe ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
-                fault = body ? this.domParser.getChildNode(body, "soap:Fault") : null,
-                faultstring = fault ? this.domParser.getChildNode(fault, "faultstring").firstChild.nodeValue : null,
-                detail = fault ? this.domParser.getChildNode(fault, "detail") : null,
-                exception = detail ? this.domParser.getChildNode(detail, "Exception") : null,
-                statusCode = exception ? this.domParser.getChildNode(exception, "StatusCode").firstChild.nodeValue : null,
-                message = exception ? this.domParser.getChildNode(exception, "Message").firstChild.nodeValue : null,
-                idStart,
-                idEnd;
-
-            if (fault) {
-                idStart = message.lastIndexOf('[') + 1;
-                idEnd = message.indexOf(']');
-                return {
-                    code: statusCode,
-                    name: faultstring + ' : ' + message.substring(idStart, idEnd)
-                };
-            }
-            return null;
         },
 
         onKeyMessage = function(e) {
@@ -375,16 +311,16 @@ MediaPlayer.dependencies.ProtectionController = function() {
             xhrLicense.open(licenseServerData.getHTTPMethod(messageType), url, true);
             xhrLicense.responseType = licenseServerData.getResponseType(keySystemString, messageType);
             xhrLicense.onload = function() {
-                if (this.status == 200) {
+                if (this.status === 200) {
                     self.debug.log("[DRM] Received license response");
                     sendEvent(eventData);
                     licenseMessage = licenseServerData.getLicenseMessage(this.response, keySystemString, messageType);
-                    soapError = getSoapError.call(self, licenseMessage);
-                    if (!soapError) {
+                    if (licenseMessage !== null) {
                         self.protectionModel.updateKeySession(sessionToken, licenseMessage);
                     } else {
+                        var error = licenseServerData.getErrorResponse(this.response, keySystemString, messageType);
                         sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
-                            'DRM: ' + keySystemString + ' ' + soapError.name + ' with error code = ' + soapError.code);
+                            'DRM: ' + keySystemString + ' ' + error.name + ' with error code = ' + error.code);
                     }
                 } else {
                     sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
@@ -591,7 +527,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
         protectionExt: undefined,
         keySystem: undefined,
         manifestExt: undefined,
-        domParser: undefined,
 
         setup: function() {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);

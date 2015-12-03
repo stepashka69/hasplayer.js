@@ -40,7 +40,78 @@
 MediaPlayer.dependencies.protection.servers.PlayReady = function() {
     "use strict";
 
+    var errorResponse = null,
+
+        decodeUtf8 = function(arrayBuffer) {
+            var result = "",
+                i = 0,
+                c = 0,
+                c2 = 0,
+                c3 = 0,
+                data = new Uint8Array(arrayBuffer);
+
+            // If we have a BOM skip it
+            if (data.length >= 3 && data[0] === 0xef && data[1] === 0xbb && data[2] === 0xbf) {
+                i = 3;
+            }
+
+            while (i < data.length) {
+                c = data[i];
+
+                if (c < 128) {
+                    result += String.fromCharCode(c);
+                    i++;
+                } else if (c > 191 && c < 224) {
+                    if (i + 1 >= data.length) {
+                        throw "UTF-8 Decode failed. Two byte character was truncated.";
+                    }
+                    c2 = data[i + 1];
+                    result += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                    i += 2;
+                } else {
+                    if (i + 2 >= data.length) {
+                        throw "UTF-8 Decode failed. Multi byte character was truncated.";
+                    }
+                    c2 = data[i + 1];
+                    c3 = data[i + 2];
+                    result += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                    i += 3;
+                }
+            }
+            return result;
+        },
+
+        parseServerResponse = function(serverResponse) {
+            var stringResponse = decodeUtf8(serverResponse),
+                xmlDoc = this.domParser.createXmlTree(stringResponse),
+                enveloppe = xmlDoc ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null,
+                body = enveloppe ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
+                fault = body ? this.domParser.getChildNode(body, "soap:Fault") : null,
+                faultstring = fault ? this.domParser.getChildNode(fault, "faultstring").firstChild.nodeValue : null,
+                detail = fault ? this.domParser.getChildNode(fault, "detail") : null,
+                exception = detail ? this.domParser.getChildNode(detail, "Exception") : null,
+                statusCode = exception ? this.domParser.getChildNode(exception, "StatusCode").firstChild.nodeValue : null,
+                message = exception ? this.domParser.getChildNode(exception, "Message").firstChild.nodeValue : null,
+                idStart,
+                idEnd;
+
+            errorResponse = null;
+
+            if (fault) {
+                idStart = message.lastIndexOf('[') + 1;
+                idEnd = message.indexOf(']');
+                errorResponse = {
+                    code: statusCode,
+                    name: faultstring + ' : ' + message.substring(idStart, idEnd)
+                };
+                return null;
+            }
+
+            return serverResponse;
+        };
+
     return {
+        domParser: undefined,
 
         getServerURLFromMessage: function(url /*, message, messageType*/) { return url; },
 
@@ -49,10 +120,13 @@ MediaPlayer.dependencies.protection.servers.PlayReady = function() {
         getResponseType: function(/*keySystemStr, messageType*/) { return 'arraybuffer'; },
 
         getLicenseMessage: function(serverResponse/*, keySystemStr, messageType*/) {
-            return serverResponse;
+            return parseServerResponse.call(this, serverResponse);
         },
 
         getErrorResponse: function(serverResponse/*, keySystemStr, messageType*/) {
+            if (errorResponse !== null) {
+                return errorResponse;
+            }
             return String.fromCharCode.apply(null, new Uint8Array(serverResponse));
         }
     };
