@@ -281,7 +281,7 @@ MediaPlayer.dependencies.Stream = function() {
                         },
                         function(/*error*/) {
                             if (videoState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating video source buffer");
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer");
                                 videoState = "error";
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
@@ -334,7 +334,7 @@ MediaPlayer.dependencies.Stream = function() {
                         },
                         function(/*error*/) {
                             if (audioState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer");
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer");
                                 audioState = "error";
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
