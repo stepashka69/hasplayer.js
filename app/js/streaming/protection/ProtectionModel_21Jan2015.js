@@ -41,6 +41,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
 
     var videoElement = null,
         mediaKeys = null,
+        eventHandler = null,
 
         // Session list
         sessions = [],
@@ -111,7 +112,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                                 this.session.licenseStored = false;
                                 this.session = null;
                             }
-                            videoElement.removeEventListener("waitingforkey", this);
+                            videoElement.removeEventListener("waitingforkey", eventHandler);
                             self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_NO_VALID_KEY);
 
                         break;
@@ -119,7 +120,6 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                 }
             };
         },
-        eventHandler = null,
 
         removeSession = function(token) {
             // Remove from our session list
@@ -265,6 +265,8 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                    i--;
                 }
             }
+
+            videoElement.removeEventListener("waitingforkey", eventHandler);
 
             // Do not close and remove sessions to keep licences persistence
             this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE);
