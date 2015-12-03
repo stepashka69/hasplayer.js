@@ -697,7 +697,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                         this.debug.log("[DRM] Ignoring initData because we have already seen it!");
                         // If Key session already exists for this content, we check if the session and stored license key
                         // correclty decrypt the content
-                        this.protectionModel.checkIfEncrypted();
+                        //this.protectionModel.checkIfEncrypted();
                         return;
                     }
                 }
