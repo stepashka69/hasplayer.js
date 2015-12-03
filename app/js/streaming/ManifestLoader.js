@@ -14,13 +14,16 @@
 MediaPlayer.dependencies.ManifestLoader = function () {
     "use strict";
 
-
     var RETRY_ATTEMPTS = 3,
         RETRY_INTERVAL = 500,
         deferred = null,
         request = new XMLHttpRequest(),
 
         getDecodedResponseText = function (text) {
+            var fixedCharCodes = [],
+                i = 0,
+                charCode;
+
             // Some content is not always successfully decoded by every browser.
             // Known problem case: UTF-16 BE manifests on Internet Explorer 11.
             // This function decodes any text that the browser failed to decode.
@@ -33,10 +36,9 @@ MediaPlayer.dependencies.ManifestLoader = function () {
                 return text;
 
             // We have a problem!
-            var fixedCharCodes = [];
-
-            for (var i = 0; i < text.length; i++) {
-                var charCode = text.charCodeAt(i);
+            
+            for (i = 0; i < text.length; i++) {
+                charCode = text.charCodeAt(i);
 
                 // Swap around the two bytes that make up the character code.
                 fixedCharCodes.push((charCode & 0xFF) << 8 | (charCode & 0xFF00) >> 8);
