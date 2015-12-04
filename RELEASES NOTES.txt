@@ -1,3 +1,15 @@
+### Release Notes v1.2.5.6 (2015/12/04)
+* Buf fixing:
+* - Regression with error MEDIA_KEYMESSERR_NO_VALID_KEY
+
+### Release Notes v1.2.5.5 (2015/12/03)
+* Buf fixing:
+* - Keep using MS-prefixed EME version for new Edge 13
+
+### Release Notes v1.2.5.4 (2015/11/20)
+* Buf fixing:
+* - HLS zapping error (correct reset process)
+
 ### Release Notes v1.2.5.3 (2015/11/19)
 * Correct regression and refactor tracks language switching
 
