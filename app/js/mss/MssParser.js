@@ -16,8 +16,8 @@
 Mss.dependencies.MssParser = function () {
     "use strict";
 
-    var TIME_SCALE_100_NANOSECOND_UNIT = 10000000.0;
-    var samplingFrequencyIndex = {96000:0x0,
+    var TIME_SCALE_100_NANOSECOND_UNIT = 10000000.0,
+        samplingFrequencyIndex = {96000:0x0,
                                   88200:0x1,
                                   64000:0x2,
                                   48000:0x3,
@@ -29,18 +29,16 @@ Mss.dependencies.MssParser = function () {
                                   12000:0x9,
                                   11025:0xA,
                                    8000:0xB,
-                                   7350:0xC};
-
-    var mimeTypeMap = {
+                                   7350:0xC},
+    mimeTypeMap = {
         "video" : "video/mp4",
         "audio" : "audio/mp4",
         "text"  : "application/ttml+xml+mp4"
-    };
+    },
+    xmlDoc = null,
+    baseURL = null,
 
-    var xmlDoc = null;
-    var baseURL = null;
-
-    var mapPeriod = function () {
+    mapPeriod = function () {
         var period = {},
             adaptations = [],
             smoothNode = this.domParser.getChildNode(xmlDoc, "SmoothStreamingMedia"),
@@ -60,9 +58,9 @@ Mss.dependencies.MssParser = function () {
         period.AdaptationSet_asArray = adaptations;
 
         return period;
-    };
+    },
 
-    var mapAdaptationSet = function (streamIndex) {
+    mapAdaptationSet = function (streamIndex) {
 
         var adaptationSet = {},
             representations = [],
@@ -108,9 +106,9 @@ Mss.dependencies.MssParser = function () {
         adaptationSet.SegmentTemplate = segmentTemplate;
 
         return adaptationSet;
-    };
+    },
 
-    var mapRepresentation = function (qualityLevel) {
+    mapRepresentation = function (qualityLevel) {
 
         var representation = {},
             fourCCValue = null;
@@ -138,9 +136,9 @@ Mss.dependencies.MssParser = function () {
         representation.BaseURL = qualityLevel.BaseURL;
 
         return representation;
-    };
+    },
 
-    var getH264Codec = function (qualityLevel) {
+    getH264Codec = function (qualityLevel) {
         var codecPrivateData = this.domParser.getAttributeValue(qualityLevel, "CodecPrivateData").toString(),
             nalHeader,
             avcoti;
@@ -154,9 +152,9 @@ Mss.dependencies.MssParser = function () {
         avcoti = nalHeader && nalHeader[0] ? (codecPrivateData.substr(codecPrivateData.indexOf(nalHeader[0])+10, 6)) : undefined;
 
         return "avc1." + avcoti;
-    };
+    },
 
-    var getAACCodec = function (qualityLevel) {
+    getAACCodec = function (qualityLevel) {
         var objectType = 0,
             codecPrivateData = this.domParser.getAttributeValue(qualityLevel, "CodecPrivateData").toString(),
             codecPrivateDataHex,
@@ -219,10 +217,9 @@ Mss.dependencies.MssParser = function () {
         }
 
         return "mp4a.40." + objectType;
-    };
+    },
 
-
-    var mapSegmentTemplate = function (streamIndex) {
+    mapSegmentTemplate = function (streamIndex) {
 
         var segmentTemplate = {},
             mediaUrl;
@@ -236,9 +233,9 @@ Mss.dependencies.MssParser = function () {
         segmentTemplate.SegmentTimeline = mapSegmentTimeline.call(this, streamIndex);
 
         return segmentTemplate;
-    };
+    },
 
-    var mapSegmentTimeline = function (streamIndex) {
+    mapSegmentTimeline = function (streamIndex) {
 
         var segmentTimeline = {},
             chunks = this.domParser.getChildNodes(streamIndex, "c"),
@@ -278,10 +275,10 @@ Mss.dependencies.MssParser = function () {
         segmentTimeline.S_asArray = segments;
 
         return segmentTimeline;
-    };
+    },
 
     /* @if PROTECTION=true */
-    var getKIDFromProtectionHeader = function (protectionHeader) {
+    getKIDFromProtectionHeader = function (protectionHeader) {
         var prHeader,
             wrmHeader,
             xmlReader,
@@ -310,9 +307,9 @@ Mss.dependencies.MssParser = function () {
         convertUuidEndianness(KID);
 
         return KID;
-    };
+    },
 
-    var getWRMHeaderFromPRHeader = function (prHeader) {
+    getWRMHeaderFromPRHeader = function (prHeader) {
         var length,
             recordCount,
             recordType,
@@ -351,23 +348,23 @@ Mss.dependencies.MssParser = function () {
         }
 
         return null;
-    };
+    },
 
-    var convertUuidEndianness = function (uuid) {
+    convertUuidEndianness = function (uuid) {
         swapBytes(uuid, 0, 3);
         swapBytes(uuid, 1, 2);
         swapBytes(uuid, 4, 5);
         swapBytes(uuid, 6, 7);
-    };
+    },
 
-    var swapBytes = function (bytes, pos1, pos2) {
+    swapBytes = function (bytes, pos1, pos2) {
         var temp = bytes[pos1];
         bytes[pos1] = bytes[pos2];
         bytes[pos2] = temp;
-    };
+    },
 
 
-    var createPRContentProtection = function (protectionHeader) {
+    createPRContentProtection = function (protectionHeader) {
 
         var contentProtection = {},
             keySystem = this.system.getObject("ksPlayReady"),
@@ -384,7 +381,7 @@ Mss.dependencies.MssParser = function () {
         contentProtection.pro_asArray = pro;
 
         return contentProtection;
-    };
+    },
 
     /*var createCENCContentProtection = function (protectionHeader) {
 
@@ -396,7 +393,7 @@ Mss.dependencies.MssParser = function () {
         return contentProtection;
     };*/
 
-    var createWidevineContentProtection = function (protectionHeader) {
+    createWidevineContentProtection = function (protectionHeader) {
 
         var contentProtection = {},
             keySystem = this.system.getObject("ksWidevine");
@@ -405,10 +402,10 @@ Mss.dependencies.MssParser = function () {
         contentProtection.value = keySystem.systemString;
 
         return contentProtection;
-    };
+    },
     /* @endif */
 
-    var processManifest = function (manifestLoadedTime) {
+     processManifest = function (manifestLoadedTime) {
         var mpd = {},
             period,
             adaptations,
@@ -510,9 +507,9 @@ Mss.dependencies.MssParser = function () {
 
 
         return mpd;
-    };
+    },
 
-    var internalParse = function(data, baseUrl) {
+    internalParse = function(data, baseUrl) {
         this.debug.info("[MssParser]", "Doing parse.");
 
         var start = new Date(),
