@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                 post: {
                   js: [{
                     name: 'concat',
-                    createConfig: function (context, block) {
+                            createConfig: function(context, block) {
                       context.options.generated = {};
                     }
                   },
@@ -27,7 +27,6 @@ module.exports = function(grunt) {
               }
             }
           }
-
     });
 
 	require('load-grunt-tasks')(grunt);

@@ -19,7 +19,8 @@ Mss.dependencies.MssFragmentController = function() {
     var getIndex = function(adaptation, manifest) {
             var periods = manifest.Period_asArray,
                 adaptations,
-                i, j;
+                i,
+                j;
 
             for (i = 0; i < periods.length; i += 1) {
                 adaptations = periods[i].AdaptationSet_asArray;
@@ -69,7 +70,7 @@ Mss.dependencies.MssFragmentController = function() {
                 i += 1;
             }
 
-            for (j = segments.length - 1; j >= 0; j--) {
+            for (j = segments.length - 1; j >= 0; j -= 1) {
                 if (segments[j].t === tfdt.baseMediaDecodeTime) {
                     segmentId = j;
                     break;
@@ -77,13 +78,13 @@ Mss.dependencies.MssFragmentController = function() {
             }
 
             if (segmentId >= 0) {
-                for (i = 0; i < entries.length; i++) {
+                for (i = 0; i < entries.length; i += 1) {
                     if (segmentId + i < segments.length) {
                         t = segments[segmentId + i].t;
                         if ((t + segments[segmentId + i].d) != entries[i].fragment_absolute_time) {
                             segments[segmentId + i].t = entries[i].fragment_absolute_time;
                             segments[segmentId + i].d = entries[i].fragment_duration;
-                            rslt.debug.log("[MssFragmentController] Correct tfrf time  = "+entries[i].fragment_absolute_time+"and duration = "+entries[i].fragment_duration+"! ********");
+                            rslt.debug.log("[MssFragmentController] Correct tfrf time  = " + entries[i].fragment_absolute_time + "and duration = " + entries[i].fragment_duration + "! ********");
                             segmentsUpdated = true;
                         }
                     }
@@ -174,7 +175,7 @@ Mss.dependencies.MssFragmentController = function() {
 
                     // get for each sample_info the size
                     if (sepiff.flags & 2) {
-                        for (i = 0; i < sepiff.sample_count; i++) {
+                        for (i = 0; i < sepiff.sample_count; i += 1) {
                             saiz.sample_info_size[i] = 8 + (sepiff.entry[i].NumberOfEntries * 6) + 2;
                             //8 (Init vector size) + NumberOfEntries*(clear (2) +crypted (4))+ 2 (numberofEntries size (2))
                             if (i > 0) {
@@ -223,7 +224,7 @@ Mss.dependencies.MssFragmentController = function() {
             // Process tfrf box
             tfrf = traf.getBoxesByType("tfrf");
             if (tfrf.length !== 0) {
-                for (i = 0; i < tfrf.length; i++) {
+                for (i = 0; i < tfrf.length; i += 1) {
                     processTfrf(tfrf[i], tfdt, adaptation);
                     traf.removeBoxByType("tfrf");
                 }

@@ -228,8 +228,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         onKeyMessage = function(e) {
             var self = this,
-                licenseMessage = null,
-                soapError = null;
+                licenseMessage = null;
 
             if (e.error) {
                 this.debug.log(e.error);
@@ -294,7 +293,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
             } else {
                 url = this.keySystem.getLicenseServerURLFromInitData(MediaPlayer.dependencies.protection.CommonEncryption.getPSSHData(sessionToken.initData));
                 if (!url) {
-                    url = e.data.laURL;
+                    url = e.data.defaultURL;
                 }
             }
             // Possibly update or override the URL based on the message
