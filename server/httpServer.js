@@ -8,7 +8,7 @@ var exec = require('child_process').exec,
 
 var app = express();
 
-// var port =  process.env.PORT || 3000;
+var PORT =  process.env.PORT || 8080;
 
 // set path to the parent folder 
 var dirname = __dirname.replace('server','..');
@@ -21,7 +21,9 @@ app.use(bodyParser.json());
 app.use(app.router);
 
 app.use(express.static(dirname));
-app.listen(process.env.PORT || 8080);
+app.listen(PORT);
+
+console.log("Server starteed at ", PORT);
 
 //tableau de données d'export pdf
 var database = {};
