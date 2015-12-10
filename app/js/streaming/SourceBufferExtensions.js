@@ -29,22 +29,21 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
         try {
             if (mediaSource) {
                 deferred.resolve(mediaSource.addSourceBuffer(codec));
-            }else{
+            } else {
                 deferred.reject();
             }
         } catch(ex) {
-            if (!self.manifestExt.getIsTextTrack(codec)) {
-                deferred.reject(ex.description);
-            } else {
-                if ((codec==='text/vtt') || (codec==='text/ttml')) {
+            // For text track not supported by MSE, we try to create corresponding specific source buffer
+            if (self.manifestExt.getIsTextTrack(codec)) {
+                if ((codec === 'text/vtt') || (codec === 'text/ttml')) {
                     deferred.resolve(self.system.getObject("textSourceBuffer"));
+                } else if (codec === 'application/ttml+xml+mp4') {
+                    deferred.resolve(self.system.getObject("textTTMLXMLMP4SourceBuffer"));
                 } else {
-                    if (codec==='application/ttml+xml+mp4') {
-                        deferred.resolve(self.system.getObject("textTTMLXMLMP4SourceBuffer"));
-                    } else {
-                        deferred.reject();
-                    }
+                    deferred.reject(ex);
                 }
+            } else {
+                deferred.reject(ex);
             }
         }
         return deferred.promise;
