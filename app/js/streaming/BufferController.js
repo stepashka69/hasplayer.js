@@ -812,8 +812,7 @@ MediaPlayer.dependencies.BufferController = function() {
         },
 
         loadInitialization = function(quality) {
-            var deferred = Q.defer(),
-                self = this;
+            var self = this;
 
             // Check if initialization segment for current quality has not already been stored
             if (initializationData[quality]) {
@@ -827,19 +826,11 @@ MediaPlayer.dependencies.BufferController = function() {
                         }
                     }
                 );
-                deferred.resolve(null);
+                return Q.when(null);
             } else {
                 // if we have not loaded the init segment for the current quality, do it
-                this.indexHandler.getInitRequest(availableRepresentations[quality]).then(
-                    function(request) {
-                        deferred.resolve(request);
-                    }, function(e) {
-                        deferred.reject(e);
-                    }
-                );
+                return this.indexHandler.getInitRequest(availableRepresentations[quality]);
             }
-
-            return deferred.promise;
         },
 
         loadNextFragment = function() {
@@ -1137,9 +1128,11 @@ MediaPlayer.dependencies.BufferController = function() {
                                                 }
                                             }, function(e) {
                                                 signalSegmentBuffered.call(self);
-                                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC,
-                                                    "Problem during init segment generation (" + e.name + ':' + e.message + ")",
-                                                    self.manifestModel.getValue());
+                                                if (e.name === MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED) {
+                                                    self.errHandler.sendError(e.name, e.message, e.data);
+                                                }
+                                                // TODO: manage not available init segment request (internal error?)
+                                                // TODO: discard unsupported representations
                                             }
                                         );
                                     } else {
