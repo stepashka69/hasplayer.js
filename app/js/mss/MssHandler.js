@@ -16,9 +16,7 @@
 Mss.dependencies.MssHandler = function() {
     "use strict";
 
-    var isDynamic = false,
-
-        getAudioChannels = function(adaptation, representation) {
+    var getAudioChannels = function(adaptation, representation) {
             var channels = 1;
 
             if (adaptation.audioChannels) {
@@ -42,60 +40,65 @@ Mss.dependencies.MssHandler = function() {
             return samplingRate;
         },
 
+        // Generates initialization segment data from representation information
+        // by using mp4lib library
         getInitData = function(representation) {
-            var self = this,
-                manifest,
+            var manifest = rslt.manifestModel.getValue(),
                 adaptation,
                 realAdaptation,
                 realRepresentation,
-                track;
+                track,
+                codec;
 
-            // return data in byte format
-            // call MP4 lib to generate the init
+            if (representation.initData) {
+                return representation.initData;
+            }
 
             // Get required media information from manifest  to generate initialisation segment
-            //var representation = getRepresentationForQuality(quality, adaptation);
-            if (representation) {
-                if (!representation.initData) {
-                    manifest = rslt.manifestModel.getValue();
-                    adaptation = representation.adaptation;
-                    realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
-                    realRepresentation = realAdaptation.Representation_asArray[representation.index];
+            adaptation = representation.adaptation;
+            realAdaptation = manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
+            realRepresentation = realAdaptation.Representation_asArray[representation.index];
 
-                    track = new MediaPlayer.vo.Mp4Track();
-                    track.type = rslt.getType() || 'und';
-                    track.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
-                    track.timescale = representation.timescale;
-                    track.duration = representation.adaptation.period.duration;
-                    track.codecs = realRepresentation.codecs;
-                    track.codecPrivateData = realRepresentation.codecPrivateData;
-                    track.bandwidth = realRepresentation.bandwidth;
+            track = new MediaPlayer.vo.Mp4Track();
+            track.type = rslt.getType() || 'und';
+            track.trackId = adaptation.index + 1; // +1 since track_id shall start from '1'
+            track.timescale = representation.timescale;
+            track.duration = representation.adaptation.period.duration;
+            track.codecs = realRepresentation.codecs;
+            track.codecPrivateData = realRepresentation.codecPrivateData;
+            track.bandwidth = realRepresentation.bandwidth;
 
-                    if (track.type !== 'text' && !self.capabilities.supportsCodec(self.videoModel.getElement(), realRepresentation.mimeType + ';codecs="' + realRepresentation.codecs + '"')) {
-                        return null;
-                    }
-
-                    // DRM Protected Adaptation is detected
-                    if (realAdaptation.ContentProtection_asArray && (realAdaptation.ContentProtection_asArray.length > 0)) {
-                        track.contentProtection = realAdaptation.ContentProtection_asArray;
-                    }
-
-                    // Video related informations
-                    track.width = realRepresentation.width || realAdaptation.maxWidth;
-                    track.height = realRepresentation.height || realAdaptation.maxHeight;
-
-                    // Audio related informations
-                    track.language = realAdaptation.lang ? realAdaptation.lang : 'und';
-
-                    track.channels = getAudioChannels(realAdaptation, realRepresentation);
-                    track.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
-
-                    representation.initData = rslt.mp4Processor.generateInitSegment([track]);
+            if (track.type !== 'text') {
+                codec = realRepresentation.mimeType + ';codecs="' + realRepresentation.codecs + '"';
+                if (!this.capabilities.supportsCodec(this.videoModel.getElement(), codec)) {
+                    throw {
+                        name: MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED,
+                        message: "Codec is not supported",
+                        data: {
+                            codec: codec
+                        }
+                    };
                 }
-                return representation.initData;
-            } else {
-                return null;
             }
+
+            // DRM Protected Adaptation is detected
+            if (realAdaptation.ContentProtection_asArray && (realAdaptation.ContentProtection_asArray.length > 0)) {
+                track.contentProtection = realAdaptation.ContentProtection_asArray;
+            }
+
+            // Video related informations
+            track.width = realRepresentation.width || realAdaptation.maxWidth;
+            track.height = realRepresentation.height || realAdaptation.maxHeight;
+
+            // Audio related informations
+            track.language = realAdaptation.lang ? realAdaptation.lang : 'und';
+
+            track.channels = getAudioChannels(realAdaptation, realRepresentation);
+            track.samplingRate = getAudioSamplingRate(realAdaptation, realRepresentation);
+
+            representation.initData = rslt.mp4Processor.generateInitSegment([track]);
+            
+            return representation.initData;
 
         };
 
@@ -106,50 +109,37 @@ Mss.dependencies.MssHandler = function() {
         var period = null,
             self = this,
             presentationStartTime = null,
-            manifest,
-            request,
+            request = null,
             deferred = Q.defer();
-        //Mss.dependencies.MssHandler.prototype.getInitRequest.call(this,quality,data).then(onGetInitRequestSuccess);
-        // get the period and startTime
-        if (representation) {
-            period = representation.adaptation.period;
-            presentationStartTime = period.start;
 
-            manifest = rslt.manifestModel.getValue();
-            isDynamic = rslt.manifestExt.getIsDynamic(manifest);
-
-            request = new MediaPlayer.vo.SegmentRequest();
-
-            request.streamType = rslt.getType();
-            request.type = "Initialization Segment";
-            request.url = null;
-            try {
-                request.data = getInitData.call(this, representation);
-            } catch (e) {
-                deferred.reject(e);
-                return deferred.promise;
-            }
-
-            if (!request.data) {
-                deferred.reject({
-                    name: request.streamType,
-                    message: "codec is not supported"
-                });
-                return deferred.promise;
-            }
-
-            request.range = representation.range;
-            request.availabilityStartTime = self.timelineConverter.calcAvailabilityStartTimeFromPresentationTime(presentationStartTime, representation.adaptation.period.mpd, isDynamic);
-            request.availabilityEndTime = self.timelineConverter.calcAvailabilityEndTimeFromPresentationTime(presentationStartTime + period.duration, period.mpd, isDynamic);
-
-            //request.action = "complete"; //needed to avoid to execute request
-            request.quality = representation.index;
-            deferred.resolve(request);
-        } else {
-            deferred.reject({
-                message: "representation is undefined or null"
-            });
+        if (!representation) {
+            throw new Error("MssHandler.getInitRequest(): representation is undefined");
         }
+
+        period = representation.adaptation.period;
+        presentationStartTime = period.start;
+
+        request = new MediaPlayer.vo.SegmentRequest();
+
+        request.streamType = rslt.getType();
+        request.type = "Initialization Segment";
+        request.url = null;
+
+        try {
+            request.data = getInitData.call(this, representation);
+        } catch (e) {
+            deferred.reject(e);
+            return deferred.promise;
+        }
+
+        request.range = representation.range;
+        request.availabilityStartTime = self.timelineConverter.calcAvailabilityStartTimeFromPresentationTime(presentationStartTime, representation.adaptation.period.mpd, rslt.getIsDynamic());
+        request.availabilityEndTime = self.timelineConverter.calcAvailabilityEndTimeFromPresentationTime(presentationStartTime + period.duration, period.mpd, rslt.getIsDynamic());
+
+        //request.action = "complete"; //needed to avoid to execute request
+        request.quality = representation.index;
+        deferred.resolve(request);
+
         return deferred.promise;
     };
     return rslt;
