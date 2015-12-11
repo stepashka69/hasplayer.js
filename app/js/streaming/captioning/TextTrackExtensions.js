@@ -11,7 +11,7 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.utils.TextTrackExtensions = function () {
+MediaPlayer.utils.TextTrackExtensions = function() {
     "use strict";
     var Cue;
 
@@ -22,14 +22,14 @@ MediaPlayer.utils.TextTrackExtensions = function () {
             Cue = window.VTTCue || window.TextTrackCue;
         },
 
-        subtitlesStyleChanged : function (style) {
+        subtitlesStyleChanged: function(style) {
             this.eventBus.dispatchEvent({
                 type: "subtitlesStyleChanged",
                 data: style
             });
         },
 
-        addTextTrack: function(video, captionData,  label, scrlang, isDefaultTrack) {
+        addTextTrack: function(video, captionData, label, scrlang, isDefaultTrack) {
             var track = null,
                 currentItem = null,
                 i;
@@ -45,12 +45,12 @@ MediaPlayer.utils.TextTrackExtensions = function () {
                 /*jshint -W024 */
                 track.default = isDefaultTrack;
                 track.mode = "showing";
-            }else {
+            } else {
                 //this.deleteCues(video);
                 track = video.textTracks[0];
             }
 
-            for(i = 0; i < captionData.length; i++) {
+            for (i = 0; i < captionData.length; i += 1) {
                 currentItem = captionData[i];
                 track.addCue(new Cue(currentItem.start, currentItem.end, currentItem.data));
             }
@@ -58,7 +58,7 @@ MediaPlayer.utils.TextTrackExtensions = function () {
             return Q.when(track);
         },
 
-        onCueEnter: function(e){
+        onCueEnter: function(e) {
             this.subtitlesStyleChanged(e.currentTarget.style);
         },
 
@@ -70,7 +70,7 @@ MediaPlayer.utils.TextTrackExtensions = function () {
                 currentItem = null,
                 newCue = null;
 
-            for(i = 0; i < captionData.length; i++) {
+            for (i = 0; i < captionData.length; i += 1) {
                 currentItem = captionData[i];
                 if (currentItem.start < currentItem.end) {
                     newCue = new Cue(currentItem.start, currentItem.end, currentItem.data);
@@ -104,7 +104,7 @@ MediaPlayer.utils.TextTrackExtensions = function () {
                     if (cues) {
                         lastIdx = cues.length - 1;
 
-                        for (i = lastIdx; i >= 0 ; i -= 1) {
+                        for (i = lastIdx; i >= 0; i -= 1) {
                             track.removeCue(cues[i]);
                         }
                     }
