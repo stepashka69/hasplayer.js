@@ -42,6 +42,21 @@
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
         },
+         {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo + DRM",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP-DRM.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+
         {
             "type": "Live",
             "protocol": "MSS",
