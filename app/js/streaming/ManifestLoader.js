@@ -122,11 +122,9 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                             self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
                             deferred.resolve(manifest);
                         },
-                        function(error) {
-                            self.debug.error("[ManifestLoader] Manifest parsing error.");
-                            var data = {};
-                            data.mpdUrl = url;
-                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "parsing the manifest failed : " + error, data);
+                        function(/*error*/) {
+                            self.debug.error("[ManifestLoader] Manifest parsing error");
+                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "Failed to parse manifest", {manifestUrl: url});
                             deferred.reject(request);
                         }
                     );

@@ -522,8 +522,7 @@ Mss.dependencies.MssParser = function() {
             xml = new Date();
 
             if (xmlDoc === null) {
-                this.debug.error("[MssParser]", "Failed to parse manifest!!");
-                return Q.reject("[MssParser] Failed to parse manifest!!");
+                return Q.reject(null);
             }
 
             baseURL = baseUrl;
