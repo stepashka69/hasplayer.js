@@ -777,7 +777,6 @@ MediaPlayer.dependencies.BufferController = function() {
             // Segment download failed
             segmentDownloadErrorCount += 1;
 
-
             // => If failed SEGMENT_DOWNLOAD_ERROR_MAX times, then raise an error
             // => Else try to reload session
             if (segmentDownloadErrorCount === SEGMENT_DOWNLOAD_ERROR_MAX) {
@@ -902,26 +901,25 @@ MediaPlayer.dependencies.BufferController = function() {
                         });
                 }
             } else {
-                //impossible to find a request for the loadNextFragment call
-                //the end of the createdSegment list has been reached, recall updateCheckBufferTimeout to update the list and get the next segment
+                // No more fragment in current list
                 self.debug.log("[BufferController][" + type + "] loadNextFragment failed");
-
                 signalSegmentBuffered.call(self);
-                if (htmlVideoState !== BUFFERING) {
-                    // HLS use case => update current representation playlist
-                    if ((manifest.name === "M3U") && isDynamic) {
+
+                // If live HLS, then try to refresh playlist
+                if (isDynamic) {
+                    if (manifest.name === "M3U") {
+                        // HLS use case => update current representation playlist
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
                             function() {
                                 _currentRepresentation = getRepresentationForQuality.call(self, currentDownloadQuality);
                                 updateCheckBufferTimeout.call(self, 0);
-                            }, function() {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT, type + ": Failed to update hls playlist", null);
+                            }, function(err) {
+                                self.errHandler.sendError(err.name, err.message, err.data);
                             }
                         );
-                    } else {
-                        updateCheckBufferTimeout.call(self, 0);
                     }
-                } else if (!isDynamic) {
+                } else {
+                    // For VOD streams, signal end of stream
                     signalStreamComplete.call(self);
                 }
             }
@@ -1106,8 +1104,8 @@ MediaPlayer.dependencies.BufferController = function() {
                                             _currentRepresentation = getRepresentationForQuality.call(self, quality);
                                             playlistUpdated.resolve();
                                         },
-                                        function() {
-                                            playlistUpdated.reject();
+                                        function(err) {
+                                            playlistUpdated.reject(err);
                                         }
                                     );
                                 }
@@ -1142,8 +1140,9 @@ MediaPlayer.dependencies.BufferController = function() {
                                         loadNextFragment.call(self);
                                     }
                                 },
-                                function() {
+                                function(err) {
                                     signalSegmentBuffered();
+                                    self.errHandler.sendError(err.name, err.message, err.data);
                                 }
                             );
                         }
@@ -1170,8 +1169,8 @@ MediaPlayer.dependencies.BufferController = function() {
                                 }
                             );
                         },
-                        function() {
-                            deferred.reject();
+                        function(err) {
+                            deferred.reject(err);
                         }
                     );
                 }
