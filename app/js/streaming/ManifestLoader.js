@@ -121,7 +121,13 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                         },
                         function() {
                             self.debug.error("[ManifestLoader] Manifest parsing error");
-                            deferred.reject({name: MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, message: "Failed to parse manifest"});
+                            deferred.reject({
+                                name: MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE,
+                                message: "Failed to parse manifest",
+                                data: {
+                                    url: url
+                                }
+                            });
                         }
                     );
                 }
@@ -148,7 +154,14 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                 if (request.aborted) {
                     deferred.reject();
                 } else {
-                    deferred.reject({name: MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, message: "Failed to download manifest"});
+                    deferred.reject({
+                        name: MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST,
+                        message: "Failed to download manifest",
+                        data : {
+                            url: url,
+                            status: request.status
+                        }
+                    });
                 }
             };
 

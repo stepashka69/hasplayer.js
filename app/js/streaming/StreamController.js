@@ -561,7 +561,7 @@ MediaPlayer.dependencies.StreamController = function() {
                 function(err) {
                     // err is undefined in the case the request has been aborted
                     if (err) {
-                        self.errHandler.sendError(err.name, err.message, {url: url});
+                        self.errHandler.sendError(err.name, err.message, err.data);
                     }
                 }
             );
@@ -578,7 +578,7 @@ MediaPlayer.dependencies.StreamController = function() {
                 function(err) {
                     // err is undefined in the case the request has been aborted
                     if (err) {
-                        self.errHandler.sendWarning(err.name, err.message, {url: url});
+                        self.errHandler.sendWarning(err.name, err.message, err.data);
 
                         // Notify webapp to refresh url if failed to dowload manifest (for example if manifest url expired)
                         if (isIntern && err.name === MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST) {
