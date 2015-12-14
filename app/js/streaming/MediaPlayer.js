@@ -95,7 +95,7 @@ MediaPlayer = function(aContext) {
             }
 
             if (!this.capabilities.supportsMediaSource()) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE);
+                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE, "MediaSource extension not supported by the browser");
                 return;
             }
 
