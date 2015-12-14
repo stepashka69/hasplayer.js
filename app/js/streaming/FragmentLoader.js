@@ -40,8 +40,8 @@ MediaPlayer.dependencies.FragmentLoader = function() {
         },
 
         _load = function(request, bytesRange) {
-            var d = Q.defer();
-            var req = new XMLHttpRequest(),
+            var d = Q.defer(),
+                req = new XMLHttpRequest(),
                 httpRequestMetrics = null,
                 firstProgress = true,
                 needFailureReport = true,
@@ -258,7 +258,9 @@ MediaPlayer.dependencies.FragmentLoader = function() {
         },
 
         abort: function() {
-            for (var i = 0; i < xhrs.length; i += 1) {
+            var i = 0;
+
+            for (i = 0; i < xhrs.length; i += 1) {
                 this.debug.log("[FragmentLoader] Abort XHR " + (xhrs[i].responseURL ? xhrs[i].responseURL : ""));
                 xhrs[i].abort();
             }
