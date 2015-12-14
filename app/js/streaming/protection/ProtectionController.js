@@ -52,21 +52,28 @@ if (!ArrayBuffer.isView) {
 
 if (!ArrayBuffer.prototype.slice) {
     ArrayBuffer.prototype.slice = function(begin, end) {
-        var len = this.byteLength;
+        var len = this.byteLength,
+            length,
+            target,
+            targetArray;
         begin = (begin | 0) || 0;
         end = end === (void 0) ? len : (end | 0);
 
         // Handle negative values.
-        if (begin < 0) begin = Math.max(begin + len, 0);
-        if (end < 0) end = Math.max(end + len, 0);
+        if (begin < 0) {
+            begin = Math.max(begin + len, 0);
+        }
+        if (end < 0) {
+            end = Math.max(end + len, 0);
+        }
 
         if (len === 0 || begin >= len || begin >= end) {
             return new ArrayBuffer(0);
         }
 
-        var length = Math.min(len - begin, end - begin);
-        var target = new ArrayBuffer(length);
-        var targetArray = new Uint8Array(target);
+        length = Math.min(len - begin, end - begin);
+        target = new ArrayBuffer(length);
+        targetArray = new Uint8Array(target);
         targetArray.set(new Uint8Array(this, begin, length));
         return target;
     };
@@ -97,27 +104,30 @@ MediaPlayer.dependencies.ProtectionController = function() {
         selectKeySystem = function(supportedKS, fromManifest) {
 
             var self = this,
-                sessionType;
+                sessionType,
+                // Build our request object for requestKeySystemAccess
+                requestedKeySystems = [],
+                ksIdx,
+                ksAccess,
+                i = 0,
+                ksSelected,
+                keySystemAccess;
 
             self.debug.log("[DRM] Select key system");
 
-            // Build our request object for requestKeySystemAccess
-            var requestedKeySystems = [];
-
-            var ksIdx;
             if (this.keySystem) {
                 // We have a key system
                 for (ksIdx = 0; ksIdx < supportedKS.length; ksIdx++) {
                     if (this.keySystem === supportedKS[ksIdx].ks) {
-                        sessionType =supportedKS[ksIdx].ks.sessionType;
+                        sessionType = supportedKS[ksIdx].ks.sessionType;
                         requestedKeySystems.push({
                             ks: supportedKS[ksIdx].ks,
-                            configs: supportedKS[ksIdx].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
+                            configs: supportedKS[ksIdx].ks.getKeySystemConfigurations(videoCodec, audioCodec, sessionType)
                         });
 
                         // Ensure that we would be granted key system access using the key
                         // system and codec information
-                        var ksAccess = {};
+                        ksAccess = {};
                         ksAccess[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE] = function(event) {
                             if (event.error) {
                                 //if (!fromManifest) {
@@ -146,16 +156,16 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 pendingNeedKeyData.push(supportedKS);
 
                 // Add all key systems to our request list since we have yet to select a key system
-                for (var i = 0; i < supportedKS.length; i++) {
-                    sessionType =supportedKS[i].ks.sessionType;
+                for (i = 0; i < supportedKS.length; i++) {
+                    sessionType = supportedKS[i].ks.sessionType;
                     requestedKeySystems.push({
                         ks: supportedKS[i].ks,
-                        configs: supportedKS[i].ks.getKeySystemConfigurations(videoCodec, audioCodec,sessionType)
+                        configs: supportedKS[i].ks.getKeySystemConfigurations(videoCodec, audioCodec, sessionType)
                     });
                 }
 
-                var ksSelected = {},
-                    keySystemAccess;
+                ksSelected = {};
+
                 ksSelected[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE] = function(event) {
                     if (event.error) {
                         self.debug.log("[DRM] KeySystem Access Denied!");
@@ -183,7 +193,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                             type: MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED,
                             data: keySystemAccess
                         });
-                        for (var i = 0; i < pendingNeedKeyData.length; i++) {
+                        for (i = 0; i < pendingNeedKeyData.length; i++) {
                             for (ksIdx = 0; ksIdx < pendingNeedKeyData[i].length; ksIdx++) {
                                 if (self.keySystem === pendingNeedKeyData[i][ksIdx].ks) {
                                     self.createKeySession(pendingNeedKeyData[i][ksIdx].initData, pendingNeedKeyData[i][ksIdx].cdmData);
@@ -228,14 +238,15 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         onKeyMessage = function(e) {
             var self = this,
-                licenseMessage = null;
+                licenseMessage = null,
+                keyMessage;
 
             if (e.error) {
                 this.debug.log(e.error);
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, e.error);
             }
             // Dispatch event to applications indicating we received a key message
-            var keyMessage = e.data;
+            keyMessage = e.data;
 
             this.debug.log("[DRM] Key message: type = " + keyMessage.messageType);
 
@@ -378,7 +389,9 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         onNeedKey = function(event) {
 
-            var self = this;
+            var self = this,
+                abInitData,
+                supportedKS;
 
             self.debug.log("[DRM] onNeedKey, initDataType = " + event.data.initDataType);
 
@@ -390,12 +403,12 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
             // Some browsers return initData as Uint8Array (IE), some as ArrayBuffer (Chrome).
             // Convert to ArrayBuffer
-            var abInitData = event.data.initData;
+            abInitData = event.data.initData;
             if (ArrayBuffer.isView(abInitData)) {
                 abInitData = abInitData.buffer;
             }
 
-            var supportedKS = this.protectionExt.getSupportedKeySystems(abInitData);
+            supportedKS = this.protectionExt.getSupportedKeySystems(abInitData);
             if (supportedKS.length === 0) {
                 self.debug.log("[DRM] Received needkey event with initData, but we don't support any of the key systems!");
                 return;
@@ -577,7 +590,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
          * applications to create {@link MediaPlayer.vo.StreamInfo} with the right information,
          */
         init: function(contentProtection, aCodec, vCodec) {
-
+            var supportedKS;
             // TODO: We really need to do much more here... We need to be smarter about knowing
             // which adaptation sets for which we have initialized, including the default key ID
             // value from the ContentProtection elements so we know whether or not we still need to
@@ -591,7 +604,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
                 // ContentProtection elements are specified at the AdaptationSet level, so the CP for audio
                 // and video will be the same.  Just use one valid MediaInfo object
-                var supportedKS = this.protectionExt.getSupportedKeySystemsFromContentProtection(contentProtection);
+                supportedKS = this.protectionExt.getSupportedKeySystemsFromContentProtection(contentProtection);
                 if (supportedKS && supportedKS.length > 0) {
                     selectKeySystem.call(this, supportedKS, true);
                 }
@@ -686,12 +699,14 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
             this.debug.log("[DRM] Create key session");
 
-            var initDataForKS = MediaPlayer.dependencies.protection.CommonEncryption.getPSSHForKeySystem(this.keySystem, initData);
+            var initDataForKS = MediaPlayer.dependencies.protection.CommonEncryption.getPSSHForKeySystem(this.keySystem, initData),
+                i = 0,
+                currentInitData;
             if (initDataForKS) {
 
                 // Check for duplicate initData
-                var currentInitData = this.protectionModel.getAllInitData();
-                for (var i = 0; i < currentInitData.length; i++) {
+                currentInitData = this.protectionModel.getAllInitData();
+                for (i = 0; i < currentInitData.length; i++) {
                     if (this.protectionExt.initDataEquals(initDataForKS, currentInitData[i])) {
                         this.debug.log("[DRM] Ignoring initData because we have already seen it!");
                         // If Key session already exists for this content, we check if the session and stored license key
@@ -805,7 +820,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
          * @instance
          */
         setSessionType: function(sessionType) {
-            if(this.keysystem){
+            if (this.keysystem) {
                 this.keySystem.sessionType = sessionType;
             }
         },
