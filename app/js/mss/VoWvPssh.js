@@ -53,7 +53,9 @@ Mss.dependencies.createVOWidevinePssh = function (KID, debug) {
             0x00                    // Policy length*/
         ]),
         length = pssh.length,
-        dataLength = length - 32;
+        dataLength = length - 32,
+        str = "",
+        i = 0;
 
     // Update box length value
     pssh[0] = (length & 0xFF000000) >> 32;
@@ -71,8 +73,8 @@ Mss.dependencies.createVOWidevinePssh = function (KID, debug) {
     pssh.set(KID, 36);
 
     if (debug) {
-        var str = "";
-        for (var i = 0; i < pssh.length; i++) {
+        str = "";
+        for (i = 0; i < pssh.length; i++) {
             str += "\\0x" + pssh[i].toString(16);
         }
         debug.log("[VoWvPssh] " + str);
