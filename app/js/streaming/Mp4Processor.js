@@ -925,7 +925,8 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             var trun = new mp4lib.boxes.TrackFragmentRunBox(),
                 i,
                 cts_base,
-                sample_duration_present_flag;
+                sample_duration_present_flag,
+                sample;
 
             cts_base = track.samples[0].cts;
             sample_duration_present_flag = (track.samples[0].duration > 0) ? 0x000100 : 0x000000;
@@ -941,7 +942,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             trun.sample_count = track.samples.length;
 
             for (i = 0; i < track.samples.length; i++) {
-                var sample = {
+                sample = {
                     sample_duration: track.samples[i].duration,
                     sample_size: track.samples[i].size,
                     sample_composition_time_offset: track.samples[i].cts - track.samples[i].dts

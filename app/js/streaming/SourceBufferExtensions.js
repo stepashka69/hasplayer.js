@@ -65,6 +65,7 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
     },
 
     getBufferRange: function (buffer, time, tolerance) {
+        "use strict";
         var ranges = null,
             start = 0,
             end = 0,
@@ -153,13 +154,17 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
             CHECK_INTERVAL = 50,
             checkIsUpdateEnded = function() {
                 // if undating is still in progress do nothing and wait for the next check again.
-                if (buffer.updating) return;
+                if (buffer.updating) {
+                    return;
+                }
                 // updating is completed, now we can stop checking and resolve the promise
                 clearInterval(intervalId);
                 defer.resolve(true);
             },
             updateEndHandler = function() {
-                if (buffer.updating) return;
+                if (buffer.updating) {
+                    return;
+                }
 
                 buffer.removeEventListener("updateend", updateEndHandler, false);
                 defer.resolve(true);

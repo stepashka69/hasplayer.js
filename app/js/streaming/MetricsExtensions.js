@@ -197,8 +197,8 @@
         {
             return "";
         }
-        var profile = h264ProfileMap[codecs.substr(5, 2)];
-        var level = parseInt(codecs.substr(9, 2), 16) / 10.0;
+        var profile = h264ProfileMap[codecs.substr(5, 2)],
+            level = parseInt(codecs.substr(9, 2), 16) / 10.0;
 
         return profile + "@" + level.toString();
     };

@@ -272,9 +272,9 @@ MediaPlayer = function(aContext) {
          * @access public
          */
         formatUTC = function(time, locales, hour12) {
-            var dt = new Date(time * 1000);
-            var d = dt.toLocaleDateString(locales);
-            var t = dt.toLocaleTimeString(locales, {
+            var dt = new Date(time * 1000),
+                d = dt.toLocaleDateString(locales),
+                t = dt.toLocaleTimeString(locales, {
                 hour12: hour12
             });
             return t + ' ' + d;
@@ -289,9 +289,9 @@ MediaPlayer = function(aContext) {
         convertToTimeCode = function(value) {
             value = Math.max(value, 0);
 
-            var h = Math.floor(value / 3600);
-            var m = Math.floor((value % 3600) / 60);
-            var s = Math.floor((value % 3600) % 60);
+            var h = Math.floor(value / 3600),
+                m = Math.floor((value % 3600) / 60),
+                s = Math.floor((value % 3600) % 60);
             return (h === 0 ? "" : (h < 10 ? "0" + h.toString() + ":" : h.toString() + ":")) + (m < 10 ? "0" + m.toString() : m.toString()) + ":" + (s < 10 ? "0" + s.toString() : s.toString());
         };
 

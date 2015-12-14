@@ -223,7 +223,7 @@ MediaPlayer.dependencies.StreamController = function() {
                 duration += streams[0].getStartTime();
             }
 
-            for (i = 0; i < ln; i++) {
+            for (i = 0; i < ln; i += 1) {
                 stream = streams[i];
                 duration += stream.getDuration();
 
@@ -612,6 +612,7 @@ MediaPlayer.dependencies.StreamController = function() {
 
             teardownComplete[MediaPlayer.models.ProtectionModel.eventList.ENAME_TEARDOWN_COMPLETE] = function() {
                 var i = 0,
+                    ln,
                     stream;
 
                 // Complete teardown process
