@@ -496,7 +496,13 @@ Hls.dependencies.HlsParser = function() {
                 if (_parsePlaylist.call(self, playlistRequest.response, representation)) {
                     deferred.resolve();
                 } else {
-                    deferred.reject();
+                    deferred.reject({
+                        name: MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE,
+                        message: "Failed to parse variant stream playlist",
+                        data: {
+                            url: representation.url
+                        }
+                    });
                 }
             }
         };
@@ -505,7 +511,13 @@ Hls.dependencies.HlsParser = function() {
             if (!error) {
                 return;
             }
-            deferred.reject();
+            deferred.reject({
+                name: MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST,
+                message: "Failed to download variant stream playlist",
+                data: {
+                    url: representation.url
+                }
+            });
         };
 
         try {
