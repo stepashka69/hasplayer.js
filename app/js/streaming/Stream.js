@@ -199,22 +199,15 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.log("[Stream] checkIfInitialized videoState=" + videoState + " audioState=" + audioState + " textTrackState=" + textTrackState);
             if (videoState !== null && audioState !== null && textTrackState !== null) {
                 if (videoState === "ready" && audioState === "ready" && textTrackState === "ready") {
-                    if (videoController === null && audioController === null && textController === null) {
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No streams to play", manifest);
+                    // Initialize protection controller
+                    if (protectionController) {
+                        protectionController.init(contentProtection, audioCodec, videoCodec);
+                    } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
+                        // No protectionController (MediaKeys not supported/enabled) but content is protected => error
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "Content is signalized protected but EME is not supported/enabled", manifest);
                         initializedeferred.reject();
-                    } else {
-                        //this.debug.log("MediaSource initialized!");
-                        // Initialize protection controller
-                        if (protectionController) {
-                            protectionController.init(contentProtection, audioCodec, videoCodec);
-                        } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
-                            // No protectionController (MediaKeys not supported/enabled) but content is protected => error
-                            this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "Content is signalized protected but EME is not supported/enabled", manifest);
-                            initializedeferred.reject();
-                        }
-
-                        initializedeferred.resolve(true);
                     }
+                    initializedeferred.resolve(true);
                 } else if (videoState === "error" || audioState === "error" || textTrackState === "error") {
                     initializedeferred.reject();
                 }
@@ -369,8 +362,11 @@ MediaPlayer.dependencies.Stream = function() {
                     );
                     return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
                 },
-                // self.manifestExt.getSpecificAudioData() succeeded
+                // self.manifestExt.getSpecificAudioData() failed or no video track
                 function() {
+                    if (videoState === "error") {
+                        return Q.reject();
+                    }
                     self.debug.log("[Stream] No audio streams.");
                     audioState = "ready";
                     self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_AUDIO, "No audio data in manifest");
@@ -433,8 +429,11 @@ MediaPlayer.dependencies.Stream = function() {
 
                     return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                 },
-                // self.manifestExt.getSpecificTextData() failed
+                // self.manifestExt.getSpecificTextData() failed or no video track
                 function() {
+                    if (videoState === "error") {
+                        return Q.reject();
+                    }
                     self.debug.log("[Stream] No text tracks.");
                     textTrackState = "ready";
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
