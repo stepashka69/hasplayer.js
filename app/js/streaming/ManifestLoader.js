@@ -14,9 +14,7 @@
 MediaPlayer.dependencies.ManifestLoader = function() {
     "use strict";
 
-    var RETRY_ATTEMPTS = 3,
-        RETRY_INTERVAL = 500,
-        deferred = null,
+    var deferred = null,
         request = new XMLHttpRequest(),
 
         getDecodedResponseText = function(text) {
@@ -70,14 +68,13 @@ MediaPlayer.dependencies.ManifestLoader = function() {
             this.parser.abort();
         },
 
-        doLoad = function(url, remainingAttempts, noRetry) {
+        doLoad = function(url) {
             var baseUrl = parseBaseUrl(url),
                 requestTime = new Date(),
                 mpdLoadedTime = null,
                 needFailureReport = true,
                 onload = null,
                 report = null,
-                rejectWithoutRetry = null,
                 onabort = null,
                 self = this;
 
@@ -93,7 +90,7 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                 if (request.status === 200 && request.readyState === 4) {
                     self.debug.log("[ManifestLoader] Manifest downloaded");
 
-                    //ORANGE : Get the redirection URL and use it as base URL
+                    // Get the redirection URL and use it as base URL
                     if (request.responseURL) {
                         self.debug.log("[ManifestLoader] Redirect URL: " + request.responseURL);
                         baseUrl = parseBaseUrl(request.responseURL);
@@ -122,10 +119,9 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                             self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
                             deferred.resolve(manifest);
                         },
-                        function(/*error*/) {
+                        function() {
                             self.debug.error("[ManifestLoader] Manifest parsing error");
-                            self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, "Failed to parse manifest", {manifestUrl: url});
-                            deferred.reject(request);
+                            deferred.reject({name: MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE, message: "Failed to parse manifest"});
                         }
                     );
                 }
@@ -148,38 +144,18 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                     request.status,
                     null,
                     null);
-                if (remainingAttempts > 0 && !request.aborted) {
-                    self.debug.log("Failed loading manifest: " + url + ", retry in " + RETRY_INTERVAL + "ms" + " attempts: " + remainingAttempts);
-                    remainingAttempts--;
-                    setTimeout(function() {
-                        doLoad.call(self, url, remainingAttempts);
-                    }, RETRY_INTERVAL);
-                } else if (!request.aborted) {
-                    var data = {},
-                        msgError = "Failed loading manifest: " + url + " no retry attempts left";
 
-                    self.debug.log(msgError);
-
-                    data.url = url;
-                    data.request = request;
-                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, msgError, data);
-                    deferred.reject(request);
+                if (request.aborted) {
+                    deferred.reject();
+                } else {
+                    deferred.reject({name: MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST, message: "Failed to download manifest"});
                 }
-            };
-
-            rejectWithoutRetry = function() {
-                if (!needFailureReport) {
-                    return;
-                }
-                needFailureReport = false;
-                deferred.reject(request);
             };
 
             try {
-                //this.debug.log("Start loading manifest: " + url);
                 request.onload = onload;
-                request.onloadend = noRetry ? rejectWithoutRetry : report;
-                request.onerror = noRetry ? rejectWithoutRetry : report;
+                request.onloadend = report;
+                request.onerror = report;
                 request.onabort = onabort;
                 request.open("GET", url, true);
                 request.send();
@@ -194,11 +170,9 @@ MediaPlayer.dependencies.ManifestLoader = function() {
         errHandler: undefined,
         metricsModel: undefined,
         tokenAuthentication: undefined,
-        load: function(url, noRetry) {
+        load: function(url) {
             deferred = Q.defer();
-
-            doLoad.call(this, url, RETRY_ATTEMPTS, noRetry);
-
+            doLoad.call(this, url);
             return deferred.promise;
         },
         abort: abort

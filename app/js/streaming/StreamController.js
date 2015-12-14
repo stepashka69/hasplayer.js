@@ -558,8 +558,11 @@ MediaPlayer.dependencies.StreamController = function() {
                     //self.debug.log(self.manifestModel.getValue());
                     self.manifestUpdater.start();
                 },
-                function() {
-                    self.debug.error("[StreamController] Manifest loading error.");
+                function(err) {
+                    // err is undefined in the case the request has been aborted
+                    if (err) {
+                        self.errHandler.sendError(err.name, err.message, {url: url});
+                    }
                 }
             );
         },
@@ -572,19 +575,18 @@ MediaPlayer.dependencies.StreamController = function() {
                     self.manifestModel.setValue(manifestResult);
                     self.debug.log("### Manifest has been refreshed.");
                 },
-                function(reqerror) {
-                    // Check if request has been aborted
-                    if (reqerror.aborted) {
-                        return;
-                    }
-                    // Otherwise notfiy webapp to refresh url
-                    if (isIntern) {
-                        self.eventBus.dispatchEvent({
-                            type: "manifestUrlUpdate",
-                            data: url
-                        });
-                    } else {
-                        self.debug.warn("[StreamController] Failed to refresh manifest at url : " + url);
+                function(err) {
+                    // err is undefined in the case the request has been aborted
+                    if (err) {
+                        self.errHandler.sendWarning(err.name, err.message, {url: url});
+
+                        // Notify webapp to refresh url if failed to dowload manifest (for example if manifest url expired)
+                        if (isIntern && err.name === MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST) {
+                            self.eventBus.dispatchEvent({
+                                type: "manifestUrlUpdate",
+                                data: url
+                            });
+                        }
                     }
                 }
             );
