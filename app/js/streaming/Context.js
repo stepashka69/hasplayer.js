@@ -79,9 +79,7 @@ MediaPlayer.di.Context = function () {
             mapProtectionModel.call(this); // Determines EME API support and version
 
             this.system.mapClass('metrics', MediaPlayer.models.MetricsList);
-            this.system.mapClass('downloadRatioRule', MediaPlayer.rules.DownloadRatioRule);
             this.system.mapClass('abandonRequestRule', MediaPlayer.rules.AbandonRequestsRule);
-            this.system.mapClass('insufficientBufferRule', MediaPlayer.rules.InsufficientBufferRule);
             this.system.mapClass('limitSwitchesRule', MediaPlayer.rules.LimitSwitchesRule);
             this.system.mapClass('abrRulesCollection', MediaPlayer.rules.BaseRulesCollection);
 
@@ -123,11 +121,15 @@ MediaPlayer.di.Context = function () {
             // here replace dash or streaming modules by ours
             this.system.mapSingleton('metricsExt', MediaPlayer.dependencies.MetricsExtensions);
             this.system.mapSingleton('config', MediaPlayer.utils.Config);
-
+             /* @if DASHIFRULE=true */
+            this.system.mapClass('insufficientBufferRule', MediaPlayer.rules.InsufficientBufferRule);
+            this.system.mapClass('downloadRatioRule', MediaPlayer.rules.DownloadRatioRule);
+            // @endif
             // overload ABR rules
+            /* @if HASRULE=true */
             this.system.mapClass('downloadRatioRule', MediaPlayer.rules.o.DownloadRatioRule);
             this.system.mapClass('insufficientBufferRule', MediaPlayer.rules.o.InsufficientBufferRule);
-
+            // @endif
             // plug message handler. When the message is notify, the contextManager is called
             this.system.mapHandler('setContext', 'contextManager', 'setContext');
         }

@@ -2,10 +2,13 @@ module.exports = function(grunt) {
 
     var protocols  = grunt.option('protocol'),
         protection = grunt.option('protection'),
-		proxy = grunt.option('proxy'),
+        proxy = grunt.option('proxy'),
         metricsAgent = grunt.option('metricsAgent'),
         analytics = grunt.option('analytics'),
         vowv = grunt.option('vowv'),
+        rules = grunt.option('rules'),
+        hasRule = true,
+        dashIfRule = ! hasRule,
         hls = true,
         mss = true;
 
@@ -26,12 +29,17 @@ module.exports = function(grunt) {
         }
     }
 
+    if (typeof(rules) === 'string' && rules === "dashif") {
+        dashIfRule = true;
+        hasRule = false;
+    }
+
     if (typeof(protection) !== 'boolean') {
         // protection is always included unless boolean is set to false
         protection = true;
     }
-	
-	if (typeof(proxy) !== 'boolean') {
+
+    if (typeof(proxy) !== 'boolean') {
         proxy = false;
     }
 
@@ -65,7 +73,9 @@ module.exports = function(grunt) {
                 METRICS_AGENT:metricsAgent,
                 VOWV:vowv,
                 PROTECTION: protection,
-				PROXY: proxy,
+                HASRULE: hasRule,
+                DASHIFRULE: dashIfRule,
+                PROXY: proxy,
                 ANALYTICS:analytics,
                 sendError: sendError,
                 reject: reject

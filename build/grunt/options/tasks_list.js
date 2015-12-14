@@ -10,7 +10,8 @@ module.exports = {
                     '-proxy                     Include/exclude OrangeHasPlayer proxy.\n\n' +
                     '-analytics                 Include/exclude analytics.\n\n' +
                     '-vowv                      Include/exclude source code for VO Widevine pssh generation.\n\n' +
-                    '-metricsAgent              Include/exclude MetricsAgent in hasplayer distribution.\n\n'
+                    '-metricsAgent              Include/exclude MetricsAgent in hasplayer distribution.\n\n' +
+                    '-rules has,dashif          Include/exclude dashif has rules or orange in hasplayer distribution.\n\n'
             }, {
                 name: 'build_dashif_sample',
                 info: 'Create built version of DashIF sample application.\n' +
