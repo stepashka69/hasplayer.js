@@ -276,7 +276,7 @@ MediaPlayer.dependencies.Stream = function() {
                             // TODO : How to tell index handler live/duration?
                             // TODO : Pass to controller and then pass to each method on handler?
                             videoController = self.system.getObject("bufferController");
-                            videoController.initialize("video", periodInfo, videoData, buffer, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            videoController.initialize("video", periodInfo, videoData, buffer, self.fragmentController, mediaSource, eventController);
                             videoState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
@@ -284,7 +284,9 @@ MediaPlayer.dependencies.Stream = function() {
                         function(ex) {
                             videoState = "error";
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Video codec is not supported", {codec: videoCodec});
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Video codec is not supported", {
+                                    codec: videoCodec
+                                });
                             } else {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer", ex);
                             }
@@ -344,7 +346,7 @@ MediaPlayer.dependencies.Stream = function() {
                             // TODO : How to tell index handler live/duration?
                             // TODO : Pass to controller and then pass to each method on handler?
                             audioController = self.system.getObject("bufferController");
-                            audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.fragmentController, mediaSource, eventController);
                             //self.debug.log("Audio is ready!");
                             audioState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
@@ -353,7 +355,9 @@ MediaPlayer.dependencies.Stream = function() {
                         function(ex) {
                             audioState = "error";
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Audio codec is not supported", {codec: videoCodec});
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Audio codec is not supported", {
+                                    codec: videoCodec
+                                });
                             } else {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer", ex);
                             }
@@ -405,7 +409,7 @@ MediaPlayer.dependencies.Stream = function() {
                     ).then(
                         function(buffer) {
                             textController = self.system.getObject("bufferController");
-                            textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.requestScheduler, self.fragmentController, mediaSource);
+                            textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.fragmentController, mediaSource);
 
                             if (buffer.hasOwnProperty('initialize')) {
                                 buffer.initialize(mimeType, textController, specificSubtitleData);
@@ -416,7 +420,9 @@ MediaPlayer.dependencies.Stream = function() {
                         },
                         function(ex) {
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
-                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Text codec is not supported", {codec: videoCodec});
+                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Text codec is not supported", {
+                                    codec: videoCodec
+                                });
                             } else {
                                 self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create text source buffer", ex);
                             }
@@ -610,7 +616,7 @@ MediaPlayer.dependencies.Stream = function() {
             //test if seek time is less than range start, never seek before range start.
             var start = this.getStartTime();
 
-            if (time<start) {
+            if (time < start) {
                 time = start;
             }
 
@@ -724,23 +730,6 @@ MediaPlayer.dependencies.Stream = function() {
 
             clearInterval(checkStartTimeIntervalId);
         },
-
-        /*updateCurrentTime = function() {
-            if (this.videoModel.isPaused()) return;
-
-            var currentTime = this.videoModel.getCurrentTime(),
-                representation = videoController ? videoController.getCurrentRepresentation() : audioController.getCurrentRepresentation(),
-                actualTime = this.timelineConverter.calcActualPresentationTime(representation, currentTime, this.manifestExt.getIsDynamic(manifest)),
-                timeChanged = (!isNaN(actualTime) && actualTime !== currentTime);
-
-            // ORANGE: unuseful?? and generate some bug since we cannot get availability window of current representation (@see TimelineConverter)
-            // if (timeChanged) {
-            //     this.videoModel.setCurrentTime(actualTime);
-            //     startBuffering(actualTime);
-            // } else {
-            //    startBuffering();
-            // }
-        },*/
 
         doLoad = function(manifestResult) {
 
@@ -1017,7 +1006,6 @@ MediaPlayer.dependencies.Stream = function() {
         metricsExt: undefined,
         errHandler: undefined,
         timelineConverter: undefined,
-        requestScheduler: undefined,
         scheduleWhilePaused: undefined,
         // ORANGE : add metricsModel
         metricsModel: undefined,
@@ -1087,8 +1075,6 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.listenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.listenOnParent("webkitfullscreenchange", fullScreenListener);
 
-            this.requestScheduler.videoModel = value;
-
             //document.addEventListener("visibilitychange", visibilitychangeListener);
         },
 
@@ -1136,7 +1122,7 @@ MediaPlayer.dependencies.Stream = function() {
                     function(index) {
                         textTrackIndex = index;
 
-                       // Update manifest
+                        // Update manifest
                         self.system.notify("manifestUpdate");
                     }
                 );
@@ -1236,7 +1222,6 @@ MediaPlayer.dependencies.Stream = function() {
 
                     protectionController = undefined;
                     self.fragmentController = undefined;
-                    self.requestScheduler = undefined;
 
                     load = Q.defer();
                     deferred.resolve();
@@ -1271,14 +1256,16 @@ MediaPlayer.dependencies.Stream = function() {
             eventController.reset();
         },
 
-        enableSubtitles: function(enabled){
-            if(enabled !== subtitlesEnabled){
-                subtitlesEnabled  = enabled;
-                if(textController){
-                    if(enabled){
-                        var time = this.videoModel.getCurrentTime();
+        enableSubtitles: function(enabled) {
+            var time;
+
+            if (enabled !== subtitlesEnabled) {
+                subtitlesEnabled = enabled;
+                if (textController) {
+                    if (enabled) {
+                        time = this.videoModel.getCurrentTime();
                         textController.seek(time);
-                    }else{
+                    } else {
                         textController.stop();
                     }
                 }
