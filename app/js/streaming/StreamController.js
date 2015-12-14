@@ -325,7 +325,7 @@ MediaPlayer.dependencies.StreamController = function() {
                         function(periods) {
 
                             if (periods.length === 0) {
-                                return deferred.reject("There are no regular periods");
+                                return deferred.reject();
                             }
 
                             self.metricsModel.updateManifestUpdateInfo(manifestUpdateInfo, {
@@ -433,8 +433,8 @@ MediaPlayer.dependencies.StreamController = function() {
                     updateSubtitleTracks.call(self);
                     self.system.notify("streamsComposed");
                 },
-                function(errMsg) {
-                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, errMsg, self.manifestModel.getValue());
+                function() {
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No stream/period is provided in the manifest");
                     self.reset();
                 }
             );
