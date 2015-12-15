@@ -93,7 +93,7 @@ SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
     var index = -1,
         i = 0,
         len = 0;
-    for (i = 0, len = tracks.length; i < len; i++) {
+    for (i = 0, len = tracks.length; i < len; i += 1) {
         if (tracks[i].id === id) {
             index = i;
             break;
@@ -191,7 +191,7 @@ SettingsPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selected
 SettingsPanel.prototype.addCombo = function(tracks, combo) {
     var i, option;
 
-    for (i = 0; i < tracks.length; i++) {
+    for (i = 0; i < tracks.length; i += 1) {
         option = document.createElement('option');
         option.text = tracks[i].id;
         option.value = tracks[i].lang;
@@ -210,7 +210,7 @@ SettingsPanel.prototype.addCombo = function(tracks, combo) {
 SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
     var i;
 
-    for (i = 0; i < tracks.length; i++) {
+    for (i = 0; i < tracks.length; i += 1) {
         if (currentTrack === tracks[i]) {
             combo.selectedIndex = i;
         }
@@ -220,7 +220,7 @@ SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
 SettingsPanel.prototype.resetCombo = function(tracks, combo) {
     var i;
 
-    for (i = tracks.length - 1; i >= 0; i--) {
+    for (i = tracks.length - 1; i >= 0; i -= 1) {
         combo.options.remove(i);
     }
 
