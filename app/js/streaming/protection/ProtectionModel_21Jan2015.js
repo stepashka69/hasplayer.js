@@ -431,9 +431,9 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                 eventHandler.session = sessionToken;
                 videoElement.addEventListener("waitingforkey", eventHandler);
             })
-            .catch(function (error) {
+            .catch(function (ex) {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR,
-                    new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR, sessionToken, "Error sending update() message! " + error.name));
+                    new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR, "Error while providing license to the CDM", ex));
             });
         },
 
@@ -451,8 +451,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             session.load(sessionID).then(function (success) {
                 if (success) {
                     var sessionToken = createSessionToken.call(this, session);
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        sessionToken);
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
                 } else {
                     self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
                         null, "Could not load session! Invalid Session ID (" + sessionID + ")");
