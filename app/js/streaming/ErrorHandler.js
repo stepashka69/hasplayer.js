@@ -48,9 +48,8 @@ MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_DECODE = "MEDIA_ERR_DE
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_SRC_NOT_SUPPORTED = "MEDIA_ERR_SRC_NOT_SUPPORTED";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED = "MEDIA_ERR_ENCRYPTED";
 
-// Manifest errors
-MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_VIDEO = "MANIFEST_ERR_NO_VIDEO";
-MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_AUDIO = "MANIFEST_ERR_NO_AUDIO";
+MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE = "CAPABILITY_ERR_MEDIASOURCE";
+MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS = "CAPABILITY_ERR_MEDIAKEYS";
 
 // MSE errors
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED = "MEDIA_ERR_CODEC_UNSUPPORTED";
@@ -58,21 +57,19 @@ MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER = 
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_APPEND_SOURCEBUFFER = "MEDIA_ERR_APPEND_SOURCEBUFFER";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER = "MEDIA_ERR_REMOVE_SOURCEBUFFER";
 
+// MediaPlayer errors
 MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_PARSE = "MANIFEST_ERR_PARSE";
 MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM = "MANIFEST_ERR_NOSTREAM";
-
-MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE = "CAPABILITY_ERR_MEDIASOURCE";
-MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS = "CAPABILITY_ERR_MEDIAKEYS";
-
+MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_VIDEO = "MANIFEST_ERR_NO_VIDEO";
+MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_AUDIO = "MANIFEST_ERR_NO_AUDIO";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST = "DOWNLOAD_ERR_MANIFEST";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_SIDX = "DOWNLOAD_ERR_SIDX";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_CONTENT = "DOWNLOAD_ERR_CONTENT";
 MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_INIT = "DOWNLOAD_ERR_INIT";
-
 MediaPlayer.dependencies.ErrorHandler.prototype.STREAM_ERR_BUFFER = "STREAM_ERR_BUFFER";
-
 MediaPlayer.dependencies.ErrorHandler.prototype.CC_ERR_PARSE = "CC_ERR_PARSE";
 
+// MediaKeyError from EME v0.1b (https://dvcs.w3.org/hg/html-media/raw-file/eme-v0.1b/encrypted-media/encrypted-media.html)
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR = "MEDIA_KEYERR";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_UNKNOWN = "MEDIA_KEYERR_UNKNOWN";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_CLIENT = "MEDIA_KEYERR_CLIENT";
@@ -81,8 +78,10 @@ MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_OUTPUT = "MEDIA_KEY
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_HARDWARECHANGE = "MEDIA_KEYERR_HARDWARECHANGE";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_DOMAIN = "MEDIA_KEYERR_DOMAIN";
 
+// Key system errors
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED = "MEDIA_KEYSYSERR_ACCESS_DENIED";
 
+// Key/license errors
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN = "MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NOCHALLENGE = "MEDIA_KEYMESSERR_NOCHALLENGE";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ABORTED = "MEDIA_KEYMESSERR_XHR_ABORTED";
