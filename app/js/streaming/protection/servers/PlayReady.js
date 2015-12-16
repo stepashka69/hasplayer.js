@@ -40,9 +40,7 @@
 MediaPlayer.dependencies.protection.servers.PlayReady = function() {
     "use strict";
 
-    var errorResponse = null,
-
-        decodeUtf8 = function(arrayBuffer) {
+    var decodeUtf8 = function(arrayBuffer) {
             var result = "",
                 i = 0,
                 c = 0,
@@ -86,28 +84,42 @@ MediaPlayer.dependencies.protection.servers.PlayReady = function() {
                 xmlDoc = this.domParser.createXmlTree(stringResponse),
                 enveloppe = xmlDoc ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null,
                 body = enveloppe ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
+                fault = body ? this.domParser.getChildNode(body, "soap:Fault") : null;
+
+            if (fault) {
+                return null;
+            }
+
+            return serverResponse;
+        },
+
+        parseErrorResponse = function(serverResponse) {
+            var stringResponse = decodeUtf8(serverResponse),
+                xmlDoc = this.domParser.createXmlTree(stringResponse),
+                enveloppe = xmlDoc ? this.domParser.getChildNode(xmlDoc, "soap:Envelope") : null,
+                body = enveloppe ? this.domParser.getChildNode(enveloppe, "soap:Body") : null,
                 fault = body ? this.domParser.getChildNode(body, "soap:Fault") : null,
                 faultstring = fault ? this.domParser.getChildNode(fault, "faultstring").firstChild.nodeValue : null,
                 detail = fault ? this.domParser.getChildNode(fault, "detail") : null,
                 exception = detail ? this.domParser.getChildNode(detail, "Exception") : null,
                 statusCode = exception ? this.domParser.getChildNode(exception, "StatusCode").firstChild.nodeValue : null,
                 message = exception ? this.domParser.getChildNode(exception, "Message").firstChild.nodeValue : null,
-                idStart,
-                idEnd;
+                idStart = message ? message.lastIndexOf('[') + 1 : -1,
+                idEnd = message ? message.indexOf(']') : -1;
 
-            errorResponse = null;
-
-            if (fault) {
-                idStart = message.lastIndexOf('[') + 1;
-                idEnd = message.indexOf(']');
-                errorResponse = {
-                    code: statusCode,
-                    name: faultstring + ' : ' + message.substring(idStart, idEnd)
+            if (fault === null) {
+                return {
+                    code: 0,
+                    name: "UnknownError",
+                    message: String.fromCharCode.apply(null, new Uint8Array(serverResponse))
                 };
-                return null;
             }
 
-            return serverResponse;
+            return {
+                code: statusCode,
+                name: faultstring,
+                message: message ? message.substring(idStart, idEnd) : ""
+            };
         };
 
     return {
@@ -124,10 +136,7 @@ MediaPlayer.dependencies.protection.servers.PlayReady = function() {
         },
 
         getErrorResponse: function(serverResponse/*, keySystemStr, messageType*/) {
-            if (errorResponse !== null) {
-                return errorResponse;
-            }
-            return String.fromCharCode.apply(null, new Uint8Array(serverResponse));
+            return parseErrorResponse.call(this, serverResponse);
         }
     };
 };

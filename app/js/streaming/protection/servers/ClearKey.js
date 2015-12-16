@@ -81,8 +81,12 @@ MediaPlayer.dependencies.protection.servers.ClearKey = function() {
             return new MediaPlayer.vo.protection.ClearKeyKeySet(keyPairs);
         },
 
-        getErrorResponse: function(serverResponse /*, keySystemStr, messageType*/ ) {
-            return String.fromCharCode.apply(null, new Uint8Array(serverResponse));
+        getErrorResponse: function(serverResponse/*, keySystemStr, messageType*/) {
+            return {
+                code: 0,
+                name: "UnknownError",
+                message: String.fromCharCode.apply(null, new Uint8Array(serverResponse))
+            };
         }
     };
 };
