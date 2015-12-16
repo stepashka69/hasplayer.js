@@ -59,14 +59,12 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                             mediaKeySystemAccess.getConfiguration() : null;
                     var keySystemAccess = new MediaPlayer.vo.protection.KeySystemAccess(keySystem, configuration);
                     keySystemAccess.mksa = mediaKeySystemAccess;
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE,
-                            keySystemAccess);
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, keySystemAccess);
                 }).catch(function() {
                     if (++i < ksConfigurations.length) {
                         requestKeySystemAccessInternal.call(self, ksConfigurations, i);
                     } else {
-                        self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE,
-                                null, "Key system access denied!");
+                        self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, null, "Key system access denied!");
                     }
                 });
             })(idx);
@@ -113,7 +111,8 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                                 this.session = null;
                             }
                             videoElement.removeEventListener("waitingforkey", eventHandler);
-                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_NO_VALID_KEY);
+                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR,
+                                new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED, "Media is encrypted and no key is available"));
 
                         break;
                     }
@@ -149,8 +148,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
 
                         case "keystatuseschange":
                             self.debug.log("[DRM][PM_21Jan2015] 'keystatuseschange' event: ", event);
-                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_STATUSES_CHANGED,
-                                    this);
+                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_STATUSES_CHANGED, this);
 
                              event.target.keyStatuses.forEach(function() {
                                 // has Edge and Chrome implement different version of keystatues, param are not on same order
@@ -423,6 +421,11 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             if (this.protectionExt.isClearKey(this.keySystem)) {
                 message = message.toJWK();
             }
+
+            /*sessionToken.licenseStored = true;
+            eventHandler.session = sessionToken;
+            videoElement.addEventListener("waitingforkey", eventHandler);*/
+
             session.update(message)
             .then(function(){
                 // track license has been stored in order to not retry request
