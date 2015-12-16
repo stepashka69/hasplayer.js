@@ -83,7 +83,7 @@ MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED = 
 
 // Key/license errors
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN = "MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN";
-MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NOCHALLENGE = "MEDIA_KEYMESSERR_NOCHALLENGE";
+MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_CHALLENGE = "MEDIA_KEYMESSERR_NO_CHALLENGE";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_LICENSER_ERROR = "MEDIA_KEYMESSERR_LICENSER_ERROR";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION = "MEDIA_KEYMESSERR_NO_SESSION";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_REMOVE_SESSION = "MEDIA_KEYMESSERR_NO_REMOVE_SESSION";
