@@ -82,7 +82,7 @@ MediaPlayer.dependencies.SourceBufferExtensions.prototype = {
             return null;
         }
 
-        if (ranges !== null) {
+        if (ranges) {
             for (i = 0, len = ranges.length; i < len; i += 1) {
                 start = ranges.start(i);
                 end = ranges.end(i);
