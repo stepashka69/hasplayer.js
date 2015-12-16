@@ -224,16 +224,11 @@ MediaPlayer.dependencies.ProtectionController = function() {
             }
         },
 
-        sendLicenseRequestCompleteEvent = function(data, errorType, errorMesage) {
+        sendLicenseRequestCompleteEvent = function(data) {
             this.eventBus.dispatchEvent({
                 type: MediaPlayer.dependencies.ProtectionController.events.LICENSE_REQUEST_COMPLETE,
-                data: data,
-                error: errorMesage
+                data: data
             });
-            if (errorType) {
-                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                    new MediaPlayer.vo.Error(errorType, errorMesage, data));
-            }
         },
 
         onKeyMessage = function(e) {
@@ -241,10 +236,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 licenseMessage = null,
                 keyMessage;
 
-            if (e.error) {
-                this.debug.log(e.error);
-                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, e.error);
-            }
             // Dispatch event to applications indicating we received a key message
             keyMessage = e.data;
 
@@ -261,7 +252,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 protData = getProtData(this.keySystem),
                 keySystemString = this.keySystem.systemString,
                 licenseServerData = this.protectionExt.getLicenseServer(this.keySystem, protData, messageType),
-                sendEvent = sendLicenseRequestCompleteEvent.bind(this),
                 eventData = {
                     sessionToken: sessionToken,
                     messageType: messageType
@@ -270,7 +260,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
             // Message not destined for license server
             if (!licenseServerData) {
                 this.debug.log("[DRM] License server request not required for this message (type = " + e.data.messageType + ").  Session ID = " + sessionToken.getSessionID());
-                sendEvent(eventData);
                 return;
             }
 
@@ -279,7 +268,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 var clearkeys = this.protectionExt.processClearKeyLicenseRequest(protData, message);
                 if (clearkeys) {
                     this.debug.log("[DRM] ClearKey license request handled by application!");
-                    sendEvent(eventData);
                     this.protectionModel.updateKeySession(sessionToken, clearkeys);
                     return;
                 }
@@ -314,7 +302,8 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
             // Ensure valid license server URL
             if (!url) {
-                sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN, 'DRM: No license server URL specified!');
+                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_URL_LICENSER_UNKNOWN, "No license server URL specified"));
                 return;
             }
 
@@ -323,20 +312,20 @@ MediaPlayer.dependencies.ProtectionController = function() {
             xhrLicense.onload = function() {
                 if (this.status === 200) {
                     self.debug.log("[DRM] Received license response");
-                    sendEvent(eventData);
                     licenseMessage = licenseServerData.getLicenseMessage(this.response, keySystemString, messageType);
                     if (licenseMessage !== null) {
                         self.protectionModel.updateKeySession(sessionToken, licenseMessage);
                     } else {
                         var error = licenseServerData.getErrorResponse(this.response, keySystemString, messageType);
-                        sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
-                            'DRM: ' + keySystemString + ' ' + error.name + ' with error code = ' + error.code);
+                        self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                            new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR, "License server returned an error", error));
                     }
                 } else {
-                    sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
-                        'DRM: ' + keySystemString + ' update, XHR status is "' + this.statusText + '" (' + this.status +
-                        '), expected to be 200. readyState is ' + this.readyState +
-                        ".  Response is " + ((this.response) ? licenseServerData.getErrorResponse(this.response, keySystemString, messageType) : "NONE"));
+                    self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                        new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR, "License request failed", {
+                            url: url,
+                            status: this.status
+                        }));
                 }
                 // reset xhrLicense for next call
                 xhrLicense = null;
@@ -344,15 +333,20 @@ MediaPlayer.dependencies.ProtectionController = function() {
             xhrLicense.onabort = function() {
                 // send error only if request has  not been aborted by reset
                 if (!this.aborted) {
-                    sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ABORTED,
-                        'DRM: ' + keySystemString + ' update, XHR aborted. status is "' + this.statusText + '" (' + this.status + '), readyState is ' + this.readyState);
+                    self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                        new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ABORTED, "License request aborted", {
+                            url: url,
+                            status: this.status
+                        }));
                 }
                 xhrLicense = null;
             };
             xhrLicense.onerror = function() {
-                sendEvent(eventData, MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR,
-                    'DRM: ' + keySystemString + ' update, XHR error. status is "' + this.statusText + '" (' + this.status + '), readyState is ' + this.readyState);
-                // reset xhrLicense for next call
+                self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_XHR_ERROR, "License request failed", {
+                        url: url,
+                        status: this.status
+                    }));
                 xhrLicense = null;
             };
 
