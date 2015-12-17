@@ -277,6 +277,7 @@ MediaPlayer.dependencies.Stream = function() {
                         // self.sourceBufferExt.createSourceBuffer() failed
                         function(ex) {
                             videoState = "error";
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Video codec is not supported", {
                                     codec: videoCodec
@@ -285,7 +286,6 @@ MediaPlayer.dependencies.Stream = function() {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer",
                                     new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
-                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
                     );
                     return self.manifestExt.getSpecificAudioData(manifest, periodInfo.index, defaultAudioLang);
@@ -293,8 +293,8 @@ MediaPlayer.dependencies.Stream = function() {
                 // self.manifestExt.getVideoData() failed
                 function() {
                     videoState = "error";
-                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_VIDEO, "No Video data in manifest");
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_VIDEO, "No Video data in manifest");
                     // Video is required, cancel any other track initialization
                     return Q.reject();
                 }
@@ -364,14 +364,13 @@ MediaPlayer.dependencies.Stream = function() {
                 },
                 // self.manifestExt.getSpecificAudioData() failed or no video track
                 function() {
+                    audioState = "ready";
+                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
                     if (videoState === "error") {
                         return Q.reject();
                     }
                     self.debug.log("[Stream] No audio streams.");
-                    audioState = "ready";
                     self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_AUDIO, "No audio data in manifest");
-                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
-
                     return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
                 }
             ).then(
@@ -415,6 +414,9 @@ MediaPlayer.dependencies.Stream = function() {
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
                         function(ex) {
+                            textTrackState = "ready";
+                            textController = null;
+                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
                                 self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Text codec is not supported", {
                                     codec: videoCodec
@@ -423,10 +425,6 @@ MediaPlayer.dependencies.Stream = function() {
                                 self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create text source buffer",
                                     new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
-
-                            textTrackState = "ready";
-                            textController = null;
-                            checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
                     );
 
@@ -434,13 +432,12 @@ MediaPlayer.dependencies.Stream = function() {
                 },
                 // self.manifestExt.getSpecificTextData() failed or no video track
                 function() {
+                    textTrackState = "ready";
+                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
                     if (videoState === "error") {
                         return Q.reject();
                     }
                     self.debug.log("[Stream] No text tracks.");
-                    textTrackState = "ready";
-                    checkIfInitialized.call(self, videoState, audioState, textTrackState);
-
                     return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                 }
             ).then(
