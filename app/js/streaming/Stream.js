@@ -198,7 +198,7 @@ MediaPlayer.dependencies.Stream = function() {
                         protectionController.init(contentProtection, audioCodec, videoCodec);
                     } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
                         // No protectionController (MediaKeys not supported/enabled) but content is protected => error
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "EME is not supported/enabled", contentProtection);
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "EME is not supported/enabled", null);
                         initializedeferred.reject();
                     }
                     initializedeferred.resolve(true);
