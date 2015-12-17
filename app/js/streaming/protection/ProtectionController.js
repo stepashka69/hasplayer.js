@@ -411,31 +411,19 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         onServerCertificateUpdated = function(event) {
             if (!event.error) {
-                this.debuglog("[DRM] License server certificate successfully updated.");
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.SERVER_CERTIFICATE_UPDATED,
-                    data: null,
-                    error: null
-                });
+                this.debug.log("[DRM] License server certificate successfully updated");
             } else {
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.SERVER_CERTIFICATE_UPDATED,
-                    data: null,
-                    error: "DRM: Failed to update license server certificate. -- " + event.error
-                });
+                this.debug.error("[DRM] Failed to set license server certificate");
+                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
+                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_SERVER_CERTIFICATE, "Failed to set server certificate", event.error));
             }
         },
 
         onKeySessionCreated = function(event) {
-
             if (!event.error) {
                 this.debug.log("[DRM] Session created.  SessionID = " + event.data.getSessionID());
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED,
-                    data: event.data,
-                    error: null
-                });
             } else {
+                this.debug.error("[DRM] Failed to create key session");
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                     new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION, "Failed to create key session", event.error));
             }
@@ -443,19 +431,9 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         onKeyAdded = function( /*event*/ ) {
             this.debug.log("[DRM] Key added");
-            this.eventBus.dispatchEvent({
-                type: MediaPlayer.dependencies.ProtectionController.events.KEY_ADDED,
-                data: null,
-                error: null
-            });
         },
 
         onKeyError = function(event) {
-            /*this.eventBus.dispatchEvent({
-                type: MediaPlayer.dependencies.ProtectionController.events.KEY_ADDED,
-                data: event.data,
-                error: "DRM: MediaKeyError - " + (event.data.sessionToken ? " sessionId: " + event.data.sessionToken.getSessionID() : "") + ".  " + event.data.error
-            });*/
             this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                 new MediaPlayer.vo.Error(event.data.code, event.data.message, event.data.data));
         },
@@ -463,47 +441,25 @@ MediaPlayer.dependencies.ProtectionController = function() {
         onKeySessionClosed = function(event) {
             if (!event.error) {
                 this.debug.log("[DRM] Session closed.  SessionID = " + event.data);
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CLOSED,
-                    data: event.data,
-                    error: null
-                });
             } else {
-                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_CLOSE_SESSION, "[DRM] Failed to close key session. -- " + event.error, null));
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CLOSED,
-                    data: null,
-                    error: "DRM Failed to close key session. -- " + event.error
-                });
+                this.debug.warn("[DRM] Failed to close session");
             }
         },
 
         onKeySessionRemoved = function(event) {
             if (!event.error) {
                 this.debug.log("[DRM] Session removed.  SessionID = " + event.data);
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_REMOVED,
-                    data: event.data,
-                    error: null
-                });
             } else {
-                this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_REMOVE_SESSION, "[DRM] Failed to remove key session. -- " + event.error, null));
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_REMOVED,
-                    data: null,
-                    error: "DRM Failed to remove key session. -- " + event.error
-                });
+                this.debug.warn("[DRM] Failed to remove session");
             }
         },
 
         onKeyStatusesChanged = function(event) {
-            this.eventBus.dispatchEvent({
-                type: MediaPlayer.dependencies.ProtectionController.events.KEY_STATUSES_CHANGED,
-                data: event.data,
-                error: null
-            });
+            if (!event.error) {
+                this.debug.log("[DRM] Key statuses changed. statuses = " + event.data);
+            } /*else {
+                // TODO: handle expired session
+            }*/
         };
 
     return {
@@ -518,8 +474,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
 
         setup: function() {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);
-            //this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED] = onKeySystemSelected.bind(this);
-            //this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE] = onKeySystemAccessComplete.bind(this);
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_NEED_KEY] = onNeedKey.bind(this);
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_SERVER_CERTIFICATE_UPDATED] = onServerCertificateUpdated.bind(this);
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ADDED] = onKeyAdded.bind(this);
@@ -688,18 +642,11 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 try {
                     this.protectionModel.createKeySession(initDataForKS, this.keySystem.sessionType, cdmData);
                 } catch (error) {
-                    this.eventBus.dispatchEvent({
-                        type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED,
-                        data: null,
-                        error: "Error creating key session! " + error.message
-                    });
+                    this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, error.message);
                 }
             } else {
-                this.eventBus.dispatchEvent({
-                    type: MediaPlayer.dependencies.ProtectionController.events.KEY_SESSION_CREATED,
-                    data: null,
-                    error: "Selected key system is " + this.keySystem.systemString + ".  needkey/encrypted event contains no initData corresponding to that key system!"
-                });
+                this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
+                    "needkey/encrypted event contains no initData corresponding to that key system " + this.keySystem.systemString);
             }
         },
 

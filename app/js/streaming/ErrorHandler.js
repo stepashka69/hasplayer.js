@@ -24,7 +24,7 @@ MediaPlayer.dependencies.ErrorHandler = function () {
                 type: "warning",
                 event: {code : code, message: message, data: data}
             });
-            this.debug.warn("[Warn] Code: " + code + ", Message: " + message + ", Data: " + JSON.stringify(data));
+            this.debug.warn("[Warn] Code: " + code + ", Message: " + message + ", Data: " + JSON.stringify(data, null, '\t'));
         },
 
         sendError: function (code, message, data) {
@@ -32,7 +32,7 @@ MediaPlayer.dependencies.ErrorHandler = function () {
                 type: "error",
                 event: {code : code, message: message, data: data}
             });
-            this.debug.error("[Error] Code: " + code + ", Message: " + message + ", Data: " + JSON.stringify(data));
+            this.debug.error("[Error] Code: " + code + ", Message: " + message + ", Data: " + JSON.stringify(data, null, '\t'));
         }
     };
 };
@@ -86,8 +86,9 @@ MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_URL_LICENSER_UN
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_CHALLENGE = "MEDIA_KEYMESSERR_NO_CHALLENGE";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_LICENSER_ERROR = "MEDIA_KEYMESSERR_LICENSER_ERROR";
 MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION = "MEDIA_KEYMESSERR_NO_SESSION";
-MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_REMOVE_SESSION = "MEDIA_KEYMESSERR_NO_REMOVE_SESSION";
-MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_CLOSE_SESSION = "MEDIA_KEYMESSERR_NO_CLOSE_SESSION";
+
+// Other MediaKeyError
+MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR_SERVER_CERTIFICATE = "MEDIA_KEYERR_SERVER_CERTIFICATE";
 
 // DOM exceptions (see http://www.w3.org/TR/WebIDL-1/#h-idl-domexception-error-names)
 MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_INDEX_SIZE = 1;
