@@ -133,7 +133,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                                 //if (!fromManifest) {
                                 self.eventBus.dispatchEvent({
                                     type: MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED,
-                                    error: "DRM: KeySystem Access Denied! -- " + event.error
+                                    error: "[DRM] KeySystem Access Denied! -- " + event.error
                                 });
                                 //}
                             } else {
@@ -174,7 +174,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                         if (!fromManifest) {
                             self.eventBus.dispatchEvent({
                                 type: MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED,
-                                error: "DRM: KeySystem Access Denied! -- " + event.error
+                                error: "[DRM] KeySystem Access Denied! -- " + event.error
                             });
                         }
                         self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
@@ -206,7 +206,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                         if (!fromManifest) {
                             self.eventBus.dispatchEvent({
                                 type: MediaPlayer.dependencies.ProtectionController.events.KEY_SYSTEM_SELECTED,
-                                error: "DRM: Error selecting key system! -- " + event.error
+                                error: "[DRM] Error selecting key system! -- " + event.error
                             });
                         }
                         self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
@@ -627,7 +627,6 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 i = 0,
                 currentInitData;
             if (initDataForKS) {
-
                 // Check for duplicate initData
                 currentInitData = this.protectionModel.getAllInitData();
                 for (i = 0; i < currentInitData.length; i++) {
@@ -642,11 +641,16 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 try {
                     this.protectionModel.createKeySession(initDataForKS, this.keySystem.sessionType, cdmData);
                 } catch (error) {
-                    this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, error.message);
+                    this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                        reason: "Create key session raised en exception",
+                        error: error
+                    });
                 }
             } else {
-                this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
-                    "needkey/encrypted event contains no initData corresponding to that key system " + this.keySystem.systemString);
+                this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                    reason: "needkey/encrypted event contains no initData corresponding to that key system " + this.keySystem.systemString,
+                    error: null
+                });
             }
         },
 

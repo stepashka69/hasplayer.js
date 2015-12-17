@@ -402,10 +402,11 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             session.generateRequest("cenc", initData).then(function() {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
             }).catch(function(error) {
-                // TODO: Better error string
                 removeSession(sessionToken);
-                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
-                    "Failed to generate key request (" + error.name + ")");
+                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                    reason: "Failed to generate key request",
+                    error: error
+                });
             });
         },
 
@@ -456,12 +457,16 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                     var sessionToken = createSessionToken.call(this, session);
                     self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
                 } else {
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
-                        "Failed to load session " + sessionID);
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                        reason: "Failed to load session " + sessionID,
+                        error: null
+                    });
                 }
             }).catch(function (error) {
-                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                    "Failed to load session " + sessionID + " (" + error.name + ")");
+                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, {
+                    reason: "Failed to load session " + sessionID,
+                    error: error
+                });
             });
         },
 
