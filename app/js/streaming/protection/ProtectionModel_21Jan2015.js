@@ -399,7 +399,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
 
             // Generate initial key request
             var self = this;
-            session.generateRequest("cenc2", initData).then(function() {
+            session.generateRequest("cenc", initData).then(function() {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
             }).catch(function(ex) {
                 removeSession(sessionToken);

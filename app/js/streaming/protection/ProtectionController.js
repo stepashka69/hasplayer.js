@@ -178,7 +178,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                             });
                         }
                         self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                            new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED, "No KeySystem/CDM available", null));
+                            new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED, "No KeySystem/CDM available", requestedKeySystems));
                     } else {
                         keySystemAccess = event.data;
                         self.debug.log("[DRM] KeySystem Access (" + keySystemAccess.keySystem.systemString + ") Granted!  Selecting key system...");
@@ -210,7 +210,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                             });
                         }
                         self.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                            new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED, "No KeySystem/CDM available", null));
+                            new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYSYSERR_ACCESS_DENIED, "No KeySystem/CDM available", requestedKeySystems));
 
                     }
                 };
