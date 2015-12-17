@@ -32,15 +32,13 @@ OrangeHasPlayer = function() {
         audioQualityChanged = [],
         videoBitrates = null,
         audioBitrates = null,
-        videoDownloadedBdthValue,
-        audioDownloadedBdthValue,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
         metricsAgent = {
             ref: null,
-            deferInit : null,
+            deferInit: null,
             isActivated: false
         },
         initialQuality = {
@@ -48,10 +46,10 @@ OrangeHasPlayer = function() {
             audio: -1
         },
 
-        debugData ={
-            isInDebug:false,
-            level:0,
-            loggerType:'console'
+        debugData = {
+            isInDebug: false,
+            level: 0,
+            loggerType: 'console'
         },
         state = 'UNINITIALIZED';
 
@@ -81,7 +79,7 @@ OrangeHasPlayer = function() {
                 debugData.isInDebug = false;
                 console.log("debug mode desactivated");
                 _isPlayerInitialized();
-                if ((e.keyCode === 90)) {
+                if (e.keyCode === 90) {
                     _downloadDebug(mediaPlayer.getDebug().getLogger().getLogs());
                 }
                 mediaPlayer.getDebug().setLevel(debugData.level);
@@ -90,7 +88,7 @@ OrangeHasPlayer = function() {
                 debugData.isInDebug = true;
                 console.log("debug mode activated");
                 _isPlayerInitialized();
-                debugData.level =  mediaPlayer.getDebug().getLevel();
+                debugData.level = mediaPlayer.getDebug().getLevel();
                 mediaPlayer.getDebug().setLevel((e.keyCode === 68) ? 4 : 3);
                 mediaPlayer.getDebug().setLogger((e.keyCode === 68) ? 'console' : 'memory');
             }
@@ -101,16 +99,18 @@ OrangeHasPlayer = function() {
         if (array && array.length > 0) {
             var filename = 'hasplayer_logs.txt',
                 data = JSON.stringify(array, null, '\r\n'),
-                blob = new Blob([data], {type: 'text/json'});
+                blob = new Blob([data], {
+                    type: 'text/json'
+                });
 
             if (navigator.msSaveBlob) { // For IE10+ and edge
-                navigator.msSaveBlob(blob,filename);
+                navigator.msSaveBlob(blob, filename);
             } else {
-                var e    = document.createEvent('MouseEvents'),
-                    a    = document.createElement('a');
+                var e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
                 a.download = filename;
                 a.href = window.URL.createObjectURL(blob);
-                a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
                 e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                 a.dispatchEvent(e);
             }
@@ -130,10 +130,10 @@ OrangeHasPlayer = function() {
         video.dispatchEvent(event);
     };
 
-    var _cleanStreamTab = function(streamTab, idToRemove){
+    var _cleanStreamTab = function(streamTab, idToRemove) {
         var i = 0;
 
-        for (i = idToRemove.length - 1; i >= 0; i--) {
+        for (i = idToRemove.length - 1; i >= 0; i -= 1) {
             streamTab.splice(i, 1);
         }
     };
@@ -148,7 +148,7 @@ OrangeHasPlayer = function() {
             currentSwitch = streamTab[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
                 _dispatchBitrateEvent('play_bitrate', currentSwitch);
-                debug.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t="+currentSwitch.mediaStartTime + "(" + video.playbackRate + ")");
+                debug.log("[OrangeHasPlayer][" + currentSwitch.streamType + "] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t=" + currentSwitch.mediaStartTime + "(" + video.playbackRate + ")");
                 // And remove when it's played
                 idToRemove.push(i);
             }
@@ -191,8 +191,8 @@ OrangeHasPlayer = function() {
                             width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate - b="+videoBitrates[e.data.value.lto]);
-                    }    
+                        debug.log("[OrangeHasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
+                    }
                 } else if (e.data.stream == "audio") {
                     audioBitrates = metricsExt.getBitratesForType(e.data.stream);
                     if (audioBitrates) {
@@ -203,33 +203,33 @@ OrangeHasPlayer = function() {
                             width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate - b="+videoBitrates[e.data.value.lto]);
+                        debug.log("[OrangeHasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
                     }
                 }
                 break;
-            case "BufferedSwitch" :
+            case "BufferedSwitch":
                 _isPlayerInitialized();
                 if (e.data.stream == "video") {
                     videoQualityChanged.push({
-                                streamType: e.data.stream,
-                                mediaStartTime: e.data.value.mt,
-                                switchedQuality: videoBitrates[e.data.value.lto],
-                                representationId: e.data.value.to,
-                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                        streamType: e.data.stream,
+                        mediaStartTime: e.data.value.mt,
+                        switchedQuality: videoBitrates[e.data.value.lto],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
                 } else if (e.data.stream == "audio") {
                     audioQualityChanged.push({
-                                streamType: e.data.stream,
-                                mediaStartTime: e.data.value.mt,
-                                switchedQuality: audioBitrates[e.data.value.lto],
-                                representationId: e.data.value.to,
-                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                        streamType: e.data.stream,
+                        mediaStartTime: e.data.value.mt,
+                        switchedQuality: audioBitrates[e.data.value.lto],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
                 }
                 break;
-            case "BufferLevel" :
+            case "BufferLevel":
                 //debug.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('bufferLevel_updated', false, false, {
@@ -238,7 +238,7 @@ OrangeHasPlayer = function() {
                 });
                 video.dispatchEvent(event);
                 break;
-            case "State" :
+            case "State":
                 //debug.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('state_changed', false, false, {
@@ -279,7 +279,7 @@ OrangeHasPlayer = function() {
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
         video.addEventListener("timeupdate", _onTimeupdate);
-        window.addEventListener("keydown",_handleKeyPressedEvent);
+        window.addEventListener("keydown", _handleKeyPressedEvent);
     };
 
     /**
@@ -372,19 +372,17 @@ OrangeHasPlayer = function() {
     this.load = function(url, protData) {
         var self = this,
             config = {
-            video: {
-                "ABR.keepBandwidthCondition": true
-            },
-            audio: {
-                "ABR.keepBandwidthCondition": true
-            }
-        };
+                video: {
+                    "ABR.keepBandwidthCondition": true
+                },
+                audio: {
+                    "ABR.keepBandwidthCondition": true
+                }
+            };
 
         audioTracks = [];
         subtitleTracks = [];
 
-        videoDownloadedBdthValue = undefined;
-        audioDownloadedBdthValue = undefined;
         videoQualityChanged = [];
         audioQualityChanged = [];
 
@@ -435,7 +433,7 @@ OrangeHasPlayer = function() {
      * @memberof OrangeHasPlayer#
      * param {string} url - the video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
      */
-    this.refreshManifest = function(url){
+    this.refreshManifest = function(url) {
         _isPlayerInitialized();
         mediaPlayer.refreshManifest(url);
     };
@@ -521,7 +519,7 @@ OrangeHasPlayer = function() {
      * @method reset
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {number} reason - 0 : a stop during streaming (ex: browser has been closed), 1 : a stop because all the stream has been watched and 2 : a stop, after an error. 
+     * @param {number} reason - 0 : a stop during streaming (ex: browser has been closed), 1 : a stop because all the stream has been watched and 2 : a stop, after an error.
      */
     this.reset = function(reason) {
         _isPlayerInitialized();
@@ -696,7 +694,7 @@ OrangeHasPlayer = function() {
             mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
             if (mediaPlayerAudioTracks) {
-                for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+                for (i = 0; i < mediaPlayerAudioTracks.length; i += 1) {
                     audioTracks.push({
                         id: mediaPlayerAudioTracks[i].id,
                         lang: mediaPlayerAudioTracks[i].lang
@@ -735,7 +733,7 @@ OrangeHasPlayer = function() {
         mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
         if (mediaPlayerAudioTracks) {
-            for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+            for (i = 0; i < mediaPlayerAudioTracks.length; i += 1) {
                 if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
@@ -762,7 +760,7 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedAudioTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < audioTracks.length; i++) {
+            for (i = 0; i < audioTracks.length; i += 1) {
                 if (audioTracks[i].id === selectedTrack.id ||
                     audioTracks[i].lang === selectedTrack.lang) {
                     selectedAudioTrack = audioTracks[i];
@@ -816,7 +814,7 @@ OrangeHasPlayer = function() {
             mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
             if (mediaPlayerSubtitleTracks) {
-                for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+                for (i = 0; i < mediaPlayerSubtitleTracks.length; i += 1) {
                     subtitleTracks.push({
                         id: mediaPlayerSubtitleTracks[i].id,
                         lang: mediaPlayerSubtitleTracks[i].lang
@@ -855,7 +853,7 @@ OrangeHasPlayer = function() {
         mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
         if (mediaPlayerSubtitleTracks) {
-            for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+            for (i = 0; i < mediaPlayerSubtitleTracks.length; i += 1) {
                 if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
@@ -884,7 +882,7 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < subtitleTracks.length; i++) {
+            for (i = 0; i < subtitleTracks.length; i += 1) {
                 if (subtitleTracks[i].id === selectedTrack.id ||
                     subtitleTracks[i].lang === selectedTrack.lang) {
                     selectedSubtitleTrack = subtitleTracks[i];
