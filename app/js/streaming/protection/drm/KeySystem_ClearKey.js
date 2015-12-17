@@ -87,7 +87,7 @@ MediaPlayer.dependencies.protection.KeySystem_ClearKey.getClearKeysFromProtectio
             var clearkeyID = jsonMsg.kids[i],
                     clearkey = (protData.clearkeys.hasOwnProperty(clearkeyID)) ? protData.clearkeys[clearkeyID] : null;
             if (!clearkey) {
-                throw new Error("DRM: ClearKey keyID (" + clearkeyID + ") is not known!");
+                throw new Error("[DRM] ClearKey keyID (" + clearkeyID + ") is not known!");
             }
             // KeyIDs from CDM are not base64 padded.  Keys may or may not be padded
             keyPairs.push(new MediaPlayer.vo.protection.KeyPair(clearkeyID, clearkey));

@@ -117,7 +117,7 @@ MediaPlayer.models.ProtectionModel_01b = function () {
                                 if (event.systemCode) {
                                     msg += "  (System Code = " + event.systemCode + ")";
                                 }
-                                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR, new MediaPlayer.vo.protection.KeyError(code, msg, sessionToken));
+                                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR, new MediaPlayer.vo.protection.KeyError(code, msg));
                             } else {
                                 self.log("No session token found for key error");
                             }
