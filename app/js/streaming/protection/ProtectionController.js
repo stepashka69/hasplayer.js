@@ -640,10 +640,10 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 }
                 try {
                     this.protectionModel.createKeySession(initDataForKS, this.keySystem.sessionType, cdmData);
-                } catch (error) {
+                } catch (ex) {
                     this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
                         reason: "Create key session raised en exception",
-                        error: error
+                        error: new MediaPlayer.vo.Error(ex.code, ex.name, ex.message)
                     });
                 }
             } else {

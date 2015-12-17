@@ -71,15 +71,9 @@ MediaPlayer.dependencies.Stream = function() {
         startStreamTime = -1,
         visibilitychangeListener,
 
-        // Encrypted Media Extensions
+        // Protection errors
         onProtectionError = function(event) {
-            if (protectionController && event && event.data && event.data.data && event.data.data.sessionToken) {
-                var sessionToken = event.data.data.sessionToken;
-                protectionController.closeKeySession(sessionToken);
-            }
             this.errHandler.sendError(event.data.code, event.data.message, event.data.data);
-            // if the errors give the session token in params we close the current session
-            //this.reset();
         },
 
         play = function() {
@@ -204,7 +198,7 @@ MediaPlayer.dependencies.Stream = function() {
                         protectionController.init(contentProtection, audioCodec, videoCodec);
                     } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
                         // No protectionController (MediaKeys not supported/enabled) but content is protected => error
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "Content is signalized protected but EME is not supported/enabled", manifest);
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "EME is not supported/enabled", contentProtection);
                         initializedeferred.reject();
                     }
                     initializedeferred.resolve(true);
@@ -288,7 +282,8 @@ MediaPlayer.dependencies.Stream = function() {
                                     codec: videoCodec
                                 });
                             } else {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer", ex);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
@@ -359,7 +354,8 @@ MediaPlayer.dependencies.Stream = function() {
                                     codec: videoCodec
                                 });
                             } else {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer", ex);
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
@@ -424,7 +420,8 @@ MediaPlayer.dependencies.Stream = function() {
                                     codec: videoCodec
                                 });
                             } else {
-                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create text source buffer", ex);
+                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create text source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
 
                             textTrackState = "ready";

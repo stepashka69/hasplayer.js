@@ -399,13 +399,13 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
 
             // Generate initial key request
             var self = this;
-            session.generateRequest("cenc", initData).then(function() {
+            session.generateRequest("cenc2", initData).then(function() {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
-            }).catch(function(error) {
+            }).catch(function(ex) {
                 removeSession(sessionToken);
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
                     reason: "Failed to generate key request",
-                    error: error
+                    error: new MediaPlayer.vo.Error(ex.code, ex.name, ex.message)
                 });
             });
         },
@@ -462,10 +462,10 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                         error: null
                     });
                 }
-            }).catch(function (error) {
+            }).catch(function (ex) {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, {
                     reason: "Failed to load session " + sessionID,
-                    error: error
+                    error: new MediaPlayer.vo.Error(ex.code, ex.name, ex.message)
                 });
             });
         },

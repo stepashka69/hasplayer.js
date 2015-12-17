@@ -419,13 +419,8 @@ MediaPlayer.dependencies.BufferController = function() {
                                     self.system.notify("bufferUpdated");
                                 },
                                 function(result) {
-                                    var data = {
-                                        code: result.err.code,
-                                        name: result.err.name,
-                                        message: result.err.message
-                                    };
-
-                                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_APPEND_SOURCEBUFFER, "Failed to append data into " + type + " source buffer", data);
+                                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_APPEND_SOURCEBUFFER, "Failed to append data into " + type + " source buffer",
+                                        new MediaPlayer.vo.Error(result.err.code, result.err.name, result.err.message));
                                     // if the append has failed because the buffer is full we should store the data
                                     // that has not been appended and stop request scheduling. We also need to store
                                     // the promise for this append because the next data can be appended only after
@@ -686,13 +681,9 @@ MediaPlayer.dependencies.BufferController = function() {
                     self.debug.log("[BufferController][" + type + "] Seek to " + seekTarget);
                     deferred.resolve();
                 },
-                function(err) {
-                    var data = {
-                        code: err.code,
-                        name: err.name,
-                        message: err.message
-                    };
-                    self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "Failed to remove data from " + type + " source buffer", data);
+                function(ex) {
+                    self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "Failed to remove data from " + type + " source buffer",
+                        new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                     deferred.resolve();
                 }
             );
@@ -728,13 +719,9 @@ MediaPlayer.dependencies.BufferController = function() {
                     // the executed requests for which playback time is inside the time interval that has been removed from the buffer
                     self.fragmentController.removeExecutedRequestsBeforeTime(fragmentModel, removeEnd);
                     deferred.resolve(removeEnd - removeStart);
-                }, function(err) {
-                    var data = {
-                        code: err.code,
-                        name: err.name,
-                        message: err.message
-                    };
-                    self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "Failed to remove data from " + type + " source buffer", data);
+                }, function(ex) {
+                    self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_REMOVE_SOURCEBUFFER, "Failed to remove data from " + type + " source buffer",
+                        new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                     deferred.resolve(0);
                 }
             );
