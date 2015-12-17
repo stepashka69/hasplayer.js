@@ -377,7 +377,7 @@ Mss.dependencies.MssParser = function() {
             };
 
             contentProtection.schemeIdUri = keySystem.schemeIdURI;
-            contentProtection.value = 2; //keySystem.systemString;
+            contentProtection.value = keySystem.systemString;
             contentProtection.pro = pro;
             contentProtection.pro_asArray = pro;
 
