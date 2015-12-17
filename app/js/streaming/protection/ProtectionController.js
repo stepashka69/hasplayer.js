@@ -437,7 +437,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                 });
             } else {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
-                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION, "[DRM] Failed to create key session. -- " + event.error, null));
+                    new MediaPlayer.vo.Error(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYMESSERR_NO_SESSION, "Failed to create key session", event.error));
             }
         },
 

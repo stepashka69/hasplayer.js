@@ -404,8 +404,8 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             }).catch(function(error) {
                 // TODO: Better error string
                 removeSession(sessionToken);
-                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Error generating key request -- " + error.name);
+                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
+                    "Failed to generate key request (" + error.name + ")");
             });
         },
 
@@ -456,12 +456,12 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                     var sessionToken = createSessionToken.call(this, session);
                     self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
                 } else {
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Could not load session! Invalid Session ID (" + sessionID + ")");
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null,
+                        "Failed to load session " + sessionID);
                 }
             }).catch(function (error) {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Could not load session (" + sessionID + ")! " + error.name);
+                    "Failed to load session " + sessionID + " (" + error.name + ")");
             });
         },
 
