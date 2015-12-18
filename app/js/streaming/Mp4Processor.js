@@ -753,7 +753,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
                 mvex.boxes.push(mehd);
             }*/
 
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i += 1) {
                 track = tracks[i];
                 // Create Track Extend Box (trex), exactly one for each track in the movie box
                 // This sets up default values used by the movie fragments. By setting defaults in this way, space and
@@ -780,7 +780,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
                 pssh,
                 i;
 
-            for (i = 0; i < keySystems.length; i++) {
+            for (i = 0; i < keySystems.length; i += 1) {
                 pssh_bytes = new Uint8Array(keySystems[i].initData);
                 pssh = new mp4lib.boxes.ProtectionSystemSpecificHeaderBox();
                 pssh.read(pssh_bytes, 8, pssh_bytes.length); // 8: skip box length and type fields
@@ -805,7 +805,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             // Create and add MovieHeader box (mvhd)
             moov.boxes.push(createMovieHeaderBox(tracks));
 
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i += 1) {
                 // Create and add Track box (trak)
                 moov.boxes.push(createTrackBox(tracks[i]));
             }
@@ -990,7 +990,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             // Create Movie Fragment Header box (moof) 
             moof.boxes.push(createMovieFragmentHeaderBox(sequenceNumber));
 
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i += 1) {
                 // Create Track Fragment box (traf)
                 moof.boxes.push(createTrackFragmentBox(tracks[i]));
             }
@@ -1008,7 +1008,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             // mdat array size = tracks.length
             mdatTracksTab = [tracks.length];
 
-            for (i = 0; i < tracks.length; i++) {
+            for (i = 0; i < tracks.length; i += 1) {
                 // Update trun.data_offset for the track
                 trafs[i].getBoxByType("trun").data_offset = length;
                 // Update length of output fragment file

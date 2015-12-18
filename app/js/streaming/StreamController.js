@@ -294,7 +294,6 @@ MediaPlayer.dependencies.StreamController = function() {
                 return Q.when(false);
             }
 
-
             if (self.capabilities.supportsEncryptedMedia()) {
                 if (!protectionController) {
                     protectionController = self.system.getObject("protectionController");
@@ -623,7 +622,7 @@ MediaPlayer.dependencies.StreamController = function() {
                 protectionData = null;
 
                 // Reset the streams
-                for (i = 0, ln = streams.length; i < ln; i++) {
+                for (i = 0, ln = streams.length; i < ln; i += 1) {
                     stream = streams[i];
                     funcs.push(stream.reset());
                     // we should not remove the video element for the active stream since it is the element users see at the page
