@@ -150,7 +150,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             var code = 0,
                 i;
 
-            for (i = 0; i < str.length; i++) {
+            for (i = 0; i < str.length; i += 1) {
                 code |= str.charCodeAt(i) << ((str.length - i - 1) * 8);
             }
             return code;
@@ -305,7 +305,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
             var res = new Uint8Array(a.length / 2),
                 i;
 
-            for (i = 0; i < a.length / 2; i++) {
+            for (i = 0; i < a.length / 2; i += 1) {
                 res[i] = parseInt("" + a[i * 2] + a[i * 2 + 1], 16);
             }
             return res;
@@ -353,7 +353,7 @@ MediaPlayer.dependencies.Mp4Processor = function() {
 
             SPS_index = 0;
             PPS_index = 0;
-            for (i = 0; i < NALArray.length; i++) {
+            for (i = 0; i < NALArray.length; i += 1) {
                 NALBuffer = _hexstringtoBuffer(NALArray[i]);
 
                 if (NALArray[i].match(regexpSPS)) {
@@ -911,7 +911,6 @@ MediaPlayer.dependencies.Mp4Processor = function() {
 
             return tfdt;
         },
-
 
         createTrackFragmentRunBox = function(track) {
 
