@@ -990,7 +990,6 @@ MediaPlayer.dependencies.Stream = function() {
         manifestModel: undefined,
         mediaSourceExt: undefined,
         sourceBufferExt: undefined,
-        bufferExt: undefined,
         manifestExt: undefined,
         fragmentController: undefined,
         fragmentExt: undefined,

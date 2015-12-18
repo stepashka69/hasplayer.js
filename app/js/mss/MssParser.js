@@ -540,7 +540,6 @@ Mss.dependencies.MssParser = function() {
     return {
         debug: undefined,
         system: undefined,
-        errHandler: undefined,
         domParser: undefined,
 
         parse: internalParse
