@@ -46,6 +46,23 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
         // Session list
         sessions = [],
 
+        arrayToHexString = function (array) {
+
+            var str = "[",
+                i;
+
+            for (i = 0; i < array.length; i++) {
+                str += "0x" + array[i].toString(16);
+                if (i < (array.length - 1)) {
+                    str += ",";
+                }
+            }
+
+            str += "]";
+
+            return str;
+        },
+
         requestKeySystemAccessInternal = function(ksConfigurations, idx) {
             var self = this;
             (function(i) {
@@ -170,7 +187,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                                         }
                                     }
                                 }
-                                self.debug.log("[DRM][PM_21Jan2015] status = " + status + " for KID " + MediaPlayer.utils.arrayToHexString(new Uint8Array(keyId)));
+                                self.debug.log("[DRM][PM_21Jan2015] status = " + status + " for KID " + arrayToHexString(new Uint8Array(keyId)));
                                 switch (status) {
                                     case "expired":
                                       // Report an expired key.

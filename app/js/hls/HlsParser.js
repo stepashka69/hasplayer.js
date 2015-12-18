@@ -705,19 +705,6 @@ Hls.dependencies.HlsParser = function() {
             }
         );
 
-        // store all playlist requests to do
-
-        /*var requestPromiseArray = [];
-        for (var k= 0; k < requestsToDo.length; k++) {
-            requestPromiseArray.push(Custom.utils.doRequestWithPromise.call(this, requestsToDo[k].url, _parsePlaylist, requestsToDo[k].parent));
-        }
-        // wait for all request are done
-        Q.all(requestPromiseArray).then(function() {
-            postProcess.call(self, mpd).then(function() {
-                deferred.resolve(mpd);
-            });
-        });*/
-
         return deferred.promise;
     };
 
