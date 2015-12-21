@@ -439,11 +439,6 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             if (this.protectionExt.isClearKey(this.keySystem)) {
                 message = message.toJWK();
             }
-
-            /*sessionToken.licenseStored = true;
-            eventHandler.session = sessionToken;
-            videoElement.addEventListener("waitingforkey", eventHandler);*/
-
             session.update(message)
             .then(function(){
                 // track license has been stored in order to not retry request
