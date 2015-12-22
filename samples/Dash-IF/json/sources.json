@@ -262,6 +262,12 @@
         },
         {
             "type": "MSS",
+            "name": "LIVE - BFM-TV (DVR)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
             "name": "VOD - SynchroAV",
             "url": "http://2is7server2.rd.francetelecom.com/VOD/Synchro/C4-52_S1.ism/Manifest",
             "browsers": "cdsbi"
