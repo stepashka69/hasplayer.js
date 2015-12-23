@@ -1,4 +1,10 @@
-module.exports = {
+module.exports = function(grunt) {
+
+    var errorsTable = grunt.file.read("../doc/JSDoc/HasPlayerErrors.html");
+    var regex = /<BODY[^>]*>([\w|\W]*)<\/BODY>/g;
+    errorsTable = regex.exec(errorsTable)[1];
+
+    return {
 
     infos: {
         options: {
@@ -199,7 +205,7 @@ module.exports = {
             patterns: [
             {
                 match: /<!-- ERRORS_TABLE -->/,
-                replacement: '<%= grunt.file.read("../doc/JSDoc/HasPlayerErrors.html") %>'
+                replacement: errorsTable
             }
             ]
         },
@@ -207,4 +213,5 @@ module.exports = {
         {expand: true, src: ['<%= path %>/doc/JSDoc/OrangeHasPlayer/index.html']}
         ]
     }
+}
 };
