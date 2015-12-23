@@ -103,10 +103,10 @@ function onload() {
 
 /**
  * [onSubtitlesStyleChanged description]
- * @param  {[type]} style [description]
+ * @param  {[type]} e [description]
  */
-function onSubtitlesStyleChanged(style) {
-    handleSubtitleStyleChange(style);
+function onSubtitlesStyleChanged(e) {
+    handleSubtitleStyleChange(e.data);
 }
 
 /**
@@ -114,7 +114,7 @@ function onSubtitlesStyleChanged(style) {
  * @param  {[type]} e [description]
  */
 function onWarning(e) {
-    handleWarning(e);
+    handleWarning(e.data);
 }
 
 /**
@@ -123,7 +123,7 @@ function onWarning(e) {
  */
 function onError(e) {
     orangeHasPlayer.reset(2);
-    handleError(e);
+    handleError(e.data);
 }
 
 /**
@@ -143,7 +143,7 @@ function onDownloadBitrateChanged(e) {
 }
 
 function onBufferLevelUpdated(e) {
-    handleBufferLevelUpdated(e.detail.type, e.detail.level);
+    handleBufferLevelUpdated(e.detail.type, e.detail.level.toFixed(3));
 }
 
 function onVolumeChange() {

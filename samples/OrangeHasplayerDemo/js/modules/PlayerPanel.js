@@ -425,13 +425,13 @@ PlayerPanel.prototype.setSubtitlesCSSStyle = function(style) {
     if (style) {
         this.subtitlesCSSStyle = style;
 
-        fontSize = style.data.fontSize;
+        fontSize = style.fontSize;
 
-        if (style.data.fontSize && style.data.fontSize[style.data.fontSize.length - 1] === '%') {
-            fontSize = (this.video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length - 1)) / 100;
+        if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
+            fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100;
         }
 
-        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
+        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
     }
 };
 
