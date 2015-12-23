@@ -580,7 +580,9 @@ MediaPlayer.dependencies.StreamController = function() {
                         if (isIntern && err.name === MediaPlayer.dependencies.ErrorHandler.prototype.DOWNLOAD_ERR_MANIFEST) {
                             self.eventBus.dispatchEvent({
                                 type: "manifestUrlUpdate",
-                                data: url
+                                data: {
+                                    url: url
+                                }
                             });
                         }
                     }
