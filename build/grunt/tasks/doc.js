@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
 	grunt.registerTask('doc', [
-        'jsdoc'
+        'jsdoc',
+        'replace:docErrorsTable'
     ]);
 };

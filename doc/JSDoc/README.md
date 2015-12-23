@@ -9,10 +9,12 @@ If your intent is to use the player code without contributing back to this proje
 If your goal is to improve or extend the code and contribute back to this project, then you should make your changes in, and submit a pull request against, the DEVELOPMENT branch. 
 
 ## Getting Started
+
 Create a video element somewhere in your html. For our purposes, make sure to set the controls property to true.
 ```
 <video id="videoPlayer" controls="true"></video>
 ```
+
 Add hasplayer.js to the end of the body.
 ```
 <body>
@@ -20,6 +22,7 @@ Add hasplayer.js to the end of the body.
   <script src="yourPathToHasplayer/hasplayer.js"></script>
 </body>
 ```
+
 Now comes the good stuff. We need to create an OrangeHasPlayer. Then we need to initialize it, attach it to our "videoPlayer" and then tell it where to get the video from. We will do this in an anonymous self executing function, that way it will run as soon as the page loads. So, here is how we do it:
 ``` js
 (function(){
@@ -54,7 +57,7 @@ When it is all done, it should look similar to this:
 </html>
 ```
 ## DRM Video Stream
-In the case of protected content, the code should look like this:
+In the case of protected content, here is an example illustrating setting of the protection data:
 ```
 <!doctype html>
 <html>
@@ -82,21 +85,24 @@ In the case of protected content, the code should look like this:
     </body>
 </html>
 ```
-## Next Step
+## Events
 
-orangeHasPlayer offers events to be notify of differents events on video streaming. Those events are, for a part, sent by the HTML5 video  element, and for an other part, sent by hasPlayer.js.
+OrangeHasPlayer offers events to be notified of differents events on video streaming. Those events are, for a part, sent by the HTML5 video element, and for an other part, sent by hasPlayer.js.
  
 ```
 function registerHasPlayerEvents() {
+    // OrangeHasPlayer events
 	orangeHasPlayer.addEventListener("error", onError);
+    orangeHasPlayer.addEventListener("warning", onWarning);
 	orangeHasPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
-	orangeHasPlayer.addEventListener("loadeddata", onload);
 	orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
 	orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
-	orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
+    // <video> element events
+    orangeHasPlayer.addEventListener("loadeddata", onload);
 	orangeHasPlayer.addEventListener("play", onPlay);
 	orangeHasPlayer.addEventListener("pause", onPause);
 	orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
+    orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
 };
 ```
 For instance, callback function looks like this :
@@ -105,3 +111,10 @@ function onPlayBitrateChanged(e) {
 	handlePlayBitrate(e.detail.bitrate, e.detail.time);
 };
 ```
+
+### Errors
+
+The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer.
+
+<!-- ERRORS_TABLE -->
+

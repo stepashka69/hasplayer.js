@@ -192,5 +192,19 @@ module.exports = {
         files:[
         {expand: true, src:['<%= path %>/dashif.js']}
         ]
+    },
+
+    docErrorsTable: {
+        options: {
+            patterns: [
+            {
+                match: /<!-- ERRORS_TABLE -->/,
+                replacement: '<%= grunt.file.read("../doc/JSDoc/HasPlayerErrors.html") %>'
+            }
+            ]
+        },
+        files: [
+        {expand: true, src: ['<%= path %>/doc/JSDoc/OrangeHasPlayer/index.html']}
+        ]
     }
 };
