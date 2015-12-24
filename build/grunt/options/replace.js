@@ -154,7 +154,7 @@ module.exports = function(grunt) {
             ]
         },
         files: [
-        {expand: true, flatten: true, src: ['<%= path %>/hasplayer.js', '<%= path %>/hasplayer.min.js'], dest: '<%= path %>'}
+        {expand: true, flatten: true, src: ['<%= path %>/hasplayer.js'], dest: '<%= path %>'}
         ]
     },
 
