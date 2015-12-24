@@ -2,8 +2,20 @@
     "items": [
         {
             "type": "HLS",
-            "name": "VIMTV - Live",
-            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
+            "name": "VIMTV - 1",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - 2",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - 3",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
