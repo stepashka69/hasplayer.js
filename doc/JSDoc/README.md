@@ -114,7 +114,7 @@ function onPlayBitrateChanged(e) {
 
 ### Errors
 
-The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer.
+The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer (see OrangeHasplayer's [addEventListener()](OrangeHasPlayer.html#addEventListener) function).
 
 <!-- ERRORS_TABLE -->
 
