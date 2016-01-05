@@ -472,9 +472,10 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
             $scope.audioData = $scope.audioTracks[0];
         }
         //init subtitles tracks
+        player.enableSubtitles(true);
         $scope.textTracks = player.getSubtitleTracks();
         if ($scope.textTracks !== null) {
-            $scope.textTracks = $scope.textTracks[0];
+            $scope.textData = $scope.textTracks[0];
         }
     }
 
