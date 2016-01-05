@@ -140,7 +140,7 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
   margin-top: -7px; }
 
-input[type=range]::-webkit-slider-runnable-track {
+  input[type=range]::-webkit-slider-runnable-track {
   cursor: pointer;
   background: #fff;
   height: 2px;
@@ -189,6 +189,36 @@ input.op-range96::-webkit-slider-runnable-track {
 
 input.op-range100::-webkit-slider-runnable-track {
   background: -webkit-linear-gradient(left, #ff9700 100%, #fff 100%, #fff 100%); }
+
+/*********************** IE slider informations *********************************/
+input[type=range]::-ms-thumb {
+  border: 1px solid #ff9700;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: #ff9700;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+input.op-range100::-ms-fill-lower,
+input.op-range96::-ms-fill-lower,
+input.op-range88::-ms-fill-lower,
+input.op-range80::-ms-fill-lower,
+input.op-range72::-ms-fill-lower,
+input.op-range64::-ms-fill-lower,
+input.op-range56::-ms-fill-lower,
+input.op-range48::-ms-fill-lower,
+input.op-range40::-ms-fill-lower,
+input.op-range32::-ms-fill-lower,
+input.op-range24::-ms-fill-lower,
+input.op-range16::-ms-fill-lower,
+input.op-range8::-ms-fill-lower
+{
+    background: #ff9700;
+}
+
+/*********************** IE slider informations *********************************/
 
 .op-hidden {
   visibility: hidden; }
@@ -2496,8 +2526,8 @@ div:-webkit-full-screen-ancestor:not(iframe) > .op-sumup {
       border: 0.2em solid #ff9700; }
       .op-towatch .op-towatch-container .op-info-content .op-info-visuel {
         position: absolute;
-        top: 0px;
-        left: 0px;
+        top: 0;
+        left: 0;
         width: 100%; }
     .op-towatch .op-towatch-container .op-reco {
       display: -webkit-box;
