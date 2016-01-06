@@ -38,6 +38,13 @@
         {
             "type": "Live",
             "protocol": "MSS",
+            "name": "Smooth Orange Spain",
+            "url": "http://80.12.13.72/jXFcOxmrQLZN6QPzmZwlLw/3450257649/13214/89042/8/live/smooth/TF1.isml/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
