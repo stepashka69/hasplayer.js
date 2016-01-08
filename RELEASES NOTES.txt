@@ -1,13 +1,44 @@
+### Release Notes v1.2.6 (2016/01/08)
+* Bugs fixing:
+* - Initial bitrate setting
+* - Error if protection module is not included
+* - Error sent if aborted request 
+* - Track switching that raise DOWNLOAD_ERROR_CONTENT
+* - HLS zapping error (correct reset process)
+* - Keep using MS-prefixed EME version for new Edge 13
+* - Fast zapping with HLS stream generates a javascript error
+* - ABR.minBandwidth parameter not supported
+* - Audio track swithing fails if 'Language' attribute is not set
+* OrangeHasPlayer: waits for video's loadeddata' event first before sending any 'play_bitrate' event
+* Refactored track language switching
+* Optimized abandon request rule
+* Error events refactoring and add Warning events
+* Report HTTP status code when manifest/segment download fails
+* Report error code contained in licenser server response body
+* Segment download error robustness (automatic session reload when buffer becomes underflow)
+* Switch off/on text track downloading when subtitles are disabled/enabled
+
+### Release Notes v1.2.6 (2016/01/08) [Diff from 1.2.5.6]
+* Bugs fixing:
+* - ABR.minBandwidth parameter not supported
+* - Audio track swithing fails if 'Language' attribute is not set
+* Refactored track language switching
+* Error events refactoring and add Warning events
+* Report HTTP status code when manifest/segment download fails
+* Report error code contained in licenser server response body
+* Segment download error robustness (automatic session reload when buffer becomes underflow)
+* Switch off/on text track downloading when subtitles are disabled/enabled
+
 ### Release Notes v1.2.5.6 (2015/12/04)
-* Buf fixing:
+* Bugs fixing:
 * - Regression with error MEDIA_KEYMESSERR_NO_VALID_KEY
 
 ### Release Notes v1.2.5.5 (2015/12/03)
-* Buf fixing:
+* Bugs fixing:
 * - Keep using MS-prefixed EME version for new Edge 13
 
 ### Release Notes v1.2.5.4 (2015/11/20)
-* Buf fixing:
+* Bugs fixing:
 * - HLS zapping error (correct reset process)
 
 ### Release Notes v1.2.5.3 (2015/11/19)
