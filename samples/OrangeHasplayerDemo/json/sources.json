@@ -45,6 +45,13 @@
         {
             "type": "Live",
             "protocol": "MSS",
+            "name": "Smooth Orange FRANCE",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
