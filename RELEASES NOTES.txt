@@ -1,4 +1,4 @@
-### Release Notes v1.2.6 (2016/01/08)
+### Release Notes v1.2.6 (2016/01/11) [Diff from 1.2.5]
 * Bugs fixing:
 * - Initial bitrate setting
 * - Error if protection module is not included
@@ -19,7 +19,7 @@
 * Segment download error robustness (automatic session reload when buffer becomes underflow)
 * Switch off/on text track downloading when subtitles are disabled/enabled
 
-### Release Notes v1.2.6 (2016/01/08) [Diff from 1.2.5.6]
+### Release Notes v1.2.6 (2016/01/11) [Diff from 1.2.5.6]
 * Bugs fixing:
 * - ABR.minBandwidth parameter not supported
 * - Audio track swithing fails if 'Language' attribute is not set
