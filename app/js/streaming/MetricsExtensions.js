@@ -62,14 +62,12 @@
         // The metrics extensions should have every method use promises.
 
         if (bufferType === "video") {
-            //found = this.manifestExt.getIsVideo(adaptation);
             this.manifestExt.getIsVideo(adaptation);
             if (adaptation.type === "video") {
                 found = true;
             }
         }
         else if (bufferType === "audio") {
-            //found = this.manifestExt.getIsAudio(adaptation); // TODO : Have to be sure it's the *active* audio track.
             this.manifestExt.getIsAudio(adaptation);
             if (adaptation.type === "audio") {
                 found = true;
@@ -86,9 +84,8 @@
 
     rslt.getDuration = function() {
         var self = this,
-            manifest = self.manifestModel.getValue();
-
-        var duration = manifest.Period.duration;
+            manifest = self.manifestModel.getValue(),
+            duration = manifest? manifest.Period.duration : null;
 
         if (duration !== Infinity) {
             return duration;
@@ -99,11 +96,13 @@
 
     rslt.getFormatForType = function(type) {
         var self = this,
-            manifest = self.manifestModel.getValue();
+            manifest = self.manifestModel.getValue(),
+            i = 0,
+            adaptation;
 
-        for(var i = 0;i<manifest.Period.AdaptationSet.length;i++)
+        for(i = 0;i<manifest.Period.AdaptationSet.length;i++)
         {
-            var adaptation = manifest.Period.AdaptationSet[i];
+            adaptation = manifest.Period.AdaptationSet[i];
             if (adaptation.type === type) {
                 return adaptation.mimeType;
             }
@@ -114,11 +113,13 @@
 
     rslt.getCodecForType = function(type) {
         var self = this,
-            manifest = self.manifestModel.getValue();
+            manifest = self.manifestModel.getValue(),
+            i = 0,
+            adaptation;
 
-        for(var i = 0;i<manifest.Period.AdaptationSet.length;i++)
+        for(i = 0;i<manifest.Period.AdaptationSet.length;i++)
         {
-            var adaptation = manifest.Period.AdaptationSet[i];
+            adaptation = manifest.Period.AdaptationSet[i];
             if (adaptation.type === type || adaptation.contentType === type) {
                 //return codecs of the first Representation
                 return adaptation.Representation[0].codecs;
@@ -170,8 +171,6 @@
         }
     };
 
-
-
     rslt.getCodecsForRepresentation = function (representationId) {
         var self = this,
             manifest = self.manifestModel.getValue(),
@@ -187,15 +186,14 @@
         return representation.codecs;
     };
 
-
     rslt.getH264ProfileLevel = function (codecs) {
 
         if (codecs.indexOf("avc1") < 0)
         {
             return "";
         }
-        var profile = h264ProfileMap[codecs.substr(5, 2)];
-        var level = parseInt(codecs.substr(9, 2), 16) / 10.0;
+        var profile = h264ProfileMap[codecs.substr(5, 2)],
+            level = parseInt(codecs.substr(9, 2), 16) / 10.0;
 
         return profile + "@" + level.toString();
     };

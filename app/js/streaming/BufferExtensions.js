@@ -47,7 +47,6 @@ MediaPlayer.dependencies.BufferExtensions = function () {
     return {
         system:undefined,
         videoModel: undefined,
-        manifestExt: undefined,
         metricsExt: undefined,
         metricsModel: undefined,
         abrController: undefined,
@@ -88,7 +87,7 @@ MediaPlayer.dependencies.BufferExtensions = function () {
                 minBufferTarget = Math.min(duration, minBufferTime);
             }
 
-            return Q.when(minBufferTarget);
+            return minBufferTarget;
         },
 
         getLeastBufferLevel: function() {

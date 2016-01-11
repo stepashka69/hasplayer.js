@@ -229,6 +229,24 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return [];
     },
 
+    getIndex: function(adaptation, manifest) {
+        var periods = manifest.Period_asArray,
+            adaptations,
+            i,
+            j;
+
+        for (i = 0; i < periods.length; i += 1) {
+            adaptations = periods[i].AdaptationSet_asArray;
+            for (j = 0; j < adaptations.length; j += 1) {
+                if (adaptations[j] === adaptation) {
+                    return j;
+                }
+            }
+        }
+
+        return -1;
+    },
+
     getDataIndex: function(data, manifest, periodIndex) {
         "use strict";
 

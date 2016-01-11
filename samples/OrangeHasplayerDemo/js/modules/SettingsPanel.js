@@ -2,19 +2,19 @@ var SettingsPanel = function() {
     this.menuContainer = null;
 
     // Quick settings
-    this.audioListCombobox = null,
+    this.audioListCombobox = null;
     this.enableSubtitlesCheckbox = null;
-    this.subtitleListCombobox = null,
-    this.audioTracks = [],
-    this.subtitleTracks = [],
-    this.currentaudioTrack = null,
-    this.currentsubtitleTrack = null,
+    this.subtitleListCombobox = null;
+    this.audioTracks = [];
+    this.subtitleTracks = [];
+    this.currentaudioTrack = null;
+    this.currentsubtitleTrack = null;
 
     // Settings
     this.settingsMenuButton = null;
     this.enableMetricsCheckbox = null;
     this.enableOptimzedZappingCheckbox = null;
-    this.metricsAgentCombobox =  null;
+    this.metricsAgentCombobox = null;
     this.defaultAudioLangCombobox = null;
     this.defaultSubtitleLangCombobox = null;
     this.optimizedZappingEnabled = true;
@@ -29,7 +29,7 @@ SettingsPanel.prototype.init = function() {
     this.enableSubtitlesCheckbox = document.getElementById('enable-subtitles');
     this.subtitleListCombobox = document.getElementById('subtitleCombo');
     this.settingsMenuButton = document.getElementById('settingsMenuButton');
-    this.metricsAgentCombobox =  document.getElementById('metrics-agent-options');
+    this.metricsAgentCombobox = document.getElementById('metrics-agent-options');
     this.enableMetricsCheckbox = document.getElementById('enable-metrics-agent');
     this.defaultAudioLangCombobox = document.getElementById('default_audio_language');
     this.defaultSubtitleLangCombobox = document.getElementById('default_subtitle_language');
@@ -57,24 +57,26 @@ SettingsPanel.prototype.setupEventListeners = function() {
 };
 
 SettingsPanel.prototype.initMetricsAgentOptions = function() {
-        var reqMA = new XMLHttpRequest(),
+    var reqMA = new XMLHttpRequest(),
+        i = 0,
+        len = 0,
         self = this;
 
-        reqMA.onload = function () {
-            if (reqMA.status === 200) {
-                self.metricsConfig = JSON.parse(reqMA.responseText);
+    reqMA.onload = function() {
+        if (reqMA.status === 200) {
+            self.metricsConfig = JSON.parse(reqMA.responseText);
 
-                self.metricsAgentCombobox.innerHTML = '';
+            self.metricsAgentCombobox.innerHTML = '';
 
-                for (var i = 0, len = self.metricsConfig.items.length; i < len; i++) {
-                    self.metricsAgentCombobox.innerHTML += '<option value="' + i + '">' + self.metricsConfig.items[i].name + '</option>';
-                }
-                self.metricsAgentCombobox.selectedIndex = -1;
+            for (i = 0, len = self.metricsConfig.items.length; i < len; i++) {
+                self.metricsAgentCombobox.innerHTML += '<option value="' + i + '">' + self.metricsConfig.items[i].name + '</option>';
             }
-        };
-        reqMA.open('GET', './json/metricsagent_config.json', true);
-        reqMA.setRequestHeader('Content-type', 'application/json');
-        reqMA.send();
+            self.metricsAgentCombobox.selectedIndex = -1;
+        }
+    };
+    reqMA.open('GET', './json/metricsagent_config.json', true);
+    reqMA.setRequestHeader('Content-type', 'application/json');
+    reqMA.send();
 };
 
 SettingsPanel.prototype.audioChanged = function(e) {
@@ -88,8 +90,10 @@ SettingsPanel.prototype.subtitleChanged = function(e) {
 };
 
 SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
-    var index = -1;
-    for(var i = 0, len = tracks.length; i < len; i++) {
+    var index = -1,
+        i = 0,
+        len = 0;
+    for (i = 0, len = tracks.length; i < len; i += 1) {
         if (tracks[i].id === id) {
             index = i;
             break;
@@ -139,7 +143,7 @@ SettingsPanel.prototype.onEnableMetrics = function() {
     }
 };
 
-SettingsPanel.prototype.onSelectMetricsAgent = function (value) {
+SettingsPanel.prototype.onSelectMetricsAgent = function(value) {
     if (typeof MetricsAgent === 'function') {
         if (this.enableMetricsCheckbox.checked) {
             orangeHasPlayer.loadMetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
@@ -174,6 +178,8 @@ SettingsPanel.prototype.updateAudioData = function(_audioTracks, _selectedAudioT
 SettingsPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
     //init subtitles tracks
     this.subtitleTracks = _subtitleTracks;
+    //if no subtitles, disabled subtitle checkbox.
+    this.enableSubtitlesCheckbox.disabled = this.subtitleTracks.length > 0 ? false : true;
     this.currentsubtitleTrack = _selectedSubtitleTrack;
 
     if (this.subtitleTracks && this.currentsubtitleTrack) {
@@ -185,7 +191,7 @@ SettingsPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selected
 SettingsPanel.prototype.addCombo = function(tracks, combo) {
     var i, option;
 
-    for (i = 0; i < tracks.length; i++) {
+    for (i = 0; i < tracks.length; i += 1) {
         option = document.createElement('option');
         option.text = tracks[i].id;
         option.value = tracks[i].lang;
@@ -204,7 +210,7 @@ SettingsPanel.prototype.addCombo = function(tracks, combo) {
 SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
     var i;
 
-    for (i = 0; i < tracks.length; i++) {
+    for (i = 0; i < tracks.length; i += 1) {
         if (currentTrack === tracks[i]) {
             combo.selectedIndex = i;
         }
@@ -214,7 +220,7 @@ SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
 SettingsPanel.prototype.resetCombo = function(tracks, combo) {
     var i;
 
-    for (i = tracks.length - 1; i >= 0; i--) {
+    for (i = tracks.length - 1; i >= 0; i -= 1) {
         combo.options.remove(i);
     }
 
@@ -226,6 +232,10 @@ SettingsPanel.prototype.resetCombo = function(tracks, combo) {
 SettingsPanel.prototype.reset = function() {
     this.resetCombo(this.audioTracks, this.audioListCombobox);
     this.resetCombo(this.subtitleTracks, this.subtitleListCombobox);
+    
+    this.subtitleListCombobox.disabled = true;
+    this.enableSubtitlesCheckbox.checked = false;
+    enableSubtitles(this.enableSubtitlesCheckbox.checked);
 
     this.currentaudioTrack = null;
     this.currentsubtitleTrack = null;

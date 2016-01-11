@@ -38,10 +38,46 @@
         {
             "type": "Live",
             "protocol": "MSS",
+            "name": "Norigin Media Spain with Subtitles",
+            "url": "http://80.12.13.72/jXFcOxmrQLZN6QPzmZwlLw/3450257649/13214/89042/8/live/smooth/TF1.isml/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Arte with Subtitles",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "France 2 with Subtitles",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-41_S2.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
         },
+         {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo + DRM",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP-DRM.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+
         {
             "type": "Live",
             "protocol": "MSS",
@@ -288,6 +324,13 @@
             "protocol": "MSS",
             "name": "Arte multi-audio",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "LIVE - BFM-TV (DVR)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {

@@ -2,8 +2,20 @@
     "items": [
         {
             "type": "HLS",
-            "name": "VIMTV - Live",
-            "url": "http://vimtv.orange-labs.fr/streaming/1.m3u8",
+            "name": "VIMTV - 1",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - 2",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "HLS",
+            "name": "VIMTV - 3",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
@@ -258,6 +270,12 @@
             "type": "MSS",
             "name": "LIVE - Arte multi-audio",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "LIVE - BFM-TV (DVR)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {

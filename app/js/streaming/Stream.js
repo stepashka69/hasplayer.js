@@ -25,13 +25,12 @@ MediaPlayer.dependencies.Stream = function() {
         audioController = null,
         audioTrackIndex = -1,
         textController = null,
+        subtitlesEnabled = false,
         textTrackIndex = -1,
         autoPlay = true,
         initialized = false,
         load,
         errored = false,
-        kid = null,
-        initData = [],
         // ORANGE : add FullScreen Listener
         fullScreenListener,
         // ORANGE : add Ended Event listener
@@ -49,7 +48,6 @@ MediaPlayer.dependencies.Stream = function() {
         canplayListener,
         playingListener,
         loadstartListener,
-        waitingListener,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
 
@@ -67,15 +65,15 @@ MediaPlayer.dependencies.Stream = function() {
         protectionController,
         initializedeferred = null,
 
-        // Encrypted Media Extensions
+        isReloading = false,
+
+        startClockTime = -1,
+        startStreamTime = -1,
+        visibilitychangeListener,
+
+        // Protection errors
         onProtectionError = function(event) {
-            if (protectionController && event && event.data && event.data.data && event.data.data.sessionToken) {
-                var sessionToken = event.data.data.sessionToken;
-                protectionController.closeKeySession(sessionToken);
-            }
             this.errHandler.sendError(event.data.code, event.data.message, event.data.data);
-            // if the errors give the session token in params we close the current session
-            //this.reset();
         },
 
         play = function() {
@@ -103,12 +101,12 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.debug.info("[Stream] Do seek: " + time);
 
-            this.system.notify("setCurrentTime");
-            this.videoModel.setCurrentTime(time);
-
-            updateBuffer.call(this).then(function() {
-                startBuffering(time);
-            });
+            // Performs a programmatical seek:
+            // 1- seeks the buffer controllers at the desired time
+            // 2- once data is present in the buffers, then we can set the current time to the <video> component (see onBufferUpdated()) 
+            initialSeekTime = time;
+            this.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(this));
+            startBuffering(initialSeekTime);
         },
 
         // Media Source
@@ -166,8 +164,6 @@ MediaPlayer.dependencies.Stream = function() {
 
                             initialized = false;
 
-                            kid = null;
-                            initData = [];
                             contentProtection = null;
 
                             videoController = null;
@@ -197,22 +193,15 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.log("[Stream] checkIfInitialized videoState=" + videoState + " audioState=" + audioState + " textTrackState=" + textTrackState);
             if (videoState !== null && audioState !== null && textTrackState !== null) {
                 if (videoState === "ready" && audioState === "ready" && textTrackState === "ready") {
-                    if (videoController === null && audioController === null && textController === null) {
-                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NOSTREAM, "No streams to play (" + msg + ")", manifest);
+                    // Initialize protection controller
+                    if (protectionController) {
+                        protectionController.init(contentProtection, audioCodec, videoCodec);
+                    } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
+                        // No protectionController (MediaKeys not supported/enabled) but content is protected => error
+                        this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "EME is not supported/enabled", null);
                         initializedeferred.reject();
-                    } else {
-                        //this.debug.log("MediaSource initialized!");
-                        // Initialize protection controller
-                        if (protectionController) {
-                            protectionController.init(contentProtection, audioCodec, videoCodec);
-                        } else if (contentProtection && !this.capabilities.supportsEncryptedMedia()) {
-                            // No protectionController (MediaKeys not supported/enabled) but content is protected => error
-                            this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIAKEYS, "Content is signalized protected but EME is not supported/enabled", manifest);
-                            initializedeferred.reject();
-                        }
-
-                        initializedeferred.resolve(true);
                     }
+                    initializedeferred.resolve(true);
                 } else if (videoState === "error" || audioState === "error" || textTrackState === "error") {
                     initializedeferred.reject();
                 }
@@ -228,74 +217,93 @@ MediaPlayer.dependencies.Stream = function() {
             initializedeferred = Q.defer();
 
             eventController = self.system.getObject("eventController");
-            // Figure out some bits about the stream before building anything.
-            //self.debug.log("Gathering information for buffers. (1)");
+
             self.manifestExt.getVideoData(manifest, periodInfo.index).then(
+                // self.manifestExt.getVideoData() succeeded
                 function(videoData) {
                     //self.debug.log("Create video buffer.");
                     self.manifestExt.getDataIndex(videoData, manifest, periodInfo.index).then(
                         function(index) {
                             videoTrackIndex = index;
-                            //self.debug.log("Save video track: " + videoTrackIndex);
                         }
                     );
 
+                    // Get codec of first representation
                     self.manifestExt.getCodec(videoData).then(
                         function(codec) {
                             self.debug.info("[Stream] Video codec: " + codec);
                             videoCodec = codec;
 
                             if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "Video Codec (" + codec + ") is not supported", manifest);
-                                videoState = "error";
-                                return Q.reject();
+                                // If codec is not supported by the <video> element, then raise DOMException 'NotSupportedError'
+                                // as it can raised by MediaSource's addSourceBuffer() method (see https://w3c.github.io/media-source/#widl-MediaSource-addSourceBuffer) 
+                                return Q.reject({
+                                    code: MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED,
+                                    name: "NotSupportedError",
+                                    message: "Codec not supported"
+                                });
                             }
 
+                            // Get and store ContentProtection data
                             return self.manifestExt.getContentProtectionData(videoData).then(
                                 function(contentProtectionData) {
                                     contentProtection = contentProtectionData;
 
+                                    // Create and add the SourceBuffer
                                     if (mediaSource) {
                                         return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
                                     } else {
-                                        return Q.reject();
+                                        // If MediaSource is not defined then raise DOMException 'InvalidAccessError'
+                                        // as it can raised by MediaSource's addSourceBuffer() method (see https://w3c.github.io/media-source/#widl-MediaSource-addSourceBuffer)
+                                        return Q.reject({
+                                            code: MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_INVALID_ACCESS,
+                                            name: "InvalidAccessError",
+                                            message: "MediaSource undefined"
+                                        });
                                     }
                                 }
                             );
                         }
                     ).then(
+                        // self.sourceBufferExt.createSourceBuffer() succeeded
                         function(buffer) {
                             // TODO : How to tell index handler live/duration?
                             // TODO : Pass to controller and then pass to each method on handler?
                             videoController = self.system.getObject("bufferController");
-                            videoController.initialize("video", periodInfo, videoData, buffer, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            videoController.initialize("video", periodInfo, videoData, buffer, self.fragmentController, mediaSource, eventController);
                             videoState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function(/*error*/) {
-                            if (videoState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating video source buffer");
-                                videoState = "error";
-                            }
+                        // self.sourceBufferExt.createSourceBuffer() failed
+                        function(ex) {
+                            videoState = "error";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                            if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Video codec is not supported", {
+                                    codec: videoCodec
+                                });
+                            } else {
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create video source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
+                            }
                         }
                     );
                     return self.manifestExt.getSpecificAudioData(manifest, periodInfo.index, defaultAudioLang);
-                }, function() {
-                    if (videoState !== "error") {
-                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "No Video Data in manifest", manifest);
-                        videoState = "error";
-                    }
+                },
+                // self.manifestExt.getVideoData() failed
+                function() {
+                    videoState = "error";
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
-                    //no video, so don't analyse audio datas....
+                    self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_VIDEO, "No Video data in manifest");
+                    // Video is required, cancel any other track initialization
                     return Q.reject();
                 }
             ).then(
+                // self.manifestExt.getSpecificAudioData() succeeded
                 function(specificAudioData) {
                     self.manifestExt.getDataIndex(specificAudioData, manifest, periodInfo.index).then(
                         function(index) {
                             audioTrackIndex = index;
-                            //self.debug.log("Save audio track: " + audioTrackIndex);
                         }
                     );
 
@@ -303,54 +311,79 @@ MediaPlayer.dependencies.Stream = function() {
                         function(codec) {
                             self.debug.info("[Stream] Audio codec: " + codec);
                             audioCodec = codec;
+
                             if (!self.capabilities.supportsCodec(self.videoModel.getElement(), codec)) {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_CODEC, "Audio Codec (" + codec + ") is not supported", manifest);
-                                audioState = "error";
-                                return Q.reject();
+                                // If codec is not supported by the <video> element, then raise DOMException 'NotSupportedError'
+                                // as it can raised by MediaSource's addSourceBuffer() method (see https://w3c.github.io/media-source/#widl-MediaSource-addSourceBuffer) 
+                                return Q.reject({
+                                    code: MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED,
+                                    name: "NotSupportedError",
+                                    message: "Codec not supported"
+                                });
                             }
 
+                            // Create and add the SourceBuffer
                             if (mediaSource) {
                                 return self.sourceBufferExt.createSourceBuffer(mediaSource, codec);
                             } else {
-                                return Q.reject();
+                                return Q.reject({
+                                    // If MediaSource is not defined then raise DOMException 'InvalidAccessError'
+                                    // as it can raised by MediaSource's addSourceBuffer() method (see https://w3c.github.io/media-source/#widl-MediaSource-addSourceBuffer)
+                                    code: MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_INVALID_ACCESS,
+                                    name: "InvalidAccessError",
+                                    message: "MediaSource undefined"
+                                });
                             }
                         }
                     ).then(
+                        // self.sourceBufferExt.createSourceBuffer() succeeded
                         function(buffer) {
                             // TODO : How to tell index handler live/duration?
                             // TODO : Pass to controller and then pass to each method on handler?
                             audioController = self.system.getObject("bufferController");
-                            audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.requestScheduler, self.fragmentController, mediaSource, eventController);
+                            audioController.initialize("audio", periodInfo, specificAudioData, buffer, self.fragmentController, mediaSource, eventController);
                             //self.debug.log("Audio is ready!");
                             audioState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function(/*error*/) {
-                            if (audioState !== "error") {
-                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Error creating audio source buffer");
-                                audioState = "error";
+                        // self.sourceBufferExt.createSourceBuffer() failed
+                        function(ex) {
+                            audioState = "error";
+                            if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Audio codec is not supported", {
+                                    codec: videoCodec
+                                });
+                            } else {
+                                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
                             }
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         }
                     );
                     return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
-                }, function() {
-                    self.debug.log("[Stream] No audio streams.");
+                },
+                // self.manifestExt.getSpecificAudioData() failed or no video track
+                function() {
                     audioState = "ready";
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
-
+                    if (videoState === "error") {
+                        return Q.reject();
+                    }
+                    self.debug.log("[Stream] No audio streams.");
+                    self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_AUDIO, "No audio data in manifest");
                     return self.manifestExt.getSpecificTextData(manifest, periodInfo.index, defaultSubtitleLang);
                 }
             ).then(
                 // ORANGE: added Support for fragmented subtitles
                 //         which are downloaded and handled just like Audio/Video - by a regular bufferController, fragmentController etc
                 //         (fragmented subtitles are used by MSS and live streams)
+
+                // self.manifestExt.getSpecificTextData() succeeded
                 function(specificSubtitleData) {
                     var mimeType;
                     self.manifestExt.getDataIndex(specificSubtitleData, manifest, periodInfo.index).then(
                         function(index) {
                             textTrackIndex = index;
-                            self.debug.log("Save text track: " + textTrackIndex);
                         });
 
                     self.manifestExt.getMimeType(specificSubtitleData).then(
@@ -359,12 +392,19 @@ MediaPlayer.dependencies.Stream = function() {
                             if (mediaSource) {
                                 return self.sourceBufferExt.createSourceBuffer(mediaSource, mimeType);
                             } else {
-                                return Q.reject();
+                                return Q.reject({
+                                    // If MediaSource is not defined then raise DOMException 'InvalidAccessError'
+                                    // as it can raised by MediaSource's addSourceBuffer() method (see https://w3c.github.io/media-source/#widl-MediaSource-addSourceBuffer)
+                                    code: MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_INVALID_ACCESS,
+                                    name: "InvalidAccessError",
+                                    message: "MediaSource undefined"
+                                });
                             }
-                        }).then(
+                        }
+                    ).then(
                         function(buffer) {
                             textController = self.system.getObject("bufferController");
-                            textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.requestScheduler, self.fragmentController, mediaSource);
+                            textController.initialize("text", periodInfo, specificSubtitleData, buffer, self.fragmentController, mediaSource);
 
                             if (buffer.hasOwnProperty('initialize')) {
                                 buffer.initialize(mimeType, textController, specificSubtitleData);
@@ -373,20 +413,31 @@ MediaPlayer.dependencies.Stream = function() {
                             textTrackState = "ready";
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
                         },
-                        function(/*error*/) {
-                            self.debug.warn("Error creating text source buffer");
+                        function(ex) {
                             textTrackState = "ready";
                             textController = null;
                             checkIfInitialized.call(self, videoState, audioState, textTrackState);
+                            if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
+                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Text codec is not supported", {
+                                    codec: videoCodec
+                                });
+                            } else {
+                                self.errHandler.sendWarning(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create text source buffer",
+                                    new MediaPlayer.vo.Error(ex.code, ex.name, ex.message));
+                            }
                         }
                     );
 
                     return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
-                }, function() {
-                    self.debug.log("[Stream] No text tracks.");
+                },
+                // self.manifestExt.getSpecificTextData() failed or no video track
+                function() {
                     textTrackState = "ready";
                     checkIfInitialized.call(self, videoState, audioState, textTrackState);
-
+                    if (videoState === "error") {
+                        return Q.reject();
+                    }
+                    self.debug.log("[Stream] No text tracks.");
                     return self.manifestExt.getEventsForPeriod(manifest, periodInfo);
                 }
             ).then(
@@ -436,11 +487,12 @@ MediaPlayer.dependencies.Stream = function() {
             isPaused = this.videoModel.isPaused();
             if (initialSeekTime !== this.videoModel.getCurrentTime()) {
                 // ORANGE: we start the <video> element at the real start time got from the video buffer
-                // once the first fragment has been appended (see onBufferUpdated)
+                // once the first fragment has been appended (see onBufferUpdated())
                 this.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(self));
 
-            } else {
+            } else if (load !== null) {
                 load.resolve(null);
+                load = null;
             }
         },
 
@@ -452,14 +504,14 @@ MediaPlayer.dependencies.Stream = function() {
         onPlaying = function() {
             this.debug.info("<video> playing event");
             this.debug.log("[Stream] Got playing event.");
+
+            // Store start time (clock and stream time) for resynchronization purpose
+            startClockTime = new Date().getTime() / 1000;
+            startStreamTime = this.getVideoModel().getCurrentTime();
         },
 
         onLoadStart = function() {
             this.debug.info("<video> loadstart event");
-        },
-
-        onWaiting = function() {
-            this.debug.info("<video> waiting event");
         },
 
         onPlay = function() {
@@ -467,7 +519,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.log("[Stream] Got play event.");
 
             // set the currentTime here to be sure that videoTag is ready to accept the seek (cause IE fail on set currentTime on BufferUpdate)
-            if ((currentTimeToSet !== 0) && (this.videoModel.getCurrentTime() === 0)) {
+            if (currentTimeToSet !== 0) {
                 this.system.notify("setCurrentTime");
                 this.videoModel.setCurrentTime(currentTimeToSet);
                 currentTimeToSet = 0;
@@ -508,13 +560,16 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("<video> pause event");
             //this.debug.log("[Stream] ################################# Got pause event.");
             isPaused = true;
+            startClockTime = -1;
+            startStreamTime = -1;
             this.metricsModel.addPlayList("video", new Date().getTime(), this.videoModel.getCurrentTime(), "pause");
             suspend.call(this);
         },
 
         onError = function(event) {
             var error = event.srcElement.error,
-                code;
+                code,
+                message = "<video> error: ";
 
             if (error.code === -1) {
                 // not an error!
@@ -524,24 +579,29 @@ MediaPlayer.dependencies.Stream = function() {
             switch (error.code) {
                 case 1:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ABORTED;
+                    message += "fetching process aborted";
                     break;
                 case 2:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_NETWORK;
+                    message += "network error";
                     break;
                 case 3:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_DECODE;
+                    message += "media decoding error";
                     break;
                 case 4:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_SRC_NOT_SUPPORTED;
+                    message += "media format not supported";
                     break;
                 case 5:
                     code = MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED;
+                    message += "media is encrypted";
                     break;
             }
 
             errored = true;
 
-            this.errHandler.sendError(code, "<video> error event");
+            this.errHandler.sendError(code, message);
         },
 
         onSeeking = function() {
@@ -550,7 +610,7 @@ MediaPlayer.dependencies.Stream = function() {
             //test if seek time is less than range start, never seek before range start.
             var start = this.getStartTime();
 
-            if (time<start) {
+            if (time < start) {
                 time = start;
             }
 
@@ -564,6 +624,9 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.videoModel.listen("seeking", seekingListener);
             this.videoModel.unlisten("seeked", seekedListener);
+
+            startClockTime = -1;
+            startStreamTime = -1;
         },
 
         onProgress = function() {
@@ -591,6 +654,15 @@ MediaPlayer.dependencies.Stream = function() {
             if (textController) {
                 textController.updateStalledState();
             }
+        },
+
+        onReload = function() {
+
+            // Ask for manifest refresh
+            // Then, once manifest has been refresh and data updated, we reload session (see updateData())
+            pause.call(this);
+            isReloading = true;
+            this.system.notify("manifestUpdate");
         },
 
         updateBuffer = function() {
@@ -624,8 +696,7 @@ MediaPlayer.dependencies.Stream = function() {
                     audioController.seek(time);
                 }
             }
-
-            if (textController) {
+            if (textController && subtitlesEnabled) {
                 if (time === undefined) {
                     textController.start();
                 } else {
@@ -653,23 +724,6 @@ MediaPlayer.dependencies.Stream = function() {
 
             clearInterval(checkStartTimeIntervalId);
         },
-
-        /*updateCurrentTime = function() {
-            if (this.videoModel.isPaused()) return;
-
-            var currentTime = this.videoModel.getCurrentTime(),
-                representation = videoController ? videoController.getCurrentRepresentation() : audioController.getCurrentRepresentation(),
-                actualTime = this.timelineConverter.calcActualPresentationTime(representation, currentTime, this.manifestExt.getIsDynamic(manifest)),
-                timeChanged = (!isNaN(actualTime) && actualTime !== currentTime);
-
-            // ORANGE: unuseful?? and generate some bug since we cannot get availability window of current representation (@see TimelineConverter)
-            // if (timeChanged) {
-            //     this.videoModel.setCurrentTime(actualTime);
-            //     startBuffering(actualTime);
-            // } else {
-            //    startBuffering();
-            // }
-        },*/
 
         doLoad = function(manifestResult) {
 
@@ -740,21 +794,24 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
 
-        // ORANGE: 'liveEdgeFound' event raised when live edge has been found on video stream
-        // => then seek every BufferController at the found live edge time
-        onLiveEdgeFound = function(liveEdgeTime) {
+        // 'startTimeFound' event raised by video controller when start time has been found
+        // startTime = video live edge for live streams
+        // startTime = first video segment time for static streams
+        // => then seek every BufferController at the found start time
+        onStartTimeFound = function(startTime) {
 
-            //var liveEdgeTime = this.timelineConverter.calcPresentationStartTime(periodInfo);
-            this.debug.info("[Stream] ### LiveEdge = " + liveEdgeTime);
+            this.debug.info("[Stream] ### Start time = " + startTime);
+
+            initialSeekTime = startTime;
 
             if (videoController) {
-                videoController.seek(liveEdgeTime);
+                videoController.seek(startTime);
             }
             if (audioController) {
-                audioController.seek(liveEdgeTime);
+                audioController.seek(startTime);
             }
-            if (textController) {
-                textController.seek(liveEdgeTime);
+            if (textController && subtitlesEnabled) {
+                textController.seek(startTime);
             }
         },
 
@@ -794,7 +851,7 @@ MediaPlayer.dependencies.Stream = function() {
                 }
             }
 
-            self.debug.info("[Stream] Check start time: OK");
+            self.debug.info("[Stream] Check start time: OK => " + startTime);
 
             // Align audio and video buffers
             //self.sourceBufferExt.remove(audioController.getBuffer(), audioRange.start, videoRange.start, Infinity, mediaSource, false);
@@ -811,8 +868,14 @@ MediaPlayer.dependencies.Stream = function() {
                 currentTimeToSet = startTime;
             }
 
-            // Resolve load promise in order to start playing (see doLoad)
-            load.resolve(null);
+            // Resolve load promise in order to start playing (see doLoad())
+            if (load !== null) {
+                load.resolve(null);
+                load = null;
+            } else {
+                // Else start playing (reload use case)
+                play.call(self);
+            }
         },
 
         updateData = function(updatedPeriodInfo) {
@@ -885,13 +948,44 @@ MediaPlayer.dependencies.Stream = function() {
 
             Q.when(deferredVideoUpdate.promise, deferredAudioUpdate.promise, deferredTextUpdate.promise).then(
                 function() {
-                    // ORANGE: unnecessary since seek is performed into each BufferController
-                    //updateCurrentTime.call(self);
+                    if (isReloading && videoController) {
+                        isReloading = false;
+                        self.system.unmapHandler("bufferUpdated");
+                        self.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(self));
+                        // Call load on video controller in order to get new stream start time (=live edge for live streams)
+                        videoController.load();
+                    }
+
                     deferred.resolve();
                 }
             );
 
             return deferred.promise;
+        },
+
+        streamsComposed = function() {
+            var time = this.videoModel.getCurrentTime();
+            textController.seek(time);
+        },
+
+        onVisibilitychange = function() {
+
+            if (document.hidden === true || startClockTime === -1) {
+                return;
+            }
+
+            // If current document get focus back, then check if resynchronization is required
+            var clockTime = new Date().getTime() / 1000,
+                streamTime = this.getVideoModel().getCurrentTime(),
+                elapsedClockTime = clockTime - startClockTime,
+                elapsedStreamTime = streamTime - startStreamTime;
+
+            this.debug.log("[Stream] VisibilityChange: elapsedClockTime = " + elapsedClockTime + ", elapsedStreamTime = " + elapsedStreamTime + " (" + (elapsedClockTime - elapsedStreamTime) + ")");
+
+            if ((elapsedClockTime - elapsedStreamTime) > 1) {
+                onReload.call(this);
+            }
+
         };
 
     return {
@@ -901,7 +995,6 @@ MediaPlayer.dependencies.Stream = function() {
         manifestModel: undefined,
         mediaSourceExt: undefined,
         sourceBufferExt: undefined,
-        bufferExt: undefined,
         manifestExt: undefined,
         fragmentController: undefined,
         fragmentExt: undefined,
@@ -911,7 +1004,6 @@ MediaPlayer.dependencies.Stream = function() {
         metricsExt: undefined,
         errHandler: undefined,
         timelineConverter: undefined,
-        requestScheduler: undefined,
         scheduleWhilePaused: undefined,
         // ORANGE : add metricsModel
         metricsModel: undefined,
@@ -922,8 +1014,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.system.mapHandler("setCurrentTime", undefined, currentTimeChanged.bind(this));
             this.system.mapHandler("bufferingCompleted", undefined, bufferingCompleted.bind(this));
             this.system.mapHandler("segmentLoadingFailed", undefined, segmentLoadingFailed.bind(this));
-            // ORANGE: add event handler "liveEdgeFound"
-            this.system.mapHandler("liveEdgeFound", undefined, onLiveEdgeFound.bind(this));
+            this.system.mapHandler("startTimeFound", undefined, onStartTimeFound.bind(this));
+            this.system.mapHandler("needForReload", undefined, onReload.bind(this));
 
             /* @if PROTECTION=true */
             // Protection event handlers
@@ -945,13 +1037,13 @@ MediaPlayer.dependencies.Stream = function() {
             canplayListener = onCanPlay.bind(this);
             playingListener = onPlaying.bind(this);
             loadstartListener = onLoadStart.bind(this);
-            waitingListener = onWaiting.bind(this);
 
             // ORANGE : add FullScreen Event listener
             fullScreenListener = onFullScreenChange.bind(this);
             // ORANGE : add Ended Event listener
             endedListener = onEnded.bind(this);
 
+            visibilitychangeListener = onVisibilitychange.bind(this);
         },
 
         load: function(manifest, periodInfoValue) {
@@ -974,7 +1066,6 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.listen("canplay", canplayListener);
             this.videoModel.listen("playing", playingListener);
             this.videoModel.listen("loadstart", loadstartListener);
-            //this.videoModel.listen("waiting", waitingListener);
 
             // ORANGE : add FullScreen Event listener
             this.videoModel.listen("webkitfullscreenchange", fullScreenListener);
@@ -982,7 +1073,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.listenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.listenOnParent("webkitfullscreenchange", fullScreenListener);
 
-            this.requestScheduler.videoModel = value;
+            //document.addEventListener("visibilitychange", visibilitychangeListener);
         },
 
         // ORANGE: add the capability to set audioTrack
@@ -1024,12 +1115,12 @@ MediaPlayer.dependencies.Stream = function() {
                 self = this;
 
             if (textController) {
-                // Get data index corresponding to new audio track
+                // Get data index corresponding to new subtitle track
                 self.manifestExt.getDataIndex(subtitleTrack, manifest, periodInfo.index).then(
                     function(index) {
                         textTrackIndex = index;
 
-                       // Update manifest
+                        // Update manifest
                         self.system.notify("manifestUpdate");
                     }
                 );
@@ -1093,6 +1184,8 @@ MediaPlayer.dependencies.Stream = function() {
 
             pause.call(this);
 
+            //document.removeEventListener("visibilityChange");
+
             this.videoModel.unlisten("play", playListener);
             this.videoModel.unlisten("pause", pauseListener);
             this.videoModel.unlisten("error", errorListener);
@@ -1106,19 +1199,19 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.unlisten("canplay", canplayListener);
             this.videoModel.unlisten("playing", playingListener);
             this.videoModel.unlisten("loadstart", loadstartListener);
-            //this.videoModel.unlisten("waiting", waitingListener);
 
             this.videoModel.unlisten("webkitfullscreenchange", fullScreenListener);
             this.videoModel.unlisten("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("webkitfullscreenchange", fullScreenListener);
 
-
             this.system.unmapHandler("bufferUpdated");
             this.system.unmapHandler("liveEdgeFound");
             this.system.unmapHandler("setCurrentTime");
             this.system.unmapHandler("bufferingCompleted");
             this.system.unmapHandler("segmentLoadingFailed");
+            this.system.unmapHandler("needForReload");
+            this.system.unmapHandler("streamsComposed", undefined, streamsComposed);
 
             tearDownMediaSource.call(this).then(
                 function() {
@@ -1128,7 +1221,6 @@ MediaPlayer.dependencies.Stream = function() {
 
                     protectionController = undefined;
                     self.fragmentController = undefined;
-                    self.requestScheduler = undefined;
 
                     load = Q.defer();
                     deferred.resolve();
@@ -1161,6 +1253,21 @@ MediaPlayer.dependencies.Stream = function() {
         },
         resetEventController: function() {
             eventController.reset();
+        },
+        enableSubtitles: function(enabled) {
+            
+            if (enabled !== subtitlesEnabled) {
+                subtitlesEnabled = enabled;
+                if (textController) {
+                    if (enabled) {
+                        this.system.mapHandler("streamsComposed", undefined, streamsComposed.bind(this), true);
+                        // Update manifest
+                        this.system.notify("manifestUpdate");
+                    } else {
+                        textController.stop();
+                    }
+                }
+            }
         },
 
         updateData: updateData,

@@ -46,6 +46,23 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
         // Session list
         sessions = [],
 
+        arrayToHexString = function (array) {
+
+            var str = "[",
+                i;
+
+            for (i = 0; i < array.length; i++) {
+                str += "0x" + array[i].toString(16);
+                if (i < (array.length - 1)) {
+                    str += ",";
+                }
+            }
+
+            str += "]";
+
+            return str;
+        },
+
         requestKeySystemAccessInternal = function(ksConfigurations, idx) {
             var self = this;
             (function(i) {
@@ -59,14 +76,12 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                             mediaKeySystemAccess.getConfiguration() : null;
                     var keySystemAccess = new MediaPlayer.vo.protection.KeySystemAccess(keySystem, configuration);
                     keySystemAccess.mksa = mediaKeySystemAccess;
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE,
-                            keySystemAccess);
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, keySystemAccess);
                 }).catch(function() {
                     if (++i < ksConfigurations.length) {
                         requestKeySystemAccessInternal.call(self, ksConfigurations, i);
                     } else {
-                        self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE,
-                                null, "Key system access denied!");
+                        self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, null, "Key system access denied!");
                     }
                 });
             })(idx);
@@ -113,7 +128,8 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                                 this.session = null;
                             }
                             videoElement.removeEventListener("waitingforkey", eventHandler);
-                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_NO_VALID_KEY);
+                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR,
+                                new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED, "Media is encrypted and no key is available"));
 
                         break;
                     }
@@ -149,11 +165,29 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
 
                         case "keystatuseschange":
                             self.debug.log("[DRM][PM_21Jan2015] 'keystatuseschange' event: ", event);
-                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_STATUSES_CHANGED,
-                                    this);
+                            self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_STATUSES_CHANGED, this);
 
-                             event.target.keyStatuses.forEach(function(status, keyId, map) {
-                                self.debug.log("[DRM][PM_21Jan2015] status = " + status + " for KID " + MediaPlayer.utils.arrayToHexString(new Uint8Array(keyId)));
+                             event.target.keyStatuses.forEach(function() {
+                                // has Edge and Chrome implement different version of keystatues, param are not on same order
+                                var status, keyId;
+                                if(arguments && arguments.length > 0){
+                                    if(arguments[0]){
+                                        if(typeof arguments[0] === 'string'){
+                                            status = arguments[0];
+                                        }else{
+                                            keyId = arguments[0];
+                                        }
+                                    }
+
+                                    if(arguments[1]){
+                                        if(typeof arguments[1] === 'string'){
+                                            status = arguments[1];
+                                        }else{
+                                            keyId = arguments[1];
+                                        }
+                                    }
+                                }
+                                self.debug.log("[DRM][PM_21Jan2015] status = " + status + " for KID " + arrayToHexString(new Uint8Array(keyId)));
                                 switch (status) {
                                     case "expired":
                                       // Report an expired key.
@@ -309,7 +343,7 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             if (mediaKeys !== null) {
                 self.debug.log("[DRM][PM_21Jan2015] MediaKeys already created");
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED);
-                return;                
+                return;
             }
 
             keySystemAccess.mksa.createMediaKeys().then(function(mkeys) {
@@ -384,11 +418,12 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             var self = this;
             session.generateRequest("cenc", initData).then(function() {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
-            }).catch(function(error) {
-                // TODO: Better error string
+            }).catch(function(ex) {
                 removeSession(sessionToken);
-                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Error generating key request -- " + error.name);
+                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                    reason: "Failed to generate key request",
+                    error: new MediaPlayer.vo.Error(ex.code, ex.name, ex.message)
+                });
             });
         },
 
@@ -412,9 +447,9 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
                 eventHandler.session = sessionToken;
                 videoElement.addEventListener("waitingforkey", eventHandler);
             })
-            .catch(function (error) {
+            .catch(function (ex) {
                 self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_ERROR,
-                    new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR, sessionToken, "Error sending update() message! " + error.name));
+                    new MediaPlayer.vo.protection.KeyError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_KEYERR, "Error while providing license to the CDM", ex));
             });
         },
 
@@ -432,15 +467,18 @@ MediaPlayer.models.ProtectionModel_21Jan2015 = function () {
             session.load(sessionID).then(function (success) {
                 if (success) {
                     var sessionToken = createSessionToken.call(this, session);
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        sessionToken);
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, sessionToken);
                 } else {
-                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Could not load session! Invalid Session ID (" + sessionID + ")");
+                    self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, null, {
+                        reason: "Failed to load session " + sessionID,
+                        error: null
+                    });
                 }
-            }).catch(function (error) {
-                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED,
-                        null, "Could not load session (" + sessionID + ")! " + error.name);
+            }).catch(function (ex) {
+                self.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CREATED, {
+                    reason: "Failed to load session " + sessionID,
+                    error: new MediaPlayer.vo.Error(ex.code, ex.name, ex.message)
+                });
             });
         },
 

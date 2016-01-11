@@ -49,7 +49,7 @@ MediaPlayer = function(aContext) {
      *
      */
     var VERSION = "1.2.0",
-        VERSION_HAS = "1.2.5.6",
+        VERSION_HAS = "1.2.6_dev",
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
@@ -83,17 +83,19 @@ MediaPlayer = function(aContext) {
          */
         play = function() {
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.play(): MediaPlayer not initialized');
+            }
+
+            if (!element) {
+                throw new Error('MediaPlayer.play(): Video element not attached to MediaPlayer');
+            }
+
+            if (!source) {
+                throw new Error('MediaPlayer.play(): Source not attached to MediaPlayer');
             }
 
             if (!this.capabilities.supportsMediaSource()) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE);
-                return;
-            }
-
-            if (!element || !source) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "Missing view or source.");
+                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE, "MediaSource extension not supported by the browser");
                 return;
             }
 
@@ -113,7 +115,6 @@ MediaPlayer = function(aContext) {
             streamController.load(source, protectionData);
             system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
             system.mapOutlet("scheduleWhilePaused", "stream");
-            system.mapOutlet("scheduleWhilePaused", "bufferController");
             system.mapValue("bufferMax", bufferMax);
             system.injectInto(this.bufferExt, "bufferMax");
         },
@@ -138,6 +139,9 @@ MediaPlayer = function(aContext) {
                         playing = false;
 
                         resetting = false;
+
+                        self.debug.log("[MediaPlayer] Player is stopped");
+
                         if (isReady.call(self)) {
                             doAutoPlay.call(self);
                         }
@@ -190,7 +194,7 @@ MediaPlayer = function(aContext) {
          */
         seek = function(value) {
 
-            videoModel.getElement().currentTime = this.getDVRSeekOffset(value);
+            streamController.seek(value);
         },
 
         /**
@@ -266,9 +270,9 @@ MediaPlayer = function(aContext) {
          * @access public
          */
         formatUTC = function(time, locales, hour12) {
-            var dt = new Date(time * 1000);
-            var d = dt.toLocaleDateString(locales);
-            var t = dt.toLocaleTimeString(locales, {
+            var dt = new Date(time * 1000),
+                d = dt.toLocaleDateString(locales),
+                t = dt.toLocaleTimeString(locales, {
                 hour12: hour12
             });
             return t + ' ' + d;
@@ -283,9 +287,9 @@ MediaPlayer = function(aContext) {
         convertToTimeCode = function(value) {
             value = Math.max(value, 0);
 
-            var h = Math.floor(value / 3600);
-            var m = Math.floor((value % 3600) / 60);
-            var s = Math.floor((value % 3600) % 60);
+            var h = Math.floor(value / 3600),
+                m = Math.floor((value % 3600) / 60),
+                s = Math.floor((value % 3600) % 60);
             return (h === 0 ? "" : (h < 10 ? "0" + h.toString() + ":" : h.toString() + ":")) + (m < 10 ? "0" + m.toString() : m.toString()) + ":" + (s < 10 ? "0" + s.toString() : s.toString());
         };
 
@@ -627,6 +631,19 @@ MediaPlayer = function(aContext) {
         },
 
         /**
+         * function used to enable/disable subtitle download
+         * @access public
+         * @memberof MediaPlayer#
+         * @param  enabled - boolean true if the download of subtitle need to be enabled
+        */
+        enableSubtitles:function(enabled){
+            if(streamController){
+                streamController.enableSubtitles(enabled);
+            }
+        },
+
+
+        /**
          * get the subtitle track list
          * @access public
          * @memberof MediaPlayer#
@@ -647,9 +664,9 @@ MediaPlayer = function(aContext) {
          * @param  view - html5 video element
          */
         attachView: function(view) {
+
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.attachView(): MediaPlayer not initialized');
             }
 
             element = view;
@@ -677,18 +694,14 @@ MediaPlayer = function(aContext) {
          */
         attachSource: function(url, protData) {
             var loop,
-                videoModel;
+                videoModel = this.getVideoModel();
 
             if (!initialized) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "MediaPlayer not initialized!");
-                return;
+                throw new Error('MediaPlayer.play(): MediaPlayer not initialized');
             }
 
-            videoModel = this.getVideoModel();
-
             if (!videoModel) {
-                this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.HASPLAYER_INIT_ERROR, "videoModel not initialized");
-                return;
+                throw new Error('MediaPlayer.play(): Video element not attached to MediaPlayer');
             }
 
             // ORANGE : add metric

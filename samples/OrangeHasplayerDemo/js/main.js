@@ -1,7 +1,6 @@
 var // Main Container
     streamUrl = null,
 
-
     // Modules
     playerPanel = null,
     streamsPanel = null,
@@ -48,7 +47,7 @@ var displayVersion = function() {
 };
 
 var getURLParameter = function (name) {
-  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
 /********************************************************************************************************************
@@ -112,7 +111,7 @@ var handleBuffering = function(show){
     }else{
         playerPanel.hideLoadingElement();
     }
-}
+};
 
 var handleVolumeChange = function(volumeLevel) {
     playerPanel.onVolumeChange(volumeLevel);
@@ -141,15 +140,19 @@ var handleBufferLevelUpdated = function(type, level) {
     }else if (type === "audio") {
         settingsPanel.audioBufferLength.innerHTML = level +" s";
     }
-}
+};
 
 var handleBitrates = function(bitrates) {
     var ctx = document.getElementById('canvas').getContext('2d');
     graphPanel.init(ctx, bitrates);
 };
 
-var handleError = function(e) {
-    playerPanel.displayError(e.event.code, e.event.message);
+var handleWarning = function(warning) {
+    console.warn("Code: " + warning.code + ", message: " + warning.message, warning.data);
+};
+
+var handleError = function(error) {
+    playerPanel.displayError(error.code, error.message);
 };
 
 var handleVideoEnd = function(){

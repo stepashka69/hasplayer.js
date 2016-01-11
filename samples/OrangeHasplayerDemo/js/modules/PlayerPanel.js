@@ -35,7 +35,7 @@ var PlayerPanel = function() {
     this.languagesModule = null;
     this.languagesButton = null;
 
-    this.loadingElement = null,
+    this.loadingElement = null;
 
     this.errorModule = null;
     this.titleError = null;
@@ -96,8 +96,8 @@ PlayerPanel.prototype.init = function() {
 
 PlayerPanel.prototype.setupEventListeners = function() {
     this.playerContainer.addEventListener('webkitfullscreenchange', this.onFullScreenChange.bind(this));
-    this.playerContainer.addEventListener('mozfullscreenchange',  this.onFullScreenChange.bind(this));
-    this.playerContainer.addEventListener('fullscreenchange',  this.onFullScreenChange.bind(this));
+    this.playerContainer.addEventListener('mozfullscreenchange', this.onFullScreenChange.bind(this));
+    this.playerContainer.addEventListener('fullscreenchange', this.onFullScreenChange.bind(this));
     this.playerContainer.addEventListener('mouseenter', this.showBarsTimed.bind(this));
     this.playerContainer.addEventListener('mousemove', this.showBarsTimed.bind(this));
     this.playerContainer.addEventListener('click', this.showBarsTimed.bind(this));
@@ -221,7 +221,7 @@ PlayerPanel.prototype.onVideoQualityClicked = function() {
 };
 
 PlayerPanel.prototype.setCurrentBitrate = function(bitrate) {
-    this.currentBitrateSpan.innerHTML = bitrate/1000000;
+    this.currentBitrateSpan.innerHTML = bitrate / 1000000;
 };
 
 PlayerPanel.prototype.onPreviousClicked = function() {
@@ -273,13 +273,15 @@ PlayerPanel.prototype.setDuration = function(duration) {
 };
 
 PlayerPanel.prototype.setPlayingTime = function(time) {
+    var progress;
+
     this.elapsedTimeSpan.textContent = setTimeWithSeconds(time);
     if (this.videoDuration !== Infinity) {
-        var progress = (time / this.videoDuration) * 100;
+        progress = (time / this.videoDuration) * 100;
         this.seekbar.style.width = progress + '%';
-     } else {
+    } else {
         this.seekbar.style.width = 0;
-     }
+    }
 };
 
 PlayerPanel.prototype.setVolumeOff = function(value) {
@@ -302,7 +304,7 @@ PlayerPanel.prototype.onVolumeChange = function(volumeLevel) {
     } else if (sliderValue > 8 && sliderValue <= 16) {
         this.sliderVolume.className = 'op-volume op-range16';
     } else if (sliderValue >= 16 && sliderValue <= 24) {
-       this. sliderVolume.className = 'op-volume op-range24';
+        this.sliderVolume.className = 'op-volume op-range24';
     } else if (sliderValue >= 24 && sliderValue <= 32) {
         this.sliderVolume.className = 'op-volume op-range32';
     } else if (sliderValue >= 32 && sliderValue <= 40) {
@@ -376,7 +378,9 @@ PlayerPanel.prototype.showBarsTimed = function(e) {
     if (hasClass(document.querySelector('.op-middle-container'), 'disabled')) {
         var self = this;
         clearTimeout(this.barsTimer);
-        this.barsTimer = setTimeout(function() { self.hideBars(); }, self.hidebarsTimeout);
+        this.barsTimer = setTimeout(function() {
+            self.hideBars();
+        }, self.hidebarsTimeout);
         this.controlBarModule.className = 'op-control-bar';
     }
 };
@@ -416,16 +420,18 @@ PlayerPanel.prototype.resetSeekbar = function() {
 };
 
 PlayerPanel.prototype.setSubtitlesCSSStyle = function(style) {
+    var fontSize;
+
     if (style) {
         this.subtitlesCSSStyle = style;
 
-        var fontSize = style.data.fontSize;
+        fontSize = style.fontSize;
 
-        if (style.data.fontSize && style.data.fontSize[style.data.fontSize.length - 1] === '%') {
-            fontSize = (this.video.clientHeight * style.data.fontSize.substr(0, style.data.fontSize.length - 1)) / 100;
+        if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
+            fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100;
         }
 
-        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.data.backgroundColor + ';color:' + style.data.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.data.fontFamily + '}';
+        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
     }
 };
 
@@ -466,48 +472,51 @@ PlayerPanel.prototype.enableMiddleContainer = function(enabled) {
 };
 
 PlayerPanel.prototype.createLanguageLine = function(audioTrack, selectedAudioTrack, type) {
-    var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : '';
-    var lang =  audioTrack.lang !== undefined ? audioTrack.lang : audioTrack.id;
-    var html = '<div class="op-languages-line">' +
-                '<input type="radio" name="' + type + '" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
-                '<label for="' +  audioTrack.id + '">' +
-                '<span class="op-radio">' +
-                '<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1_1_"><g><g><circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g></svg>' +
-                '</span>' +
-                '<span class="op-radiocheck">' +
-                '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">	<g>		<g>			<circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g><g id="Calque_2">	<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1		S11.5,7.9,15.9,7.9z"></path></g></svg>' +
-                '</span>' +
-                '<span> ' + lang + '</span>' +
-                '</label>' +
-                '</div>';
+    var checked = selectedAudioTrack.id === audioTrack.id ? 'checked="checked"' : '',
+        lang = audioTrack.lang !== undefined ? audioTrack.lang : audioTrack.id,
+        html = '<div class="op-languages-line">' +
+        '<input type="radio" name="' + type + '" id="' + audioTrack.id + '" value="' + audioTrack.id + '" ' + checked + ' >' +
+        '<label for="' + audioTrack.id + '">' +
+        '<span class="op-radio">' +
+        '<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1_1_"><g><g><circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g></svg>' +
+        '</span>' +
+        '<span class="op-radiocheck">' +
+        '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><g id="Calque_3" display="none">	<rect x="-0.1" y="0" display="inline" fill="none" width="32" height="32"></rect></g><g id="Calque_1">	<g>		<g>			<circle fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" cx="15.9" cy="16" r="13"></circle></g></g></g><g id="Calque_2">	<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9,7.9c4.5,0,8.1,3.6,8.1,8.1s-3.6,8.1-8.1,8.1c-4.5,0-8.1-3.6-8.1-8.1		S11.5,7.9,15.9,7.9z"></path></g></svg>' +
+        '</span>' +
+        '<span> ' + lang + '</span>' +
+        '</label>' +
+        '</div>';
     return html;
 };
 
 PlayerPanel.prototype.addLanguageLine = function(audioTrack, selectedAudioTrack) {
-    var html = this.createLanguageLine(audioTrack, selectedAudioTrack, 'language');
-    var languageContainer = document.querySelector('.op-summary');
+    var html = this.createLanguageLine(audioTrack, selectedAudioTrack, 'language'),
+        languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
     document.getElementById(audioTrack.id).addEventListener('click', this.onLanguageRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
-    var html = this.createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle');
-    var subtitleContainer = document.querySelector('.op-panel-container');
+    var html = this.createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle'),
+        subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
     document.getElementById(subtitleTrack.id).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
+    var i = 0;
     if (_audioTracks && _currenTrack) {
-        for (var i = 0; i < _audioTracks.length; i++) {
+        for (i = 0; i < _audioTracks.length; i += 1) {
             this.addLanguageLine(_audioTracks[i], _currenTrack);
         }
     }
 };
 
 PlayerPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
+    var i = 0;
+
     if (_subtitleTracks && _selectedSubtitleTrack) {
-        for (var i = 0; i < _subtitleTracks.length; i++) {
+        for (i = 0; i < _subtitleTracks.length; i += 1) {
             this.addSubtitleLine(_subtitleTracks[i], _selectedSubtitleTrack);
         }
     }
@@ -531,7 +540,7 @@ PlayerPanel.prototype.resetLanguageLines = function() {
     var languageLines = document.getElementsByClassName('op-languages-line');
 
     if (languageLines !== null) {
-        while(languageLines.length > 0) {
+        while (languageLines.length > 0) {
             languageLines[0].removeEventListener('click', this.onLanguageRadioClicked.bind(this));
             languageLines[0].parentNode.removeChild(languageLines[0]);
         }

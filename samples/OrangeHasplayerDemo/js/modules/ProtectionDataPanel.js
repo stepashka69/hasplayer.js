@@ -12,9 +12,10 @@ ProtectionDataPanel.prototype.clear = function() {
 };
 
 ProtectionDataPanel.prototype.displayDatum = function(protectionName, protectionDatum) {
-    var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>';
+    var html = '<tr><td class="protection-data-name" colspan="2">' + protectionName + '</td></tr>',
+        p;
 
-    for (var p in protectionDatum) {
+    for (p in protectionDatum) {
         if (protectionDatum.hasOwnProperty(p)) {
             html += '<tr><td class="protection-key">' + p + '</td><td class="protection-value">' + protectionDatum[p] + '</td></tr>';
         }
@@ -24,11 +25,12 @@ ProtectionDataPanel.prototype.displayDatum = function(protectionName, protection
 };
 
 ProtectionDataPanel.prototype.display = function(streamInfos) {
+    var html = '<table>',
+        p;
+
     this.protectionDataContainer.className = 'module';
 
-    var html = '<table>';
-
-    for (var p in streamInfos) {
+    for (p in streamInfos) {
         if (streamInfos.hasOwnProperty(p)) {
             html += this.displayDatum(p, streamInfos[p]);
         }

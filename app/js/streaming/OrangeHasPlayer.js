@@ -25,22 +25,20 @@ OrangeHasPlayer = function() {
         debug,
         video,
         isFullScreen = false,
-        isSubtitleVisible = true,
+        isSubtitleVisible = false,
         audioTracks = [],
         subtitleTracks = [],
         videoQualityChanged = [],
         audioQualityChanged = [],
         videoBitrates = null,
         audioBitrates = null,
-        videoDownloadedBdthValue,
-        audioDownloadedBdthValue,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
         metricsAgent = {
             ref: null,
-            deferInit : null,
+            deferInit: null,
             isActivated: false
         },
         initialQuality = {
@@ -48,16 +46,16 @@ OrangeHasPlayer = function() {
             audio: -1
         },
 
-        debugData ={
-            isInDebug:false,
-            level:0,
-            loggerType:'console'
+        debugData = {
+            isInDebug: false,
+            level: 0,
+            loggerType: 'console'
         },
         state = 'UNINITIALIZED';
 
     var _isPlayerInitialized = function() {
         if (state === 'UNINITIALIZED') {
-            throw new Error('OrangeHasPlayer.hasMediaSourceExtension(): Must not be in UNINITIALIZED state');
+            throw new Error('OrangeHasPlayer not initialized');
         }
     };
 
@@ -69,6 +67,7 @@ OrangeHasPlayer = function() {
         this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
+            mediaPlayer.enableSubtitles(isSubtitleVisible);
         }
     };
 
@@ -80,7 +79,7 @@ OrangeHasPlayer = function() {
                 debugData.isInDebug = false;
                 console.log("debug mode desactivated");
                 _isPlayerInitialized();
-                if ((e.keyCode === 90)) {
+                if (e.keyCode === 90) {
                     _downloadDebug(mediaPlayer.getDebug().getLogger().getLogs());
                 }
                 mediaPlayer.getDebug().setLevel(debugData.level);
@@ -89,7 +88,7 @@ OrangeHasPlayer = function() {
                 debugData.isInDebug = true;
                 console.log("debug mode activated");
                 _isPlayerInitialized();
-                debugData.level =  mediaPlayer.getDebug().getLevel();
+                debugData.level = mediaPlayer.getDebug().getLevel();
                 mediaPlayer.getDebug().setLevel((e.keyCode === 68) ? 4 : 3);
                 mediaPlayer.getDebug().setLogger((e.keyCode === 68) ? 'console' : 'memory');
             }
@@ -100,16 +99,18 @@ OrangeHasPlayer = function() {
         if (array && array.length > 0) {
             var filename = 'hasplayer_logs.txt',
                 data = JSON.stringify(array, null, '\r\n'),
-                blob = new Blob([data], {type: 'text/json'});
+                blob = new Blob([data], {
+                    type: 'text/json'
+                });
 
             if (navigator.msSaveBlob) { // For IE10+ and edge
-                navigator.msSaveBlob(blob,filename);
+                navigator.msSaveBlob(blob, filename);
             } else {
-                var e    = document.createEvent('MouseEvents'),
-                    a    = document.createElement('a');
+                var e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
                 a.download = filename;
                 a.href = window.URL.createObjectURL(blob);
-                a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
                 e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                 a.dispatchEvent(e);
             }
@@ -129,10 +130,10 @@ OrangeHasPlayer = function() {
         video.dispatchEvent(event);
     };
 
-    var _cleanStreamTab = function(streamTab, idToRemove){
+    var _cleanStreamTab = function(streamTab, idToRemove) {
         var i = 0;
 
-        for (i = idToRemove.length - 1; i >= 0; i--) {
+        for (i = idToRemove.length - 1; i >= 0; i -= 1) {
             streamTab.splice(i, 1);
         }
     };
@@ -147,7 +148,7 @@ OrangeHasPlayer = function() {
             currentSwitch = streamTab[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
                 _dispatchBitrateEvent('play_bitrate', currentSwitch);
-                debug.log("[OrangeHasPlayer]["+currentSwitch.streamType+"] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t="+currentSwitch.mediaStartTime + "(" + video.playbackRate + ")");
+                debug.log("[OrangeHasPlayer][" + currentSwitch.streamType + "] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t=" + currentSwitch.mediaStartTime + "(" + video.playbackRate + ")");
                 // And remove when it's played
                 idToRemove.push(i);
             }
@@ -190,8 +191,8 @@ OrangeHasPlayer = function() {
                             width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate - b="+videoBitrates[e.data.value.lto]);
-                    }    
+                        debug.log("[OrangeHasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
+                    }
                 } else if (e.data.stream == "audio") {
                     audioBitrates = metricsExt.getBitratesForType(e.data.stream);
                     if (audioBitrates) {
@@ -202,42 +203,42 @@ OrangeHasPlayer = function() {
                             width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        debug.log("[OrangeHasPlayer]["+e.data.stream+"] send download_bitrate - b="+videoBitrates[e.data.value.lto]);
+                        debug.log("[OrangeHasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
                     }
                 }
                 break;
-            case "BufferedSwitch" :
+            case "BufferedSwitch":
                 _isPlayerInitialized();
                 if (e.data.stream == "video") {
                     videoQualityChanged.push({
-                                streamType: e.data.stream,
-                                mediaStartTime: e.data.value.mt,
-                                switchedQuality: videoBitrates[e.data.value.lto],
-                                representationId: e.data.value.to,
-                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                        streamType: e.data.stream,
+                        mediaStartTime: e.data.value.mt,
+                        switchedQuality: videoBitrates[e.data.value.lto],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
                 } else if (e.data.stream == "audio") {
                     audioQualityChanged.push({
-                                streamType: e.data.stream,
-                                mediaStartTime: e.data.value.mt,
-                                switchedQuality: audioBitrates[e.data.value.lto],
-                                representationId: e.data.value.to,
-                                width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
-                                height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
+                        streamType: e.data.stream,
+                        mediaStartTime: e.data.value.mt,
+                        switchedQuality: audioBitrates[e.data.value.lto],
+                        representationId: e.data.value.to,
+                        width: metricsExt.getVideoWidthForRepresentation(e.data.value.to),
+                        height: metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                     });
                 }
                 break;
-            case "BufferLevel" :
+            case "BufferLevel":
                 //debug.log("[OrangeHasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('bufferLevel_updated', false, false, {
                     type: e.data.stream,
-                    level: e.data.value.level.toFixed(3)
+                    level: e.data.value.level
                 });
                 video.dispatchEvent(event);
                 break;
-            case "State" :
+            case "State":
                 //debug.log("[OrangeHasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('state_changed', false, false, {
@@ -278,7 +279,7 @@ OrangeHasPlayer = function() {
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
         video.addEventListener("timeupdate", _onTimeupdate);
-        window.addEventListener("keydown",_handleKeyPressedEvent);
+        window.addEventListener("keydown", _handleKeyPressedEvent);
     };
 
     /**
@@ -294,7 +295,7 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * Returns the full version of the player (including git tag)
+     * Returns the full version of the player (including git tag).
      * @method getVersionFull
      * @access public
      * @memberof OrangeHasPlayer#
@@ -317,19 +318,27 @@ OrangeHasPlayer = function() {
         return mediaPlayer.getBuildDate();
     };
 
+
+    /**
+     * Metrics agent parameters object.
+     * @typedef MetricsAgentParams
+     * @type Object
+     * @property {String} name - the metrics agent name
+     * @property {boolean} enable - enable state
+     * @property {String} activationUrl - the activation url
+     * @property {String} serverUrl - the collecter url
+     * @property {String} dbServerUrl - the inside events database server (for debug purpose)
+     * @property {String} collector - the collector type ('HasPlayer')
+     * @property {String} formatter - the formatter type ('CSQoE' or 'PRISME')
+     * @property {Integer} sendingTime - the periodic delay (in milliseconds) for sending events to collector
+     */
+
     /**
      * Loads and initializes the metrics agent.
      * @method loadMetricsAgent
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {json} parameters - the metrics agent parameters
-     * @param {String} parameters.name - the metrics agent name
-     * @param {String} parameters.activationUrl - the activation url
-     * @param {String} parameters.serverUrl - the collecter url
-     * @param {String} parameters.dbServerUrl - the inside events database server (for debug purpose)
-     * @param {String} parameters.collector - the collector type ('HasPlayer')
-     * @param {String} parameters.formatter - the formatter type ('CSQoE' or 'PRISME')
-     * @param {Integer} parameters.sendingTime - the periodic delay (in milliseconds) for sending events to collector
+     * @param {MetricsAgentParams} parameters - the metrics agent parameters
      */
     this.loadMetricsAgent = function(parameters) {
         _isPlayerInitialized();
@@ -356,9 +365,10 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @param {string} url - the video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
-     * @param {json} protData - information about protection, with the following syntax:
+     * @param {json} protData - protection scheme(s) information, with the following syntax:
         <pre>
         {
+            // one entry for each key system ('com.microsoft.playready' or 'com.widevine.alpha')
             "[key_system_name]": {
                 laURL: "[licenser url (optionnal)]",
                 pssh: "[base64 pssh box (optionnal)]"
@@ -371,19 +381,17 @@ OrangeHasPlayer = function() {
     this.load = function(url, protData) {
         var self = this,
             config = {
-            video: {
-                "ABR.keepBandwidthCondition": true
-            },
-            audio: {
-                "ABR.keepBandwidthCondition": true
-            }
-        };
+                video: {
+                    "ABR.keepBandwidthCondition": true
+                },
+                audio: {
+                    "ABR.keepBandwidthCondition": true
+                }
+            };
 
         audioTracks = [];
         subtitleTracks = [];
 
-        videoDownloadedBdthValue = undefined;
-        audioDownloadedBdthValue = undefined;
         videoQualityChanged = [];
         audioQualityChanged = [];
 
@@ -428,16 +436,17 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * refresh manifest url
+     * Updates the manifest url.
      * @method refeshManifest
      * @access public
      * @memberof OrangeHasPlayer#
-     * param {string} url - the video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
+     * param {string} url - the updated video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
      */
-    this.refreshManifest = function(url){
+    this.refreshManifest = function(url) {
         _isPlayerInitialized();
         mediaPlayer.refreshManifest(url);
     };
+
     /**
      * Plays/resumes playback of the media.
      * @method play
@@ -516,11 +525,15 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * Resets the player. HasPlayer data : stop downloading chunks elements, current url and protection data values set to null.
+     * Stops and resets the player.
      * @method reset
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {number} reason - 0 : a stop during streaming (ex: browser has been closed), 1 : a stop because all the stream has been watched and 2 : a stop, after an error. 
+     * @param {number} reason - the reason for stopping the player.
+     * Possible values are:
+     * <li>0 : stop during streaming (ex: browser has been closed)
+     * <li>1 : stop because all the stream has been watched
+     * <li>2 : stop after an error
      */
     this.reset = function(reason) {
         _isPlayerInitialized();
@@ -533,7 +546,7 @@ OrangeHasPlayer = function() {
     };
 
     /**
-     * Returns the current playback time in seconds.
+     * Returns the current playback time.
      * @method getPosition
      * @access public
      * @memberof OrangeHasPlayer#
@@ -579,7 +592,7 @@ OrangeHasPlayer = function() {
      * @method getVideoBitrates
      * @access public
      * @memberof OrangeHasPlayer#
-     * @return {Array} array of bitrate values
+     * @return {Array<Number>} array of bitrate values
      */
     this.getVideoBitrates = function() {
         _isPlayerInitialized();
@@ -590,26 +603,26 @@ OrangeHasPlayer = function() {
 
     /**
      * Registers a listener on the specified event.
+     * The possible event types are:
+     * <li>'error' (see [error]{@link OrangeHasPlayer#event:error} event specification)
+     * <li>'warning' (see [warning]{@link OrangeHasPlayer#event:warning} event specification)
+     * <li>'subtitlesStyleChanged' (see [subtitlesStyleChanged]{@link OrangeHasPlayer#event:subtitlesStyleChanged} event specification)
+     * <li>'manifestUrlUpdate' (see [manifestUrlUpdate]{@link OrangeHasPlayer#event:manifestUrlUpdate} event specification)
+     * <li>'play_bitrate' (see [play_bitrate]{@link OrangeHasPlayer#event:play_bitrate} event specification)
+     * <li>'download_bitrate' (see [download_bitrate]{@link OrangeHasPlayer#event:download_bitrate} event specification)
+     * <li>'bufferLevel_updated' (see [bufferLevel_updated]{@link OrangeHasPlayer#event:bufferLevel_updated} event specification)
+     * <li>'state_changed' (see [state_changed]{@link OrangeHasPlayer#event:state_changed} event specification)
      * @method addEventListener
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {string} type - the event type for listen to, either any HTML video element event or player event
-     * ('play_bitrate', 'download_bitrate', 'error' or 'subtitlesStyleChanged') events.
-     * For play_bitrate and download_bitrate events, callback parameter contains, in detail attribute, those values :
-     * <pre>
-     *  type: stream type (audio or video),
-     *  bitrate: new bitrate,
-     *  representationId: id for the stream representation,
-     *  time: video currentTime value,
-     *  width: video width for video stream, undefined otherwise,
-     *  height: video height for video stream, undefined otherwise
-     * </pre>
+     * @param {string} type - the event type for listen to, either any HTML video element event or player event.
      * @param {callback} listener - the callback which is called when an event of the specified type occurs
-     * @param {boolean} useCapture - @see HTML DOM addEventListener() method documentation
+     * @param {boolean} useCapture - see HTML DOM addEventListener() method specification
      */
     this.addEventListener = function(type, listener, useCapture) {
         switch (type) {
             case "error":
+            case "warning":
             case "subtitlesStyleChanged":
             case "manifestUrlUpdate":
                 mediaPlayer.addEventListener(type, listener, useCapture);
@@ -637,7 +650,9 @@ OrangeHasPlayer = function() {
     this.removeEventListener = function(type, listener) {
         switch (type) {
             case "error":
+            case "warning":
             case "subtitlesStyleChanged":
+            case "manifestUrlUpdate":
                 mediaPlayer.removeEventListener(type, listener);
                 break;
             case "play_bitrate":
@@ -654,8 +669,15 @@ OrangeHasPlayer = function() {
     /////////// AUDIO TRACKS
 
     /**
+     * @typedef Track
+     * @type Object
+     * @property {string} id - the track id
+     * @property {string} lang - the track language
+     */
+
+    /**
      * Sets the default audio language. If the default language is available in the stream,
-     * the corresponding audio track is selected. Otherwise, the first declared audio track is selected.
+     * the corresponding audio track is selected. Otherwise, the first declared audio track in the manifest is selected.
      * @method setDefaultAudioLang
      * @access public
      * @memberof OrangeHasPlayer#
@@ -670,18 +692,11 @@ OrangeHasPlayer = function() {
 
     /**
      * Returns the list of audio tracks contained in the stream (as specified in the stream manifest).
-     * The audio tracks list can be retrieved once the 'loadeddata' event has been raised.
+     * The audio tracks list can be retrieved once the video 'loadeddata' event has been fired.
      * @method getAudioTracks
      * @access public
-     * @see [addEventListener]{@link OrangeHasPlayer#addEventListener}
      * @memberof OrangeHasPlayer#
-     * @return {Array} the audio tracks list as an array of objects with the following syntax:
-       <pre>
-        {
-            "id": "[the track id]",
-            "lang": "[the track language]"
-        };
-        </pre>
+     * @return {Array<Track>} the audio tracks
      */
     this.getAudioTracks = function() {
         var i = 0,
@@ -694,7 +709,7 @@ OrangeHasPlayer = function() {
             mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
             if (mediaPlayerAudioTracks) {
-                for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+                for (i = 0; i < mediaPlayerAudioTracks.length; i += 1) {
                     audioTracks.push({
                         id: mediaPlayerAudioTracks[i].id,
                         lang: mediaPlayerAudioTracks[i].lang
@@ -712,7 +727,7 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @see [getAudioTracks]{@link OrangeHasPlayer#getAudioTracks}
-     * @param {string} audioTrack - the audio track object, as returned by the getAudioTracks() method
+     * @param {Track} audioTrack - the audio track to select
      */
     this.setAudioTrack = function(audioTrack) {
         var i = 0,
@@ -733,7 +748,7 @@ OrangeHasPlayer = function() {
         mediaPlayerAudioTracks = mediaPlayer.getAudioTracks();
 
         if (mediaPlayerAudioTracks) {
-            for (i = 0; i < mediaPlayerAudioTracks.length; i++) {
+            for (i = 0; i < mediaPlayerAudioTracks.length; i += 1) {
                 if ((audioTrack.id === mediaPlayerAudioTracks[i].id) ||
                     (audioTrack.lang === mediaPlayerAudioTracks[i].lang)) {
                     mediaPlayer.setAudioTrack(mediaPlayerAudioTracks[i]);
@@ -749,7 +764,7 @@ OrangeHasPlayer = function() {
      * @method getSelectedAudioTrack
      * @access public
      * @memberof OrangeHasPlayer#
-     * @return {Object} the selected audio track as an object with the syntax as specified in [getAudioTracks]{@link OrangeHasPlayer#getAudioTracks}
+     * @return {Track} the selected audio track
      */
     this.getSelectedAudioTrack = function() {
         var i = 0,
@@ -760,7 +775,7 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedAudioTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < audioTracks.length; i++) {
+            for (i = 0; i < audioTracks.length; i += 1) {
                 if (audioTracks[i].id === selectedTrack.id ||
                     audioTracks[i].lang === selectedTrack.lang) {
                     selectedAudioTrack = audioTracks[i];
@@ -775,7 +790,7 @@ OrangeHasPlayer = function() {
 
     /**
      * Sets the default subtitle language. If the default language is available in the stream,
-     * the corresponding audio track is selected. Otherwise, the first declared subtitle track is selected.
+     * the corresponding audio track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
      * @method setDefaultSubtitleLang
      * @access public
      * @memberof OrangeHasPlayer#
@@ -790,18 +805,11 @@ OrangeHasPlayer = function() {
 
     /**
      * Returns the list of subtitle tracks contained in the stream (as specified in the stream manifest).
-     * The subtitle tracks list can be retrieved once the 'loadeddata' event has been raised.
+     * The subtitle tracks list can be retrieved once the video 'loadeddata' event has been fired.
      * @method getSubtitleTracks
      * @access public
-     * @see [addEventListener]{@link OrangeHasPlayer#addEventListener}
      * @memberof OrangeHasPlayer#
-     * @return {Array} the subtitle tracks list as an array of objects with the following syntax:
-       <pre>
-        {
-            "id": "[the track id]",
-            "lang": "[the track language]"
-        };
-        </pre>
+     * @return {Array<Track>} the subtitle tracks
      */
     this.getSubtitleTracks = function() {
         var i = 0,
@@ -814,7 +822,7 @@ OrangeHasPlayer = function() {
             mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
             if (mediaPlayerSubtitleTracks) {
-                for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+                for (i = 0; i < mediaPlayerSubtitleTracks.length; i += 1) {
                     subtitleTracks.push({
                         id: mediaPlayerSubtitleTracks[i].id,
                         lang: mediaPlayerSubtitleTracks[i].lang
@@ -832,7 +840,7 @@ OrangeHasPlayer = function() {
      * @access public
      * @memberof OrangeHasPlayer#
      * @see [getSubtitleTracks]{@link OrangeHasPlayer#getSubtitleTracks}
-     * @param {string} subtitleTrack - the subtitle track object, as returned by the getSubtitleTracks() method
+     * @param {Track} subtitleTrack - the subtitle track to select
      */
     this.setSubtitleTrack = function(subtitleTrack) {
         var i = 0,
@@ -853,7 +861,7 @@ OrangeHasPlayer = function() {
         mediaPlayerSubtitleTracks = mediaPlayer.getSubtitleTracks();
 
         if (mediaPlayerSubtitleTracks) {
-            for (i = 0; i < mediaPlayerSubtitleTracks.length; i++) {
+            for (i = 0; i < mediaPlayerSubtitleTracks.length; i += 1) {
                 if ((subtitleTrack.id === mediaPlayerSubtitleTracks[i].id) ||
                     (subtitleTrack.lang === mediaPlayerSubtitleTracks[i].lang)) {
                     mediaPlayer.setSubtitleTrack(mediaPlayerSubtitleTracks[i]);
@@ -871,7 +879,7 @@ OrangeHasPlayer = function() {
      * @method getSelectedSubtitleTrack
      * @access public
      * @memberof OrangeHasPlayer#
-     * @return {Object} the selected subtitle track as an object with the syntax as specified in [getSubtitleTracks]{@link OrangeHasPlayer#getSubtitleTracks}
+     * @return {Track} the selected subtitle track
      */
     this.getSelectedSubtitleTrack = function() {
         var i = 0,
@@ -882,7 +890,7 @@ OrangeHasPlayer = function() {
         selectedTrack = mediaPlayer.getSelectedSubtitleTrack();
 
         if (selectedTrack) {
-            for (i = 0; i < subtitleTracks.length; i++) {
+            for (i = 0; i < subtitleTracks.length; i += 1) {
                 if (subtitleTracks[i].id === selectedTrack.id ||
                     subtitleTracks[i].lang === selectedTrack.lang) {
                     selectedSubtitleTrack = subtitleTracks[i];
@@ -954,7 +962,7 @@ OrangeHasPlayer = function() {
     /////////// SUBTITLES DISPLAY
 
     /**
-     * Sets the subtitles visibility
+     * Sets the subtitles visibility state.
      * @method setSubtitleVisibility
      * @access public
      * @memberof OrangeHasPlayer#
@@ -967,6 +975,7 @@ OrangeHasPlayer = function() {
         }
 
         isSubtitleVisible = value;
+        mediaPlayer.enableSubtitles(value);
 
         if (video.textTracks.length === 0) {
             return;
@@ -980,7 +989,7 @@ OrangeHasPlayer = function() {
      * @method getSubtitleVisibility
      * @access public
      * @memberof OrangeHasPlayer#
-     * @return {boolean} true if subtitles are shown, false if they are hidden
+     * @return {boolean} true if subtitles are shown, false if hidden
      */
     this.getSubtitleVisibility = function() {
         _isPlayerInitialized();
@@ -992,6 +1001,31 @@ OrangeHasPlayer = function() {
     /////////// ADVANCED CONFIGURATION
 
     /**
+     * Player parameters object.
+     * All parameters values are applied for any stream type. Parameters can be overriden specifically for audio and video track by setting
+     * parameters values in the params.audio and params.video objects.
+     * @typedef PlayerParams
+     * @type Object
+     * @property {number} BufferController.minBufferTimeForPlaying - Minimum buffer level before playing, in seconds (default value = 0)
+     * @property {number} BufferController.minBufferTime - Minimum buffer size, in seconds (default value = 16)
+     * @property {number} ABR.minBandwidth - Minimum bandwidth to be playbacked (default value = -1)
+     * @property {number} ABR.maxBandwidth - Maximum bandwidth to be playbacked (default value = -1)
+     * @property {number} ABR.minQuality - Minimum quality index (start from 0) to be playbacked (default value = -1)
+     * @property {number} ABR.maxQuality - Maximum quality index (start from 0) to be playbacked (default value = -1)
+     * @property {boolean} ABR.switchUpIncrementally - Switch up quality incrementally, or not (default value = false)
+     * @property {number} ABR.switchUpRatioSafetyFactor - Switch up bandwith ratio safety factor (default value = 1.5)
+     * @property {boolean} ABR.latencyInBandwidth - Include (or not) latency in bandwidth (default value = true)
+     * @property {number} ABR.switchLowerBufferTime - Buffer level (in seconds) under which switching down to lowest quality occurs (default value = -1)
+     * @property {number} ABR.switchLowerBufferRatio - Buffer level (as percentage of buffer size) under which switching down to lowest quality occurs (default value = 0.25)
+     * @property {number} ABR.switchDownBufferTime - Buffer level (in seconds) under which switching down quality occur, if unsufficient bandwidth (default value = -1)
+     * @property {number} ABR.switchDownBufferRatio - Buffer level (as percentage of buffer size) under which switching down quality occurs, if unsufficient bandwidth (default value = 0.5)
+     * @property {number} ABR.switchUpBufferTime - Buffer level (in seconds) upper which switching up quality occurs, if sufficient bandwidth (default value = -1)
+     * @property {number} ABR.switchUpBufferRatio - Buffer level (as percentage of buffer size) upper which switching up quality occurs, if sufficient bandwidth (default value = 0.75)
+     * @property {Object} video - Video parameters (parameters for video track)
+     * @property {Object} audio - audio parameters (parameters for audio track)
+     */
+
+    /**
      * Sets the initial quality to be downloaded for the given track type.
      * This method has to be used before each call to load() method to set the initial quality.
      * Otherwise, the initial quality is set according to previous bandwidth condition.
@@ -999,7 +1033,7 @@ OrangeHasPlayer = function() {
      * @memberof OrangeHasPlayer#
      * @see [setConfig]{@link OrangeHasPlayer#setConfig} to set quality boundaries
      * @param {string} type - the track type ('video' or 'audio')
-     * @param  {number} value - the new initial quality index (starting from 0) to be downloaded
+     * @param {number} value - the new initial quality index (starting from 0) to be downloaded
      */
     this.setInitialQualityFor = function(type, value) {
         initialQuality[type] = value;
@@ -1010,24 +1044,7 @@ OrangeHasPlayer = function() {
      * @method setParams
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {json} params - a json object containing parameters values to set.
-     * @param {number} params.BufferController.minBufferTimeForPlaying - Minimum buffer level before playing, in seconds (default value = 0)
-     * @param {number} params.BufferController.minBufferTime - Minimum buffer size, in seconds (default value = 16)
-     * @param {number} params.ABR.minBandwidth - Minimum bandwidth to be playbacked (default value = -1)
-     * @param {number} params.ABR.maxBandwidth - Maximum bandwidth to be playbacked (default value = -1)
-     * @param {number} params.ABR.minQuality - Minimum quality index (start from 0) to be playbacked (default value = -1)
-     * @param {number} params.ABR.maxQuality - Maximum quality index (start from 0) to be playbacked (default value = -1)
-     * @param {boolean} params.ABR.switchUpIncrementally - Switch up quality incrementally, or not (default value = false)
-     * @param {number} params.ABR.switchUpRatioSafetyFactor - Switch up bandwith ratio safety factor (default value = 1.5)
-     * @param {boolean} params.ABR.latencyInBandwidth - Include (or not) latency in bandwidth (default value = true)
-     * @param {number} params.ABR.switchLowerBufferTime - Buffer level (in seconds) under which switching down to lowest quality occurs (default value = -1)
-     * @param {number} params.ABR.switchLowerBufferRatio - Buffer level (as percentage of buffer size) under which switching down to lowest quality occurs (default value = 0.25)
-     * @param {number} params.ABR.switchDownBufferTime - Buffer level (in seconds) under which switching down quality occur, if unsufficient bandwidth (default value = -1)
-     * @param {number} params.ABR.switchDownBufferRatio - Buffer level (as percentage of buffer size) under which switching down quality occurs, if unsufficient bandwidth (default value = 0.5)
-     * @param {number} params.ABR.switchUpBufferTime - Buffer level (in seconds) upper which switching up quality occurs, if sufficient bandwidth (default value = -1)
-     * @param {number} params.ABR.switchUpBufferRatio - Buffer level (as percentage of buffer size) upper which switching up quality occurs, if sufficient bandwidth (default value = 0.75)
-     * @param {json} params.video - Video parameters (parameters can be overriden specifically for video track)
-     * @param {json} params.audio - audio parameters (parameters can be overriden specifically for audio track)
+     * @param {PlayerParams} params - parameter(s) value(s) to set.
      */
     this.setParams = function(params) {
         _isPlayerInitialized();
@@ -1060,11 +1077,111 @@ OrangeHasPlayer = function() {
      * @method fullscreenChanged
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {boolean} true if the HTML video container element has been resized to full screen, false otherwise
+     * @param {boolean} value - true if the HTML video container element has been resized to full screen, false otherwise
      */
     this.fullscreenChanged = function(value) {
         isFullScreen = !isFullScreen;
     };
+
+    /////////// EVENTS
+
+    /**
+     * The error event is fired when an error occurs.
+     * When the error event is fired, the application shall stop the player.
+     *
+     * @event OrangeHasPlayer#error
+     * @param {object} event - the event
+     * @param {object} event.type - the event type ('error')
+     * @param {object} event.data - the event data
+     * @param {string} event.data.code - error code
+     * @param {string} event.data.message - error message
+     * @param {object} event.data.data - error additionnal data
+     */
+
+    /**
+     * The warning event is fired when a warning occurs.
+     *
+     * @event OrangeHasPlayer#warning
+     * @param {object} event - the event
+     * @param {object} event.type - the event type ('warning')
+     * @param {object} event.data - the event data
+     * @param {string} event.data.code - warning code
+     * @param {string} event.data.message - warning message
+     * @param {object} event.data.data - warning additionnal data
+     */
+
+     /**
+     * The subtitlesStyleChanged event is fired when the style of the subtitles changed.
+     *
+     * @event OrangeHasPlayer#subtitlesStyleChanged
+     * @param {object} event - the event
+     * @param {object} event.type - the event type ('subtitlesStyleChanged')
+     * @param {object} event.data - the event data
+     * @param {string} event.data.backgroundColor - the background color
+     * @param {string} event.data.color - the font color
+     * @param {string} event.data.fontFamily - the font family
+     * @param {string} event.data.fontSize - the font size
+     */
+
+     /**
+     * The manifestUrlUpdate event is fired when the URL of the manifest may have to be refreshed,
+     * since the player failed to download the manifest file (URL expiration for example).
+     * The application shall therefore provide an updated manifest URL by using the method [refreshManifest]{@link OrangeHasPlayer#refreshManifest}
+     *
+     * @event OrangeHasPlayer#manifestUrlUpdate
+     * @param {object} event - the event
+     * @param {object} event.type - the event type ('manifestUrlUpdate')
+     * @param {object} event.data - the event data
+     * @param {object} event.data.url - the current manifest url
+     */
+
+     /**
+     * The 'play_bitrate' event is fired when the current played bitrate has changed.
+     *
+     * @event OrangeHasPlayer#play_bitrate
+     * @param {CustomEvent} event - the event
+     * @param {object} event.detail - the event data
+     * @param {string} event.detail.type - the stream type ('audio' or 'video')
+     * @param {number} event.detail.bitrate - the new bitrate
+     * @param {string} event.detail.representationId - the corresponding representation id (from manifest)
+     * @param {number} event.detail.time - the current video time
+     * @param {number} event.detail.width - in case of video stream, the video width of the representation
+     * @param {number} event.detail.height - in case of video stream, the video height of the representation
+     */
+
+     /**
+     * The download_bitrate event is fired when the current downloaded bitrate has changed.
+     *
+     * @event OrangeHasPlayer#download_bitrate
+     * @param {CustomEvent} event - the event
+     * @param {object} event.detail - the event data
+     * @param {string} event.detail.type - the stream type ('audio' or 'video')
+     * @param {number} event.detail.bitrate - the new bitrate
+     * @param {string} event.detail.representationId - the corresponding representation id (from manifest)
+     * @param {number} event.detail.time - the current video time
+     * @param {number} event.detail.width - in case of video stream, the video width of the representation
+     * @param {number} event.detail.height - in case of video stream, the video height of the representation
+     */
+
+    /**
+     * The bufferLevel_updated event is fired when the buffer level changed.
+     *
+     * @event OrangeHasPlayer#bufferLevel_updated
+     * @param {CustomEvent} event - the event
+     * @param {object} event.detail - the event data
+     * @param {string} event.detail.type - the stream type ('audio' or 'video')
+     * @param {number} event.detail.level - the buffer level (in seconds)
+     */
+
+     /**
+     * The state_changed event is fired when the player state changed.
+     *
+     * @event OrangeHasPlayer#state_changed
+     * @param {CustomEvent} event - the event
+     * @param {object} event.detail - the event data
+     * @param {string} event.detail.type - the stream type ('audio' or 'video')
+     * @param {string} event.detail.state - the current state ('stopped', 'buffering', 'seeking' or 'playing')
+     */
 
 };
 
@@ -1087,3 +1204,5 @@ OrangeHasPlayer.hasMediaSourceExtension = function() {
 OrangeHasPlayer.hasMediaKeysExtension = function() {
     return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
 };
+
+
