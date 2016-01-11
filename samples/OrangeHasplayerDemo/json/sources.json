@@ -38,15 +38,22 @@
         {
             "type": "Live",
             "protocol": "MSS",
-            "name": "Smooth Orange Spain",
+            "name": "Norigin Media Spain with Subtitles",
             "url": "http://80.12.13.72/jXFcOxmrQLZN6QPzmZwlLw/3450257649/13214/89042/8/live/smooth/TF1.isml/manifest",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "MSS",
-            "name": "Smooth Orange FRANCE",
+            "name": "Arte with Subtitles",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "France 2 with Subtitles",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-41_S2.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
