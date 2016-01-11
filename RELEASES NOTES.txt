@@ -9,6 +9,7 @@
 * - Fast zapping with HLS stream generates a javascript error
 * - ABR.minBandwidth parameter not supported
 * - Audio track swithing fails if 'Language' attribute is not set
+* - UTF-16 subtitles not supported
 * OrangeHasPlayer: waits for video's loadeddata' event first before sending any 'play_bitrate' event
 * Refactored track language switching
 * Optimized abandon request rule
@@ -22,6 +23,7 @@
 * Bugs fixing:
 * - ABR.minBandwidth parameter not supported
 * - Audio track swithing fails if 'Language' attribute is not set
+* - UTF-16 subtitles not supported
 * Refactored track language switching
 * Error events refactoring and add Warning events
 * Report HTTP status code when manifest/segment download fails
