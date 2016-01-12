@@ -1,4 +1,4 @@
-### Release Notes v1.2.6 (2016/01/08)
+### Release Notes v1.2.6 (2016/01/12)
 * Bugs fixing:
 * - Initial bitrate setting
 * - Error if protection module is not included
@@ -7,7 +7,7 @@
 * - HLS zapping error (correct reset process)
 * - Keep using MS-prefixed EME version for new Edge 13
 * - Fast zapping with HLS stream generates a javascript error
-* - ABR.minBandwidth parameter not supported
+* - Bandwidth/quality configuration parameters not correctly supported
 * - Audio track swithing fails if 'Language' attribute is not set
 * - UTF-16 subtitles not supported
 * OrangeHasPlayer: waits for video's loadeddata' event first before sending any 'play_bitrate' event
@@ -19,9 +19,9 @@
 * Segment download error robustness (automatic session reload when buffer becomes underflow)
 * Switch off/on text track downloading when subtitles are disabled/enabled
 
-### Release Notes v1.2.6 (2016/01/08) [Diff from 1.2.5.6]
+### Release Notes v1.2.6 (2016/01/12) [Diff from 1.2.5.6]
 * Bugs fixing:
-* - ABR.minBandwidth parameter not supported
+* - Bandwidth/quality configuration parameters not correctly supported
 * - Audio track swithing fails if 'Language' attribute is not set
 * - UTF-16 subtitles not supported
 * Refactored track language switching
