@@ -200,6 +200,14 @@
 <script src="../../../metricsagent.js/src/formatters/PrismeFormatter.js"></script>
 <!-- /metricsagent -->
 
+<!-- adsplayer -->
+<script type="text/javascript" src="../../../adsplayer.js/src/VAST/vast-client.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/adsplayer.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/MAST/MastLoader.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/MAST/MastParser.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/MAST/mast-client.js"></script>
+<!-- /adsplayer -->
+
 <!-- build:js orangeHasPlayerApp.js -->
 <script type="text/javascript" src="js/libs/Chart.js"></script>
 <script type="text/javascript" src="js/libs/ChartLineConstant.js"></script>
@@ -246,6 +254,8 @@
                 <div id="demo-player-container" class="demo-player" tabindex="0">
                     <div id="VideoModule" class="op-video">
                         <video id="player" class="player"></video>
+                        <video id="adsPlayer" style="position:absolute;top:0;left:0;width:100%"></video>
+                        <div id="adsOverlay"></div>
                     </div>
                     <div id="LoadingModule" class="op-loading op-none">
                         <div class="spinner">

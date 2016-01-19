@@ -224,6 +224,14 @@
         {
             "type": "VOD",
             "protocol": "MSS",
+            "name": "Big Buck Bunny + PUB",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://localhost:8084/PUB/Tests Mast/02_MAST_midroll.xml",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
             "name": "Audio stream AAC HE implicit mode",
             "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_Implicit.ism/Manifest",
             "browsers": "cdsbi"

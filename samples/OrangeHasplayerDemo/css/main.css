@@ -2,6 +2,19 @@
  * Global
  ******************************/
 
+#adsOverlay
+{
+    margin: auto;
+    position: absolute;
+    color: white;
+    font-size: 3vmin;
+    background-color: rgba(0,0,0,0);
+    height:10%;
+    width:100%;
+    z-index: 10;
+    top:0;
+}
+
 html {
     min-height:100%;
     position: relative;
@@ -154,6 +167,7 @@ h1 {
     position: relative;
     margin: auto;
     overflow: hidden;
+    max-height: 500px;
 }
 
 .demo-player-fullscreen {

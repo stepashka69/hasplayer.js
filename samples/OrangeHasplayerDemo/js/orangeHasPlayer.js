@@ -1,4 +1,5 @@
 var orangeHasPlayer = null,
+    adsPlayer = null,
     config = null,
     video = null,
     currentStreamInfos = null,
@@ -26,6 +27,7 @@ var orangeHasPlayer = null,
 function createHasPlayer() {
     orangeHasPlayer = new OrangeHasPlayer();
     video = document.getElementById('player');
+    adsPlayer = new AdsPlayer(video);
     orangeHasPlayer.init(video);
     orangeHasPlayer.setInitialQualityFor('video', 0);
     orangeHasPlayer.setInitialQualityFor('audio', 0);
@@ -199,6 +201,12 @@ function loadStream(streamInfos, optimizedZappingEnabled) {
         orangeHasPlayer.setInitialQualityFor('audio', 0);
     }
     currentStreamInfos = streamInfos;
+    if (currentStreamInfos.mastUrl) {
+        if (adsPlayer.isPlayingAds()) {
+            adsPlayer.stop();
+        }
+        adsPlayer.start(currentStreamInfos.mastUrl);
+    }
     orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
 }
 
