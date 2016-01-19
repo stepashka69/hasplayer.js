@@ -21,7 +21,7 @@
     "grunt-usemin": "^2.3.0",
     "jshint-stylish": "^0.4.0",
     "load-grunt-tasks": "^0.6.0",
-    "intern": "~2.1.1"
+    "intern": "^3"
   },
   "dependencies": {
     "grunt-targethtml": "^0.2.6"
