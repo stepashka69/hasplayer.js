@@ -351,7 +351,7 @@ MediaPlayer.dependencies.Stream = function() {
                             audioState = "error";
                             if (ex.code && ex.code === MediaPlayer.dependencies.ErrorHandler.prototype.DOM_ERR_NOT_SUPPORTED) {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CODEC_UNSUPPORTED, "Audio codec is not supported", {
-                                    codec: videoCodec
+                                    codec: audioCodec
                                 });
                             } else {
                                 self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_SOURCEBUFFER, "Failed to create audio source buffer",
@@ -733,12 +733,22 @@ MediaPlayer.dependencies.Stream = function() {
 
             manifest = manifestResult;
             self.debug.log("[Stream] Create MediaSource");
-            return self.mediaSourceExt.createMediaSource().then(
-                function(mediaSourceResult) {
-                    self.debug.log("[Stream] Setup MediaSource");
-                    return setUpMediaSource.call(self, mediaSourceResult);
-                }
-            ).then(
+
+            try {
+                mediaSource = self.mediaSourceExt.createMediaSource();
+            } catch (error) {
+                self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_CREATE_MEDIASOURCE, "Failed to create MediaSource", {
+                    name: error.name,
+                    message: error.message
+                });
+            }
+
+            if (mediaSource === null) {
+                return;
+            }
+
+            self.debug.log("[Stream] Setup MediaSource");
+            setUpMediaSource.call(self, mediaSource).then(
                 function(mediaSourceResult) {
                     mediaSource = mediaSourceResult;
                     self.debug.log("[Stream] Initialize MediaSource");

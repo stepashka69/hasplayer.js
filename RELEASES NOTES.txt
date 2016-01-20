@@ -1,3 +1,7 @@
+### Release Notes v1.2.6.1 (2016/01/20)
+* Add configuration parameters "RetryAttempts" and "RetryInterval" for manifest and segments downloading
+* Add new error MEDIA_ERR_CREATE_MEDIASOURCE in case of system error while accessing MSE API
+
 ### Release Notes v1.2.6 (2016/01/12) [Diff from 1.2.5]
 * Bugs fixing:
 * - Initial bitrate setting

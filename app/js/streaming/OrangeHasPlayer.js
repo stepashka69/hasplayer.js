@@ -1021,6 +1021,10 @@ OrangeHasPlayer = function() {
      * @property {number} ABR.switchDownBufferRatio - Buffer level (as percentage of buffer size) under which switching down quality occurs, if unsufficient bandwidth (default value = 0.5)
      * @property {number} ABR.switchUpBufferTime - Buffer level (in seconds) upper which switching up quality occurs, if sufficient bandwidth (default value = -1)
      * @property {number} ABR.switchUpBufferRatio - Buffer level (as percentage of buffer size) upper which switching up quality occurs, if sufficient bandwidth (default value = 0.75)
+     * @property {number} ManifestLoader.RetryAttempts - Number of retry attempts for downloading manifest file when it fails (default value = 2)
+     * @property {number} ManifestLoader.RetryInterval - Interval (in milliseconds) between each retry attempts for downloading manifest file (default value = 500)
+     * @property {number} FragmentLoader.RetryAttempts - Number of retry attempts for downloading segment files when it fails (default value = 2)
+     * @property {number} FragmentLoader.RetryInterval - Interval (in milliseconds) between each retry attempts for downloading segment files (default value = 500)
      * @property {Object} video - Video parameters (parameters for video track)
      * @property {Object} audio - audio parameters (parameters for audio track)
      */

@@ -41,7 +41,7 @@ define({
     ],
     //Test Live stream play (playing after 10 seconds with buffering margin of 2 seconds)
     playLive: [
-        {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest'},
+        // {stream: 'http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2/Manifest'},
         {stream: 'http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest'}
     ],
     //Test VOD stream play (playing after 10 seconds with buffering margin of 2 seconds)

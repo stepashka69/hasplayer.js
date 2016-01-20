@@ -5,7 +5,7 @@ JAVA_BIN="/usr/bin/java"
  
 SELENIUM_DIR="/selenium"
 PID_FILE="$SELENIUM_DIR/selenium-grid.pid"
-JAR_FILE="$SELENIUM_DIR/selenium-server-standalone-2.44.0.jar"
+JAR_FILE="$SELENIUM_DIR/selenium-server-standalone-2.48.2.jar"
 LOG_DIR="$SELENIUM_DIR/log"
 LOG_FILE="${LOG_DIR}/selenium-grid.log"
  

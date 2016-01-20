@@ -50,6 +50,18 @@
     "// ABR.switchUpBufferTime" : "The buffer size (in seconds) lower limit before switching up, if defined it overrides ABR.switchUpBufferRatio",
     "ABR.switchUpBufferTime": -1,
 
+    "// ManifestLoader.RetryAttempts" : "The number of retry attempts for downloading manifest file when it fails",
+    "ManifestLoader.RetryAttempts": -1,
+
+    "// ManifestLoader.RetryInterval" : "The interval (in milliseconds) between each retry attempts for downloading manifest file",
+    "ManifestLoader.RetryInterval": -1,
+
+    "// FragmentLoader.RetryAttempts" : "The number of retry attempts for downloading segment files when it fails",
+    "FragmentLoader.RetryAttempts": -1,
+
+    "// FragmentLoader.RetryInterval" : "The interval (in milliseconds) between each retry attempts for downloading segment files",
+    "FragmentLoader.RetryInterval": -1,
+
     "// video" : "Video media parameters that override general parameters",
     "video": {
     },
