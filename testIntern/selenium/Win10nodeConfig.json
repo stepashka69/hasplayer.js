@@ -1,18 +1,11 @@
 {
     "capabilities":[
         {
-            "browserName":"Chrome",
+            "browserName":"chrome",
             "maxInstances":5,
             "plateform":"WINDOWS",
             "seleniumProtocol":"WebDriver"
         },
-        {
-            "browserName":"Internet Explorer",
-            "maxInstances":5,
-            "plateform":"WINDOWS",
-            "seleniumProtocol":"WebDriver"
-        },
-
         {
             "browserName":"MicrosoftEdge",
             "maxInstances":5,
@@ -30,7 +23,6 @@
         "hubPort": 4444,
         "hubHost": "127.0.0.1",
         "Dwebdriver.chrome.driver=chromedriver.exe": "",
-        "Dwebdriver.ie.driver=IEDriverServer.exe": "",
-        "Dwebdriver.edge.driver=MicrosoftWebdriver.exe": ""
+        "Dwebdriver.edge.driver=MicrosoftWebDriver.exe": ""
     }
 }
