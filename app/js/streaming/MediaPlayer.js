@@ -49,11 +49,7 @@ MediaPlayer = function(aContext) {
      *
      */
     var VERSION = "1.2.0",
-<<<<<<< HEAD
-        VERSION_HAS = "1.2.6",
-=======
-        VERSION_HAS = "1.2.7_dev",
->>>>>>> origin/development
+        VERSION_HAS = "1.2.6.1",
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
