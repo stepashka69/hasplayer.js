@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 
     grunt.config.set('rootpath',        '../');
     grunt.config.set('preprocesspath',  '../build/.tmp/preprocess');
+    grunt.config.set('concatpath',      '../build/.tmp/concat');
     grunt.config.set('path',            '../dist');
     grunt.config.set('samples',         '../samples');
     grunt.config.set('appDemoPlayer',   '../samples/DemoPlayer');
@@ -56,6 +57,7 @@ module.exports = function(grunt) {
         'revision',                              // Get git revision info
         'useminPrepare:orangeHasPlayer',         // Get sources files list from specified blocks in index.html
         'concat:generated',                      // Merge all the files in one for each blocks
+        'preprocess:adsPlayerRemove',
         'uglify:generated',                      // Uglify the JS in blocks
         'cssmin:generated',                      // Minify the CSS in blocks
         'json:orangeHasplayer',                  // Get the json files into a json.js

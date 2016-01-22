@@ -1,5 +1,7 @@
 var orangeHasPlayer = null,
+    // @if ADSPLAYER
     adsPlayer = null,
+    // @endif
     config = null,
     video = null,
     currentStreamInfos = null,
@@ -27,7 +29,9 @@ var orangeHasPlayer = null,
 function createHasPlayer() {
     orangeHasPlayer = new OrangeHasPlayer();
     video = document.getElementById('player');
+    // @if ADSPLAYER
     adsPlayer = new AdsPlayer(video);
+    // @endif
     orangeHasPlayer.init(video);
     orangeHasPlayer.setInitialQualityFor('video', 0);
     orangeHasPlayer.setInitialQualityFor('audio', 0);
@@ -201,12 +205,14 @@ function loadStream(streamInfos, optimizedZappingEnabled) {
         orangeHasPlayer.setInitialQualityFor('audio', 0);
     }
     currentStreamInfos = streamInfos;
+    // @if ADSPLAYER
     if (currentStreamInfos.mastUrl) {
         if (adsPlayer.isPlayingAds()) {
             adsPlayer.stop();
         }
         adsPlayer.start(currentStreamInfos.mastUrl);
     }
+    // @endif
     orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
 }
 

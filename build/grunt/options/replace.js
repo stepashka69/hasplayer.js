@@ -100,10 +100,6 @@ module.exports = function(grunt) {
             {
                 match: /<!-- metricsagent -->([\s\S]*?)<!-- \/metricsagent -->/,
                 replacement: '<script src="metricsagent.js"></script>'
-            },
-            {
-                match: /<!-- adsplayer -->([\s\S]*?)<!-- \/adsplayer -->/,
-                replacement: ''
             }
             ]
         },
@@ -221,5 +217,5 @@ module.exports = function(grunt) {
         {expand: true, src: ['<%= path %>/doc/JSDoc/OrangeHasPlayer/index.html']}
         ]
     }
-}
+};
 };

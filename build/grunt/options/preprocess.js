@@ -88,6 +88,16 @@ module.exports = function(grunt) {
                 '<%= preprocesspath %>/Stream.js' : '<%= rootpath %>/app/js/streaming/Stream.js',
                 '<%= preprocesspath %>/MssParser.js' : '<%= rootpath %>/app/js/mss/MssParser.js'
             }
+        },
+        adsPlayerRemove : {
+            src : [ '<%= concatpath %>/orangeHasPlayer.js' ],
+            options: {
+                inline : true,
+                context : {
+                    ADSPLAYER: false
+                }
+            }
         }
     };
 };
+
