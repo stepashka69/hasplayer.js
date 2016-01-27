@@ -8,11 +8,15 @@ define(function(require) {
             applications.OrangeHasPlayer.development
         ],
 
-        playLive: {
-            streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2 ]
+        testPlay: {
+            streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
         },
 
-        seek: {
+        testZapping: {
+            streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
+        },
+
+        testSeek: {
             streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
             positions: [ 35, 10, 83, 23 ]
         }

@@ -4,28 +4,33 @@ define([],
         var defaultTimeout  = 5000;
 
     return {
-        setup:function(command){
+
+        setup: function(command) {
             command.setExecuteAsyncTimeout(defaultTimeout);
             return command;
         },
 
-        executeAsync:function(command, scripts, args, timeout){
+        log: function(tag, message) {
+            console.log('[' + tag + '] ', message);
+        },
+
+        executeAsync: function(command, scripts, args, timeout) {
         
-            var p = new Promise(function(resolve, reject){
+            var p = new Promise(function(resolve, reject) {
                 var originalTimeout = defaultTimeout;
-                if(timeout){
+                if (timeout) {
                     originalTimeout = command.getExecuteAsyncTimeout();
-                    command.setExecuteAsyncTimeout(timeout + defaultTimeout);
+                    command.setExecuteAsyncTimeout(timeout * 1000);
                 }
                 command.executeAsync(scripts, args).then(
-                    function(result){
-                        if(timeout){
+                    function(result) {
+                        if (timeout) {
                             command.setExecuteAsyncTimeout(originalTimeout);
                         }
                         resolve(result);
                     },
-                    function(result){
-                        if(timeout){
+                    function(result) {
+                        if (timeout) {
                             command.setExecuteAsyncTimeout(originalTimeout);
                         }
                         reject(result);

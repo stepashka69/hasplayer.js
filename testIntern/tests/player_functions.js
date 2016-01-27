@@ -1,10 +1,9 @@
 
-
-define(function () {
+define([], function () {
     return {
 
-        loadStream: function(stream) {
-            orangeHasPlayer.load(stream);
+        loadStream: function(url) {
+			orangeHasPlayer.load(url);
         }
     };
 });

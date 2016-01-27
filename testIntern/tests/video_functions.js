@@ -1,19 +1,14 @@
 
 define(function () {
 
-
     return {
 
-        getVideo: function () {
-            return document.querySelector('video');
-        },
-
         play: function () {
-            this.getVideo().play();
+            document.querySelector('video').play();
         },
 
         stop: function () {
-            this.getVideo().stop();
+            document.querySelector('video').stop();
         },
 
         getCurrentTime: function() {
@@ -21,40 +16,40 @@ define(function () {
         },
 
         seek: function (time) {
-            getVideo().currentTime = time;
+            document.querySelector('video').currentTime = time;
         },
 
         isPaused: function () {
-            return getVideo().isPaused;
+            return document.querySelector('video').isPaused;
         },
 
         isPlaying: function (done) {
-            var vid = document.querySelector('video'),
+            var video = document.querySelector('video'),
                 onPlaying = function(){
-                    vid.removeEventListener('playing', onPlaying);
+                    video.removeEventListener('playing', onPlaying);
                     done(true);
                 };
-            vid.addEventListener('playing', onPlaying);
-            if(!vid.paused && vid.playbackRate >0){
-                vid.removeEventListener('playing', onPlaying);
+            video.addEventListener('playing', onPlaying);
+            if(!video.paused && video.playbackRate > 0){
+                video.removeEventListener('playing', onPlaying);
                 done(true);
             }
         },
 
-        stillPlaying: function(time, done){
-            var vid = document.querySelector('video'),
+        isProgressing: function(time, done){
+            var video = document.querySelector('video'),
                 startingTime=-1,
-                onTimeUpdate = function(){
-                    if(startingTime<0){
-                        startingTime = vid.currentTime;
-                    }else{
-                        if(vid.currentTime >= startingTime + time){
-                            vid.removeEventListener('timeupdate', onTimeUpdate);
+                onTimeUpdate = function() {
+                    if (startingTime < 0) {
+                        startingTime = video.currentTime;
+                    } else {
+                        if (video.currentTime >= startingTime + time){
+                            video.removeEventListener('timeupdate', onTimeUpdate);
                             done(true);
                         }
                     }
                 };
-            vid.addEventListener('timeupdate', onTimeUpdate);
+            video.addEventListener('timeupdate', onTimeUpdate);
         }
 
     };
