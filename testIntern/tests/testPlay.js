@@ -15,7 +15,8 @@ define([
         var test = function(stream) {
 
             var NAME = 'TEST_PLAY';
-            var DELAY = 10;
+            var PROGRESS_DELAY = 10;
+            var ASYNC_TIMEOUT = 15;
 
             registerSuite({
                 name: NAME,
@@ -29,23 +30,23 @@ define([
 
                 loadStream: function() {
                     tests.log(NAME, 'Load stream ' + stream.name + ' (' + stream.url + ')');
-                    command.execute(player.loadStream, [stream.url]);
-                    return command;
+                    return command.execute(player.loadStream, [stream.url]);
                 },
 
                 checkIfPlaying: function() {
-                    return command.executeAsync(video.isPlaying).then(function(isPlaying){
+                    return command.executeAsync(video.isPlaying)
+                    .then(function(isPlaying) {
                         assert.isTrue(isPlaying);
                     });
                 },
 
-                checkIfAlwaysPlaying: function() {
-                    return tests.executeAsync(command, video.stillPlaying, [DELAY], DELAY).then(
-                        function(stillPlaying){
-                            assert.isTrue(stillPlaying);
-                        }, function(){
-                            assert.ok(false);
-                        });
+                checkProgressing: function() {
+                    return tests.executeAsync(command, video.isProgressing, [PROGRESS_DELAY], ASYNC_TIMEOUT)
+                    .then(function(progressing) {
+                        assert.isTrue(progressing);
+                    }, function(){
+                        assert.ok(false);
+                    });
                 }
             });
         };

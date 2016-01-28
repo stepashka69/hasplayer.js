@@ -13,7 +13,7 @@ define(function(require) {
         },
 
         testZapping: {
-            streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
+            streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_LIVE_MULTI_AUDIO, streams.MSS_LIVE_SUBT_1, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
         },
 
         testSeek: {
