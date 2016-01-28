@@ -14,6 +14,10 @@ define([],
             console.log('[' + tag + '] ', message);
         },
 
+        logLoadStream: function(tag, stream) {
+            this.log(tag, 'Load stream "' + stream.name + '" (' + stream.url + ')');
+        },
+
         executeAsync: function(command, scripts, args, timeout) {
         
             var p = new Promise(function(resolve, reject) {

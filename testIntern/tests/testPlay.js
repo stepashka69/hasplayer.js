@@ -2,13 +2,12 @@
 define([
     'intern!object',
     'intern/chai!assert',
-    'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
     'testIntern/config/testsConfig',
     'testIntern/tests/player_functions',
     'testIntern/tests/video_functions',
     'testIntern/tests/tests_functions'
-    ], function(registerSuite, assert, pollUntil, require, config, player, video, tests) {
+    ], function(registerSuite, assert, require, config, player, video, tests) {
 
         var command = null;
 
@@ -29,8 +28,8 @@ define([
                 },
 
                 loadStream: function() {
-                    tests.log(NAME, 'Load stream ' + stream.name + ' (' + stream.url + ')');
-                    return command.execute(player.loadStream, [stream.url]);
+                    tests.logLoadStream(NAME, stream);
+                    return command.execute(player.loadStream, [stream]);
                 },
 
                 checkIfPlaying: function() {

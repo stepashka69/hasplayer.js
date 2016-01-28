@@ -18,7 +18,7 @@ define(function(require) {
 
         testSeek: {
             streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
-            positions: [ 35, 10, 83, 23 ]
+            seekCount: 5
         }
 
     };

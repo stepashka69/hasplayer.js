@@ -2,61 +2,38 @@
 define([
     'intern!object',
     'intern/chai!assert',
-    'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
     'testIntern/config/testsConfig',
     'testIntern/tests/player_functions',
     'testIntern/tests/video_functions',
     'testIntern/tests/tests_functions'
-    ], function(registerSuite, assert, pollUntil, require, config, player, video, tests) {
+    ], function(registerSuite, assert, require, config, player, video, tests) {
 
         var command = null;
 
-        var test = function(streams) {
+        var NAME = 'TEST_ZAPPING';
+        var PROGRESS_DELAY = 5; // Delay for checking progressing (in s) 
+        var SEEK_PLAY = 500;    // Delay before each play operation (in ms)
+        var ASYNC_TIMEOUT = 5;
+        var i;
 
-            var NAME = 'TEST_ZAPPING';
-            var PROGRESS_DELAY = 5;
-            var ASYNC_TIMEOUT = 5;
-
-            var testZapping = function(command, i, progressDelay) {
-                tests.log(NAME, 'Load stream ' + streams[i].name + ' (' + streams[i].url + ')');
-                return command.execute(player.loadStream, [streams[i].url])
-                .executeAsync(video.isPlaying)
-                .then(function(isPlaying) {
-                    assert.isTrue(isPlaying);
-                })
-                .then(function () {
-                    return tests.executeAsync(command, video.isProgressing, [progressDelay], (progressDelay + ASYNC_TIMEOUT));
-                })
-                .then(
-                    function(progressing) {
-                        if (i < (streams.length - 1)) {
-                            return testZapping(command, i+1, progressDelay);
-                        } else {
-                            assert.isTrue(progressing);
-                        }
-                    }, function(){
+        var isPlaying = function (progressDelay) {
+            return command.executeAsync(video.isPlaying)
+            .then(function(isPlaying) {
+                if (progressDelay > 0) {
+                    return tests.executeAsync(command, video.isProgressing, [progressDelay], (progressDelay + ASYNC_TIMEOUT))
+                    .then(function(progressing) {
+                        assert.isTrue(progressing);
+                    }, function() {
                         assert.ok(false);
-                    }
-                );
-            };
+                    });
+                } else {
+                    assert.isTrue(isPlaying);
+                }
+            });
+        };
 
-            var testReset = function(command, i) {
-                tests.log(NAME, 'Load stream ' + streams[i].name + ' (' + streams[i].url + ')');
-                return command.execute(player.loadStream, [streams[i].url])
-                .sleep(500)
-                .then(function() {
-                    if (i < (streams.length - 1)) {
-                        return testReset(command, i+1);
-                    } else {
-                        return command.executeAsync(video.isPlaying)
-                        .then(function(isPlaying) {
-                            assert.isTrue(isPlaying);
-                        });
-                    }
-                });
-            };
-
+        var testSetup = function () {
             registerSuite({
                 name: NAME,
 
@@ -65,22 +42,46 @@ define([
                     command = this.remote.get(require.toUrl(config.testPage));
                     command = tests.setup(command);
                     return command;
-                },
-
-                zapping: function () {
-                    return testZapping(command, 0, PROGRESS_DELAY);
-                },
-
-                fastZapping: function () {
-                    return testZapping(command, 0, 0);
-                },
-
-                fastReset: function () {
-                    return testReset(command, 0);
                 }
             });
         };
 
-        test(config.testZapping.streams);
+        var testZapping = function (stream, progressDelay) {
+
+            registerSuite({
+                name: NAME,
+
+                zapping: function () {
+                    tests.logLoadStream(NAME, stream);
+                    return command.sleep(SEEK_PLAY)
+                    .execute(player.loadStream, [stream])
+                    .then(function () {
+                        if (progressDelay >= 0) {
+                            return isPlaying(progressDelay);
+                        }
+                    });
+                }
+            });
+        };
+
+        var streams = config.testZapping.streams;
+
+        // Setup (load test page)
+        testSetup();
+
+        // Zapping (change stream after some progressing)
+        for (i = 0; i < streams.length; i++) {
+            testZapping(streams[i], PROGRESS_DELAY);
+        }
+
+        // Zapping (change stream as soon as playing)
+        for (i = 0; i < streams.length; i++) {
+            testZapping(streams[i], i < (streams.length - 1) ? 0 : PROGRESS_DELAY);
+        }
+
+        // Fast zapping (change stream without waiting for playing)
+        for (i = 0; i < streams.length; i++) {
+            testZapping(streams[i], i < (streams.length - 1) ? -1 : PROGRESS_DELAY);
+        }
 
 });

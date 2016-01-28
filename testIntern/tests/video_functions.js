@@ -15,6 +15,10 @@ define(function () {
             return document.querySelector('video').currentTime;
         },
 
+        getDuration: function() {
+            return document.querySelector('video').duration;
+        },
+
         seek: function (time) {
             document.querySelector('video').currentTime = time;
         },
