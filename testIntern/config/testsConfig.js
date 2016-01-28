@@ -19,7 +19,11 @@ define(function(require) {
         testSeek: {
             streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
             seekCount: 5
-        }
+        },
 
+        testPause: {
+            streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
+            pauseCount: 5
+        }
     };
 });

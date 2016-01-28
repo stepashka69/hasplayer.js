@@ -17,6 +17,7 @@ define(function(require){
             'testIntern/tests/testPlay',
             'testIntern/tests/testZapping',
             'testIntern/tests/testSeek',
+            'testIntern/tests/testPause',
         ],
 
         // A regular expression matching URLs to files that should not be included in code coverage analysis

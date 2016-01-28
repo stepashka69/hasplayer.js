@@ -1,4 +1,12 @@
+/**
+TEST_PLAY:
 
+- for each stream:
+    - load test page
+    - load stream (OrangeHasPlayer.load())
+    - check if <video> is playing
+    - check if <video> is progressing
+**/
 define([
     'intern!object',
     'intern/chai!assert',

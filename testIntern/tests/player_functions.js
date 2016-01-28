@@ -10,9 +10,16 @@ define([], function () {
             return orangeHasPlayer.getDuration();
         },
 
+        play: function() {
+            orangeHasPlayer.play();
+        },
+
+        pause: function() {
+            orangeHasPlayer.pause();
+        },
+
         seek: function(pos) {
             orangeHasPlayer.seek(pos);
-        }
-
+        },
     };
 });

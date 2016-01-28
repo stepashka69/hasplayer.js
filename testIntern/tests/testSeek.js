@@ -1,4 +1,14 @@
+/**
+TEST_SEEK:
 
+- load test page
+- for each stream:
+    - load stream
+    - repeat N times:
+        - get stream duration (OrangeHasPlayer.getDuration())
+        - seek at a random position (OrangeHasPlayer.seek())
+        - check if <video> is playing and progressing
+**/
 define([
     'intern!object',
     'intern/chai!assert',
@@ -55,7 +65,7 @@ define([
             });
         };
 
-        
+
         var testSetup = function (stream) {
             registerSuite({
                 name: NAME,

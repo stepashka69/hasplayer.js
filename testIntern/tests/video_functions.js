@@ -7,6 +7,10 @@ define(function () {
             document.querySelector('video').play();
         },
 
+        pause: function () {
+            document.querySelector('video').pause();
+        },
+
         stop: function () {
             document.querySelector('video').stop();
         },
@@ -24,30 +28,30 @@ define(function () {
         },
 
         isPaused: function () {
-            return document.querySelector('video').isPaused;
+            return document.querySelector('video').paused;
         },
 
         isPlaying: function (done) {
             var video = document.querySelector('video'),
-                onPlaying = function(){
+                onPlaying = function() {
                     video.removeEventListener('playing', onPlaying);
                     done(true);
                 };
             video.addEventListener('playing', onPlaying);
-            if(!video.paused && video.playbackRate > 0){
+            if (!video.paused && video.playbackRate > 0) {
                 video.removeEventListener('playing', onPlaying);
                 done(true);
             }
         },
 
-        isProgressing: function(time, done){
+        isProgressing: function(time, done) {
             var video = document.querySelector('video'),
-                startingTime=-1,
+                startingTime = -1,
                 onTimeUpdate = function() {
                     if (startingTime < 0) {
                         startingTime = video.currentTime;
                     } else {
-                        if (video.currentTime >= startingTime + time){
+                        if (video.currentTime >= startingTime + time) {
                             video.removeEventListener('timeupdate', onTimeUpdate);
                             done(true);
                         }
