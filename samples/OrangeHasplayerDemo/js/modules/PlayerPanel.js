@@ -358,7 +358,9 @@ PlayerPanel.prototype.onVideoEnded = function(e) {
 };
 
 PlayerPanel.prototype.showLoadingElement = function() {
-    this.loadingElement.className = 'op-loading';
+    if (!trickModeEnabled) {
+        this.loadingElement.className = 'op-loading';
+    }
 };
 
 PlayerPanel.prototype.hideLoadingElement = function() {

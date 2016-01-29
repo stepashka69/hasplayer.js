@@ -8,6 +8,7 @@ var // Main Container
     protectionDataPanel = null,
     settingsPanel = null,
     isChrome = false,
+    trickModeEnabled = false,
 
     minivents = null;
 
@@ -38,6 +39,10 @@ window.onload = function() {
     if (urlParam) {
         onStreamClicked({url: urlParam, protData: undefined});
     }
+};
+
+var setTrickMode = function(mode) {
+    trickModeEnabled = mode;
 };
 
 var getDOMElements = function() {

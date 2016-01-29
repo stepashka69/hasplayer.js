@@ -251,7 +251,6 @@ OrangeHasPlayer = function() {
                 break;
         }
     };
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -457,7 +456,7 @@ OrangeHasPlayer = function() {
      */
     this.play = function() {
         _isPlayerInitialized();
-
+                
         video.play();
 
         state = 'PLAYER_RUNNING';
@@ -495,6 +494,27 @@ OrangeHasPlayer = function() {
                 video.currentTime = time;
             }
         }
+    };
+    
+    /**
+     * For VOD, change the playback speed.
+     * @method setTrickPlay
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {number} speed - the speed to read stream : -32, -16, -8, -4, -2, 1, 2, 4, 8, 16, 32  
+     */
+    this.setTrickPlay = function(speed) {
+        _isPlayerInitialized();
+
+        if (speed != 1) {
+            this.setMute(true);
+            this.pause();
+        }else{
+            this.setMute(false);
+            this.play();
+        }
+
+        mediaPlayer.setTrickPlay(speed);
     };
 
     /**

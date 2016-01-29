@@ -53,6 +53,7 @@ MediaPlayer.dependencies.BufferController = function() {
         minBufferTimeAtStartup,
         bufferTimeout,
         bufferStateTimeout,
+        trickModeEnabled = false,
 
         playListMetrics = null,
         playListTraceMetrics = null,
@@ -83,6 +84,8 @@ MediaPlayer.dependencies.BufferController = function() {
 
         // ORANGE: HLS chunk sequence number
         currentSequenceNumber = -1,
+
+        lastDownloadedSegmentDuration = NaN,
 
         sendRequest = function() {
 
@@ -299,6 +302,8 @@ MediaPlayer.dependencies.BufferController = function() {
                 eventStreamAdaption = this.manifestExt.getEventStreamForAdaptationSet(self.getData()),
                 eventStreamRepresentation = this.manifestExt.getEventStreamForRepresentation(self.getData(), _currentRepresentation),
                 segmentStartTime = null;
+            
+            lastDownloadedSegmentDuration = request.duration;
 
             if (!isRunning()) {
                 return;
@@ -749,10 +754,10 @@ MediaPlayer.dependencies.BufferController = function() {
             // Abandonned request => load segment at lowest quality
             if (e.aborted) {
                 // if (e.quality !== 0) {
-                    // this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
-                    // this.abrController.setAutoSwitchBitrate(false);
-                    // this.abrController.setPlaybackQuality(type, 0);
-                    bufferFragment.call(this);
+                // this.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
+                // this.abrController.setAutoSwitchBitrate(false);
+                // this.abrController.setPlaybackQuality(type, 0);
+                bufferFragment.call(this);
                 // }
                 return;
             }
@@ -894,6 +899,11 @@ MediaPlayer.dependencies.BufferController = function() {
                     self.debug.log("[BufferController][" + type + "] new fragment request => already loaded or pending");
                     self.indexHandler.getNextSegmentRequest(_currentRepresentation).then(onFragmentRequest.bind(self));
                 } else {
+                    //if trick mode enbaled, get the request to get I Frame data.
+                    if (trickModeEnabled) {
+                        request = self.indexHandler.getIFrameRequest(request);
+                    }
+
                     // Store current segment time for next segment request
                     currentSegmentTime = request.startTime;
 
@@ -1078,7 +1088,9 @@ MediaPlayer.dependencies.BufferController = function() {
                         function(result) {
 
                             // Re-enable ABR in case it has been previsouly disabled (see onBytesError)
-                            self.abrController.setAutoSwitchBitrate(true);
+                            if (!trickModeEnabled) {
+                                self.abrController.setAutoSwitchBitrate(true);
+                            }
 
                             quality = result.quality;
 
@@ -1508,7 +1520,7 @@ MediaPlayer.dependencies.BufferController = function() {
         updateBufferState: function() {
             var self = this,
                 currentTime = this.videoModel.getCurrentTime(),
-                previousTime = htmlVideoTime === -1? currentTime : htmlVideoTime,
+                previousTime = htmlVideoTime === -1 ? currentTime : htmlVideoTime,
                 progress = (currentTime - previousTime),
                 ranges;
 
@@ -1537,7 +1549,7 @@ MediaPlayer.dependencies.BufferController = function() {
                     } else if (!this.getVideoModel().isStalled()) {
                         ranges = this.sourceBufferExt.getAllRanges(buffer);
                         if (ranges.length > 0) {
-                            var gap = getWorkingTime.call(this) - ranges.end(ranges.length-1);
+                            var gap = getWorkingTime.call(this) - ranges.end(ranges.length - 1);
                             this.debug.log("[BufferController][" + type + "] BUFFERING - delay from current time = " + gap);
                             if (gap > 4) {
                                 this.debug.log("[BufferController][" + type + "] BUFFERING => reload session");
@@ -1638,6 +1650,35 @@ MediaPlayer.dependencies.BufferController = function() {
                 }
             );
 
+            return deferred.promise;
+        },
+
+        getLastDownloadedSegmentDuration: function(){
+            return lastDownloadedSegmentDuration;
+        },
+
+        setTrickPlay: function(enabled) {
+            var self = this,
+                deferred = Q.defer();
+
+
+            this.debug.log("[BufferController][" + type + "] setTrickPlay - enabled = " + enabled);
+
+            trickModeEnabled = enabled;
+
+            if (enabled) {
+                deferred.resolve();
+                self.fragmentController.setSampleDuration(true);
+                self.setAutoSwitchBitrate(false);
+                self.abrController.setPlaybackQuality(type, 0);
+            } else {
+                self.setAutoSwitchBitrate(true);
+                self.fragmentController.setSampleDuration(false);
+                removeBuffer.call(this).then(function() {
+                    debugBufferRange.call(self);
+                    deferred.resolve();
+                });
+            }
             return deferred.promise;
         },
 
