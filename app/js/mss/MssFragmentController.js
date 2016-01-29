@@ -218,6 +218,11 @@ Mss.dependencies.MssFragmentController = function() {
             trun.flags |= 0x000001; // set trun.data-offset-present to true
             trun.data_offset = 0; // Set a default value for trun.data_offset
 
+            if (this.fixDuration && request.streamType === 'video') {
+                trun.samples_table[0].sample_duration = request.duration * request.timescale;
+                this.debug.log("[MssFragmentController] convertFragment  fix sample Duration = " + trun.samples_table[0].sample_duration);
+            }
+
             // Determine new size of the converted fragment
             // and allocate new data buffer
             fragment_size = fragment.getLength();
@@ -243,6 +248,7 @@ Mss.dependencies.MssFragmentController = function() {
 
     rslt.manifestModel = undefined;
     rslt.manifestExt = undefined;
+    rslt.fixDuration = false;
 
     rslt.process = function(bytes, request, representations) {
         var result = null,
@@ -267,6 +273,10 @@ Mss.dependencies.MssFragmentController = function() {
         }
 
         return Q.when(result);
+    };
+
+    rslt.setSampleDuration = function(state) {
+        this.fixDuration = state;
     };
 
     return rslt;

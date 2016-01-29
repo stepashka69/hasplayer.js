@@ -488,6 +488,12 @@ OrangeHasPlayer = function() {
         }
     };
 
+    this.setTrickPlay = function(speed) {
+        _isPlayerInitialized();
+        
+        mediaPlayer.setTrickPlay(speed);
+    };
+
     /**
      * Pauses the media playback.
      * @method pause
