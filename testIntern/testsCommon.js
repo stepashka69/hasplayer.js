@@ -1,6 +1,6 @@
 define(function(require){
 
-    var seleniumConfig = require('./config/seleniumLocal');
+    var seleniumConfig = require('./config/seleniumRemote');
     var browsersConfig = require('./config/browsers');
 
     var conf = {
