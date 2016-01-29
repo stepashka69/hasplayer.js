@@ -15,7 +15,7 @@ define([],
         },
 
         logLoadStream: function(tag, stream) {
-            this.log(tag, 'Load stream "' + stream.name + '" (' + stream.url + ')');
+            this.log(tag, 'Load stream "' + stream.name + '" [' + stream.protocol + '/' + stream.type + ']');
         },
 
         executeAsync: function(command, scripts, args, timeout) {

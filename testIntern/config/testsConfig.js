@@ -8,6 +8,8 @@ define(function(require) {
             applications.OrangeHasPlayer.development
         ],
 
+        asyncTimeout: 5,
+
         testPlay: {
             streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
         },
@@ -22,7 +24,7 @@ define(function(require) {
         },
 
         testPause: {
-            streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
+            streams:  [ streams.MSS_VOD_1 ],
             pauseCount: 5
         }
     };

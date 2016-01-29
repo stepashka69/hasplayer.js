@@ -4,10 +4,11 @@ TEST_SEEK:
 - load test page
 - for each stream:
     - load stream
+    - get stream duration (OrangeHasPlayer.getDuration())
     - repeat N times:
-        - get stream duration (OrangeHasPlayer.getDuration())
         - seek at a random position (OrangeHasPlayer.seek())
-        - check if <video> is playing and progressing
+        - check if <video> is playing at new position
+        - check if <video> is progressing
 **/
 define([
     'intern!object',
@@ -24,47 +25,19 @@ define([
         var NAME = 'TEST_SEEK';
         var PROGRESS_DELAY = 2; // Delay for checking progressing (in s) 
         var SEEK_SLEEP = 200;   // Delay before each seek operation (in ms)
-        var ASYNC_TIMEOUT = 5;
+        var streamDuration = 0;
         var i, j;
 
-        var isPlaying = function (progressDelay) {
-            return command.executeAsync(video.isPlaying)
-            .then(function(isPlaying) {
-                if (progressDelay > 0) {
-                    return tests.executeAsync(command, video.isProgressing, [progressDelay], (progressDelay + ASYNC_TIMEOUT))
-                    .then(function(progressing) {
-                        assert.isTrue(progressing);
-                    }, function() {
-                        assert.ok(false);
-                    });
-                } else {
-                    assert.isTrue(isPlaying);
-                }
-            });
-        };
-
-        var generateSeekPos = function (duration, progressDelay) {
-            var pos = Math.round(Math.random() * duration * 100) / 100;
-            if (pos > (duration - progressDelay)) {
-                pos -= progressDelay;
+        var generateSeekPos = function () {
+            var pos = Math.round(Math.random() * streamDuration * 100) / 100;
+            if (pos > (streamDuration - PROGRESS_DELAY)) {
+                pos -= PROGRESS_DELAY;
             }
-            if (pos < progressDelay) {
-                pos += progressDelay;
+            if (pos < PROGRESS_DELAY) {
+                pos += PROGRESS_DELAY;
             }
             return pos;
         };
-
-        var seek = function (pos) {
-            return command.sleep(SEEK_SLEEP)
-            .execute(player.getDuration)
-            .then(function (duration) {
-                tests.log(NAME, 'Duration: ' + duration);
-                var seekPos = pos ? pos : generateSeekPos(duration, PROGRESS_DELAY);
-                tests.log(NAME, 'Seek: ' + seekPos);
-                return command.execute(player.seek, [seekPos]);
-            });
-        };
-
 
         var testSetup = function (stream) {
             registerSuite({
@@ -81,7 +54,16 @@ define([
                     tests.logLoadStream(NAME, stream);
                     return command.execute(player.loadStream, [stream])
                     .then(function () {
-                        return isPlaying(PROGRESS_DELAY);
+                        tests.log(NAME, 'Check if playing after ' + PROGRESS_DELAY + 's.');
+                        return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], (PROGRESS_DELAY + config.asyncTimeout));
+                    })
+                    .then(function(playing) {
+                        assert.isTrue(playing);
+                        return command.execute(player.getDuration);
+                    })
+                    .then(function (duration) {
+                        streamDuration = duration;
+                        tests.log(NAME, 'Duration: ' + duration);
                     });
                 }
             });
@@ -93,10 +75,33 @@ define([
                 name: NAME,
 
                 seek: function () {
-                    return seek()
+                    var seekPos;
+
+                    return command.sleep(SEEK_SLEEP)
+                    .then(function () {
+                        seekPos = generateSeekPos();
+                        tests.log(NAME, 'Seek: ' + seekPos);
+                        return command.execute(player.seek, [seekPos]);
+                    })
                     .then(function () {
                         if (progressDelay >= 0) {
-                            return isPlaying(progressDelay);
+                            tests.log(NAME, 'Check if playing');
+                            return tests.executeAsync(command, video.isPlaying, [0], config.asyncTimeout)
+                            .then(function (playing) {
+                                assert.isTrue(playing);
+                                return command.execute(video.getCurrentTime);
+                            })
+                            .then(function (time) {
+                                tests.log(NAME, 'Check current time ' + time);
+                                assert.isTrue(time >= seekPos);
+                                if (progressDelay >= 0) {
+                                    tests.log(NAME, 'Check if playing after ' + progressDelay + 's.');
+                                    return tests.executeAsync(command, video.isPlaying, [progressDelay], (progressDelay + config.asyncTimeout))
+                                    .then(function(playing) {
+                                        assert.isTrue(playing);
+                                    });
+                                }
+                            });
                         }
                     });
                 }

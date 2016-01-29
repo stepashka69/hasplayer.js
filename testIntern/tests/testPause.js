@@ -4,13 +4,14 @@ TEST_PAUSE:
 - load test page
 - for each stream:
     - load stream
+    - check if <video> is playing
+    - wait for N seconds
     - repeat N times:
-        - (resume the player (OrangeHasPlayer.play()))
-        - wait for N seconds
         - pause the player (OrangeHasPlayer.pause())
         - check if <video> is paused
-        - wait for N seconds
         - check if <video> is not progressing
+        - resume the player (OrangeHasPlayer.play())
+        - check if <video> is playing
 **/
 
 define([
@@ -27,25 +28,9 @@ define([
 
         var NAME = 'TEST_PAUSE';
         var PROGRESS_DELAY = 2; // Delay for checking progressing (in s) 
-        var ASYNC_TIMEOUT = 5;  // Asynchronous additional delay for checking progressing 
-        var PAUSE_SLEEP = 2000; // Delay before each pause operation (in ms)
+        var ASYNC_TIMEOUT = PROGRESS_DELAY + 5;  // Asynchronous timeout for checking progressing
+        var PAUSE_DELAY = 5; // Delay (in s) for checking is player is still paused (= not prgressing)
         var i, j;
-
-        var isPlaying = function (progressDelay) {
-            return command.executeAsync(video.isPlaying)
-            .then(function(isPlaying) {
-                if (progressDelay > 0) {
-                    return tests.executeAsync(command, video.isProgressing, [progressDelay], (progressDelay + ASYNC_TIMEOUT))
-                    .then(function(progressing) {
-                        assert.isTrue(progressing);
-                    }, function() {
-                        assert.ok(false);
-                    });
-                } else {
-                    assert.isTrue(isPlaying);
-                }
-            });
-        };
         
         var testSetup = function (stream) {
             registerSuite({
@@ -62,7 +47,14 @@ define([
                     tests.logLoadStream(NAME, stream);
                     return command.execute(player.loadStream, [stream])
                     .then(function () {
-                        return isPlaying(PROGRESS_DELAY);
+                        tests.log(NAME, 'Check if playing');
+                        return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
+                    })
+                    .then(function (playing) {
+                        assert.isTrue(playing);
+                        var sleepTime = Math.round(Math.random() * 20);
+                        tests.log(NAME, 'Sleep ' + sleepTime + ' s.');
+                        return command.sleep(sleepTime * 1000);
                     });
                 }
             });
@@ -76,23 +68,37 @@ define([
                 pause: function () {
                     var currentTime = 0;
 
-                    return command.execute(player.play)
-                    .sleep(PAUSE_SLEEP)
-                    .execute(player.pause)
-                    .execute(video.isPaused)
+                    tests.log(NAME, 'Pause the player');
+                    return command.execute(player.pause)
+                    .then(function () {
+                        tests.log(NAME, 'Check if paused');
+                        return command.execute(video.isPaused);
+                    })
                     .then(function (paused) {
                         assert.isTrue(paused);
                         return command.execute(video.getCurrentTime);
                     })
                     .then(function (time) {
                         currentTime = time;
-                        return command.sleep(PAUSE_SLEEP);
+                        tests.log(NAME, 'Check if not progressing');
+                        tests.log(NAME, 'Current time = ' + time );
+                        return command.sleep(PAUSE_DELAY * 1000);
                     })
                     .then(function () {
                         return command.execute(video.getCurrentTime);
                     })
                     .then(function (time) {
+                        tests.log(NAME, 'Current time = ' + time);
                         assert.equal(time, currentTime);
+                        tests.log(NAME, 'Resume the player');
+                        return command.execute(player.play);
+                    })
+                    .then(function () {
+                        tests.log(NAME, 'Check if playing');
+                        return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
+                    })
+                    .then(function (playing) {
+                        assert.isTrue(playing);
                     });
                 }
             });

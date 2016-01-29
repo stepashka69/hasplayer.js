@@ -22,8 +22,8 @@ define([
         var test = function(stream) {
 
             var NAME = 'TEST_PLAY';
-            var PROGRESS_DELAY = 10;
-            var ASYNC_TIMEOUT = 15;
+            var PROGRESS_DELAY = 3;
+            var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;
 
             registerSuite({
                 name: NAME,
@@ -40,19 +40,10 @@ define([
                     return command.execute(player.loadStream, [stream]);
                 },
 
-                checkIfPlaying: function() {
-                    return command.executeAsync(video.isPlaying)
-                    .then(function(isPlaying) {
-                        assert.isTrue(isPlaying);
-                    });
-                },
-
-                checkProgressing: function() {
-                    return tests.executeAsync(command, video.isProgressing, [PROGRESS_DELAY], ASYNC_TIMEOUT)
-                    .then(function(progressing) {
-                        assert.isTrue(progressing);
-                    }, function(){
-                        assert.ok(false);
+                playing: function() {
+                    return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT)
+                    .then(function(playing) {
+                        assert.isTrue(playing);
                     });
                 }
             });

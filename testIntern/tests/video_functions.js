@@ -15,6 +15,10 @@ define(function () {
             document.querySelector('video').stop();
         },
 
+        seek: function (time) {
+            document.querySelector('video').currentTime = time;
+        },
+
         getCurrentTime: function() {
             return document.querySelector('video').currentTime;
         },
@@ -23,41 +27,40 @@ define(function () {
             return document.querySelector('video').duration;
         },
 
-        seek: function (time) {
-            document.querySelector('video').currentTime = time;
-        },
-
         isPaused: function () {
             return document.querySelector('video').paused;
         },
 
-        isPlaying: function (done) {
+        isPlaying: function (delay, done) {
             var video = document.querySelector('video'),
+                startTime = -1,
                 onPlaying = function() {
                     video.removeEventListener('playing', onPlaying);
-                    done(true);
-                };
-            video.addEventListener('playing', onPlaying);
-            if (!video.paused && video.playbackRate > 0) {
-                video.removeEventListener('playing', onPlaying);
-                done(true);
-            }
-        },
-
-        isProgressing: function(time, done) {
-            var video = document.querySelector('video'),
-                startingTime = -1,
+                    isProgressing(delay, done);
+                },
                 onTimeUpdate = function() {
-                    if (startingTime < 0) {
-                        startingTime = video.currentTime;
+                    if (startTime < 0) {
+                        startTime = video.currentTime;
                     } else {
-                        if (video.currentTime >= startingTime + time) {
+                        if (video.currentTime >= startTime + delay) {
                             video.removeEventListener('timeupdate', onTimeUpdate);
                             done(true);
                         }
                     }
+                },
+                isProgressing = function(delay, done) {
+                    if (delay <= 0) {
+                        done(true);
+                    } else {
+                        video.addEventListener('timeupdate', onTimeUpdate);
+                    }
                 };
-            video.addEventListener('timeupdate', onTimeUpdate);
+
+            video.addEventListener('playing', onPlaying);
+            if (!video.paused && video.playbackRate > 0) {
+                video.removeEventListener('playing', onPlaying);
+                isProgressing(delay, done);
+            }
         }
 
     };

@@ -21,24 +21,7 @@ define([
         var NAME = 'TEST_ZAPPING';
         var PROGRESS_DELAY = 5; // Delay for checking progressing (in s) 
         var SEEK_PLAY = 500;    // Delay before each play operation (in ms)
-        var ASYNC_TIMEOUT = 5;
         var i;
-
-        var isPlaying = function (progressDelay) {
-            return command.executeAsync(video.isPlaying)
-            .then(function(isPlaying) {
-                if (progressDelay > 0) {
-                    return tests.executeAsync(command, video.isProgressing, [progressDelay], (progressDelay + ASYNC_TIMEOUT))
-                    .then(function(progressing) {
-                        assert.isTrue(progressing);
-                    }, function() {
-                        assert.ok(false);
-                    });
-                } else {
-                    assert.isTrue(isPlaying);
-                }
-            });
-        };
 
         var testSetup = function () {
             registerSuite({
@@ -59,12 +42,18 @@ define([
                 name: NAME,
 
                 zapping: function () {
-                    tests.logLoadStream(NAME, stream);
                     return command.sleep(SEEK_PLAY)
-                    .execute(player.loadStream, [stream])
+                    .then(function () {
+                        tests.logLoadStream(NAME, stream);
+                        return command.execute(player.loadStream, [stream]);
+                    })
                     .then(function () {
                         if (progressDelay >= 0) {
-                            return isPlaying(progressDelay);
+                            tests.log(NAME, 'Check if playing after ' + progressDelay + 's.');
+                            return tests.executeAsync(command, video.isPlaying, [progressDelay], (progressDelay + config.asyncTimeout))
+                            .then(function(playing) {
+                                assert.isTrue(playing);
+                            });
                         }
                     });
                 }
