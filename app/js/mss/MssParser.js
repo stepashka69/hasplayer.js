@@ -136,9 +136,9 @@ Mss.dependencies.MssParser = function() {
             fourCCValue = this.domParser.getAttributeValue(qualityLevel, "FourCC");
 
             // Do not support AACH (TODO)
-            if (fourCCValue.indexOf("AACH") >= 0) {
+            /*if (fourCCValue.indexOf("AACH") >= 0) {
                 return null;
-            }
+            }*/
 
             // Get codecs value according to FourCC field
             // Note: If empty FourCC (optionnal for audio stream, see https://msdn.microsoft.com/en-us/library/ff728116%28v=vs.95%29.aspx),
