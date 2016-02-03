@@ -1,4 +1,4 @@
-var PlayerPanel = function() {
+var PlayerPanel = function(isSubtitleExternDisplay) {
     this.video = null;
     this.playerContainer = null;
     this.controlBarModule = null;
@@ -47,10 +47,19 @@ var PlayerPanel = function() {
 
     this.isMute = false;
     this.subtitlesCSSStyle = null;
+    this.subTitles = null;
+    this.isSubtitleExternDisplay = isSubtitleExternDisplay;
 };
 
 PlayerPanel.prototype.init = function() {
     this.video = document.getElementById('player');
+
+    if (this.isSubtitleExternDisplay) {
+        this.subTitles = document.createElement("div");
+        this.subTitles.setAttribute('id','subtitleDisplay');
+        document.getElementById('VideoModule').appendChild(this.subTitles);
+    }
+
     this.playerContainer = document.getElementById('demo-player-container');
     this.controlBarModule = document.getElementById('ControlBarModule');
     this.menuModule = document.getElementById('MenuModule');
@@ -410,7 +419,7 @@ PlayerPanel.prototype.onFullScreenClicked = function() {
         }
         document.getElementById('demo-player-container').className = 'demo-player';
     }
-    this.setSubtitlesCSSStyle(this.subtitlesCSSStyle);
+    this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
 };
 
 PlayerPanel.prototype.resetSeekbar = function() {
@@ -419,19 +428,50 @@ PlayerPanel.prototype.resetSeekbar = function() {
     this.elapsedTimeSpan.textContent = '00:00:00';
 };
 
-PlayerPanel.prototype.setSubtitlesCSSStyle = function(style) {
+PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
     var fontSize;
 
-    if (style) {
-        this.subtitlesCSSStyle = style;
-
-        fontSize = style.fontSize;
-
-        if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
-            fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100;
-        }
-
+    if(!this.isSubtitleExternDisplay){
         document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
+    }else{
+        this.subTitles.style.bottom = (this.controlBarModule.clientHeight + (this.video.videoHeight * 0.05)) + "px"; // set the text to appear at 5% from the top of the video
+
+        if (style) {
+
+            fontSize = style.fontSize;
+
+            if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
+                fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100;
+            }
+            this.subTitles.style.position = 'absolute';
+            this.subTitles.style.display = 'block';
+            this.subTitles.style.textAlign = 'center';
+            this.subTitles.style.padding = '10px';
+            this.subTitles.style.backgroundColor = style.backgroundColor;
+            this.subTitles.style.color = style.color;
+            this.subTitles.style.fontSize = fontSize+'px';
+            this.subTitles.style.fontFamily = style.fontFamily;
+        }
+    }
+};
+
+PlayerPanel.prototype.enterSubtitle = function(subtitleData) {
+    var style = subtitleData.style;
+    
+    this.subtitlesCSSStyle = style;
+   
+    this.applySubtitlesCSSStyle(style);
+
+    if (this.isSubtitleExternDisplay && subtitleData.text) {
+        this.subTitles.innerText = subtitleData.text;   // write the text
+        this.subTitles.style.left = ((this.video.clientWidth / 2) - (this.subTitles.clientWidth/2))+'px';  // center subtitle on the video
+    }
+};
+
+PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
+    if(this.isSubtitleExternDisplay) {
+      this.subTitles.innerText = '';
+      this.subTitles.style.backgroundColor = 'rgba(0,0,0,0)';
     }
 };
 

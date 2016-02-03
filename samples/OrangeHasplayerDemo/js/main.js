@@ -7,13 +7,16 @@ var // Main Container
     graphPanel = null,
     protectionDataPanel = null,
     settingsPanel = null,
+    isChrome = false,
 
     minivents = null;
 
 window.onload = function() {
     minivents = new Events();
 
-    playerPanel = new PlayerPanel();
+    isChrome = bowser.chrome === true ? true : false;
+
+    playerPanel = new PlayerPanel(!isChrome);
     playerPanel.init();
 
     streamsPanel = new StreamsPanel();
@@ -27,7 +30,7 @@ window.onload = function() {
     settingsPanel.init();
 
     getDOMElements();
-    createHasPlayer();
+    createHasPlayer(!isChrome);
 
     displayVersion();
 
@@ -91,8 +94,12 @@ var handleSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
     playerPanel.updateSubtitleData(_subtitleTracks, _selectedSubtitleTrack);
 };
 
-var handleSubtitleStyleChange = function(style) {
-    playerPanel.setSubtitlesCSSStyle(style);
+var handleSubtitleEnter = function(subtitleData) {
+    playerPanel.enterSubtitle(subtitleData);
+};
+
+var handleSubtitleExit = function(subtitleData) {
+    playerPanel.exitSubtitle(subtitleData);
 };
 
 var handlePlayState = function(state) {
