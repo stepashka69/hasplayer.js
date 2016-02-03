@@ -4,7 +4,8 @@ define({
         "name": "France 2",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
+        "videoBitrates": [226000, 400000, 680000, 1200000, 2100000]
     },
 
     MSS_LIVE_2: {
@@ -47,7 +48,8 @@ define({
         "name": "Big Buck Bunny",
         "protocol": "MSS",
         "type": "VOD",
-        "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+        "videoBitrates": [320000,680000,1100000,1600000,2100000]
     },
 
     MSS_VOD_2: {

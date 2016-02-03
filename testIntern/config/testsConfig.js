@@ -26,6 +26,10 @@ define(function(require) {
         testPause: {
             streams:  [ streams.MSS_VOD_1 ],
             pauseCount: 5
+        },
+
+        testGetVideoBitrates: {
+            streams:  [ streams.MSS_LIVE_1, streams.MSS_VOD_1 ]
         }
     };
 });

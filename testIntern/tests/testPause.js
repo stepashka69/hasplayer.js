@@ -89,7 +89,7 @@ define([
                     })
                     .then(function (time) {
                         tests.log(NAME, 'Current time = ' + time);
-                        assert.equal(time, currentTime);
+                        assert.strictEqual(time, currentTime);
                         tests.log(NAME, 'Resume the player');
                         return command.execute(player.play);
                     })

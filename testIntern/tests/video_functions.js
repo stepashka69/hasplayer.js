@@ -31,6 +31,16 @@ define(function () {
             return document.querySelector('video').paused;
         },
 
+        waitForEvent: function (event, done) {
+            var video = document.querySelector('video'),
+                onEventHandler = function() {
+                    video.removeEventListener(event, onEventHandler);
+                    done(true);
+                };
+
+            video.addEventListener(event, onEventHandler);
+        },
+
         isPlaying: function (delay, done) {
             var video = document.querySelector('video'),
                 startTime = -1,

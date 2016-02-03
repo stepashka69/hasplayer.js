@@ -21,5 +21,18 @@ define([], function () {
         seek: function(pos) {
             orangeHasPlayer.seek(pos);
         },
+
+        getVideoBitrates: function() {
+            return orangeHasPlayer.getVideoBitrates();
+        },
+
+        waitForEvent: function (event, done) {
+            var onEventHandler = function() {
+                    orangeHasPlayer.removeEventListener(event, onEventHandler);
+                    done(true);
+                };
+
+            orangeHasPlayer.addEventListener(event, onEventHandler);
+        }
     };
 });
