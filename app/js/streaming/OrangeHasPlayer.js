@@ -67,7 +67,6 @@ OrangeHasPlayer = function() {
         this.getSelectedSubtitleTrack();
         if (video.textTracks.length > 0) {
             video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
-            mediaPlayer.enableSubtitles(isSubtitleVisible);
         }
     };
 
@@ -178,6 +177,9 @@ OrangeHasPlayer = function() {
                 debug.log("[OrangeHasPlayer] ManifestReady");
                 videoBitrates = metricsExt.getBitratesForType('video');
                 debug.log("[OrangeHasPlayer] video bitrates: " + JSON.stringify(videoBitrates));
+                event = document.createEvent("CustomEvent");
+                event.initCustomEvent('manifest_loaded', false, false, {});
+                video.dispatchEvent(event);
                 break;
             case "RepresentationSwitch":
                 _isPlayerInitialized();
@@ -628,6 +630,7 @@ OrangeHasPlayer = function() {
             case "manifestUrlUpdate":
                 mediaPlayer.addEventListener(type, listener, useCapture);
                 break;
+            case "manifest_loaded":
             case "play_bitrate":
             case "download_bitrate":
             case "bufferLevel_updated":
