@@ -623,7 +623,8 @@ OrangeHasPlayer = function() {
         switch (type) {
             case "error":
             case "warning":
-            case "subtitlesStyleChanged":
+            case "cueEnter":
+            case "cueExit":
             case "manifestUrlUpdate":
                 mediaPlayer.addEventListener(type, listener, useCapture);
                 break;
@@ -651,7 +652,8 @@ OrangeHasPlayer = function() {
         switch (type) {
             case "error":
             case "warning":
-            case "subtitlesStyleChanged":
+            case "cueEnter":
+            case "cueExit":
             case "manifestUrlUpdate":
                 mediaPlayer.removeEventListener(type, listener);
                 break;
@@ -902,6 +904,17 @@ OrangeHasPlayer = function() {
         return null;
     };
 
+    /**
+     * Set to true if subtitles are displayed in a div outside video player.
+     * @method enableSubtitleExternDisplay
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {boolean} mode - true if subtitles are displayed in a div outside video player
+     */
+    this.enableSubtitleExternDisplay = function(mode) {
+        this.setParams({'TextTrackExtensions.displayModeExtern':mode});
+    };
+
     /////////// AUDIO VOLUME
 
     /**
@@ -1115,17 +1128,33 @@ OrangeHasPlayer = function() {
      */
 
      /**
-     * The subtitlesStyleChanged event is fired when the style of the subtitles changed.
+     * The cueEnter event is fired when a subtitle cue needs to be displayed.
      *
-     * @event OrangeHasPlayer#subtitlesStyleChanged
+     * @event OrangeHasPlayer#cueEnter
      * @param {object} event - the event
-     * @param {object} event.type - the event type ('subtitlesStyleChanged')
+     * @param {object} event.type - the event type ('cueEnter')
      * @param {object} event.data - the event data
-     * @param {string} event.data.backgroundColor - the background color
-     * @param {string} event.data.color - the font color
-     * @param {string} event.data.fontFamily - the font family
-     * @param {string} event.data.fontSize - the font size
+     * @param {object} event.data.text - the subtitle text
+     * @param {string} event.data.style.backgroundColor - the background color
+     * @param {string} event.data.style.color - the font color
+     * @param {string} event.data.style.fontFamily - the font family
+     * @param {string} event.data.style.fontSize - the font size
      */
+    
+    /**
+     * The cueExit event is fired when a subtitle cue needs to be erased.
+     *
+     * @event OrangeHasPlayer#cueEnter
+     * @param {object} event - the event
+     * @param {object} event.type - the event type ('cueExit')
+     * @param {object} event.data - the event data
+     * @param {object} event.data.text - the subtitle text
+     * @param {string} event.data.style.backgroundColor - the background color
+     * @param {string} event.data.style.color - the font color
+     * @param {string} event.data.style.fontFamily - the font family
+     * @param {string} event.data.style.fontSize - the font size
+     */
+
 
      /**
      * The manifestUrlUpdate event is fired when the URL of the manifest may have to be refreshed,
