@@ -907,17 +907,6 @@ OrangeHasPlayer = function() {
         return null;
     };
 
-    /**
-     * Set to true if subtitles are displayed in a div outside video player.
-     * @method enableSubtitleExternDisplay
-     * @access public
-     * @memberof OrangeHasPlayer#
-     * @param {boolean} mode - true if subtitles are displayed in a div outside video player
-     */
-    this.enableSubtitleExternDisplay = function(mode) {
-        this.setParams({'TextTrackExtensions.displayModeExtern':mode});
-    };
-
     /////////// AUDIO VOLUME
 
     /**
@@ -1013,6 +1002,16 @@ OrangeHasPlayer = function() {
         return isSubtitleVisible;
     };
 
+    /**
+     * Set to true if subtitles are displayed in a div outside video player.
+     * @method enableSubtitleExternDisplay
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {boolean} mode - true if subtitles are displayed in a div outside video player
+     */
+    this.enableSubtitleExternDisplay = function(mode) {
+        this.setParams({'TextTrackExtensions.displayModeExtern':mode});
+    };
 
     /////////// ADVANCED CONFIGURATION
 
