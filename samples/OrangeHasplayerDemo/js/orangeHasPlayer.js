@@ -26,13 +26,14 @@ var orangeHasPlayer = null,
  *
  *
  **********************************************************************************************************************/
-function createHasPlayer() {
+function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new OrangeHasPlayer();
     video = document.getElementById('player');
     // @if ADSPLAYER
     adsPlayer = new AdsPlayer(video);
     // @endif
     orangeHasPlayer.init(video);
+    orangeHasPlayer.enableSubtitleExternDisplay(isSubtitleExternDisplay);
     orangeHasPlayer.setInitialQualityFor('video', 0);
     orangeHasPlayer.setInitialQualityFor('audio', 0);
 
@@ -44,7 +45,6 @@ function createHasPlayer() {
     orangeHasPlayer.setDebug(true);
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
-    orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.setSubtitleVisibility(false);
     registerHasPlayerEvents();
 }
@@ -52,7 +52,8 @@ function createHasPlayer() {
 function registerHasPlayerEvents() {
     orangeHasPlayer.addEventListener('warning', onWarning);
     orangeHasPlayer.addEventListener('error', onError);
-    orangeHasPlayer.addEventListener('subtitlesStyleChanged', onSubtitlesStyleChanged);
+    orangeHasPlayer.addEventListener('cueEnter', onSubtitleEnter);
+    orangeHasPlayer.addEventListener('cueExit', onSubtitleExit);
     orangeHasPlayer.addEventListener('loadeddata', onload);
     orangeHasPlayer.addEventListener('play_bitrate', onPlayBitrateChanged);
     orangeHasPlayer.addEventListener('download_bitrate', onDownloadBitrateChanged);
@@ -111,8 +112,12 @@ function onload() {
  * [onSubtitlesStyleChanged description]
  * @param  {[type]} e [description]
  */
-function onSubtitlesStyleChanged(e) {
-    handleSubtitleStyleChange(e.data);
+function onSubtitleEnter(e) {
+    handleSubtitleEnter(e.data);
+}
+
+function onSubtitleExit(e) {
+    handleSubtitleExit(e.data);
 }
 
 /**

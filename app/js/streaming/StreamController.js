@@ -39,6 +39,7 @@ MediaPlayer.dependencies.StreamController = function() {
         protectionData,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
+        subtitlesEnabled = false,
 
         play = function() {
             activeStream.play();
@@ -345,6 +346,7 @@ MediaPlayer.dependencies.StreamController = function() {
                                     stream.setAutoPlay(autoPlay);
                                     stream.setDefaultAudioLang(defaultAudioLang);
                                     stream.setDefaultSubtitleLang(defaultSubtitleLang);
+                                    stream.enableSubtitles(subtitlesEnabled);
                                     stream.load(manifest, period);
                                     streams.push(stream);
                                 }
@@ -665,6 +667,7 @@ MediaPlayer.dependencies.StreamController = function() {
         },
 
         enableSubtitles: function(enabled) {
+            subtitlesEnabled = enabled;
             if (activeStream) {
                 activeStream.enableSubtitles(enabled);
             }

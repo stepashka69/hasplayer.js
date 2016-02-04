@@ -13,66 +13,52 @@ define([
     'intern/chai!assert',
     'intern/dojo/node!leadfoot/helpers/pollUntil',
     'require',
-    'testIntern/orangeHasPlayer/functional_common/config'
-    ], function(registerSuite, assert, pollUntil, require, config) {
+    'testIntern/orangeHasPlayer/functional_common/config',
+    'testIntern/tests/player_functions',
+    'testIntern/tests/video_functions',
+    'testIntern/tests/tests_functions'
+    ], function(registerSuite, assert, pollUntil, require, config, player, video, tests) {
 
         var command = null;
-        var videoCurrentTime = 0;
 
-        var loadStream = function(stream) {
-            orangeHasPlayer.load(stream);
-        };
+     
 
-        var getVideoCurrentTime = function() {
-            return document.querySelector('video').currentTime;
-        };
-
-        var getPlayerTimePosition = function() {
-            return orangeHasPlayer.getPosition();
-        };
-
-        var tests = function(stream) {
+        var test = function(stream) {
             var url = config.testPage;
 
             registerSuite({
-                name: 'Test playing streams',
+                name: 'Test playing Live streams',
 
                 setup: function() {
+                    console.log("[TEST_PLAYLIVE] SETUP");
                     command = this.remote.get(require.toUrl(url));
-                    return command.sleep(500).execute(loadStream, [stream]);
+                    command = tests.setup(command);
+                    return command;
                 },
 
-                'Get current time': function() {
-                    console.log('[TEST_PLAYLIVE] stream: ' + stream);
-                    return command.sleep(2000).execute(getVideoCurrentTime)
-                    .then(function (time) {
-                        videoCurrentTime = time;
-                        console.log('[TEST_PLAYLIVE] current time = ' + videoCurrentTime);
+                loadStream: function(){
+                    console.log("[TEST_PLAYLIVE] LoadStream", stream);
+                    command.execute(player.loadStream, [stream]);
+                    return command;
+                },
+
+                checkIfPlaying: function() {
+                    console.log("[TEST_PLAYLIVE] checkIfPlaying");
+                    return command.executeAsync(video.isPlaying).then(function(isPlaying){
+                        assert.isTrue(isPlaying);
                     });
                 },
 
-                'Check if playing': function() {
-                    console.log('[TEST_PLAYLIVE] Wait 5s ...');
-
-                    return command.sleep(5000)
-                    .execute(getVideoCurrentTime)
-                    .then(function (time) {
-                        console.log('[TEST_PLAYLIVE] current time = ' + time);
-                        assert.ok(time > videoCurrentTime);
-                        videoCurrentTime = time;
-                    });
-                },
-
-                'Check playing time after 10 sec.': function() {
-                    console.log('[TEST_PLAYLIVE] Wait 10s ...');
-
-                    return command.sleep(10000)
-                    .execute(getVideoCurrentTime)
-                    .then(function (time) {
-                        var delay = time - videoCurrentTime;
-                        console.log('[TEST_PLAYLIVE] current time = ' + time + ' (' + Math.round(delay*100)/100 + ')');
-                        assert.ok(delay >= 9); // 9 for sleep precision
-                    });
+                checkIfAlwaysPlaying: function(){
+                    var time = 10;
+                    console.log("[TEST_PLAYLIVE] checkIfPlaying after", time, "seconds");
+                
+                    return tests.executeAsync(command, video.stillPlaying, [10], 15000).then(
+                        function(stillPlaying){
+                            assert.isTrue(stillPlaying);
+                        }, function(){
+                            assert.fail(false, true, "An arror occured it semms stream is playing for time");
+                        });
                 }
             });
         };
@@ -81,6 +67,6 @@ define([
             len = config.playLive.length;
 
         for (i; i < len; i++) {
-            tests(config.playLive[i].stream);
+            test(config.playLive[i].stream);
         }
 });

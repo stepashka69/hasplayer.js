@@ -49,7 +49,7 @@ MediaPlayer = function(aContext) {
      *
      */
     var VERSION = "1.2.0",
-        VERSION_HAS = "1.2.6.2",
+        VERSION_HAS = "1.2.7_dev",
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
@@ -67,6 +67,7 @@ MediaPlayer = function(aContext) {
         bufferMax = MediaPlayer.dependencies.BufferExtensions.BUFFER_SIZE_REQUIRED,
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
+        subtitlesEnabled = false,
 
         /**
          * is hasplayer ready to play the stream? element and source have been setted?
@@ -110,6 +111,7 @@ MediaPlayer = function(aContext) {
 
             streamController.setDefaultAudioLang(defaultAudioLang);
             streamController.setDefaultSubtitleLang(defaultSubtitleLang);
+            streamController.enableSubtitles(subtitlesEnabled);
 
             // ORANGE: add source stream parameters
             streamController.load(source, protectionData);
@@ -636,7 +638,8 @@ MediaPlayer = function(aContext) {
          * @memberof MediaPlayer#
          * @param  enabled - boolean true if the download of subtitle need to be enabled
         */
-        enableSubtitles:function(enabled){
+        enableSubtitles: function(enabled) {
+            subtitlesEnabled = enabled;
             if(streamController){
                 streamController.enableSubtitles(enabled);
             }

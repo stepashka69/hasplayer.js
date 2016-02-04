@@ -233,10 +233,6 @@ SettingsPanel.prototype.reset = function() {
     this.resetCombo(this.audioTracks, this.audioListCombobox);
     this.resetCombo(this.subtitleTracks, this.subtitleListCombobox);
     
-    this.subtitleListCombobox.disabled = true;
-    this.enableSubtitlesCheckbox.checked = false;
-    enableSubtitles(this.enableSubtitlesCheckbox.checked);
-
     this.currentaudioTrack = null;
     this.currentsubtitleTrack = null;
     this.videoBufferLength.innerHTML = "";

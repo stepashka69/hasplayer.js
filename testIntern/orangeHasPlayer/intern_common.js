@@ -4,7 +4,7 @@
 define(function(require){
 
 
-    var seleniumConfig = require('../seleniumConfig/configDistant');
+    var seleniumConfig = require('../seleniumConfig/configLocal');
 
 
     var conf = {
