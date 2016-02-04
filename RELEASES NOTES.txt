@@ -1,3 +1,8 @@
+### Release Notes v1.2.6.3 (2016/02/04)
+* Bugs fixing:
+* - subtitles enable/disable management
+* OrangeHasPlayer: Add function to manage subtitles display outside video element
+
 ### Release Notes v1.2.6.2 (2016/01/26)
 * Add robustness in case of input stream discontinuities (HLS)
 
