@@ -468,11 +468,15 @@ PlayerPanel.prototype.enterSubtitle = function(subtitleData) {
     }
 };
 
-PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
+PlayerPanel.prototype.cleanSubtitlesDiv = function(){
     if(this.isSubtitleExternDisplay) {
       this.subTitles.innerText = '';
       this.subTitles.style.backgroundColor = 'rgba(0,0,0,0)';
     }
+};
+
+PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
+    this.cleanSubtitlesDiv();
 };
 
 PlayerPanel.prototype.onLanguagesClicked = function() {
@@ -593,4 +597,5 @@ PlayerPanel.prototype.reset = function() {
 
     this.hideErrorModule();
     this.showBarsTimed();
+    this.cleanSubtitlesDiv();
 };
