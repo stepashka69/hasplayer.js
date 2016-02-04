@@ -59,6 +59,13 @@
         {
             "type": "Live",
             "protocol": "MSS",
+            "name": "Norigin with Subtitles",
+            "url": "http://80.12.13.72/smooth/TEST_SOURCE/subtitles/Padding_OSP/Profil1/Profil1.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
             "name": "Smooth + PlayReady DRM",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
             "browsers": "cdsbi"
