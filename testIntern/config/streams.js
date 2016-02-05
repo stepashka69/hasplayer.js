@@ -71,6 +71,13 @@ define({
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest"
+    },
+
+    MSS_LIVE_MANIFEST_ERROR: {
+        "name": "France 2",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest2",
     }
     
 });

@@ -33,6 +33,14 @@ define([], function () {
                 };
 
             orangeHasPlayer.addEventListener(event, onEventHandler);
+        },
+
+        getErrorCode: function (done) {
+            var onError = function(error) {
+                    orangeHasPlayer.removeEventListener('error', onError);
+                    done(error.data.code);
+                };
+            orangeHasPlayer.addEventListener('error', onError);
         }
     };
 });
