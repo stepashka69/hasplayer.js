@@ -900,17 +900,16 @@ MediaPlayer.dependencies.BufferController = function() {
                     self.indexHandler.getNextSegmentRequest(_currentRepresentation).then(onFragmentRequest.bind(self));
                 } else {
                     //if trick mode enbaled, get the request to get I Frame data.
-                    if (trickModeEnabled && type === 'video') {
+                    if (trickModeEnabled) {
                         request = self.indexHandler.getIFrameRequest(request);
                     }
-
                     // Store current segment time for next segment request
                     currentSegmentTime = request.startTime;
 
                     // Download the segment
                     self.fragmentController.prepareFragmentForLoading(self, request, onBytesLoadingStart, onBytesLoaded, onBytesError, null /*signalStreamComplete*/ ).then(
                         function() {
-                            sendRequest.call(self);
+                                sendRequest.call(self);
                         });
                 }
             } else {
