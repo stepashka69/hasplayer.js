@@ -8,7 +8,7 @@ define(function(require) {
             applications.OrangeHasPlayer.development
         ],
 
-        asyncTimeout: 5,
+        asyncTimeout: 10,
 
         tests : {
 
