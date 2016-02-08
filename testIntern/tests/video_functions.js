@@ -15,8 +15,15 @@ define(function () {
             document.querySelector('video').stop();
         },
 
-        seek: function (time) {
-            document.querySelector('video').currentTime = time;
+        seek: function (time, done) {
+            var video = document.querySelector('video'),
+                onSeeked = function() {
+                    video.removeEventListener('seeked', onSeeked);
+                    done(true);
+                };
+
+            video.addEventListener('seeked', onSeeked);
+            video.currentTime = time;
         },
 
         getCurrentTime: function() {
@@ -66,13 +73,11 @@ define(function () {
                     }
                 };
 
-            video.addEventListener('playing', onPlaying);
             if (!video.paused && video.playbackRate > 0) {
-                video.removeEventListener('playing', onPlaying);
                 isProgressing(delay, done);
             }
+            video.addEventListener('playing', onPlaying);
         }
-
     };
 });
 

@@ -18,7 +18,13 @@ define([], function () {
             orangeHasPlayer.pause();
         },
 
-        seek: function(pos) {
+        seek: function(pos, done) {
+            var onSeeked = function() {
+                    orangeHasPlayer.removeEventListener('seeked', onSeeked);
+                    done(true);
+                };
+
+            orangeHasPlayer.addEventListener('seeked', onSeeked);
             orangeHasPlayer.seek(pos);
         },
 

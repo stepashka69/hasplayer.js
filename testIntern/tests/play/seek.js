@@ -91,20 +91,15 @@ define([
                     .then(function () {
                         seekPos = generateSeekPos();
                         tests.log(NAME, 'Seek: ' + seekPos);
-                        return command.execute(player.seek, [seekPos]);
+                        return tests.executeAsync(command, player.seek, [seekPos], config.asyncTimeout);
                     })
                     .then(function () {
                         if (progressDelay >= 0) {
-                            tests.log(NAME, 'Check if playing');
-                            return tests.executeAsync(command, video.isPlaying, [0], config.asyncTimeout)
-                            .then(function (playing) {
-                                assert.isTrue(playing);
-                                return command.execute(video.getCurrentTime);
-                            })
+                            command.execute(video.getCurrentTime)
                             .then(function (time) {
                                 tests.log(NAME, 'Check current time ' + time);
                                 assert.isTrue(time >= seekPos);
-                                if (progressDelay >= 0) {
+                                if (progressDelay > 0) {
                                     tests.log(NAME, 'Check if playing after ' + progressDelay + 's.');
                                     return tests.executeAsync(command, video.isPlaying, [progressDelay], (progressDelay + config.asyncTimeout))
                                     .then(function(playing) {
