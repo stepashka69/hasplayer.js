@@ -22,7 +22,7 @@ define(function(require) {
                 },
 
                 seek: {
-                    streams:  [ streams.MSS_VOD_1, streams.MSS_VOD_2 ],
+                    streams:  [ streams.MSS_VOD_1/*, streams.MSS_VOD_2*/ ],
                     seekCount: 5
                 },
 
