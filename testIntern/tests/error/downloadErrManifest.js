@@ -25,7 +25,7 @@ define([
             streams = testConfig.streams;
 
         // Test constants
-        var ASYNC_TIMEOUT = 10;
+        var ASYNC_TIMEOUT = config.asyncTimeout;
         var ERROR_CODE = "DOWNLOAD_ERR_MANIFEST";
 
         // Test variables

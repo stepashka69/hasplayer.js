@@ -33,7 +33,7 @@ define([
 
         // Test constants
         var PROGRESS_DELAY = 2; // Delay for checking progressing (in s) 
-        var ASYNC_TIMEOUT = PROGRESS_DELAY + 5;  // Asynchronous timeout for checking progressing
+        var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;  // Asynchronous timeout for checking progressing
         var PAUSE_DELAY = 5; // Delay (in s) for checking is player is still paused (= not prgressing)
         
         // Test variables
