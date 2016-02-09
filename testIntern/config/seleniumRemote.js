@@ -7,7 +7,7 @@ define({
         port: '4444',
         verbose: true
     },
-    reporters: ['Runner'],
+    reporters: [{id: 'JUnit', filename: 'testIntern/test-reports/' + (new Date().getFullYear())+'-'+(new Date().getMonth()+1)+'-'+(new Date().getDate())+'_'+(new Date().getHours())+'-'+(new Date().getMinutes())+'-'+(new Date().getSeconds()) + '_report.xml'}],
     capabilities: {
         'selenium-version': '2.48.2'
     }
