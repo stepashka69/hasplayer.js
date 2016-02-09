@@ -14,12 +14,12 @@ define(function(require){
 
         // Functional test suite(s) to run in each browser once non-functional tests are completed
         functionalSuites: [
-            // 'testIntern/tests/play/play',
-            // 'testIntern/tests/play/zapping',
-            // 'testIntern/tests/play/seek',
+            'testIntern/tests/play/play',
+            'testIntern/tests/play/zapping',
+            'testIntern/tests/play/seek',
             'testIntern/tests/play/pause',
-            // 'testIntern/tests/api/getVideoBitrates',
-            // 'testIntern/tests/error/downloadErrManifest',
+            'testIntern/tests/api/getVideoBitrates',
+            'testIntern/tests/error/downloadErrManifest',
         ],
 
         // The amount of time, in milliseconds, an asynchronous test can run before it is considered timed out. By default this value is 30 seconds.
@@ -29,7 +29,38 @@ define(function(require){
         excludeInstrumentation : /^tests|bower_components|node_modules|testIntern/
     };
 
+    // Check if some parameters are redefined in command line
+    process.argv.forEach(function (val, index, array) {
+        var param = val.split('='),
+            name,
+            value;
+
+        if (param.length !== 2) {
+            return;
+        }
+
+        name = param[0];
+        value = param[1];
+
+        switch (name) {
+            case 'browsers':
+                conf.environments = browsersConfig[value];
+                break;
+            case 'selenium':
+                switch (value) {
+                    case 'local':
+                        seleniumConfig = require('./config/seleniumLocal');
+                        break;
+                    case 'remote':
+                        seleniumConfig = require('./config/seleniumRemote');
+                        break;
+                }
+        }
+    });
+
     conf = Object.assign(conf, seleniumConfig);
+
+    console.log(conf);
 
     return conf;
 });
