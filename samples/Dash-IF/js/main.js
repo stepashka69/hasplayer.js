@@ -748,8 +748,8 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     player = new MediaPlayer(context);
 
     $scope.version = player.getVersion();
-    $scope.versionHAS = player.getVersionHAS();
     $scope.versionFull = player.getVersionFull();
+    $scope.versionDashJS = player.getVersionDashJS();
     $scope.buildDate = player.getBuildDate();
 
     $scope.laURL = "";
