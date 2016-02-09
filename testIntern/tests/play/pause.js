@@ -60,9 +60,6 @@ define([
                     })
                     .then(function (playing) {
                         assert.isTrue(playing);
-                        var sleepTime = Math.round(Math.random() * 20);
-                        tests.log(NAME, 'Sleep ' + sleepTime + ' s.');
-                        return command.sleep(sleepTime * 1000);
                     });
                 }
             });
@@ -75,9 +72,10 @@ define([
 
                 pause: function () {
                     var currentTime = 0;
+                    var sleepTime = Math.round(Math.random() * 20);
 
-                    tests.log(NAME, 'Pause the player');
-                    return command.execute(player.pause)
+                    tests.log(NAME, 'Wait ' + sleepTime + ' sec. and pause the player');
+                    return command.sleep(sleepTime * 1000).execute(player.pause)
                     .then(function () {
                         tests.log(NAME, 'Check if paused');
                         return command.execute(video.isPaused);
