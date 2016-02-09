@@ -1,13 +1,13 @@
 define(function(require){
 
-    var seleniumConfig = require('./config/seleniumLocal');
+    var seleniumConfig = require('./config/seleniumRemote');
     var browsersConfig = require('./config/browsers');
 
     var conf = {
         // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
         // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
         // capabilities options specified for an environment will be copied as-is
-        environments: browsersConfig.chrome,
+        environments: browsersConfig.all,
 
         // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
         maxConcurrency: 1,
