@@ -22,3 +22,5 @@ npm install
 #exit results_test1 && results_test2 && results_test3 && results_test4 && results_test5
 
 node node_modules/intern/runner.js config=testIntern/testsCommon.js
+
+# node node_modules/intern/runner.js config=testIntern/testsCommon.js browsers=chrome selenium=local
