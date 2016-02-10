@@ -5,13 +5,17 @@ define(function(require) {
 
     return {
         testPage: [
-            applications.OrangeHasPlayer.development
+            applications.OrangeHasPlayer.master
         ],
 
         asyncTimeout: 10,
 
         tests : {
-
+            authent:{
+                authent:{
+                    environment:'QUALIF'
+                }
+            },
             play: {
                 play: {
                     streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
