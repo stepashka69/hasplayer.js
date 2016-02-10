@@ -3,7 +3,14 @@ define([], function () {
     return {
 
         loadStream: function(stream) {
-            orangeHasPlayer.load(stream.url);
+            // console.log('load stream', stream);
+            if(stream.tvmUrl){
+                streamsPanel.loadTVMSource(stream, function(tvmStream){
+                    orangeHasPlayer.load(tvmStream.url);
+                })
+            }else{    
+                orangeHasPlayer.load(stream.url);
+            }
         },
 
         getDuration: function() {
