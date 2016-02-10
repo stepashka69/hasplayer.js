@@ -5,7 +5,7 @@ define(function(require) {
 
     return {
         testPage: [
-            applications.OrangeHasPlayer.master
+            applications.OrangeHasPlayer.development
         ],
 
         asyncTimeout: 10,
