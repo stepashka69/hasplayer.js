@@ -36,6 +36,7 @@ OrangeHasPlayer = function() {
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
+        trickTimer = null,
         metricsAgent = {
             ref: null,
             deferInit: null,
@@ -487,11 +488,81 @@ OrangeHasPlayer = function() {
             throw new Error('OrangeHasPlayer.seek(): seek value not correct');
         }
     };
-
+    
+    /**
+     * For VOD, change the playback speed.
+     * @method setTrickPlay
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {number} speed - the speed to read stream : -32, -16, -8, -4, -2, 1, 2, 4, 8, 16, 32  
+     */
     this.setTrickPlay = function(speed) {
         _isPlayerInitialized();
-        
-        mediaPlayer.setTrickPlay(speed);
+        var self = this;
+
+        clearTimeout(trickTimer);
+
+        mediaPlayer.setTrickPlay(speed != 1 ? true : false);
+
+        if (speed != 1) {
+            this.setMute(true);
+            this.pause();
+            var timer, seekValue;
+            switch(speed){
+                case -2 :
+                    seekValue = -1;
+                    timer = 500;
+                    break;
+                case -4 :
+                    seekValue = -2;
+                    timer = 500;
+                    break;
+                case -8 :
+                    seekValue = -2;
+                    timer = 250;
+                    break;
+                case -16 :
+                    seekValue = -4;
+                    timer = 250;
+                    break;
+                case -32 :
+                    seekValue = -16;
+                    timer = 500;
+                    break;
+                case 2 :
+                    seekValue = 1;
+                    timer = 500;
+                    break;
+                case 4 :
+                    seekValue = 2;
+                    timer = 500;
+                    break;
+                case 8 :
+                    seekValue = 2;
+                    timer = 250;
+                    break;
+                case 16 :
+                    seekValue = 4;
+                    timer = 250;
+                    break;
+                case 32 :
+                    seekValue = 16;
+                    timer = 500;
+                    break;
+            }
+            this.seek(this.getPosition()+seekValue);
+            trickTimer = setInterval(function(){
+                var currentTime = self.getPosition();
+                if ((currentTime+seekValue) <= self.getDuration() && (currentTime+seekValue) >= 0) {
+                    self.seek(currentTime+seekValue);
+                }else{
+                    self.setMute(false);
+                    clearTimeout(trickTimer);
+                } }, timer);
+        }else{
+            this.setMute(false);
+            this.play();
+        }
     };
 
     /**

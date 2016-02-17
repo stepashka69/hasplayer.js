@@ -21,7 +21,7 @@ var SettingsPanel = function() {
     this.metricsConfig = null;
     this.videoBufferLength = null;
     this.audioBufferLength = null;
-    this.nicoTest = null;
+    this.TrickModeSpeed = null;
 };
 
 SettingsPanel.prototype.init = function() {
@@ -37,7 +37,7 @@ SettingsPanel.prototype.init = function() {
     this.enableOptimzedZappingCheckbox = document.getElementById('enable-optimized-zapping');
     this.videoBufferLength = document.getElementById('video_buffer_Length');
     this.audioBufferLength = document.getElementById('audio_buffer_Length');
-    this.nicoTest = document.getElementById('nicoTest');
+    this.TrickModeSpeed = document.getElementById('TrickModeSpeed');
 
     this.setupEventListeners();
     this.initMetricsAgentOptions();
@@ -53,7 +53,7 @@ SettingsPanel.prototype.setupEventListeners = function() {
     this.defaultAudioLangCombobox.addEventListener('change', this.onChangeDefaultAudioLang.bind(this));
     this.defaultSubtitleLangCombobox.addEventListener('change', this.onChangeDefaultSubtitleLang.bind(this));
     this.enableOptimzedZappingCheckbox.addEventListener('click', this.onEnableOptimizedZapping.bind(this));
-    this.nicoTest.addEventListener('click', this.onNicoTest.bind(this));
+    this.TrickModeSpeed.addEventListener('change', this.onTrickModeSpeedChange.bind(this));
 
     minivents.on('language-radio-clicked', this.onLanguageChangedFromPlayer.bind(this));
     minivents.on('subtitle-radio-clicked', this.onSubtitleChangedFromPlayer.bind(this));
@@ -168,12 +168,15 @@ SettingsPanel.prototype.onEnableOptimizedZapping = function() {
     this.optimizedZappingEnabled = this.enableOptimzedZappingCheckbox.checked;
 };
 
-SettingsPanel.prototype.onNicoTest = function() {
-    if (this.nicoTest.checked) {
-        orangeHasPlayer.setTrickPlay(6);
-    }else {
-        orangeHasPlayer.setTrickPlay(1);
+SettingsPanel.prototype.onTrickModeSpeedChange = function(e) {
+    var speed = parseInt(e.target.selectedOptions[0].value,10);
+    if(speed != 1){
+        setTrickMode(true);
+    }else{
+        setTrickMode(false);
     }
+
+    orangeHasPlayer.setTrickPlay(speed);
 };
 
 SettingsPanel.prototype.updateAudioData = function(_audioTracks, _selectedAudioTrack) {
