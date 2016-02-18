@@ -185,9 +185,7 @@ function onStateChanged(e) {
 
 function onTimeUpdate() {
     //update progress bar in GUI.
-    if (!orangeHasPlayer.isLive()) {
-        handleTimeUpdate(video.currentTime);
-    }
+    handleTimeUpdate(video.currentTime);
 }
 
 function onManifestUrlUpdate() {
