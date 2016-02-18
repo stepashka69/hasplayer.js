@@ -1013,6 +1013,32 @@ OrangeHasPlayer = function() {
         this.setParams({'TextTrackExtensions.displayModeExtern':mode});
     };
 
+    /////////// DVR
+
+    /**
+     * Returns the DVR window size.
+     * @method getDVRWindowSize
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowSize = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowSize();
+    };
+
+    /**
+     * Returns the current DVR window range.
+     * @method getDVRWindowRange
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowRange = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowRange();
+    };
+
     /////////// ADVANCED CONFIGURATION
 
     /**
