@@ -40,11 +40,24 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function() {
             },
 
             addRange: function(start, end) {
-                this.ranges.push({
-                    start: start,
-                    end: end
-                });
-                this.length = this.length + 1;
+                var i = 0,
+                    rangesUpdated = false;
+
+                //detect discontinuity in ranges.
+                for (i = 0; i < this.ranges.length; i++) {
+                    if (this.ranges[i].end === start) {
+                        rangesUpdated = true;
+                        this.ranges[i].end = end;
+                    }
+                }
+                
+                if (!rangesUpdated) {
+                    this.ranges.push({
+                        start: start,
+                        end: end
+                    });
+                    this.length = this.length + 1;
+                }
 
                 // TimeRanges must be normalized
 
@@ -168,7 +181,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function() {
                     fragmentDuration = tfhd.default_sample_duration / self.timescale;
                 }
 
-                self.buffered.addRange(fragmentStart, fragmentStart + fragmentDuration);
+                self.buffered.addRange(parseFloat(fragmentStart.toFixed(5)), parseFloat((fragmentStart + fragmentDuration).toFixed(5)));
                 
                 //detect utf-16 encoding
                 if (self.isUTF16(mdat.data)) {
