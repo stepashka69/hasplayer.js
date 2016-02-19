@@ -256,8 +256,19 @@ PlayerPanel.prototype.onSeekBarModuleLeave = function(e) {
 };
 
 PlayerPanel.prototype.onSeekClicked = function(e) {
-    if (this.videoDuration) {
+    if (!this.videoDuration) {
+        return;
+    }
+
+    if (this.videoDuration !== Infinity) {
         setSeekValue(e.offsetX * this.videoDuration / this.seekbarBackground.clientWidth);
+    } else {
+        var range = orangeHasPlayer.getDVRWindowRange(),
+            progress = e.offsetX / this.seekbarBackground.clientWidth,
+            duration = range.end - range.start,
+            seekTime = range.start + (duration * progress);
+
+        setSeekValue(seekTime);
     }
 };
 
@@ -289,7 +300,12 @@ PlayerPanel.prototype.setPlayingTime = function(time) {
         progress = (time / this.videoDuration) * 100;
         this.seekbar.style.width = progress + '%';
     } else {
-        this.seekbar.style.width = 0;
+        var range = orangeHasPlayer.getDVRWindowRange();
+        if (range !== null && time > 0) {
+            this.durationTimeSpan.textContent = setTimeWithSeconds(range.end);
+            progress = ((time - range.start) / (range.end - range.start)) * 100;
+            this.seekbar.style.width = progress + '%';
+        }
     }
 };
 

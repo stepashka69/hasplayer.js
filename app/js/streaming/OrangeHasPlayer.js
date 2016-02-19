@@ -471,22 +471,29 @@ OrangeHasPlayer = function() {
      * @param {number} time - the new time value in seconds
      */
     this.seek = function(time) {
+        var range = null;
+
         _isPlayerInitialized();
 
         if (typeof time !== 'number') {
             throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
         }
 
-        if (!this.isLive() && time >= 0 && time <= video.duration) {
-            video.currentTime = time;
-        }
-
-        if (this.isLive()) {
-            throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
-        }
-
-        if (time < 0 || time > video.duration) {
-            throw new Error('OrangeHasPlayer.seek(): seek value not correct');
+        if (!this.isLive()) {
+            if  (time < 0 || time > video.duration) {
+                throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+            } else {
+                video.currentTime = time;
+            }
+        } else {
+            range = mediaPlayer.getDVRWindowRange();
+            if (range === null) {
+                throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
+            } else if (time < range.start || time > range.end) {
+                throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+            } else {
+                video.currentTime = time;
+            }
         }
     };
 
@@ -1011,6 +1018,32 @@ OrangeHasPlayer = function() {
      */
     this.enableSubtitleExternDisplay = function(mode) {
         this.setParams({'TextTrackExtensions.displayModeExtern':mode});
+    };
+
+    /////////// DVR
+
+    /**
+     * Returns the DVR window size.
+     * @method getDVRWindowSize
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowSize = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowSize();
+    };
+
+    /**
+     * Returns the current DVR window range.
+     * @method getDVRWindowRange
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowRange = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowRange();
     };
 
     /////////// ADVANCED CONFIGURATION
