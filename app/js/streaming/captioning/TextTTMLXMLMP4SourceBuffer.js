@@ -41,13 +41,19 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function() {
 
             addRange: function(start, end) {
                 var i = 0,
-                    rangesUpdated = false;
+                    rangesUpdated = false,
+                    tolerance =  0.01;
 
                 //detect discontinuity in ranges.
                 for (i = 0; i < this.ranges.length; i++) {
-                    if (this.ranges[i].end === start) {
+                    if (this.ranges[i].end <= (start+tolerance) && this.ranges[i].end >= (start-tolerance)) {
                         rangesUpdated = true;
                         this.ranges[i].end = end;
+                    }
+
+                    if (this.ranges[i].start <= (end+tolerance) && this.ranges[i].start >= (end-tolerance)) {
+                        rangesUpdated = true;
+                        this.ranges[i].start = start;
                     }
                 }
                 
@@ -57,13 +63,12 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function() {
                         end: end
                     });
                     this.length = this.length + 1;
+
+                    // TimeRanges must be normalized
+                    this.ranges.sort(function(a, b) {
+                        return a.start - b.start;
+                    });
                 }
-
-                // TimeRanges must be normalized
-
-                this.ranges.sort(function(a, b) {
-                    return a.start - b.start;
-                });
             },
 
             removeRange: function(start, end) {
@@ -181,7 +186,7 @@ MediaPlayer.dependencies.TextTTMLXMLMP4SourceBuffer = function() {
                     fragmentDuration = tfhd.default_sample_duration / self.timescale;
                 }
 
-                self.buffered.addRange(parseFloat(fragmentStart.toFixed(5)), parseFloat((fragmentStart + fragmentDuration).toFixed(5)));
+                self.buffered.addRange(fragmentStart, fragmentStart + fragmentDuration);
                 
                 //detect utf-16 encoding
                 if (self.isUTF16(mdat.data)) {
