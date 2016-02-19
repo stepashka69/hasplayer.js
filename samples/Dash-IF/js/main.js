@@ -260,8 +260,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.chromecast = {};
     $scope.chromecast.apiOk = false;
 
-
-
     ////////////////////////////////////////
     //
     // Metrics

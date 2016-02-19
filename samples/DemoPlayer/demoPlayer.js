@@ -16,6 +16,7 @@ var chartXaxisWindow = 30;
 var plotCount = (chartXaxisWindow * 1000) / updateIntervalLength;
 
 var enableNetBalancer = false;
+var serviceNetBalancerEnabled = true;
 var netBalancerLimitValue = 0;
 var netBalancerLimitSetted = true;
 
