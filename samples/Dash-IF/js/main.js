@@ -1059,7 +1059,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     function setProtectionData () {
         var protData = $scope.selectedItem.protData ? $scope.selectedItem.protData[$scope.protectionScheme] : null;
         $scope.laURL = protData ? protData.laURL : "";
-        $scope.cmdData = protData ? protData.cdmData : "";
+        $scope.cdmData = protData ? protData.cdmData : "";
     }
 
     function resetBitratesSlider () {
