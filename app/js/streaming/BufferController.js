@@ -85,6 +85,8 @@ MediaPlayer.dependencies.BufferController = function() {
         // ORANGE: HLS chunk sequence number
         currentSequenceNumber = -1,
 
+        lastDownloadedSegmentDuration = NaN,
+
         sendRequest = function() {
 
             // Check if running state
@@ -299,6 +301,8 @@ MediaPlayer.dependencies.BufferController = function() {
                 eventStreamAdaption = this.manifestExt.getEventStreamForAdaptationSet(self.getData()),
                 eventStreamRepresentation = this.manifestExt.getEventStreamForRepresentation(self.getData(), _currentRepresentation),
                 segmentStartTime = null;
+            
+            lastDownloadedSegmentDuration = request.duration;
 
             if (!isRunning()) {
                 return;
@@ -1083,7 +1087,9 @@ MediaPlayer.dependencies.BufferController = function() {
                         function(result) {
 
                             // Re-enable ABR in case it has been previsouly disabled (see onBytesError)
-                            self.abrController.setAutoSwitchBitrate(true);
+                            if (!trickModeEnabled) {
+                                self.abrController.setAutoSwitchBitrate(true);
+                            }
 
                             quality = result.quality;
 
@@ -1646,6 +1652,10 @@ MediaPlayer.dependencies.BufferController = function() {
             return deferred.promise;
         },
 
+        getLastDownloadedSegmentDuration: function(){
+            return lastDownloadedSegmentDuration;
+        },
+
         setTrickPlay: function(enabled) {
             var self = this,
                 deferred = Q.defer();
@@ -1658,7 +1668,10 @@ MediaPlayer.dependencies.BufferController = function() {
             if (enabled) {
                 deferred.resolve();
                 self.fragmentController.setSampleDuration(true);
+                self.setAutoSwitchBitrate(false);
+                self.abrController.setPlaybackQuality(type, 0);
             } else {
+                self.setAutoSwitchBitrate(true);
                 self.fragmentController.setSampleDuration(false);
                 removeBuffer.call(this).then(function() {
                     debugBufferRange.call(self);

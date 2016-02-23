@@ -250,70 +250,6 @@ OrangeHasPlayer = function() {
                 break;
         }
     };
-
-    var _getTrickPlayParameters = function(speed) {
-        var result = {timer: 0, seekValue: 0};
-
-        switch(speed){
-            case -2 :
-                result.seekValue = -1;
-                result.timer = 500;
-                break;
-            case -4 :
-                result.seekValue = -2;
-                result.timer = 500;
-                break;
-            case -8 :
-                result.seekValue = -2;
-                result.timer = 250;
-                break;
-            case -16 :
-                result.seekValue = -4;
-                result.timer = 250;
-                break;
-            case -32 :
-                result.seekValue = -16;
-                result.timer = 500;
-                break;
-            case 2 :
-                result.seekValue = 1;
-                result.timer = 500;
-                break;
-            case 4 :
-                result.seekValue = 2;
-                result.timer = 500;
-                break;
-            case 8 :
-                result.seekValue = 2;
-                result.timer = 250;
-                break;
-            case 16 :
-                result.seekValue = 4;
-                result.timer = 250;
-                break;
-            case 32 :
-                result.seekValue = 16;
-                result.timer = 500;
-                break;
-        }
-
-        return result;
-    };
-    
-    var _jump = function(seekValue) {
-        var currentTime,
-            duration;
-        
-        currentTime = this.getPosition();
-        duration = this.getDuration();
-
-        if ((currentTime+seekValue) <= duration && (currentTime+seekValue) >= 0) {
-            this.seek(currentTime+seekValue);
-        }else{
-            this.setMute(false);
-            clearTimeout(trickTimer);
-        }
-    };
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -519,9 +455,7 @@ OrangeHasPlayer = function() {
      */
     this.play = function() {
         _isPlayerInitialized();
-        
-        clearTimeout(trickTimer);
-        
+                
         video.play();
 
         state = 'PLAYER_RUNNING';
@@ -563,26 +497,16 @@ OrangeHasPlayer = function() {
      */
     this.setTrickPlay = function(speed) {
         _isPlayerInitialized();
-        var self = this,
-            parameters;
-
-        clearTimeout(trickTimer);
-
-        mediaPlayer.setTrickPlay(speed != 1 ? true : false);
 
         if (speed != 1) {
             this.setMute(true);
             this.pause();
-
-            parameters = _getTrickPlayParameters(speed);
-            
-            _jump.call(self, parameters.seekValue);
-
-            trickTimer = setInterval(function(){_jump.call(self, parameters.seekValue);}, parameters.timer);
         }else{
             this.setMute(false);
             this.play();
         }
+
+        mediaPlayer.setTrickPlay(speed);
     };
 
     /**
