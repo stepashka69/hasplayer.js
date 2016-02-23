@@ -903,6 +903,7 @@ MediaPlayer.dependencies.BufferController = function() {
                     if (trickModeEnabled) {
                         request = self.indexHandler.getIFrameRequest(request);
                     }
+
                     // Store current segment time for next segment request
                     currentSegmentTime = request.startTime;
 
