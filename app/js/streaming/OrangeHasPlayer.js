@@ -502,40 +502,29 @@ OrangeHasPlayer = function() {
     };
     
     /**
-     * For VOD, change the playback speed.
+     * Sets the trick mode speed.
      * @method setTrickModeSpeed
      * @access public
      * @memberof OrangeHasPlayer#
-     * @param {number} speed - the speed to read stream.
+     * @param {number} speed - the new trick mode speed.
      */
     this.setTrickModeSpeed = function(speed) {
         _isPlayerInitialized();
-        
-        if (speed !== trickModeSpeed) {
-            trickModeSpeed = speed;
-            
-            if (speed != 1) {
-                this.setMute(true);
-                this.pause();
-            }else{
-                this.setMute(false);
-                this.play();
-            }
 
-            mediaPlayer.setTrickModeSpeed(speed);
-        }
+        mediaPlayer.setTrickModeSpeed(speed);
     };
 
     /**
-     * return trick mode speed, current value.
+     * Returns the current trick mode speed.
      * @method getTrickModeSpeed
      * @access public
      * @memberof OrangeHasPlayer#
      * @return {number} the current trick mode speed
      */
     this.getTrickModeSpeed = function() {
-        return trickModeSpeed;
+        return mediaPlayer.getTrickModeSpeed();
     };
+
     /**
      * Pauses the media playback.
      * @method pause
