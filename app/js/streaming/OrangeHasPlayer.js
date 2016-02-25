@@ -36,7 +36,6 @@ OrangeHasPlayer = function() {
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
-        trickModeSpeed = 1,
         metricsAgent = {
             ref: null,
             deferInit: null,
@@ -458,10 +457,6 @@ OrangeHasPlayer = function() {
     this.play = function() {
         _isPlayerInitialized();
 
-        if (trickModeSpeed != 1) {
-            this.setTrickModeSpeed(1);
-        }
-                
         video.play();
 
         state = 'PLAYER_RUNNING';
