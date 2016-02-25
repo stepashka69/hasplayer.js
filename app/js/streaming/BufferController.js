@@ -1663,7 +1663,11 @@ MediaPlayer.dependencies.BufferController = function() {
 
 
             this.debug.log("[BufferController][" + type + "] setTrickMode - enabled = " + enabled);
-
+            
+            if (trickModeEnabled === enabled) {
+                deferred.resolve();
+                return deferred.promise;
+            }
             trickModeEnabled = enabled;
 
             if (enabled) {
