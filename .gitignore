@@ -182,3 +182,8 @@ pip-log.txt
 doc/Dash.js.~ml
 /server/MSS
 app/lib/metricsagent.min.js
+
+
+#Visual studio code
+.vscode/**
+/testIntern/selenium/profiles/**
