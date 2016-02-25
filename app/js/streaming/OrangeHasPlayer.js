@@ -36,7 +36,7 @@ OrangeHasPlayer = function() {
         defaultSubtitleLang = 'und',
         selectedAudioTrack = null,
         selectedSubtitleTrack = null,
-        trickTimer = null,
+        trickModeSpeed = 1,
         metricsAgent = {
             ref: null,
             deferInit: null,
@@ -457,6 +457,10 @@ OrangeHasPlayer = function() {
      */
     this.play = function() {
         _isPlayerInitialized();
+
+        if (trickModeSpeed != 1) {
+            this.setTrickModeSpeed(1);
+        }
                 
         video.play();
 
@@ -499,25 +503,39 @@ OrangeHasPlayer = function() {
     
     /**
      * For VOD, change the playback speed.
-     * @method setTrickPlay
+     * @method setTrickModeSpeed
      * @access public
      * @memberof OrangeHasPlayer#
      * @param {number} speed - the speed to read stream.
      */
-    this.setTrickPlay = function(speed) {
+    this.setTrickModeSpeed = function(speed) {
         _isPlayerInitialized();
+        
+        if (speed !== trickModeSpeed) {
+            trickModeSpeed = speed;
+            
+            if (speed != 1) {
+                this.setMute(true);
+                this.pause();
+            }else{
+                this.setMute(false);
+                this.play();
+            }
 
-        if (speed != 1) {
-            this.setMute(true);
-            this.pause();
-        }else{
-            this.setMute(false);
-            this.play();
+            mediaPlayer.setTrickModeSpeed(speed);
         }
-
-        mediaPlayer.setTrickPlay(speed);
     };
 
+    /**
+     * return trick mode speed, current value.
+     * @method getTrickModeSpeed
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the current trick mode speed
+     */
+    this.getTrickModeSpeed = function() {
+        return trickModeSpeed;
+    };
     /**
      * Pauses the media playback.
      * @method pause

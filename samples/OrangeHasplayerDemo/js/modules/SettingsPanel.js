@@ -176,7 +176,7 @@ SettingsPanel.prototype.onTrickModeSpeedChange = function(e) {
         setTrickMode(false);
     }
 
-    orangeHasPlayer.setTrickPlay(speed);
+    orangeHasPlayer.setTrickModeSpeed(speed);
 };
 
 SettingsPanel.prototype.updateAudioData = function(_audioTracks, _selectedAudioTrack) {
