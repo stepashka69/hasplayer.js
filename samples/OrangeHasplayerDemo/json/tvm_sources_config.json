@@ -1,5 +1,5 @@
 {
-    "server": "http://chaines-tv-preprod.orange.fr/live-webapp/v2/PC/",
+    "server": "http://qualif2.r3pc-live.rec.orange.fr/live-webapp/v2/PC/",
     "headers":  {
         
     },

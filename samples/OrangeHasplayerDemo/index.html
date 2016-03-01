@@ -43,6 +43,11 @@
 <script src="../../app/lib/mpegts/h264.js"></script>
 
 <!-- @if PROXY=true -->
+<script src="../../app/lib/fingerprint/fp_browser.js"></script>
+<script src="../../app/lib/fingerprint/fp_os.js"></script>
+<!-- @endif -->
+
+<!-- @if PROXY=true -->
 <script src="../../app/js/streaming/OrangeHasPlayer.js"></script>
 <!-- @endif -->
 <script src="../../app/js/streaming/MediaPlayer.js"></script>
@@ -511,6 +516,9 @@
                 <canvas id="canvas" height="40px"></canvas>
             </div>
             <div id="protection-data-container" class="module hidden">
+            </div>
+            <div id="terminal-id-container" style="position:absolute;right:10px;bottom:0;">
+                <p style="align:center;font-size:small" id="terminal-id"></p>
             </div>
         </div>
     </body>

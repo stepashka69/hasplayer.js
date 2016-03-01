@@ -1158,6 +1158,21 @@ OrangeHasPlayer = function() {
         isFullScreen = !isFullScreen;
     };
 
+
+    /**
+     * Returns the terminal ID.
+     * @method fullscreenChanged
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {string} the terminal ID 
+     */
+    this.getTerminalId = function() {
+        var browser = fingerprint_browser(),
+            os = fingerprint_os();
+
+        return browser.name + "-" + os.name + "_" + os.bits;
+    };
+
     /////////// EVENTS
 
     /**
