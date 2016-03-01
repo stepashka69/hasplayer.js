@@ -217,33 +217,33 @@ function fingerprint_os() {
         platform = navigator.platform.toLowerCase();
 
         if (platform.indexOf("x64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("x86_64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("x86-64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("win64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("x64;") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("amd64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("wow64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("x64_64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("ia65") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("sparc64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("ppc64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("irix64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else if (userAgent.indexOf("irix64") !== -1) {
-            bits = "64 bits";
+            bits = "64";
         } else {
-            bits = "32 bits";
+            bits = "32";
         }
     } catch (err) {
         name = "error";
@@ -252,6 +252,6 @@ function fingerprint_os() {
 
     return {
         name: name.replace(/\s+/g, ''),
-        bits: bits.replace(/\s+/g, '')
+        bits: "x" + bits
     };
 }

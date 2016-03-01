@@ -1170,7 +1170,7 @@ OrangeHasPlayer = function() {
         var browser = fingerprint_browser(),
             os = fingerprint_os();
 
-        return browser.name + "-" + os.name + "_" + os.bits;
+        return os.name + "-" + os.bits + "-" + browser.name;
     };
 
     /////////// EVENTS
