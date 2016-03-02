@@ -10,5 +10,6 @@ define({
     reporters: ['Runner'],
     capabilities: {
         'selenium-version': '2.48.2'
-    }
+    },
+    leaveRemoteOpen:true
 });
