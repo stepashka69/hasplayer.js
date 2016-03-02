@@ -1,8 +1,5 @@
 {
-    "server": "http://qualif2.r3pc-live.rec.orange.fr/live-webapp/v2/PC/",
-    "headers":  {
-        
-    },
+    "server": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/",
     "channels":[
         {
             "id":192,
