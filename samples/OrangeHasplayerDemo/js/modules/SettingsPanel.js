@@ -170,12 +170,6 @@ SettingsPanel.prototype.onEnableOptimizedZapping = function() {
 
 SettingsPanel.prototype.onTrickModeSpeedChange = function(e) {
     var speed = parseInt(e.target.selectedOptions[0].value,10);
-    if(speed != 1){
-        setTrickMode(true);
-    }else{
-        setTrickMode(false);
-    }
-
     orangeHasPlayer.setTrickModeSpeed(speed);
 };
 

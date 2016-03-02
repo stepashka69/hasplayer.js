@@ -358,7 +358,7 @@ PlayerPanel.prototype.onVideoEnded = function(e) {
 };
 
 PlayerPanel.prototype.showLoadingElement = function() {
-    if (!trickModeEnabled) {
+    if (orangeHasPlayer.getTrickModeSpeed() === 1) {
         this.loadingElement.className = 'op-loading';
     }
 };
