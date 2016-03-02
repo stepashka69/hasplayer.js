@@ -186,4 +186,3 @@ app/lib/metricsagent.min.js
 
 #Visual studio code
 .vscode/**
-/testIntern/selenium/profiles/**
