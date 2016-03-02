@@ -40,8 +40,8 @@ define([
 
                 authentificate: function() {
                     return authent.connectUser(command, testConfig.environment)
-                    .then(function() {
-                        assert.isTrue(true);
+                    .then(function(text) {
+                        assert.equal(text, "OK","user is authenticated if value is OK");
                     }, function(){
                         assert.isTrue(false);
                     });

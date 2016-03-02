@@ -1,15 +1,15 @@
 
-define(['require'],
-    function(require) {
+define([],
+    function() {
         
         var USERS = {
                 PROD:{
-                    email:"maps.poss@orange.fr",
+                    email:"maps.poss&#64;orange.fr",
                     pass:"webtv12"
                 },
 
                 QUALIF:{
-                    email:"vodpcclienta@orange.fr",
+                    email:"vodpcclienta&#64;orange.fr",
                     pass:"Passwd1"
                 }
 
@@ -17,9 +17,8 @@ define(['require'],
 
             PLATFORM = {
                 PROD: "https://id.orange.fr",
-                QUALIF:"http://id-rec.orange.fr"
+                QUALIF:"https://id-rec.orange.fr"
             };
-
 
 
     return {
@@ -41,8 +40,20 @@ define(['require'],
             .clearValue()
             .click().type(USERS[plateform].pass).end()
             .findByCssSelector('.sc_default_button_2 input')
-            .click()
-            .sleep(2000).then(resolve, reject);
+            .click().end()
+            .sleep(200)
+            .then(function(){
+                if(plateform == "QUALIF"){
+                    return command.findByXpath('.//font[@color="green"]')
+                    .getVisibleText()
+                    .then(resolve, reject);
+                }else{
+                    return function(){
+                        resolve("OK");
+                    }
+                }
+            }, reject);
+            
         },
 
         onError: function(reject){
