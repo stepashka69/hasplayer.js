@@ -43,6 +43,20 @@ define({
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest"
     },
+    
+    MSS_LIVE_DRM_TF1:{
+        "name": "TF1 (QUALIF)",
+        "protocol": "MSS",
+        "type":"Live",
+        "tvmUrl": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/channels/192/url"
+    },
+    
+    MSS_LIVE_DRM_M6:{
+        "name": "M6 (QUALIF)",
+        "protocol": "MSS",
+        "type":"Live",
+        "tvmUrl": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/channels/118/url"
+    },
 
     MSS_VOD_1: {
         "name": "Big Buck Bunny",
@@ -78,6 +92,6 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest2",
-    }
+    }   
     
 });
