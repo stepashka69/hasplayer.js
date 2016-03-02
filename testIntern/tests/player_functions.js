@@ -6,10 +6,10 @@ define([], function () {
             // console.log('load stream', stream);
             if(stream.tvmUrl){
                 streamsPanel.loadTVMSource(stream, function(tvmStream){
-                    orangeHasPlayer.load(tvmStream.url);
+                    orangeHasPlayer.load(tvmStream.url, tvmStream.protData);
                 })
             }else{    
-                orangeHasPlayer.load(stream.url);
+                orangeHasPlayer.load(stream.url, stream.protData);
             }
         },
 
