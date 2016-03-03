@@ -91,7 +91,7 @@ define([
                         return command.execute(player.setTrickModeSpeed, [speed]);
                     })
                     .then(function () {
-                        return command.sleep(PROGRESS_DELAY * 2 * 1000).execute(player.setTrickModeSpeed, [1]);
+                        return command.sleep(PROGRESS_DELAY * 6 * 1000).execute(player.setTrickModeSpeed, [1]);
                     })
                     .then(function () {
                         timeAfterTrickMode = new Date().getTime();
