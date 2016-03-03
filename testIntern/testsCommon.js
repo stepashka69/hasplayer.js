@@ -20,7 +20,8 @@ define(function(require){
             'testIntern/tests/play/seek',
             'testIntern/tests/play/pause',
             'testIntern/tests/api/getVideoBitrates',
-            'testIntern/tests/error/downloadErrManifest'
+            'testIntern/tests/error/downloadErrManifest',
+            'testIntern/tests/play/trickMode'
         ],
 
         // The amount of time, in milliseconds, an asynchronous test can run before it is considered timed out. By default this value is 30 seconds.
