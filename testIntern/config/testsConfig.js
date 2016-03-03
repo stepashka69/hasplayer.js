@@ -33,7 +33,11 @@ define(function(require) {
                 pause: {
                     streams:  [ streams.MSS_VOD_1 ],
                     pauseCount: 5
-                }
+                },
+                trickMode: {
+                    streams:  [ streams.MSS_VOD_4],
+                    trickCount: 5
+                },
             },
 
             api: {

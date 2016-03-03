@@ -35,6 +35,14 @@ define([], function () {
             orangeHasPlayer.seek(pos);
         },
 
+        setTrickModeSpeed: function(speed){
+            orangeHasPlayer.setTrickModeSpeed(speed);
+        },
+
+        getTrickModeSpeed: function(speed){
+            return orangeHasPlayer.getTrickModeSpeed();
+        },
+
         getVideoBitrates: function() {
             return orangeHasPlayer.getVideoBitrates();
         },

@@ -80,6 +80,13 @@ define({
         "url": "http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest"
     },
 
+    MSS_VOD_4: {
+        "name": "Volver Long Version",
+        "protocol": "MSS",
+        "type": "VOD",
+        "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest"
+    },
+
     MSS_VOD_MULTI_AUDIO: {
         "name": "Arte  (multi-audio)",
         "protocol": "MSS",
