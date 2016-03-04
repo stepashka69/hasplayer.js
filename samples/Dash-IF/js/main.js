@@ -826,14 +826,14 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     $scope.playbackRateDown = function () {
 
-        if (video.playbackRate === 1.0) {
+        if (video.playbackRate < 0.1) {
             return;
         }
 
         video.playbackRate = video.playbackRate / 2;
         $scope.playbackRate = "x" + video.playbackRate;
 
-        if (video.playbackRate === 1.0) {
+        if (video.playbackRate < 0.1) {
             player.setAutoSwitchQuality(true);
         }
     };
