@@ -482,7 +482,24 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="panel" id="rightvPanel" ng-show="showRIGHTv">
+                    <div class="panel-heading panel-top">
+                        <span class="panel-title">RIGHTv</span>
+                    </div>
+                    <div class="panel-body">
+                        base_url: <input type="text" class="form-control" placeholder="base url" ng-model="rightv_url">
+                        licenser_base_url: <input type="text" class="form-control" placeholder="licenser base url" ng-model="licenser_base_url">
+                        language_code: <input type="text" class="form-control" placeholder="language_code" ng-model="language_code">
+                        model_external_id: <input type="text" class="form-control" placeholder="model_external_id" ng-model="model_external_id">
+                        serial_number: <input type="text" class="form-control" placeholder="serial_number" ng-model="serial_number">
+                        video_external_id: <input type="text" class="form-control" placeholder="video_external_id" ng-model="video_external_id">
+                        <button class="btn btn-primary" ng-disabled="!video_external_id" type="button" ng-click="doGetVideoPlayingInfo()" style="border-radius: 0;">GetVideoPlayingInfo</button>
+                    </div>
+                </div>
+
                 <button ng-show="!videojsIsOn" ng-click="activateVideoJS()" class="btn btn-default btn-xs" style="border-radius: 0; width: 100%;">Use the VideoJS skin</button>
+
             </div>
 
             <div class="col-md-3">

@@ -132,7 +132,7 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
         var url = {
             method: "GET",
             url: TVM_SERVER + 'channels/' + channelId + "/url",
-            headers: TVM_HEADERS, 
+            headers: TVM_HEADERS,
             timeout: 1000
         };
         return $http(url).then(function(response) {
@@ -141,7 +141,7 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
             } else {
                 return null;
             }
-        }, function(err) {
+        }, function(/*err*/) {
             return null;
         });
     };
@@ -291,7 +291,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     $scope.protectionTypes = ["PlayReady", "Widevine"];
     $scope.protectionType = bowser.chrome ? "Widevine" : "PlayReady";
-    setProtectionScheme();
 
 
     $('#sliderAudio').labeledslider({
@@ -1006,7 +1005,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     };
 
-    if(window.jsonData === undefined) {
+    if (window.jsonData === undefined) {
         Sources.query(function (data) {
              SourceTVM.getTVMSources().then(function(results){
                 for(var i=0; i<results.length;i++){
@@ -1020,9 +1019,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 $scope.streams = data.items;
                 $scope.selectStreams();
              });
-
-             
-            
         });
 
         Notes.query(function (data) {
@@ -1058,16 +1054,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     };
 
     $scope.setStream = function (item) {
-
         $scope.selectedItem = item;
-
-        setProtectionData();
-    };
-
-
-    $scope.setProtectionType = function (item) {
-        $scope.protectionType = item;
-        setProtectionScheme();
         setProtectionData();
     };
 
@@ -1082,11 +1069,20 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 
+    $scope.setProtectionType = function (item) {
+        $scope.protectionType = item;
+        setProtectionScheme();
+        setProtectionData();
+    };
+
     function setProtectionData () {
         var protData = $scope.selectedItem.protData ? $scope.selectedItem.protData[$scope.protectionScheme] : null;
         $scope.laURL = protData ? protData.laURL : "";
         $scope.cdmData = protData ? protData.cdmData : "";
     }
+
+    setProtectionScheme();
+
 
     function resetBitratesSlider () {
         $('#sliderBitrate').labeledslider({
@@ -1108,11 +1104,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     }
 
     function initPlayer() {
-
-        function DRMParams() {
-            this.backUrl = null;
-            this.cdmData = null;
-        }
 
         // Update PR protection data
         if (($scope.laURL.length > 0) || (($scope.cdmData.length > 0))) {
@@ -1139,6 +1130,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         $scope.playbackRate = "x1";
         player.attachSource($scope.selectedItem.url, $scope.selectedItem.protData);
     }
+
 
     $scope.doLoad = function () {
         if ($scope.chromecast.playing){
@@ -1170,6 +1162,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         return (item.hasOwnProperty("logo") && item.logo !== null && item.logo !== undefined && item.logo !== "");
     };
 
+
     // Get initial stream if it was passed in.
     var paramUrl = null;
 
@@ -1195,4 +1188,66 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
             $scope.doLoad();
         }
     }
+
+
+    ///////////////////////////////// RIGHTV ////////////////////////////////////
+    if (vars && vars.hasOwnProperty("rightv")) {
+        $scope.showRIGHTv = true;//(vars.rightv === "true");
+    } else {
+        $scope.showRIGHTv = false;
+    }
+    var rightvConfigReq = new XMLHttpRequest();
+    var rightvConfig;
+    rightvConfigReq.onload = function() {
+        if (rightvConfigReq.status === 200) {
+            rightvConfig = JSON.parse(rightvConfigReq.responseText);
+            $scope.rightv_url = rightvConfig.url;
+            $scope.licenser_base_url = rightvConfig.licenser_base_url;
+            $scope.language_code = rightvConfig.language_code;
+            $scope.model_external_id = rightvConfig.model_external_id;
+            $scope.serial_number = rightvConfig.serial_number;
+            $scope.video_external_id = rightvConfig.video_external_id;
+        }
+    };
+    rightvConfigReq.open("GET", "rightv_config.json", true);
+    rightvConfigReq.setRequestHeader("Content-type", "application/json");
+    rightvConfigReq.send();
+
+    $scope.doGetVideoPlayingInfo = function () {
+
+        var url = $scope.rightv_url;
+        url += '&language_code=' + $scope.language_code;
+        url += '&model_external_id=' + $scope.model_external_id;
+        url += '&serial_number=' + $scope.serial_number;
+        url += '&video_external_id=' + $scope.video_external_id;
+
+        var req = new XMLHttpRequest();
+        req.onload = function() {
+            if (req.status === 200) {
+                var videoInfos = JSON.parse(req.responseText);
+                if (videoInfos.response.status === 'FAILURE') {
+                    alert(videoInfos.response.code + ' - ' + videoInfos.response.message);
+                } else {
+                    $scope.selectedItem = {
+                        'url': videoInfos.response.url,
+                        'protData': {
+                            'com.microsoft.playready': {
+                                laURL: $scope.licenser_base_url + 'drm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                            },
+                            'com.widevine.alpha': {
+                                laURL: $scope.licenser_base_url + 'widevinedrm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                            }
+                        }
+                    };
+                    setProtectionData();
+                    $scope.$apply();
+                }
+            }
+        };
+        req.open("GET", url, true);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send();
+    };
+    ///////////////////////////////// RIGHTV ////////////////////////////////////
+
 }]);
