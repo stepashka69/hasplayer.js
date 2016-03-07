@@ -103,6 +103,12 @@ function fingerprint_browser() {
         } else if (/appengine-google/.test(userAgent)) { //test for AppEngine-Google;
             version = Number(RegExp.$1); // capture x.x portion and store as a number
             name = "Cloud (Google AppEngine)";
+        } else if (/trident/.test(userAgent)) { //test for Trident;
+            version = Number(RegExp.$1); // capture x.x portion and store as a number
+            name = "Trident";
+        } else if (/adventurer/.test(userAgent)) { //test for Orange Adventurer;
+            version = Number(RegExp.$1); // capture x.x portion and store as a number
+            name = "Adventurer";
         } else {
             version = "unknown";
             name = "unknown";
