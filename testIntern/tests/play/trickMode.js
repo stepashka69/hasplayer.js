@@ -73,7 +73,7 @@ define([
             registerSuite({
                 name: NAME,
 
-                fastForward: function () {
+                trickModeTest: function () {
                     var videoTimeBeforeTrickMode,
                         timeBeforeTrickMode,
                         videoTimeAfterTrickMode,
@@ -88,19 +88,24 @@ define([
                     .then(function (time) {
                         videoTimeBeforeTrickMode = time;
                         timeBeforeTrickMode = new Date().getTime();
+                        tests.log(NAME, 'set trick mode speed to '+speed);
                         return command.execute(player.setTrickModeSpeed, [speed]);
                     })
                     .then(function () {
+                        tests.log(NAME, 'sleep');
                         return command.sleep(PROGRESS_DELAY * 7 * 1000);
                     })
                     .then(function () {
+                        tests.log(NAME, 'register on seeked event');
                         return tests.executeAsync(command, player.waitForEvent, ['seeked'], config.asyncTimeout);
                     })
                     .then(function () {
+                        tests.log(NAME, 'call play command to escape trick mode');
                         return command.execute(video.play);
                     })
                     .then(function () {
                         timeAfterTrickMode = new Date().getTime();
+                        tests.log(NAME, 'call getCurrentTime to calculate real trick mode speed');
                         return command.execute(video.getCurrentTime);
                     })
                     .then(function (time) {
