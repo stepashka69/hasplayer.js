@@ -73,10 +73,11 @@ define(function () {
                     }
                 };
 
-            if (!video.paused && video.playbackRate > 0) {
+            if (!video.paused) {
                 isProgressing(delay, done);
+            }else{
+                video.addEventListener('playing', onPlaying);
             }
-            video.addEventListener('playing', onPlaying);
         }
     };
 });

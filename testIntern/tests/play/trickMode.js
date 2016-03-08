@@ -35,12 +35,8 @@ define([
         // Test variables
         var command = null,
             streamDuration = 0,
-            i, j;
-
-        var generateTrickModeSpeed = function () {
-            var speed = Math.round(Math.random() * 100);
-            return speed;
-        };
+            i, j,
+            speedValues = [-128,-64,-32,-16,-8,-4,-2,2,4,8,16,32,64,128];
 
         var testSetup = function (stream) {
             registerSuite({
@@ -72,26 +68,36 @@ define([
             });
         };
 
-        var test = function () {
+        var test = function (speed) {
 
             registerSuite({
                 name: NAME,
 
                 fastForward: function () {
-                    var speed = generateTrickModeSpeed(),
-                        videoTimeBeforeTrickMode,
+                    var videoTimeBeforeTrickMode,
                         timeBeforeTrickMode,
                         videoTimeAfterTrickMode,
-                        timeAfterTrickMode;
+                        timeAfterTrickMode,
+                        initialSeek;
                     
-                    return command.sleep(PROGRESS_DELAY * 1000).execute(video.getCurrentTime)
+                    initialSeek = speed < 0 ? streamDuration-10 : 10;
+                    return tests.executeAsync(command, player.seek, [initialSeek], config.asyncTimeout)
+                    .then(function () {
+                        return command.sleep(PROGRESS_DELAY * 1000).execute(video.getCurrentTime);
+                    })
                     .then(function (time) {
-                        timeBeforeTrickMode = new Date().getTime();
                         videoTimeBeforeTrickMode = time;
+                        timeBeforeTrickMode = new Date().getTime();
                         return command.execute(player.setTrickModeSpeed, [speed]);
                     })
                     .then(function () {
-                        return command.sleep(PROGRESS_DELAY * 6 * 1000).execute(player.setTrickModeSpeed, [1]);
+                        return command.sleep(PROGRESS_DELAY * 7 * 1000);
+                    })
+                    .then(function () {
+                        return tests.executeAsync(command, player.waitForEvent, ['seeked'], config.asyncTimeout);
+                    })
+                    .then(function () {
+                        return command.execute(video.play);
                     })
                     .then(function () {
                         timeAfterTrickMode = new Date().getTime();
@@ -107,6 +113,11 @@ define([
 
                         tests.log(NAME, 'trickMode end calculated Speed = '+ calculatedSpeed+ " for wanted Speed = "+speed);
                         assert.isTrue((calculatedSpeed >= speed-delta) && (calculatedSpeed <= speed+delta));
+                        return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
+                    })
+                    .then(function (playing) {
+                        assert.isTrue(playing);
+                        tests.log(NAME, 'trickMode is disabled after a play command');
                     });
                 }
             });
@@ -119,8 +130,8 @@ define([
             testSetup(streams[i]);
 
             // Performs trick play with differents speeds
-            for (j = 0; j < testConfig.trickCount; j++) {
-                test();
+            for (j = 0; j < speedValues.length; j++) {
+                test(speedValues[j]);
             }
         }
 

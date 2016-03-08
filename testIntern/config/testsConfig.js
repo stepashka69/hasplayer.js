@@ -35,8 +35,7 @@ define(function(require) {
                     pauseCount: 5
                 },
                 trickMode: {
-                    streams:  [ streams.MSS_VOD_4],
-                    trickCount: 5
+                    streams:  [ streams.MSS_VOD_4]
                 },
             },
 
