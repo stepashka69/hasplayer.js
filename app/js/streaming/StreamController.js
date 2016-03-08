@@ -42,20 +42,6 @@ MediaPlayer.dependencies.StreamController = function() {
         subtitlesEnabled = false,
         reloadStream = false,
 
-        play = function() {
-            activeStream.play();
-        },
-
-        pause = function() {
-            if (activeStream) {
-                activeStream.pause();
-            }
-        },
-
-        seek = function(time) {
-            activeStream.seek(time);
-        },
-
         /*
          * Replaces the currently displayed <video> with a new data and corresponding <video> element.
          *
@@ -699,9 +685,21 @@ MediaPlayer.dependencies.StreamController = function() {
             return 0;
         },
 
-        play: play,
-        seek: seek,
-        pause: pause
+        play: function() {
+            activeStream.play();
+        },
+
+        pause: function() {
+            if (activeStream) {
+                activeStream.pause();
+            }
+        },
+
+        seek: function(time) {
+            if (activeStream) {
+                activeStream.seek(time);
+            }
+        },
     };
 };
 
