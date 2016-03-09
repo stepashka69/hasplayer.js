@@ -14,7 +14,7 @@ define(function(require){
 
         // Functional test suite(s) to run in each browser once non-functional tests are completed
         functionalSuites: [
-            /*'testIntern/tests/authent/authent',*/
+            'testIntern/tests/authent/authent',
             'testIntern/tests/play/play',
             'testIntern/tests/play/zapping',
             'testIntern/tests/play/seek',
