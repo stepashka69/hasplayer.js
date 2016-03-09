@@ -20,7 +20,7 @@ define([
         var NAME = 'TEST_ZAPPING';
 
         // Test configuration (see config/testConfig.js)
-        var testConfig = config.tests.play.zapping,
+        var testConfig = config.drm ?  config.tests.play.zappingDrm : config.tests.play.zapping,
             streams = testConfig.streams;
 
         // Test constants

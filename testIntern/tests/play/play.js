@@ -21,7 +21,7 @@ define([
         var NAME = 'TEST_PLAY';
 
         // Test configuration (see config/testConfig.js)
-        var testConfig = config.tests.play.play,
+        var testConfig = config.drm ? config.tests.play.playDrm : config.tests.play.play,
             streams = testConfig.streams;
 
         // Test constants

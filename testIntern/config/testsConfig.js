@@ -9,7 +9,7 @@ define(function(require) {
         ],
 
         asyncTimeout: 10,
-
+        drm:true,
         tests : {
             authent:{
                 authent:{
@@ -20,9 +20,17 @@ define(function(require) {
                 play: {
                     streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
                 },
+                
+                playDrm: {
+                    streams: [streams.MSS_LIVE_1, streams.MSS_LIVE_DRM_M6, streams.MSS_VOD_1, streams.MSS_LIVE_DRM_TF1, streams.MSS_VOD_2]
+                },
 
                 zapping: {
                     streams: [ streams.MSS_LIVE_1, streams.MSS_LIVE_2, streams.MSS_LIVE_MULTI_AUDIO, streams.MSS_LIVE_SUBT_1, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
+                },
+                
+                zappingDrm:{
+                    streams: [ streams.MSS_LIVE_1,streams.MSS_LIVE_DRM_M6, streams.MSS_LIVE_2, streams.MSS_LIVE_MULTI_AUDIO, streams.MSS_LIVE_DRM_TF1, streams.MSS_LIVE_SUBT_1, streams.MSS_VOD_1, streams.MSS_VOD_2 ]
                 },
 
                 seek: {
