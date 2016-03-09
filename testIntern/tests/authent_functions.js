@@ -4,12 +4,12 @@ define([],
         
         var USERS = {
                 PROD:{
-                    email:"maps.poss&#64;orange.fr",
+                    email:"maps.poss@orange.fr",
                     pass:"webtv12"
                 },
 
                 QUALIF:{
-                    email:"vodpcclienta&#64;orange.fr",
+                    email:"vodpcclienta@orange.fr",
                     pass:"Passwd1"
                 }
 
@@ -35,7 +35,10 @@ define([],
             command
             .findById('default_f_credential')
             .clearValue()
-            .click().type(USERS[plateform].email).end()
+            .end()
+            .execute(function(email){
+                document.getElementById('default_f_credential').value = email;
+            },[USERS[plateform].email])
             .findById('default_f_password')
             .clearValue()
             .click().type(USERS[plateform].pass).end()
