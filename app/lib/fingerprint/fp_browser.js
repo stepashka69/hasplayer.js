@@ -52,6 +52,9 @@ function fingerprint_browser() {
         } else if (userAgent.indexOf("trident/7") > -1) { //IE 11+ gets rid of the legacy 'MSIE' in the user-agent string;
             version = 11;
             name = "Internet Explorer";
+        }  else if (/edge[\/\s](\d+\.\d+)/.test(userAgent)) { //test for Firefox/x.x or Firefox x.x (ignoring remaining digits);
+            version = Number(RegExp.$1); // capture x.x portion and store as a number
+            name = "Edge";
         }  else if (/firefox[\/\s](\d+\.\d+)/.test(userAgent)) { //test for Firefox/x.x or Firefox x.x (ignoring remaining digits);
             version = Number(RegExp.$1); // capture x.x portion and store as a number
             name = "Firefox";
