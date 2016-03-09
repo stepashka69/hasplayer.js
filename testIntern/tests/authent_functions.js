@@ -44,7 +44,7 @@ define([],
             .click().type(USERS[plateform].pass).end()
             .findByCssSelector('.sc_default_button_2 input')
             .click().end()
-            .sleep(200)
+            .sleep(2000)
             .then(function(){
                 if(plateform == "QUALIF"){
                     return command.findByXpath('.//font[@color="green"]')
