@@ -3,7 +3,7 @@ define(function () {
 
     var CHROME_CONFIG  = { browserName: 'chrome', /*version: '2.11', */platform: 'WINDOWS',
                              "chromeOptions":{
-                                    /*"args": ["user-data-dir=profiles/chrome/User Data"],*/
+                                    "args": ["user-data-dir"],
                                     "excludeSwitches":["disable-component-update"]
                              }              
                          };
