@@ -1136,7 +1136,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         player.attachSource($scope.selectedItem.url, $scope.selectedItem.protData);
     }
 
-
     $scope.doLoad = function () {
         if ($scope.chromecast.playing){
             $scope.stopInChromecast();
@@ -1166,7 +1165,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.hasLogo = function (item) {
         return (item.hasOwnProperty("logo") && item.logo !== null && item.logo !== undefined && item.logo !== "");
     };
-
 
     // Get initial stream if it was passed in.
     var paramUrl = null;
