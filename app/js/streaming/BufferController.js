@@ -317,9 +317,10 @@ MediaPlayer.dependencies.BufferController = function() {
             
             lastDownloadedSegmentDuration = request.duration;
 
-            if (!isRunning()) {
-                return;
-            }
+            // Push segment into buffer even if BufferController is stopped, since FragmentLoader would indicate this segment already loaded
+            // if (!isRunning()) {
+            //     return;
+            // }
 
             // Reset segment download error status
             segmentDownloadFailed = false;
@@ -1403,6 +1404,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 this.fragmentController = value;
                 fragmentModel = this.fragmentController.attachBufferController(this);
                 fragmentModel.fragmentLoader.subscribe(MediaPlayer.dependencies.FragmentLoader.eventList.ENAME_LOADING_PROGRESS, this);
+                fragmentModel.setType(type);
             }
         },
 
