@@ -44,18 +44,18 @@ define({
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest"
     },
     
-    MSS_LIVE_DRM_TF1:{
-        "name": "TF1 (QUALIF)",
+    MSS_LIVE_DRM_1: {
+        "name": "TF1-DRM",
         "protocol": "MSS",
         "type":"Live",
-        "tvmUrl": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/channels/192/url"
+        "url": "http://{platform_url}/live-webapp/v2/PC/channels/192/url"
     },
     
-    MSS_LIVE_DRM_M6:{
-        "name": "M6 (QUALIF)",
+    MSS_LIVE_DRM_2: {
+        "name": "M6-DRM",
         "protocol": "MSS",
         "type":"Live",
-        "tvmUrl": "http://qualif.r3pc-live.rec.orange.fr/live-webapp/v2/PC/channels/118/url"
+        "url": "http://{platform_url}/live-webapp/v2/PC/channels/118/url"
     },
 
     MSS_VOD_1: {
@@ -77,28 +77,20 @@ define({
         "name": "Volver",
         "protocol": "MSS",
         "type": "VOD",
-        "url": "http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest"
-    },
-
-    MSS_VOD_4: {
-        "name": "Volver Long Version",
-        "protocol": "MSS",
-        "type": "VOD",
         "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest"
     },
 
     MSS_VOD_MULTI_AUDIO: {
-        "name": "Arte  (multi-audio)",
+        "name": "Arte (multi-audio)",
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest"
     },
 
     MSS_LIVE_MANIFEST_ERROR: {
-        "name": "France 2",
+        "name": "France 2 (Manifest error)",
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest2",
-    }   
-    
+    }
 });

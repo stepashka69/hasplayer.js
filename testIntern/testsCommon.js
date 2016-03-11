@@ -1,7 +1,8 @@
-define(function(require){
+define(function(require) {
 
-    var seleniumConfig = require('./config/seleniumRemote');
     var browsersConfig = require('./config/browsers');
+    var seleniumConfigs = require('./config/selenium');
+    var seleniumConfig = seleniumConfigs.remote;
 
     var conf = {
         // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
@@ -16,12 +17,12 @@ define(function(require){
         functionalSuites: [
             'testIntern/tests/authent/authent',
             'testIntern/tests/play/play',
-            'testIntern/tests/play/zapping',
-            'testIntern/tests/play/seek',
-            'testIntern/tests/play/pause',
-            'testIntern/tests/api/getVideoBitrates',
-            'testIntern/tests/error/downloadErrManifest',
-            'testIntern/tests/play/trickMode'
+            // 'testIntern/tests/play/zapping',
+            // 'testIntern/tests/play/seek',
+            // 'testIntern/tests/play/pause',
+            // 'testIntern/tests/api/getVideoBitrates',
+            // 'testIntern/tests/error/downloadErrManifest',
+            // 'testIntern/tests/play/trickMode'
         ],
 
         // The amount of time, in milliseconds, an asynchronous test can run before it is considered timed out. By default this value is 30 seconds.
@@ -32,7 +33,7 @@ define(function(require){
     };
 
     // Check if some parameters are redefined in command line
-    process.argv.forEach(function (val, index, array) {
+    process.argv.forEach(function (val/*, index, array*/) {
         var param = val.split('='),
             name,
             value;
@@ -49,20 +50,13 @@ define(function(require){
                 conf.environments = browsersConfig[value];
                 break;
             case 'selenium':
-                switch (value) {
-                    case 'local':
-                        seleniumConfig = require('./config/seleniumLocal');
-                        break;
-                    case 'remote':
-                        seleniumConfig = require('./config/seleniumRemote');
-                        break;
-                }
+                seleniumConfig = seleniumConfigs[value];
+                break;
         }
     });
 
     conf = Object.assign(conf, seleniumConfig);
-
-    console.log(conf);
+    console.log("Tests configuration:\n", conf);
 
     return conf;
 });
