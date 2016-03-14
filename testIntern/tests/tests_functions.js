@@ -40,8 +40,6 @@ define([],
                         reject(result);
                     }
                 );
-
-
             });
             return p;
         }

@@ -4,11 +4,11 @@ define([], function () {
 
         loadStream: function(stream) {
             // console.log('load stream', stream);
-            if(stream.tvmUrl){
-                streamsPanel.loadTVMSource(stream, function(tvmStream){
+            if(stream.tvmUrl) {
+                streamsPanel.loadTVMSource(stream, function(tvmStream) {
                     orangeHasPlayer.load(tvmStream.url, tvmStream.protData);
                 })
-            }else{    
+            } else {    
                 orangeHasPlayer.load(stream.url, stream.protData);
             }
         },
@@ -35,11 +35,11 @@ define([], function () {
             orangeHasPlayer.seek(pos);
         },
 
-        setTrickModeSpeed: function(speed){
+        setTrickModeSpeed: function(speed) {
             orangeHasPlayer.setTrickModeSpeed(speed);
         },
 
-        getTrickModeSpeed: function(speed){
+        getTrickModeSpeed: function(speed) {
             return orangeHasPlayer.getTrickModeSpeed();
         },
 
@@ -57,11 +57,17 @@ define([], function () {
         },
 
         getErrorCode: function (done) {
-            var onError = function(error) {
+            var error = orangeHasPlayer.getError(),
+                onError = function(err) {
                     orangeHasPlayer.removeEventListener('error', onError);
-                    done(error.data.code);
+                    done(err.data.code);
                 };
-            orangeHasPlayer.addEventListener('error', onError);
+
+            if (error) {
+                done(error.data.code);
+            } else {
+                orangeHasPlayer.addEventListener('error', onError);
+            }
         }
     };
 });
