@@ -64,7 +64,7 @@ define([], function () {
                 };
 
             if (error) {
-                done(error.data.code);
+                done(error.code);
             } else {
                 orangeHasPlayer.addEventListener('error', onError);
             }

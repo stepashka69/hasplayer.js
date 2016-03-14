@@ -94,9 +94,18 @@ define(function(require) {
             },
 
             error: {
-                downloadErrManifest: {
+                errorManifest: {
                     streams: [
-                        streams.MSS_LIVE_MANIFEST_ERROR
+                        streams.MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR,
+                        streams.MSS_LIVE_MANIFEST_ERROR,
+                        streams.MSS_LIVE_MALFORMED_MANIFEST_ERROR,
+                        streams.MSS_LIVE_UNSUPPORTED_AUDIO_CODEC_ERROR
+                    ],
+                    expectedErrorCode: [
+                        'MANIFEST_ERR_PARSE',
+                        'DOWNLOAD_ERR_MANIFEST',
+                        'MANIFEST_ERR_PARSE',
+                        'MEDIA_ERR_CODEC_UNSUPPORTED'
                     ]
                 }
             }

@@ -92,5 +92,23 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest2",
+    },
+    MSS_LIVE_MALFORMED_MANIFEST_ERROR: {
+        "name": "France 2 (Malformed Manifest error)",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Manifest%20Error/Manifest",
+    },
+    MSS_LIVE_UNSUPPORTED_AUDIO_CODEC_ERROR: {
+        "name": "France 2 (Unsupported audio codec error)",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Audio%20Unsupported%20Codec/Manifest",
+    },
+    MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR: {
+        "name": "France 2 (Unknown Manifest type error)",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2-%20Unknown%20Manifest%20type/Manifest",
     }
 });
