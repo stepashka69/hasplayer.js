@@ -24,6 +24,8 @@ OrangeHasPlayer = function() {
         mediaPlayer,
         debug,
         video,
+        error = null,
+        warning = null,
         isFullScreen = false,
         isSubtitleVisible = false,
         audioTracks = [],
@@ -251,6 +253,15 @@ OrangeHasPlayer = function() {
                 break;
         }
     };
+
+    var _onError = function(e) {
+        error = e.data;
+    };
+
+    var _onWarning = function(e) {
+        warning = e.data;
+    };
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -279,6 +290,8 @@ OrangeHasPlayer = function() {
 
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
+        mediaPlayer.addEventListener("error", _onError.bind(this));
+        mediaPlayer.addEventListener("warning", _onWarning.bind(this));
         video.addEventListener("timeupdate", _onTimeupdate);
         window.addEventListener("keydown", _handleKeyPressedEvent);
     };
@@ -358,6 +371,28 @@ OrangeHasPlayer = function() {
         }
     };
 
+    /////////// ERROR/WARNING
+
+    /**
+     * Returns the Error object for the most recent error
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {object} the Error object for the most recent error, or null if there has not been an error..
+     */
+    this.getError = function() {
+        return error;
+    };
+
+    /**
+     * Returns the Warning object for the most recent warning
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {object} the Warning object for the most recent warning, or null if there has not been a warning..
+     */
+    this.getWarning = function() {
+        return warning;
+    };
+
     /////////// PLAYBACK
 
     /**
@@ -428,6 +463,9 @@ OrangeHasPlayer = function() {
             mediaPlayer.setDefaultAudioLang(defaultAudioLang);
             //init default subtitle language
             mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
+
+            error = null;
+            warning = null;
 
             mediaPlayer.attachSource(url, protData);
             if (mediaPlayer.getAutoPlay()) {
