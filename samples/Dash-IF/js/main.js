@@ -670,6 +670,9 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
                 metricsAgent.stop();
             }
         }
+
+        //alert('ERROR - '  + e.data.code + ":\n" + JSON.stringify(e, null, '  '));
+        alert(e.data.code);
     }
 
     ////////////////////////////////////////
