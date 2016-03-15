@@ -118,9 +118,21 @@ define({
         "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte%20-%20Wrong%20audio%20codec%20data/manifest",
     },
     MSS_LIVE_EMPTY_VIDEO_FOURCC_ERROR: {
-        "name": "France 2 (FourCC empty value)",
+        "name": "France 2 (FourCC video empty value)",
         "protocol": "MSS",
         "type": "Live",
         "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20empty/Manifest",
+    },
+    MSS_LIVE_VIDEO_FOURCC_UNSUPPORTED_ERROR: {
+        "name": "France 2 (FourCC video unsupported value)",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20Unsupported/Manifest",
+    },
+    HLS_LIVE_MANIFEST_MISSING_ERROR: {
+        "name": "France 2 (M3U8 manifest missing)",
+        "protocol": "HLS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1%20-%20Manifest%20missing",
     }
 });
