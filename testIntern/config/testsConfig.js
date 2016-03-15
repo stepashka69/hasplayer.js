@@ -99,12 +99,16 @@ define(function(require) {
                         streams.MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR,
                         streams.MSS_LIVE_MANIFEST_ERROR,
                         streams.MSS_LIVE_MALFORMED_MANIFEST_ERROR,
-                        streams.MSS_LIVE_UNSUPPORTED_AUDIO_CODEC_ERROR
+                        streams.MSS_LIVE_UNSUPPORTED_AUDIO_CODEC_ERROR,
+                        streams.MSS_VOD_WRONG_AUDIO_CODEC_ERROR,
+                        streams.MSS_LIVE_EMPTY_VIDEO_FOURCC_ERROR
                     ],
                     expectedErrorCode: [
                         'MANIFEST_ERR_PARSE',
                         'DOWNLOAD_ERR_MANIFEST',
                         'MANIFEST_ERR_PARSE',
+                        'MEDIA_ERR_CODEC_UNSUPPORTED',
+                        'MEDIA_ERR_CODEC_UNSUPPORTED',
                         'MEDIA_ERR_CODEC_UNSUPPORTED'
                     ]
                 }

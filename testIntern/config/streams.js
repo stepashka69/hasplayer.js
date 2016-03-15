@@ -110,5 +110,17 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2-%20Unknown%20Manifest%20type/Manifest",
+    },
+    MSS_VOD_WRONG_AUDIO_CODEC_ERROR: {
+        "name": "Arte (Wrong audio codec data)",
+        "protocol": "MSS",
+        "type": "VOD",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte%20-%20Wrong%20audio%20codec%20data/manifest",
+    },
+    MSS_LIVE_EMPTY_VIDEO_FOURCC_ERROR: {
+        "name": "France 2 (FourCC empty value)",
+        "protocol": "MSS",
+        "type": "Live",
+        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20empty/Manifest",
     }
 });
