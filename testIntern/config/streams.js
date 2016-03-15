@@ -5,14 +5,18 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
-        "videoBitrates": [226000, 400000, 680000, 1200000, 2100000]
+        "videoBitrates": [226000, 400000, 680000, 1200000, 2100000],
+        "video_fragment_pattern":"(video)",
+        "audio_fragment_pattern":"(audio)"
     },
 
     MSS_LIVE_2: {
         "name": "BFMTV",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest",
+        "video_fragment_pattern":"(video)",
+        "audio_fragment_pattern":"(audio)"
     },
 
 
