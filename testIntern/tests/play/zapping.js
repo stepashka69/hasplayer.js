@@ -68,8 +68,6 @@ define([
             });
         };
 
-        var streams = testConfig.streams;
-
         // Setup (load test page)
         testSetup();
 
