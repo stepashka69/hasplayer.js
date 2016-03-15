@@ -68,6 +68,19 @@ define([], function () {
             } else {
                 orangeHasPlayer.addEventListener('error', onError);
             }
+        },
+        
+        getWarningCode: function(done){
+            var warning = orangeHasPlayer.getWarning(),
+                onWarning = function(warn){
+                    orangeHasPlayer.removeEventListener('warning', onWarning);
+                    done(warn.data.code);
+                }
+                if(warning){
+                    done(warning.data.code);
+                }else{
+                    orangeHasPlayer.addEventListener('warning', onWarning);
+                }
         }
     };
 });
