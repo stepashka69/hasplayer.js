@@ -47,8 +47,8 @@ define(function(require) {
         seleniumConfig = seleniumConfigs[intern.args.selenium];
     }
 
-    if (intern.args.browser) {
-        conf.environments = browsersConfig[intern.args.browser];
+    if (intern.args.browsers) {
+        conf.environments = browsersConfig[intern.args.browsers];
     }
 
     conf = Object.assign(conf, seleniumConfig);
