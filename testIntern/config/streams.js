@@ -48,14 +48,14 @@ define({
         "name": "TF1-DRM",
         "protocol": "MSS",
         "type":"Live",
-        "url": "http://{platform_url}/live-webapp/v2/PC/channels/192/url"
+        "tvmUrl": "http://{platform_url}/live-webapp/v2/PC/channels/192/url"
     },
     
     MSS_LIVE_DRM_2: {
         "name": "M6-DRM",
         "protocol": "MSS",
         "type":"Live",
-        "url": "http://{platform_url}/live-webapp/v2/PC/channels/118/url"
+        "tvmUrl": "http://{platform_url}/live-webapp/v2/PC/channels/118/url"
     },
 
     MSS_VOD_1: {

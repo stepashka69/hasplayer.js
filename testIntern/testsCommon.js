@@ -1,7 +1,17 @@
 define(function(require) {
 
-    var browsersConfig = require('./config/browsers');
+    var intern = require('intern');
+
     var seleniumConfigs = require('./config/selenium');
+    var browsersConfig = require('./config/browsers');
+    var applications = require('./config/applications');
+    var platforms = require('./config/platforms');
+    var streams = require('./config/streams');
+    var testsConfig = require('./config/testsConfig');
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Selenium configuration
+
     var seleniumConfig = seleniumConfigs.remote;
 
     var conf = {
@@ -32,31 +42,40 @@ define(function(require) {
         excludeInstrumentation : /^tests|bower_components|node_modules|testIntern/
     };
 
-    // Check if some parameters are redefined in command line
-    process.argv.forEach(function (val/*, index, array*/) {
-        var param = val.split('='),
-            name,
-            value;
+    // Selenium configuration from command line
+    if (intern.args.selenium) {
+        seleniumConfig = seleniumConfigs[intern.args.selenium];
+    }
 
-        if (param.length !== 2) {
-            return;
-        }
-
-        name = param[0];
-        value = param[1];
-
-        switch (name) {
-            case 'browsers':
-                conf.environments = browsersConfig[value];
-                break;
-            case 'selenium':
-                seleniumConfig = seleniumConfigs[value];
-                break;
-        }
-    });
+    if (intern.args.browser) {
+        conf.environments = browsersConfig[intern.args.browser];
+    }
 
     conf = Object.assign(conf, seleniumConfig);
-    console.log("Tests configuration:\n", conf);
+    console.log("Selenium configuration:\n", conf);
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Tests configuration parameters
+
+    // Tests configuration from command line
+
+    // application=<development|master>
+    testsConfig.testPage = intern.args.application ? [applications.OrangeHasPlayer[intern.args.application]] : [applications.OrangeHasPlayer.development];
+
+    // platform=<prod|qualif>
+    testsConfig.platform = intern.args.platform ? platforms[intern.args.platform] : platforms.prod;
+
+    // drm=<true|false>
+    testsConfig.drm = intern.args.drm ? (intern.args.drm !== 'false') : true;
+
+    // Modify streams tvmUrl according to selected platform
+    for (var stream in streams) {
+        if (streams[stream].tvmUrl && streams[stream].tvmUrl.indexOf('{platform_url}') !== -1) {
+            streams[stream].tvmUrl = streams[stream].tvmUrl.replace('{platform_url}', testsConfig.platform.streams_base_url);
+        }
+    }
+    console.log("Intern:\n", testsConfig);
 
     return conf;
 });

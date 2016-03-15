@@ -8,29 +8,20 @@ define([
     'intern!object',
     'intern/chai!assert',
     'require',
-    'testIntern/config/streams',
     'testIntern/config/testsConfig',
+    'testIntern/config/streams',
     'testIntern/tests/tests_functions',
     'testIntern/tests/authent_functions'
-    ], function(registerSuite, assert, require, streams, config, tests, authent) {
+    ], function(registerSuite, assert, require, config, streams, tests, authent) {
 
         // Suite name
         var NAME = 'TEST_AUTHENT';
 
         // Test configuration (see config/testConfig.js)
-        //var testConfig = config.tests.authent.authent;
+        // var testConfig = intern.testsConfig.tests.authent.authent;
         
         // Test variables
         var command = null;
-
-
-        var setStreamsUrl = function () {
-            for (var stream in streams) {
-                if (streams[stream].url.indexOf('{platform_url}') !== -1) {
-                    streams[stream].url = streams[stream].url.replace('{platform_url}', config.platform.streams_base_url);
-                }
-            }
-        };
         
         var test = function() {
 
@@ -53,9 +44,6 @@ define([
                 }
             });
         };
-        
-        // Set streams url according to platform
-        setStreamsUrl();
 
         test();
 });
