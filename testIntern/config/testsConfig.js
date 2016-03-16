@@ -107,6 +107,11 @@ define(function(require) {
                         streams: [
                             streams.MSS_VOD_4
                         ]
+                    },
+                    changeSubtitleVisibility: {
+                        streams: [
+                            streams.MSS_VOD_4
+                        ]
                     }
                 },
 

@@ -36,6 +36,7 @@ define(function(require) {
             'testIntern/tests/api/getSubtitleLanguages',
             'testIntern/tests/audio/setAudioLanguage',
             'testIntern/tests/subtitle/setSubtitleLanguage',
+            'testIntern/tests/subtitle/changeSubtitleVisibility',
             'testIntern/tests/play/trickMode'
         ],
 
