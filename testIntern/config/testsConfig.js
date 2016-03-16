@@ -116,13 +116,14 @@ define(function(require) {
                 },
 
                 error: {
-                    downloadErrorContent:{
-                        streams:[
-                            streams.MSS_LIVE_2
-                        ],
-                        warnCode:"DOWNLOAD_ERR_CONTENT",
-                        errorCode:"DOWNLOAD_ERR_CONTENT"
-                    },
+					 downloadErrorContent:{
+                    	streams:[
+                        
+                        	streams.MSS_LIVE_2
+                    	],
+                    	warnCode:"DOWNLOAD_ERR_CONTENT",
+                    	errorCode:"DOWNLOAD_ERR_CONTENT"
+                	},
                     errorManifest: {
                         streams: [
                             streams.MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR,
