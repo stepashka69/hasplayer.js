@@ -86,6 +86,11 @@ define(function(require) {
                         streams: [
                             streams.MSS_LIVE_1
                         ]
+                    },
+                    getSubtitleLanguages: {
+                        streams: [
+                            streams.MSS_LIVE_SUBT_2
+                        ]
                     }
                 },
 

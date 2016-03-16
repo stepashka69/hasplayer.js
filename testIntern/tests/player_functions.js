@@ -51,6 +51,10 @@ define([], function () {
             return orangeHasPlayer.getAudioTracks();
         },
 
+        getSubtitleLanguages: function() {
+            return orangeHasPlayer.getSubtitleTracks();
+        },
+
         waitForEvent: function (event, done) {
             var onEventHandler = function() {
                     orangeHasPlayer.removeEventListener(event, onEventHandler);

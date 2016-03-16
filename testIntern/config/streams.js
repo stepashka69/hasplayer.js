@@ -39,7 +39,8 @@ define({
         "name": "Arte (subtitles)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+        "subtitleTracks": [{lang:'fra', id:'301_fra'}]
     },
 
     MSS_LIVE_DVR: {

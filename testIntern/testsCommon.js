@@ -33,6 +33,7 @@ define(function(require) {
             'testIntern/tests/api/getVideoBitrates',
             'testIntern/tests/error/errorManifest',
             'testIntern/tests/api/getAudioLanguages',
+            'testIntern/tests/api/getSubtitleLanguages',
             'testIntern/tests/play/trickMode'
         ],
 
