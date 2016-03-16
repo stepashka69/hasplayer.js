@@ -1214,7 +1214,7 @@ Dash.dependencies.DashHandler = function() {
         getCurrentTime: getCurrentTime,
         getSegmentCountForDuration: getSegmentCountForDuration,
         updateSegmentList: updateSegmentList,
-        getIFrameRequest: getIFrameRequest 
+        getIFrameRequest: getIFrameRequest
     };
 };
 
