@@ -17,9 +17,6 @@ define([
         // Suite name
         var NAME = 'TEST_AUTHENT';
 
-        // Test configuration (see config/testConfig.js)
-        // var testConfig = intern.testsConfig.tests.authent.authent;
-        
         // Test variables
         var command = null;
         
@@ -37,7 +34,6 @@ define([
                 authentificate: function() {
                     return authent.connectUser(command, config.platform)
                     .then(function(text) {
-                        console.info("resolved",text);
                         assert.strictEqual(text,config.platform.authent.user.email, "user is authenticated if email is retrieved in request response");
                     }, function(){
                         assert.isTrue(false);

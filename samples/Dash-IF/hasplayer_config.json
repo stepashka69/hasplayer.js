@@ -56,6 +56,7 @@
 
     "// audio" : "Audio media parameters that override general parameters",
     "audio": {
+        "ABR.minQuality": 1
     }
 }
 

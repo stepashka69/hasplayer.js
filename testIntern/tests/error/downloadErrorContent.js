@@ -43,24 +43,24 @@ define(['intern!object',
 
 
                 videoError: function() {
-                    tests.logLoadStream(NAME, stream);
-                    var not_found = proxyConfig.rules.not_found;
-                        not_found.pattern = stream.video_fragment_pattern;
-                        console.log("not found", not_found);
-                    return tests.executeAsync(command, proxy.executeRule, [not_found, proxyConfig.url], ASYNC_TIMEOUT)
-                    .then(function(id) {
-                        if(id){
-                            ruleId = id;
-                            console.info("ruleId", ruleId);
-                           return tests.executeAsync(command, player.getWarning, [],ASYNC_TIMEOUT);
-                        }else{
-                            assert.fail("cannot execute rule on proxy test failed");
-                        }
-                    })
-                    .then(function(warnCode){
-                        console.info("warnCode");
-                        assert.strictEqual(warnCode, testConfig.warnCode);
-                    });
+                        tests.logLoadStream(NAME, stream);
+                        var not_found = proxyConfig.rules.not_found;
+                            not_found.pattern = stream.video_fragment_pattern;
+                        return command.execute(player.loadStream, [stream])
+                        .then(tests.executeAsync.bind(null,command, proxy.executeRule, [not_found, proxyConfig.url], ASYNC_TIMEOUT))
+                       .then(function(id) {
+                            if(id){
+                                ruleId = id;
+                                console.info("ruleId", ruleId);
+                            return tests.executeAsync(command, player.getWarning, [],ASYNC_TIMEOUT);
+                            }else{
+                                assert.fail("cannot execute rule on proxy test failed");
+                            }
+                        })
+                        .then(function(warnCode){
+                            console.info("warnCode");
+                            assert.strictEqual(warnCode, testConfig.warnCode);
+                        });
                 }
             });
      };

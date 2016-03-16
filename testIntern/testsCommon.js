@@ -32,6 +32,7 @@ define(function(require) {
             'testIntern/tests/play/pause',
             'testIntern/tests/api/getVideoBitrates',
             'testIntern/tests/error/errorManifest',
+			'testIntern/tests/error/downloadErrorContent',
             'testIntern/tests/api/getAudioLanguages',
             'testIntern/tests/api/getSubtitleLanguages',
             'testIntern/tests/audio/setAudioLanguage',
