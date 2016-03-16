@@ -6,7 +6,14 @@ define([], function() {
         connectUser: function(command, platform) {
             console.log(platform);
             var p = new Promise((function(resolve, reject) {
-                command.get(require.toUrl([platform.authent.url]))
+                var url = platform.authent.url;
+                console.info("url",url);
+                url = url.replace("{service}", platform.authent.service);
+                 console.info("url",url);
+                url = url.replace("{user.email}", platform.authent.user.email);
+                url = url.replace("{user.pwd}", platform.authent.user.pwd);
+                console.info("url", url);
+                command.get(require.toUrl([url]))
                 .then(this.onWassupLoaded.bind(this, command, platform, resolve, reject), this.onError.bind(this, reject));
             }).bind(this));
 
@@ -15,30 +22,9 @@ define([], function() {
 
         onWassupLoaded: function(command, platform, resolve, reject) {
             command
-            .findById('default_f_credential')
-            .clearValue()
-            .end()
-            .execute(function(email) {
-                document.getElementById('default_f_credential').value = email;
-            }, [platform.authent.user.email])
-            .findById('default_f_password')
-            .clearValue()
-            .click().type(platform.authent.user.pwd).end()
-            .findByCssSelector('.sc_default_button_2 input')
-            .click().end()
-            .sleep(2000)
-            .then(function() {
-                if (platform.name == "QUALIF") {
-                    return command.findByXpath('.//font[@color="green"]')
-                    .getVisibleText()
-                    .then(resolve, reject);
-                } else {
-                    return function() {
-                        resolve("OK");
-                    };
-                }
-            }, reject);
-            
+            .findByXpath('.//ident[@name="ulo"]')
+            .getSpecAttribute('value')
+            .then(resolve, reject);           
         },
 
         onError: function(reject) {

@@ -37,7 +37,8 @@ define([
                 authentificate: function() {
                     return authent.connectUser(command, config.platform)
                     .then(function(text) {
-                        assert.equal(text, "OK", "user is authenticated if value is OK");
+                        console.info("resolved",text);
+                        assert.strictEqual(text,config.platform.authent.user.email, "user is authenticated if email is retrieved in request response");
                     }, function(){
                         assert.isTrue(false);
                     });
