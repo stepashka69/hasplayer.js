@@ -34,6 +34,8 @@ define(function(require) {
             'testIntern/tests/error/errorManifest',
             'testIntern/tests/api/getAudioLanguages',
             'testIntern/tests/api/getSubtitleLanguages',
+            'testIntern/tests/audio/setAudioLanguage',
+            'testIntern/tests/subtitle/setSubtitleLanguage',
             'testIntern/tests/play/trickMode'
         ],
 

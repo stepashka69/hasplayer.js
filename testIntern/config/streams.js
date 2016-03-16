@@ -86,6 +86,13 @@ define({
         "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest"
     },
 
+    MSS_VOD_4:{
+        "name": "Arte",
+        "protocol": "MSS",
+        "type": "VOD",
+        "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+    },
+
     MSS_VOD_MULTI_AUDIO: {
         "name": "Arte (multi-audio)",
         "protocol": "MSS",

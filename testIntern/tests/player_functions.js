@@ -51,8 +51,28 @@ define([], function () {
             return orangeHasPlayer.getAudioTracks();
         },
 
+        getSelectedAudioLanguage: function() {
+            return orangeHasPlayer.getSelectedAudioTrack();
+        },
+
+        setSelectedAudioLanguage: function(audioTrack) {
+            return orangeHasPlayer.setAudioTrack(audioTrack);
+        },
+
         getSubtitleLanguages: function() {
             return orangeHasPlayer.getSubtitleTracks();
+        },
+
+        getSelectedSubtitleLanguage: function() {
+            return orangeHasPlayer.getSelectedSubtitleTrack();
+        },
+
+        setSelectedSubtitleLanguage: function(subtitleTrack) {
+            return orangeHasPlayer.setSubtitleTrack(subtitleTrack);
+        },
+
+        setSubtitlesVisibility: function(state) {
+            return orangeHasPlayer.setSubtitleVisibility(state);
         },
 
         waitForEvent: function (event, done) {

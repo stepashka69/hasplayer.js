@@ -94,6 +94,22 @@ define(function(require) {
                     }
                 },
 
+                audio: {
+                    setAudioLanguage: {
+                        streams: [
+                            streams.MSS_LIVE_1
+                        ]
+                    }
+                },
+
+                subtitle: {
+                    setSubtitleLanguage: {
+                        streams: [
+                            streams.MSS_VOD_4
+                        ]
+                    }
+                },
+
                 error: {
                     downloadErrorContent:{
                         streams:[
