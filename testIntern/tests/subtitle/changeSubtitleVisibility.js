@@ -66,7 +66,7 @@ define([
                         return command.execute(player.getSelectedSubtitleLanguage);
                     })
                     .then(function (subtitleTrack) {
-                        assert.isTrue(subtitleTrack !== undefined);
+                        assert.isTrue(subtitleTrack !== null);
                         return command.execute(player.setSubtitlesVisibility,[false]);
                     })
                     .then(function () {
@@ -74,7 +74,7 @@ define([
                         return command.execute(player.getSelectedSubtitleLanguage);
                     })
                     .then(function (subtitleTrack) {
-                        assert.isTrue(subtitleTrack === undefined);
+                        assert.isTrue(subtitleTrack === null);
                     });
                 }
             });
