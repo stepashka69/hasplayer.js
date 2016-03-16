@@ -47,6 +47,10 @@ define([], function () {
             return orangeHasPlayer.getVideoBitrates();
         },
 
+        getAudioLanguages: function() {
+            return orangeHasPlayer.getAudioTracks();
+        },
+
         waitForEvent: function (event, done) {
             var onEventHandler = function() {
                     orangeHasPlayer.removeEventListener(event, onEventHandler);

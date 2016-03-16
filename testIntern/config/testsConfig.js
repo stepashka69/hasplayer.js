@@ -81,18 +81,22 @@ define(function(require) {
                             streams.MSS_LIVE_1,
                             streams.MSS_VOD_1
                         ]
+                    },
+                    getAudioLanguages: {
+                        streams: [
+                            streams.MSS_LIVE_1
+                        ]
                     }
                 },
 
                 error: {
-					 downloadErrorContent:{
-                    	streams:[
-                        
-                        	streams.MSS_LIVE_2
-                    	],
-                    	warnCode:"DOWNLOAD_ERR_CONTENT",
-                    	errorCode:"DOWNLOAD_ERR_CONTENT"
-                	},
+                    downloadErrorContent:{
+                        streams:[
+                            streams.MSS_LIVE_2
+                        ],
+                        warnCode:"DOWNLOAD_ERR_CONTENT",
+                        errorCode:"DOWNLOAD_ERR_CONTENT"
+                    },
                     errorManifest: {
                         streams: [
                             streams.MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR,
