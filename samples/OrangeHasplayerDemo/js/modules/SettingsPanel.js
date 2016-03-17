@@ -118,6 +118,14 @@ SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track) {
 SettingsPanel.prototype.onEnableSubtitles = function() {
     this.subtitleListCombobox.disabled = !this.enableSubtitlesCheckbox.checked;
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
+    //if subtitles have not been activated yet, initialize the first selected track
+    if (!this.currentsubtitleTrack) {
+        this.currentsubtitleTrack = orangeHasPlayer.getSelectedSubtitleTrack();
+        var index = this.getTrackIndex(this.subtitleTracks, this.currentsubtitleTrack.id);
+        if (index > -1) {
+            this.subtitleListCombobox.selectedIndex = index;
+        }
+    }
 };
 
 SettingsPanel.prototype.onSubtitleChangedFromPlayer = function(track) {
@@ -195,9 +203,11 @@ SettingsPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selected
     this.enableSubtitlesCheckbox.disabled = this.subtitleTracks.length > 0 ? false : true;
     this.currentsubtitleTrack = _selectedSubtitleTrack;
 
-    if (this.subtitleTracks && this.currentsubtitleTrack) {
+    if (this.subtitleTracks) {
         this.addCombo(this.subtitleTracks, this.subtitleListCombobox);
-        this.selectCombo(this.subtitleTracks, this.subtitleListCombobox, this.currentsubtitleTrack);
+        if (this.currentsubtitleTrack) {
+            this.selectCombo(this.subtitleTracks, this.subtitleListCombobox, this.currentsubtitleTrack);
+        }
     }
 };
 
@@ -208,6 +218,7 @@ SettingsPanel.prototype.addCombo = function(tracks, combo) {
         option = document.createElement('option');
         option.text = tracks[i].id;
         option.value = tracks[i].lang;
+        option.id = tracks[i].id;
 
         try {
             combo.add(option, null); //Standard

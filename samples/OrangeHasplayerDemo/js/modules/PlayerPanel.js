@@ -437,7 +437,9 @@ PlayerPanel.prototype.onFullScreenClicked = function() {
         }
         document.getElementById('demo-player-container').className = 'demo-player';
     }
-    this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
+    if (this.subtitlesCSSStyle) {
+        this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
+    }
 };
 
 PlayerPanel.prototype.resetSeekbar = function() {
