@@ -30,6 +30,7 @@ define(function(require) {
             'testIntern/tests/play/zapping',
             'testIntern/tests/play/seek',
             'testIntern/tests/play/pause',
+            'testIntern/tests/play/stop',
             'testIntern/tests/error/errorManifest',
             'testIntern/tests/error/downloadErrorContent',
             'testIntern/tests/api/getVideoBitrates',

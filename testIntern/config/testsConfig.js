@@ -19,6 +19,13 @@ define(function(require) {
                             streams.HLS_LIVE_2
                         ]
                     },
+
+                    stop: {
+                        streams: [
+                            streams.MSS_VOD_1,
+                            streams.MSS_VOD_2
+                        ]
+                    },
                     
                     playDrm: {
                         streams: [

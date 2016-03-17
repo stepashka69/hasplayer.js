@@ -25,6 +25,10 @@ define([], function () {
             orangeHasPlayer.pause();
         },
 
+        stop: function() {
+            orangeHasPlayer.stop();
+        },
+
         seek: function(pos, done) {
             var onSeeked = function() {
                     orangeHasPlayer.removeEventListener('seeked', onSeeked);
