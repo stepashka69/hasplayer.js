@@ -1185,6 +1185,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
     }
 
+    var sendJsonReq = function (url) {
+        var deferred = Q.defer(),
+            req = new XMLHttpRequest();
+
+        req.onload = function() {
+            if (req.status === 200) {
+                deferred.resolve(req.responseText);
+            }
+        };
+        req.open("GET", url, true);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send();
+
+        return deferred.promise;
+    };
 
     ///////////////////////////////// RIGHTV ////////////////////////////////////
     if (vars && vars.hasOwnProperty("rightv")) {
@@ -1197,11 +1212,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     rightvConfigReq.onload = function() {
         if (rightvConfigReq.status === 200) {
             rightvConfig = JSON.parse(rightvConfigReq.responseText);
-            $scope.rightv_url = rightvConfig.url;
+            $scope.rightv_service_url = rightvConfig.service_url;
+            $scope.rightv_login_url = rightvConfig.login_url;
+            $scope.rightv_order_url = rightvConfig.order_url;
+            $scope.rightv_video_playing_infos_url = rightvConfig.video_playing_infos_url;
             $scope.licenser_base_url = rightvConfig.licenser_base_url;
-            $scope.language_code = rightvConfig.language_code;
-            $scope.model_external_id = rightvConfig.model_external_id;
-            $scope.serial_number = rightvConfig.serial_number;
             $scope.video_external_id = rightvConfig.video_external_id;
         }
     };
@@ -1210,40 +1225,79 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     rightvConfigReq.send();
 
     $scope.doGetVideoPlayingInfo = function () {
-
-        var url = $scope.rightv_url;
-        url += '&language_code=' + $scope.language_code;
-        url += '&model_external_id=' + $scope.model_external_id;
-        url += '&serial_number=' + $scope.serial_number;
-        url += '&video_external_id=' + $scope.video_external_id;
-
-        var req = new XMLHttpRequest();
-        req.onload = function() {
-            if (req.status === 200) {
-                var videoInfos = JSON.parse(req.responseText);
-                if (videoInfos.response.status === 'FAILURE') {
-                    alert(videoInfos.response.code + ' - ' + videoInfos.response.message);
-                } else {
-                    $scope.selectedItem = {
-                        'url': videoInfos.response.url,
-                        'protData': {
-                            'com.microsoft.playready': {
-                                laURL: $scope.licenser_base_url + 'drm?token=' + window.encodeURIComponent(videoInfos.response.token)
-                            },
-                            'com.widevine.alpha': {
-                                laURL: $scope.licenser_base_url + 'widevinedrm?token=' + window.encodeURIComponent(videoInfos.response.token)
-                            }
+        sendJsonReq($scope.rightv_service_url).then(function (/*response*/) {
+            sendJsonReq($scope.rightv_login_url).then(function (/*response*/) {
+                sendJsonReq($scope.rightv_order_url + '&external_video_id=' + $scope.video_external_id).then(function (/*response*/) {
+                    sendJsonReq($scope.rightv_video_playing_infos_url + '&video_external_id=' + $scope.video_external_id).then(function (response) {
+                        var videoInfos = JSON.parse(response);
+                        if (videoInfos.response.status === 'FAILURE') {
+                            alert(videoInfos.response.code + ' - ' + videoInfos.response.message);
+                        } else {
+                            $scope.selectedItem = {
+                                'url': videoInfos.response.url,
+                                'protData': {
+                                    'com.microsoft.playready': {
+                                        laURL: $scope.licenser_base_url + 'drm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                                    },
+                                    'com.widevine.alpha': {
+                                        laURL: $scope.licenser_base_url + 'widevinedrm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                                    }
+                                }
+                            };
+                            setProtectionData();
+                            $scope.$apply();
                         }
-                    };
-                    setProtectionData();
-                    $scope.$apply();
-                }
-            }
-        };
-        req.open("GET", url, true);
-        req.setRequestHeader("Content-type", "application/json");
-        req.send();
+                    });
+                });
+            });
+        });
     };
     ///////////////////////////////// RIGHTV ////////////////////////////////////
+
+    ///////////////////////////////// ORANGETV ////////////////////////////////////
+    if (vars && vars.hasOwnProperty("orangetv")) {
+        $scope.showOrangeTV = true;
+    } else {
+        $scope.showOrangeTV = false;
+    }
+    var orangetvConfigReq = new XMLHttpRequest();
+    var orangetvConfig;
+    orangetvConfigReq.onload = function() {
+        if (orangetvConfigReq.status === 200) {
+            orangetvConfig = JSON.parse(orangetvConfigReq.responseText);
+            $scope.orangetv_playable_videos_url = orangetvConfig.playable_videos_url;
+            $scope.orangetv_video_id = orangetvConfig.video_id;
+        }
+    };
+    orangetvConfigReq.open("GET", "orangetv_config.json", true);
+    orangetvConfigReq.setRequestHeader("Content-type", "application/json");
+    orangetvConfigReq.send();
+
+    $scope.doGetPlayableVideo = function () {
+        var url = $scope.orangetv_playable_videos_url.replace('{video_id}', $scope.orangetv_video_id);
+        sendJsonReq(url).then(function (response) {
+            var videoInfos = JSON.parse(response);
+            if (videoInfos.response.status === 'FAILURE') {
+                alert(videoInfos.response.code + ' - ' + videoInfos.response.message);
+            } else {
+                $scope.selectedItem = {
+                    'url': videoInfos.response.streamUrl,
+                    'protData': {
+                        'com.microsoft.playready': {
+                            laURL: videoInfos.response.licenseRetrievalURL,
+                            cdmData: videoInfos.response.drmToken
+                        },
+                        'com.widevine.alpha': {
+                            laURL: videoInfos.response.licenseRetrievalURL,
+                            cdmData: videoInfos.response.drmToken
+                        }
+                    }
+                };
+                setProtectionData();
+                $scope.$apply();
+            }
+        });
+    };
+    ///////////////////////////////// ORANGETV ////////////////////////////////////
 
 }]);
