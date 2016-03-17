@@ -62,8 +62,7 @@ define([
                         for(var i = 0; i<audioTracks.length; i += 1){
                             tests.log(NAME, 'lang : '+audioTracks[i].lang+' audio track id : '+audioTracks[i].id);
                         }
-                        // Compare languages arrays by simply comparing stringified representation
-                        assert.strictEqual(JSON.stringify(stream.audioTracks), JSON.stringify(audioTracks));
+                        assert.sameDeepMembers(stream.audioTracks, audioTracks, 'same deep members');
                     });
                 }
             });

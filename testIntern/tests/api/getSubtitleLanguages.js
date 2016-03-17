@@ -63,7 +63,7 @@ define([
                             tests.log(NAME, 'lang : '+subtitleTracks[i].lang+' subtitle track id : '+subtitleTracks[i].id);
                         }
                         // Compare languages arrays by simply comparing stringified representation
-                        assert.strictEqual(JSON.stringify(stream.subtitleTracks), JSON.stringify(subtitleTracks));
+                       assert.sameDeepMembers(stream.subtitleTracks, subtitleTracks, 'same deep members');
                     });
                 }
             });
