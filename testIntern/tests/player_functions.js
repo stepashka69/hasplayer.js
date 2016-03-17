@@ -79,6 +79,10 @@ define([], function () {
             return orangeHasPlayer.setSubtitleVisibility(state);
         },
 
+        isLive: function() {
+            return orangeHasPlayer.isLive();
+        },
+
         waitForEvent: function (event, done) {
             var onEventHandler = function() {
                     orangeHasPlayer.removeEventListener(event, onEventHandler);

@@ -37,6 +37,7 @@ define(function(require) {
             'testIntern/tests/api/getAudioLanguages',
             'testIntern/tests/api/getSubtitleLanguages',
             'testIntern/tests/api/getDuration',
+            'testIntern/tests/api/isLive',
             'testIntern/tests/audio/setAudioLanguage',
             'testIntern/tests/subtitle/setSubtitleLanguage',
             'testIntern/tests/subtitle/changeSubtitleVisibility',

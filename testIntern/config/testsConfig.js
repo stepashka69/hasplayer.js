@@ -108,6 +108,12 @@ define(function(require) {
                         streams: [
                             streams.MSS_VOD_1
                         ]
+                    },
+                    isLive: {
+                        streams: [
+                            streams.MSS_VOD_1,
+                            streams.MSS_LIVE_1
+                        ]
                     }
                 },
 
