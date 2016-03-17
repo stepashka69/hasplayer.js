@@ -97,37 +97,37 @@ define({
         "name": "France 2 (Malformed Manifest error)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Manifest%20Error/Manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/France2%20-%20Manifest%20Error/Manifest",
     },
     MSS_LIVE_UNSUPPORTED_AUDIO_CODEC_ERROR: {
         "name": "France 2 (Unsupported audio codec error)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Audio%20Unsupported%20Codec/Manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/France2%20-%20Audio%20Unsupported%20Codec/Manifest",
     },
     MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR: {
         "name": "France 2 (Unknown Manifest type error)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2-%20Unknown%20Manifest%20type/Manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/France2-%20Unknown%20Manifest%20type/Manifest",
     },
     MSS_VOD_WRONG_AUDIO_CODEC_ERROR: {
         "name": "Arte (Wrong audio codec data)",
         "protocol": "MSS",
         "type": "VOD",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/Arte%20-%20Wrong%20audio%20codec%20data/manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/Arte%20-%20Wrong%20audio%20codec%20data/manifest",
     },
     MSS_LIVE_EMPTY_VIDEO_FOURCC_ERROR: {
         "name": "France 2 (FourCC video empty value)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20empty/Manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/France2%20-%20Video%20FourCC%20empty/Manifest",
     },
     MSS_LIVE_VIDEO_FOURCC_UNSUPPORTED_ERROR: {
         "name": "France 2 (FourCC video unsupported value)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20Unsupported/Manifest",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/MSS/France2%20-%20Video%20FourCC%20Unsupported/Manifest",
     },
     HLS_LIVE_1: {
         "name": "VIMTV 1",
@@ -145,6 +145,6 @@ define({
         "name": "France 2 (M3U8 manifest missing)",
         "protocol": "HLS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr:8084/HLS/ch1%20-%20Manifest%20missing",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/HLS/ch1%20-%20Manifest%20missing",
     }
 });
