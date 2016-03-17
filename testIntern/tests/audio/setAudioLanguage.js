@@ -28,7 +28,6 @@ define([
 
         // Test constants
         var PROGRESS_DELAY = 2; // Delay for checking progressing (in s) 
-        var SEEK_SLEEP = 200;   // Delay before each seek operation (in ms)
         var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;
 
 
