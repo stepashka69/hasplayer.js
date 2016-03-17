@@ -91,6 +91,11 @@ define(function(require) {
                         streams: [
                             streams.MSS_LIVE_SUBT_2
                         ]
+                    },
+                    getDuration: {
+                        streams: [
+                            streams.MSS_VOD_1
+                        ]
                     }
                 },
 

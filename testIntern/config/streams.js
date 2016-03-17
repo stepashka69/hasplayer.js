@@ -69,7 +69,8 @@ define({
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-        "videoBitrates": [320000,680000,1100000,1600000,2100000]
+        "videoBitrates": [320000,680000,1100000,1600000,2100000],
+        "duration": 596.4583334
     },
 
     MSS_VOD_2: {
