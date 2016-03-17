@@ -1504,6 +1504,10 @@ MediaPlayer.dependencies.BufferController = function() {
                 return;
             }
 
+            if (type === "text") {
+                return;
+            }
+
             if (trickModeEnabled) {
                 return;
             }
