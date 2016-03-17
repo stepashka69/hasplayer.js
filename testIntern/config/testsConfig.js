@@ -14,7 +14,9 @@ define(function(require) {
                             streams.MSS_LIVE_1,
                             streams.MSS_LIVE_2,
                             streams.MSS_VOD_1,
-                            streams.MSS_VOD_2
+                            streams.MSS_VOD_2,
+                            streams.HLS_LIVE_1,
+                            streams.HLS_LIVE_2
                         ]
                     },
                     
@@ -24,7 +26,9 @@ define(function(require) {
                             streams.MSS_LIVE_DRM_1,
                             streams.MSS_VOD_1,
                             streams.MSS_LIVE_DRM_2,
-                            streams.MSS_VOD_2
+                            streams.MSS_VOD_2,
+                            streams.HLS_LIVE_1,
+                            streams.HLS_LIVE_2
                         ]
                     },
 
@@ -35,7 +39,8 @@ define(function(require) {
                             streams.MSS_LIVE_MULTI_AUDIO,
                             streams.MSS_LIVE_SUBT_1,
                             streams.MSS_VOD_1,
-                            streams.MSS_VOD_2
+                            streams.MSS_VOD_2,
+                            streams.HLS_LIVE_1
                         ]
                     },
                     
@@ -121,14 +126,13 @@ define(function(require) {
                 },
 
                 error: {
-					 downloadErrorContent:{
-                    	streams:[
-                        
-                        	streams.MSS_LIVE_2
-                    	],
-                    	warnCode:"DOWNLOAD_ERR_CONTENT",
-                    	errorCode:"DOWNLOAD_ERR_CONTENT"
-                	},
+                    downloadErrorContent:{
+                        streams:[
+                            streams.MSS_LIVE_2
+                        ],
+                        warnCode:"DOWNLOAD_ERR_CONTENT",
+                        errorCode:"DOWNLOAD_ERR_CONTENT"
+                    },
                     errorManifest: {
                         streams: [
                             streams.MSS_LIVE_UNKNOWN_MANIFEST_TYPE_ERROR,

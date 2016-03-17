@@ -10,7 +10,6 @@ define({
         "video_fragment_pattern":"(video)",
         "audio_fragment_pattern":"(audio)"
     },
-
     MSS_LIVE_2: {
         "name": "BFMTV",
         "protocol": "MSS",
@@ -19,22 +18,18 @@ define({
         "video_fragment_pattern":"(video)",
         "audio_fragment_pattern":"(audio)"
     },
-
-
     MSS_LIVE_MULTI_AUDIO: {
         "name": "Arte (multi-audio)",
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest"
     },
-
     MSS_LIVE_SUBT_1: {
         "name": "France 2 (subtitles)",
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-41_S2.isml/Manifest"
     },
-
     MSS_LIVE_SUBT_2: {
         "name": "Arte (subtitles)",
         "protocol": "MSS",
@@ -42,28 +37,24 @@ define({
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
         "subtitleTracks": [{lang:'fra', id:'301_fra'}]
     },
-
     MSS_LIVE_DVR: {
         "name": "BFMTV (DVR)",
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest"
     },
-    
     MSS_LIVE_DRM_1: {
         "name": "TF1-DRM",
         "protocol": "MSS",
         "type":"Live",
         "tvmUrl": "http://{platform_url}/live-webapp/v2/PC/channels/192/url"
     },
-    
     MSS_LIVE_DRM_2: {
         "name": "M6-DRM",
         "protocol": "MSS",
         "type":"Live",
         "tvmUrl": "http://{platform_url}/live-webapp/v2/PC/channels/118/url"
     },
-
     MSS_VOD_1: {
         "name": "Big Buck Bunny",
         "protocol": "MSS",
@@ -72,35 +63,30 @@ define({
         "videoBitrates": [320000,680000,1100000,1600000,2100000],
         "duration": 596.4583334
     },
-
     MSS_VOD_2: {
         "name": "SuperSpeedway",
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest"
     },
-
     MSS_VOD_3: {
         "name": "Volver",
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest"
     },
-
     MSS_VOD_4:{
         "name": "Arte",
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
     },
-
     MSS_VOD_MULTI_AUDIO: {
         "name": "Arte (multi-audio)",
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest"
     },
-
     MSS_LIVE_MANIFEST_ERROR: {
         "name": "France 2 (Manifest error)",
         "protocol": "MSS",
@@ -142,6 +128,18 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://pc-selenium.rd.francetelecom.fr:8084/MSS/France2%20-%20Video%20FourCC%20Unsupported/Manifest",
+    },
+    HLS_LIVE_1: {
+        "name": "VIMTV 1",
+        "protocol": "HLS",
+        "type": "Live",
+        "url": "http://161.105.253.165/streaming/1.m3u8",
+    },
+    HLS_LIVE_2: {
+        "name": "VIMTV 2",
+        "protocol": "HLS",
+        "type": "Live",
+        "url": "http://161.105.253.165/streaming/2.m3u8",
     },
     HLS_LIVE_MANIFEST_MISSING_ERROR: {
         "name": "France 2 (M3U8 manifest missing)",
