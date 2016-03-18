@@ -28,7 +28,8 @@ define(['intern!object',
      // Test variables
      var command = null,
          ASYNC_TIMEOUT = config.asyncTimeout,
-         ruleId= null;
+         ERROR_ASYNC_TIMEOUT = 60,
+         ruleId = null;
      
       var testSetup = function () {
           registerSuite({
@@ -44,30 +45,31 @@ define(['intern!object',
       };
 
      
-     var test = function(stream){
+     var test = function(stream) {
+
           registerSuite({
                 name: NAME,
 
-                setup: function(){
+                setup: function() {
                     tests.logLoadStream(NAME, stream);
                     return  command.execute(player.loadStream, [stream]);
                 },
                 
-                teardown: function(){
-                    return tests.executeAsync(command, proxy.resetRules, [proxyConfig.url], ASYNC_TIMEOUT)
+                teardown: function() {
+                    return tests.executeAsync(command, proxy.resetRules, [proxyConfig.url], ASYNC_TIMEOUT);
                 },
 
                 'received video warn code': function() {
                         var not_found = proxyConfig.rules.not_found;
                             not_found.pattern = stream.video_fragment_pattern;
-                        return tests.executeAsync(command, proxy.resetRules, [proxyConfig.url], ASYNC_TIMEOUT) 
-                       .then(tests.executeAsync.bind(null,command, proxy.executeRule, [not_found, proxyConfig.url], ASYNC_TIMEOUT))
+                        return tests.executeAsync(command, proxy.resetRules, [proxyConfig.url], ASYNC_TIMEOUT)
+                       .then(tests.executeAsync.bind(null, command, proxy.executeRule, [not_found, proxyConfig.url], ASYNC_TIMEOUT))
                        .then(function(id) {
-                            if(id){
+                            if (id) {
                                 ruleId = id;
                                 console.info("ruleId", ruleId);
                                 return tests.executeAsync(command, player.getWarningCode, [],ASYNC_TIMEOUT);
-                            }else{
+                            } else {
                                 assert.fail("cannot execute rule on proxy test failed");
                             }
                         })
@@ -76,11 +78,11 @@ define(['intern!object',
                         });
                 },
                 
-                'received video error code': function(){
-                    return tests.executeAsync(command, player.getErrorCode,[], ASYNC_TIMEOUT+30)
-                    .then(function(errorCode){
+                'received video error code': function() {
+                    return tests.executeAsync(command, player.getErrorCode,[], ERROR_ASYNC_TIMEOUT)
+                    .then(function(errorCode) {
                         assert.strictEqual(errorCode, testConfig.errorCode);
-                    })
+                    });
                 },
                 
                 
