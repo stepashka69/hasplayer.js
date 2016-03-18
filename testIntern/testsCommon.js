@@ -29,6 +29,7 @@ define(function(require) {
             'testIntern/tests/play/play',
             'testIntern/tests/play/zapping',
             'testIntern/tests/play/seek',
+            'testIntern/tests/play/seekDVR',
             'testIntern/tests/play/pause',
             'testIntern/tests/play/stop',
             'testIntern/tests/error/errorManifest',

@@ -83,6 +83,10 @@ define([], function () {
             return orangeHasPlayer.isLive();
         },
 
+        getDVRWindowRange: function() {
+            return orangeHasPlayer.getDVRWindowRange();
+        },
+
         waitForEvent: function (event, done) {
             var onEventHandler = function() {
                     orangeHasPlayer.removeEventListener(event, onEventHandler);

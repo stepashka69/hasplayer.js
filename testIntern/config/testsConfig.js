@@ -73,6 +73,13 @@ define(function(require) {
                         seekCount: 5
                     },
 
+                    seekDVR: {
+                        streams: [
+                            streams.MSS_LIVE_2
+                        ],
+                        seekCount: 5
+                    },
+
                     pause: {
                         streams: [
                             streams.MSS_VOD_1
