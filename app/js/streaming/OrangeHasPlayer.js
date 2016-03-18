@@ -751,6 +751,7 @@ OrangeHasPlayer = function() {
     /**
      * Sets the default audio language. If the default language is available in the stream,
      * the corresponding audio track is selected. Otherwise, the first declared audio track in the manifest is selected.
+     * This function has to be called before any other function 
      * @method setDefaultAudioLang
      * @access public
      * @memberof OrangeHasPlayer#
@@ -863,7 +864,8 @@ OrangeHasPlayer = function() {
 
     /**
      * Sets the default subtitle language. If the default language is available in the stream,
-     * the corresponding audio track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
+     * the corresponding subtitle track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
+     * This function has to be called before any other function 
      * @method setDefaultSubtitleLang
      * @access public
      * @memberof OrangeHasPlayer#
