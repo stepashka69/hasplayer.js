@@ -49,12 +49,15 @@ define([
 
                 play: function() {
                     tests.logLoadStream(NAME, stream);
-                    return command.execute(player.loadStream, [stream])
+                    return command.execute(player.setDefaultSubtitleLanguage,[stream.defaultSubtitleLang])
+                    .then(function () {
+                        return command.execute(player.loadStream, [stream]);
+                    })
                     .then(function () {
                         tests.log(NAME, 'Check if playing after ' + PROGRESS_DELAY + 's.');
                         return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
                     })
-                    .then(function(playing) {
+                    .then(function() {
                         return command.execute(player.setSubtitlesVisibility,[true]);
                     })
                     .then(function () {
@@ -62,7 +65,9 @@ define([
                         return command.execute(player.getSelectedSubtitleLanguage);
                     })
                     .then(function (subtitleTrack) {
-                        assert.isTrue(subtitleTrack !== null);
+                        tests.log(NAME, 'current subtitleTrack lang = '+subtitleTrack.lang);
+                        tests.log(NAME, 'default subtitleTrack lang = '+stream.defaultSubtitleLang);
+                        assert.isTrue(subtitleTrack.lang === stream.defaultSubtitleLang);
                         return command.execute(player.setSubtitlesVisibility,[false]);
                     })
                     .then(function () {

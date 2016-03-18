@@ -50,14 +50,24 @@ define([
                 },
 
                 play: function() {
-                    tests.logLoadStream(NAME, stream);
-                    return command.execute(player.loadStream, [stream])
+                    tests.log(NAME, 'default audio lang = '+stream.defaultAudioLang);
+                    return command.execute(player.setDefaultAudioLanguage,[stream.defaultAudioLang])
+                    .then(function () {
+                        tests.logLoadStream(NAME, stream);
+                        return command.execute(player.loadStream, [stream]);
+                    })
                     .then(function () {
                         tests.log(NAME, 'Check if playing after ' + PROGRESS_DELAY + 's.');
                         return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
                     })
                     .then(function(playing) {
                         assert.isTrue(playing);
+                        return command.execute(player.getSelectedAudioLanguage);
+                    })
+                    .then(function (audioTrack) {
+                        tests.log(NAME, 'current audioTrack lang = '+audioTrack.lang);
+                        tests.log(NAME, 'default audioTrack lang = '+stream.defaultAudioLang);
+                        assert.isTrue(audioTrack.lang === stream.defaultAudioLang);
                         return command.execute(player.getAudioLanguages);
                     })
                     .then(function (audioTracks) {

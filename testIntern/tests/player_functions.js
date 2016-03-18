@@ -63,6 +63,10 @@ define([], function () {
             return orangeHasPlayer.setAudioTrack(audioTrack);
         },
 
+        setDefaultAudioLanguage: function(lang) {
+            return orangeHasPlayer.setDefaultAudioLang(lang);
+        },
+
         getSubtitleLanguages: function() {
             return orangeHasPlayer.getSubtitleTracks();
         },
@@ -77,6 +81,10 @@ define([], function () {
 
         setSubtitlesVisibility: function(state) {
             return orangeHasPlayer.setSubtitleVisibility(state);
+        },
+
+        setDefaultSubtitleLanguage: function(lang) {
+            return orangeHasPlayer.setDefaultSubtitleLang(lang);
         },
 
         isLive: function() {

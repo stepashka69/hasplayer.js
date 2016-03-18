@@ -8,7 +8,8 @@ define({
         "videoBitrates": [226000, 400000, 680000, 1200000, 2100000],
         "audioTracks": [{lang:'qad', id:'audio102_qad'}, {lang:'fra', id:'audio101_fra'}],
         "video_fragment_pattern":"(video)",
-        "audio_fragment_pattern":"(audio)"
+        "audio_fragment_pattern":"(audio)",
+        "defaultAudioLang": 'qad'
     },
     MSS_LIVE_2: {
         "name": "BFMTV",
@@ -80,6 +81,7 @@ define({
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+        "defaultSubtitleLang": 'fra'
     },
     MSS_VOD_MULTI_AUDIO: {
         "name": "Arte (multi-audio)",
