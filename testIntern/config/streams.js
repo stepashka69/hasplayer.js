@@ -147,6 +147,6 @@ define({
         "name": "France 2 (M3U8 manifest missing)",
         "protocol": "HLS",
         "type": "Live",
-        "url": "http://pc-selenium.rd.francetelecom.fr/video/HLS/ch1%20-%20Manifest%20missing",
+        "url": "http://pc-selenium.rd.francetelecom.fr/video/HLS/ch1%20-%20Manifest%20missing/index.m3u8",
     }
 });
