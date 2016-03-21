@@ -59,7 +59,7 @@ define([
                         return command.execute(player.getDuration);
                     })
                     .then(function (duration) {
-                        assert.strictEqual(stream.duration, duration);
+                        assert.strictEqual(stream.duration.toFixed(3), duration.toFixed(3));
                     });
                 }
             });
