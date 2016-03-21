@@ -23,7 +23,7 @@ define([
         // Test configuration (see config/testConfig.js)
         var testConfig = config.tests.error.errorManifest,
             streams = testConfig.streams,
-            errorCodes = testConfig.expectedErrorCode;
+            errorCodes = testConfig.expectedErrorCodes;
 
         // Test constants
         var ASYNC_TIMEOUT = config.asyncTimeout;
@@ -46,7 +46,7 @@ define([
             });
         };
 
-        var test = function(stream, expectedErrorCode) {
+        var test = function(stream, expectedErrorCodes) {
 
             registerSuite({
                 name: NAME,
@@ -59,7 +59,8 @@ define([
                     })
                     .then(function (errorCode) {
                         tests.log(NAME, 'Error: ' + errorCode);
-                        assert.strictEqual(errorCode, expectedErrorCode);
+                        //assert.oneOf(errorCode, expectedErrorCodes);
+                        assert.include(expectedErrorCodes, errorCode);
                     });
                 }
             });
