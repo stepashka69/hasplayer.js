@@ -1,3 +1,15 @@
+### Release Notes v1.2.7 (2016/03/21)
+* Bugs fixing:
+* - Correct seeking management (BufferController's working time handling, seek to removed buffer ranges, ...)
+* - TTML parsing
+* Add DVR support
+* Add trick mode support (fast forward and rewind)
+
+### Release Notes v1.2.6.3 (2016/02/04)
+* Bugs fixing:
+* - subtitles enable/disable management
+* OrangeHasPlayer: Add function to manage subtitles display outside video element
+
 ### Release Notes v1.2.6.2 (2016/01/21)
 * Add robustness for input stream discontinuities
 
