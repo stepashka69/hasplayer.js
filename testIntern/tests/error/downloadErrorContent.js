@@ -28,8 +28,7 @@ define(['intern!object',
      // Test variables
      var command = null,
          ASYNC_TIMEOUT = config.asyncTimeout,
-         ERROR_ASYNC_TIMEOUT = 60,
-         ruleId = null;
+         ERROR_ASYNC_TIMEOUT = 60
      
       var testSetup = function () {
           registerSuite({
@@ -64,16 +63,8 @@ define(['intern!object',
                             not_found.pattern = stream.video_fragment_pattern;
                         return tests.executeAsync(command, proxy.resetRules, [proxyConfig.url], ASYNC_TIMEOUT)
                        .then(tests.executeAsync.bind(null, command, proxy.executeRule, [not_found, proxyConfig.url], ASYNC_TIMEOUT))
-                       .then(function(id) {
-                            if (id) {
-                                ruleId = id;
-                                console.info("ruleId", ruleId);
-                                return tests.executeAsync(command, player.getWarningCode, [],ASYNC_TIMEOUT);
-                            } else {
-                                assert.fail("cannot execute rule on proxy test failed");
-                            }
-                        })
-                        .then(function(warnCode){
+                       .then(tests.executeAsync.bind(null,command, player.getWarningCode, [],ASYNC_TIMEOUT)
+                       .then(function(warnCode){
                             assert.strictEqual(warnCode, testConfig.warnCode);
                         });
                 },
