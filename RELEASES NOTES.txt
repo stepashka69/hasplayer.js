@@ -1,9 +1,14 @@
-### Release Notes v1.2.7 (2016/03/21)
+### Release Notes v1.2.7 (2016/03/22)
 * Bugs fixing:
-* - Correct seeking management (BufferController's working time handling, seek to removed buffer ranges, ...)
+* - HLS support on Firefox
+* - Correct seeking and live start time management (BufferController's working time handling, seek to removed buffer ranges, ...)
 * - TTML parsing
+* - Correct manifest download error in case of automatic session reloading 
 * Add DVR support
 * Add trick mode support (fast forward and rewind)
+* Add retry for HLs variants streams playlists requests
+* Add session type parameter in input protection data
+* Add INTERNAL_ERROR for initialization and media segments processing exceptions
 
 ### Release Notes v1.2.6.3 (2016/02/04)
 * Bugs fixing:
