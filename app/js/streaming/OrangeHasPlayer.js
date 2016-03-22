@@ -1201,7 +1201,7 @@ OrangeHasPlayer = function() {
 
     /**
      * Returns the terminal ID.
-     * @method fullscreenChanged
+     * @method getTerminalId
      * @access public
      * @memberof OrangeHasPlayer#
      * @return {string} the terminal ID 
