@@ -1,5 +1,5 @@
 define({
-    url:"http://pc-selenium.rd.francetelecom.fr:3129/",
+    url:"http://localhost:3129/",
     rules:{
         not_found:{
             "type":"ON_REQUEST",
