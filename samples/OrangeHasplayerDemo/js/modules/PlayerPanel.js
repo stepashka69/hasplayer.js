@@ -256,8 +256,19 @@ PlayerPanel.prototype.onSeekBarModuleLeave = function(e) {
 };
 
 PlayerPanel.prototype.onSeekClicked = function(e) {
-    if (this.videoDuration) {
+    if (!this.videoDuration) {
+        return;
+    }
+
+    if (this.videoDuration !== Infinity) {
         setSeekValue(e.offsetX * this.videoDuration / this.seekbarBackground.clientWidth);
+    } else {
+        var range = orangeHasPlayer.getDVRWindowRange(),
+            progress = e.offsetX / this.seekbarBackground.clientWidth,
+            duration = range.end - range.start,
+            seekTime = range.start + (duration * progress);
+
+        setSeekValue(seekTime);
     }
 };
 
@@ -289,7 +300,12 @@ PlayerPanel.prototype.setPlayingTime = function(time) {
         progress = (time / this.videoDuration) * 100;
         this.seekbar.style.width = progress + '%';
     } else {
-        this.seekbar.style.width = 0;
+        var range = orangeHasPlayer.getDVRWindowRange();
+        if (range !== null && time > 0) {
+            this.durationTimeSpan.textContent = setTimeWithSeconds(range.end);
+            progress = ((time - range.start) / (range.end - range.start)) * 100;
+            this.seekbar.style.width = progress + '%';
+        }
     }
 };
 
@@ -342,7 +358,9 @@ PlayerPanel.prototype.onVideoEnded = function(e) {
 };
 
 PlayerPanel.prototype.showLoadingElement = function() {
-    this.loadingElement.className = 'op-loading';
+    if (orangeHasPlayer.getTrickModeSpeed() === 1) {
+        this.loadingElement.className = 'op-loading';
+    }
 };
 
 PlayerPanel.prototype.hideLoadingElement = function() {
@@ -419,7 +437,9 @@ PlayerPanel.prototype.onFullScreenClicked = function() {
         }
         document.getElementById('demo-player-container').className = 'demo-player';
     }
-    this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
+    if (this.subtitlesCSSStyle) {
+        this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
+    }
 };
 
 PlayerPanel.prototype.resetSeekbar = function() {

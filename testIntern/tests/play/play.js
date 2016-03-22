@@ -17,13 +17,21 @@ define([
     'testIntern/tests/tests_functions'
     ], function(registerSuite, assert, require, config, player, video, tests) {
 
+        // Suite name
+        var NAME = 'TEST_PLAY';
+
+        // Test configuration (see config/testConfig.js)
+        var testConfig = config.drm ? config.tests.play.playDrm : config.tests.play.play,
+            streams = testConfig.streams;
+
+        // Test constants
+        var PROGRESS_DELAY = 3;
+        var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;
+
+        // Test variables
         var command = null;
 
         var test = function(stream) {
-
-            var NAME = 'TEST_PLAY';
-            var PROGRESS_DELAY = 3;
-            var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;
 
             registerSuite({
                 name: NAME,
@@ -49,7 +57,7 @@ define([
             });
         };
 
-        for (var i = 0; i < config.testPlay.streams.length; i++) {
-            test(config.testPlay.streams[i]);
+        for (var i = 0; i < streams.length; i++) {
+            test(streams[i]);
         }
 });

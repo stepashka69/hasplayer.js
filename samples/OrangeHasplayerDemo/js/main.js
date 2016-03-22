@@ -34,6 +34,8 @@ window.onload = function() {
 
     displayVersion();
 
+    displayTerminalId();
+
     var urlParam = getURLParameter('url');
     if (urlParam) {
         onStreamClicked({url: urlParam, protData: undefined});
@@ -47,6 +49,11 @@ var getDOMElements = function() {
 var displayVersion = function() {
     var title = document.getElementById('app-title');
     title.innerHTML += ' ' + orangeHasPlayer.getVersionFull();
+};
+
+var displayTerminalId = function() {
+    var terminalId = document.getElementById('terminal-id');
+    terminalId.innerHTML += ' ' + orangeHasPlayer.getTerminalId();
 };
 
 var getURLParameter = function (name) {

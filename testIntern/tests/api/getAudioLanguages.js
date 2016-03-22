@@ -1,5 +1,5 @@
 /**
-TEST_GETVIDEOBITRATES:
+TEST_GETAUDIOLANGUAGES:
 
 - for each stream:
     - load test page
@@ -17,9 +17,17 @@ define([
     'testIntern/tests/tests_functions'
     ], function(registerSuite, assert, require, config, player, video, tests) {
 
-        var command = null;
+        // Suite name
+        var NAME = 'TEST_GETAUDIOLANGUAGES';
 
-        var NAME = 'TEST_GETVIDEOBITRATES';
+        // Test configuration (see config/testConfig.js)
+        var testConfig = config.tests.api.getAudioLanguages,
+            streams = testConfig.streams;
+
+        // Test constants
+
+        // Test variables
+        var command = null;
 
         var testSetup = function () {
             registerSuite({
@@ -34,7 +42,7 @@ define([
             });
         };
 
-        var testGetVideoBitrates = function(stream) {
+        var test = function(stream) {
 
             registerSuite({
                 name: NAME,
@@ -44,26 +52,26 @@ define([
                     return command.execute(player.loadStream, [stream]);
                 },
 
-                getVideoBitrates: function() {
+                getAudioLanguages: function() {
                     return tests.executeAsync(command, player.waitForEvent, ['loadeddata'], config.asyncTimeout)
                     .then(function(loaded) {
                         assert.isTrue(loaded);
-                        return command.execute(player.getVideoBitrates);
+                        return command.execute(player.getAudioLanguages);
                     })
-                    .then(function (videoBitrates) {
-                        tests.log(NAME, 'Video bitrates: ' + JSON.stringify(videoBitrates));
-                        // Compare bitrates arrays by simply comparing stringified representation
-                        assert.strictEqual(JSON.stringify(stream.videoBitrates), JSON.stringify(videoBitrates));
+                    .then(function (audioTracks) {
+                        for(var i = 0; i<audioTracks.length; i += 1){
+                            tests.log(NAME, 'lang : '+audioTracks[i].lang+' audio track id : '+audioTracks[i].id);
+                        }
+                        assert.sameDeepMembers(stream.audioTracks, audioTracks, 'same deep members');
                     });
                 }
             });
         };
 
-
         // Setup (load test page)
         testSetup();
 
-        for (var i = 0; i < config.testGetVideoBitrates.streams.length; i++) {
-            testGetVideoBitrates(config.testGetVideoBitrates.streams[i]);
+        for (var i = 0; i < streams.length; i++) {
+            test(streams[i]);
         }
 });

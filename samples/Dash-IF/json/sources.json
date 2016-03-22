@@ -221,7 +221,7 @@
         {
             "type": "MSS",
             "name": "VOD - Volver",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest",
             "browsers": "cdsbi"
         },
         {

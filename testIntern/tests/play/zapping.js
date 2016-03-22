@@ -16,12 +16,20 @@ define([
     'testIntern/tests/tests_functions'
     ], function(registerSuite, assert, require, config, player, video, tests) {
 
-        var command = null;
-
+        // Suite name
         var NAME = 'TEST_ZAPPING';
+
+        // Test configuration (see config/testConfig.js)
+        var testConfig = config.drm ?  config.tests.play.zappingDrm : config.tests.play.zapping,
+            streams = testConfig.streams;
+
+        // Test constants
         var PROGRESS_DELAY = 5; // Delay for checking progressing (in s) 
         var SEEK_PLAY = 500;    // Delay before each play operation (in ms)
-        var i;
+
+        // Test variables
+        var command = null,
+            i;
 
         var testSetup = function () {
             registerSuite({
@@ -36,7 +44,7 @@ define([
             });
         };
 
-        var testZapping = function (stream, progressDelay) {
+        var test = function (stream, progressDelay) {
 
             registerSuite({
                 name: NAME,
@@ -60,24 +68,22 @@ define([
             });
         };
 
-        var streams = config.testZapping.streams;
-
         // Setup (load test page)
         testSetup();
 
         // Zapping (change stream after some progressing)
         for (i = 0; i < streams.length; i++) {
-            testZapping(streams[i], PROGRESS_DELAY);
+            test(streams[i], PROGRESS_DELAY);
         }
 
         // Zapping (change stream as soon as playing)
         for (i = 0; i < streams.length; i++) {
-            testZapping(streams[i], i < (streams.length - 1) ? 0 : PROGRESS_DELAY);
+            test(streams[i], i < (streams.length - 1) ? 0 : PROGRESS_DELAY);
         }
 
         // Fast zapping (change stream without waiting for playing)
         for (i = 0; i < streams.length; i++) {
-            testZapping(streams[i], i < (streams.length - 1) ? -1 : PROGRESS_DELAY);
+            test(streams[i], i < (streams.length - 1) ? -1 : PROGRESS_DELAY);
         }
 
 });

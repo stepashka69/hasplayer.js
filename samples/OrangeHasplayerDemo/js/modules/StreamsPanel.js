@@ -84,9 +84,6 @@ StreamsPanel.prototype.loadTVMSource =  function(stream, callback){
     var self = this;
     var xhr = new XMLHttpRequest();
     xhr.open('GET',stream.tvmUrl);
-    for( var header in window.TVM_SOURCES_CONFIG.headers){
-        xhr.setRequestHeader(header, window.TVM_SOURCES_CONFIG.headers[header]);
-    }
     xhr.withCredentials=true;
     xhr.onreadystatechange = (function() {
         if (xhr.readyState === 4 && xhr.status === 200) {

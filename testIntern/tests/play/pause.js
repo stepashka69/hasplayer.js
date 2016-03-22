@@ -24,14 +24,22 @@ define([
     'testIntern/tests/tests_functions'
     ], function(registerSuite, assert, require, config, player, video, tests) {
 
-        var command = null;
-
+        // Suite name
         var NAME = 'TEST_PAUSE';
+
+        // Test configuration (see config/testConfig.js)
+        var testConfig = config.tests.play.pause,
+            streams = testConfig.streams;
+
+        // Test constants
         var PROGRESS_DELAY = 2; // Delay for checking progressing (in s) 
-        var ASYNC_TIMEOUT = PROGRESS_DELAY + 5;  // Asynchronous timeout for checking progressing
+        var ASYNC_TIMEOUT = PROGRESS_DELAY + config.asyncTimeout;  // Asynchronous timeout for checking progressing
         var PAUSE_DELAY = 5; // Delay (in s) for checking is player is still paused (= not prgressing)
-        var i, j;
         
+        // Test variables
+        var command = null,
+            i, j;
+
         var testSetup = function (stream) {
             registerSuite({
                 name: NAME,
@@ -52,24 +60,22 @@ define([
                     })
                     .then(function (playing) {
                         assert.isTrue(playing);
-                        var sleepTime = Math.round(Math.random() * 20);
-                        tests.log(NAME, 'Sleep ' + sleepTime + ' s.');
-                        return command.sleep(sleepTime * 1000);
                     });
                 }
             });
         };
 
-        var testPause = function () {
+        var test = function () {
 
             registerSuite({
                 name: NAME,
 
                 pause: function () {
                     var currentTime = 0;
+                    var sleepTime = Math.round(Math.random() * 20);
 
-                    tests.log(NAME, 'Pause the player');
-                    return command.execute(player.pause)
+                    tests.log(NAME, 'Wait ' + sleepTime + ' sec. and pause the player');
+                    return command.sleep(sleepTime * 1000).execute(player.pause)
                     .then(function () {
                         tests.log(NAME, 'Check if paused');
                         return command.execute(video.isPaused);
@@ -105,14 +111,14 @@ define([
         };
 
 
-        for (i = 0; i < config.testPause.streams.length; i++) {
+        for (i = 0; i < streams.length; i++) {
 
             // setup: load test page and stream
-            testSetup(config.testPause.streams[i]);
+            testSetup(streams[i]);
 
             // Performs pause tests
-            for (j = 0; j < config.testPause.pauseCount; j++) {
-                testPause();
+            for (j = 0; j < testConfig.pauseCount; j++) {
+                test();
             }
         }
 

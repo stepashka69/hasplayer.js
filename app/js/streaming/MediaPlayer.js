@@ -49,7 +49,7 @@ MediaPlayer = function(aContext) {
      *
      */
     var VERSION_DASHJS = "1.2.0",
-        VERSION = "1.2.6.3",
+        VERSION = "1.2.7",
         GIT_TAG = "@@REVISION",
         BUILD_DATE = "@@TIMESTAMP",
         context = aContext,
@@ -187,6 +187,14 @@ MediaPlayer = function(aContext) {
             }
 
             return val;
+        },
+
+        getDVRWindowRange = function () {
+            var metric = this.metricsModel.getReadOnlyMetricsFor('video'),
+                dvrInfo = metric ? this.metricsExt.getCurrentDVRInfo(metric) : null,
+                range = dvrInfo ? dvrInfo.range : null;
+
+            return range;
         },
 
         /**
@@ -766,6 +774,23 @@ MediaPlayer = function(aContext) {
             defaultSubtitleLang = language;
         },
 
+        setTrickModeSpeed: function(speed){
+            if (streamController) {
+                if (streamController.getTrickModeSpeed() !== speed && speed === 1) {
+                    videoModel.play();
+                }else{
+                    streamController.setTrickModeSpeed(speed);
+                }
+            }
+        },
+
+        getTrickModeSpeed: function() {
+            if (streamController) {
+                return streamController.getTrickModeSpeed();
+            }
+
+            return 0;
+        },
 
         play: play,
         isReady: isReady,
@@ -776,6 +801,7 @@ MediaPlayer = function(aContext) {
         durationAsUTC: durationAsUTC,
         getDVRWindowSize: getDVRWindowSize,
         getDVRSeekOffset: getDVRSeekOffset,
+        getDVRWindowRange: getDVRWindowRange,
         formatUTC: formatUTC,
         convertToTimeCode: convertToTimeCode
 

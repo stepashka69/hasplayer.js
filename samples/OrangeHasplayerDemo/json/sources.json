@@ -277,6 +277,20 @@
         {
             "type": "VOD",
             "protocol": "MSS",
+            "name": "Volver",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Montagne",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/Montagne/EE3_SS-H264_TERRE_MONTAGNES_FR_EN_CEEFAX.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
             "name": "Big Buck Bunny",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
             "browsers": "cdsbi"

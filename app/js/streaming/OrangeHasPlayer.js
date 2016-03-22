@@ -24,6 +24,8 @@ OrangeHasPlayer = function() {
         mediaPlayer,
         debug,
         video,
+        error = null,
+        warning = null,
         isFullScreen = false,
         isSubtitleVisible = false,
         audioTracks = [],
@@ -252,6 +254,14 @@ OrangeHasPlayer = function() {
         }
     };
 
+    var _onError = function(e) {
+        error = e.data;
+    };
+
+    var _onWarning = function(e) {
+        warning = e.data;
+    };
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -280,6 +290,8 @@ OrangeHasPlayer = function() {
 
         this.addEventListener("loadeddata", _onloaded.bind(this));
         mediaPlayer.addEventListener("metricAdded", _metricAdded);
+        mediaPlayer.addEventListener("error", _onError.bind(this));
+        mediaPlayer.addEventListener("warning", _onWarning.bind(this));
         video.addEventListener("timeupdate", _onTimeupdate);
         window.addEventListener("keydown", _handleKeyPressedEvent);
     };
@@ -359,6 +371,28 @@ OrangeHasPlayer = function() {
         }
     };
 
+    /////////// ERROR/WARNING
+
+    /**
+     * Returns the Error object for the most recent error
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {object} the Error object for the most recent error, or null if there has not been an error..
+     */
+    this.getError = function() {
+        return error;
+    };
+
+    /**
+     * Returns the Warning object for the most recent warning
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {object} the Warning object for the most recent warning, or null if there has not been a warning..
+     */
+    this.getWarning = function() {
+        return warning;
+    };
+
     /////////// PLAYBACK
 
     /**
@@ -430,6 +464,9 @@ OrangeHasPlayer = function() {
             //init default subtitle language
             mediaPlayer.setDefaultSubtitleLang(defaultSubtitleLang);
 
+            error = null;
+            warning = null;
+
             mediaPlayer.attachSource(url, protData);
             if (mediaPlayer.getAutoPlay()) {
                 state = 'PLAYER_RUNNING';
@@ -471,23 +508,54 @@ OrangeHasPlayer = function() {
      * @param {number} time - the new time value in seconds
      */
     this.seek = function(time) {
+        var range = null;
+
         _isPlayerInitialized();
 
         if (typeof time !== 'number') {
             throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
         }
 
-        if (!this.isLive() && time >= 0 && time <= video.duration) {
-            video.currentTime = time;
+        if (!this.isLive()) {
+            if  (time < 0 || time > video.duration) {
+                throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+            } else {
+                video.currentTime = time;
+            }
+        } else {
+            range = mediaPlayer.getDVRWindowRange();
+            if (range === null) {
+                throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
+            } else if (time < range.start || time > range.end) {
+                throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+            } else {
+                video.currentTime = time;
+            }
         }
+    };
+    
+    /**
+     * Sets the trick mode speed.
+     * @method setTrickModeSpeed
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {number} speed - the new trick mode speed.
+     */
+    this.setTrickModeSpeed = function(speed) {
+        _isPlayerInitialized();
 
-        if (this.isLive()) {
-            throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
-        }
+        mediaPlayer.setTrickModeSpeed(speed);
+    };
 
-        if (time < 0 || time > video.duration) {
-            throw new Error('OrangeHasPlayer.seek(): seek value not correct');
-        }
+    /**
+     * Returns the current trick mode speed.
+     * @method getTrickModeSpeed
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the current trick mode speed
+     */
+    this.getTrickModeSpeed = function() {
+        return mediaPlayer.getTrickModeSpeed();
     };
 
     /**
@@ -683,6 +751,7 @@ OrangeHasPlayer = function() {
     /**
      * Sets the default audio language. If the default language is available in the stream,
      * the corresponding audio track is selected. Otherwise, the first declared audio track in the manifest is selected.
+     * This function has to be called before any other function 
      * @method setDefaultAudioLang
      * @access public
      * @memberof OrangeHasPlayer#
@@ -795,7 +864,8 @@ OrangeHasPlayer = function() {
 
     /**
      * Sets the default subtitle language. If the default language is available in the stream,
-     * the corresponding audio track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
+     * the corresponding subtitle track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
+     * This function has to be called before any other function 
      * @method setDefaultSubtitleLang
      * @access public
      * @memberof OrangeHasPlayer#
@@ -1013,6 +1083,32 @@ OrangeHasPlayer = function() {
         this.setParams({'TextTrackExtensions.displayModeExtern':mode});
     };
 
+    /////////// DVR
+
+    /**
+     * Returns the DVR window size.
+     * @method getDVRWindowSize
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowSize = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowSize();
+    };
+
+    /**
+     * Returns the current DVR window range.
+     * @method getDVRWindowRange
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {number} the DVR window size in seconds
+     */
+    this.getDVRWindowRange = function() {
+        _isPlayerInitialized();
+        return mediaPlayer.getDVRWindowRange();
+    };
+
     /////////// ADVANCED CONFIGURATION
 
     /**
@@ -1100,6 +1196,21 @@ OrangeHasPlayer = function() {
      */
     this.fullscreenChanged = function(value) {
         isFullScreen = !isFullScreen;
+    };
+
+
+    /**
+     * Returns the terminal ID.
+     * @method fullscreenChanged
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @return {string} the terminal ID 
+     */
+    this.getTerminalId = function() {
+        var browser = fingerprint_browser(),
+            os = fingerprint_os();
+
+        return os.name + "-" + os.bits + "-" + browser.name;
     };
 
     /////////// EVENTS

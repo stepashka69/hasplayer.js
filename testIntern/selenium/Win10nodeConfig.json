@@ -17,6 +17,12 @@
             "maxInstances":5,
             "plateform":"WINDOWS",
             "seleniumProtocol":"WebDriver"
+        },
+        {
+            "browserName":"firefox",
+            "maxInstances":5,
+            "plateform":"WINDOWS",
+            "seleniumProtocol":"WebDriver"
         }
     ],
     "configuration":{
