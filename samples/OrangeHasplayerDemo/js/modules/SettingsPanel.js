@@ -261,4 +261,6 @@ SettingsPanel.prototype.reset = function() {
     this.currentsubtitleTrack = null;
     this.videoBufferLength.innerHTML = "";
     this.audioBufferLength.innerHTML = "";
+    this.enableSubtitlesCheckbox.checked = false;
+    enableSubtitles(this.enableSubtitlesCheckbox.checked);
 };
