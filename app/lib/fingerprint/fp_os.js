@@ -95,6 +95,8 @@ function fingerprint_os() {
             name = "Windows Mobile";
         } else if (userAgent.indexOf("wm5 pie") !== -1) {
             name = "Windows Mobile";
+        } else if (userAgent.indexOf("windows phone 10.0") !== -1) {
+            name = "Windows Phone 10";
         } else if (userAgent.indexOf("windows") !== -1) {
             name = "Windows (Unknown Version)";
         } else if (userAgent.indexOf("openbsd") !== -1) {
