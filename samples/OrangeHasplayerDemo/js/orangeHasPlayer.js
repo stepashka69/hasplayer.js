@@ -45,7 +45,7 @@ function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer.setDebug(true);
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
-    orangeHasPlayer.setSubtitleVisibility(false);
+    orangeHasPlayer.enableSubtitles(false);
     registerHasPlayerEvents();
 }
 
@@ -225,7 +225,7 @@ function changeAudio(track) {
 }
 
 function enableSubtitles(enable) {
-    orangeHasPlayer.setSubtitleVisibility(enable);
+    orangeHasPlayer.enableSubtitles(enable);
 }
 
 function changeSubtitle(track) {

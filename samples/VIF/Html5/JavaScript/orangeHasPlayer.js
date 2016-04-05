@@ -34,7 +34,7 @@ function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer.setDebug(false);
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
-    orangeHasPlayer.setSubtitleVisibility(true);
+    orangeHasPlayer.enableSubtitles(true);
     registerHasPlayerEvents();
 
     playerPanel = new PlayerPanel(true);
