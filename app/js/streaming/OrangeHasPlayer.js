@@ -27,7 +27,6 @@ OrangeHasPlayer = function() {
         error = null,
         warning = null,
         isFullScreen = false,
-        isSubtitleVisible = false,
         audioTracks = [],
         subtitleTracks = [],
         videoQualityChanged = [],
@@ -67,9 +66,6 @@ OrangeHasPlayer = function() {
         this.getSubtitleTracks();
         this.getSelectedAudioTrack();
         this.getSelectedSubtitleTrack();
-        if (video.textTracks.length > 0) {
-            video.textTracks[0].mode = (isSubtitleVisible === true) ? 'showing' : 'hidden';
-        }
     };
 
     var _handleKeyPressedEvent = function(e) {
@@ -1045,20 +1041,9 @@ OrangeHasPlayer = function() {
      */
     this.setSubtitleVisibility = function(value) {
         _isPlayerInitialized();
-        if (typeof value !== 'boolean') {
-            throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
-        }
-
-        isSubtitleVisible = value;
-        mediaPlayer.enableSubtitles(value);
-
-        if (video.textTracks.length === 0) {
-            return;
-        }
-
-        video.textTracks[0].mode = (value === true) ? 'showing' : 'hidden';
+        throw new Error('OrangeHasPlayer.setSubtitleVisibility(): is depreacated use OrangeHasPlayer.enableSubtitle() instead');
     };
-
+    
     /**
      * Returns the subtitles visibility state.
      * @method getSubtitleVisibility
@@ -1068,8 +1053,34 @@ OrangeHasPlayer = function() {
      */
     this.getSubtitleVisibility = function() {
         _isPlayerInitialized();
+        throw new Error('OrangeHasPlayer.getSubtitleVisibility(): is depreacated use OrangeHasPlayer.isSubtitleEnabled() instead');
+    };
+    
+    /**
+     * Enable / disable subtitles.
+     * @method enableSubtitles
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @param {boolean} value - true to enable subtitles, false to hide subtitles. (default false)
+     */
+    this.enableSubtitles = function(value) {
+        _isPlayerInitialized();
+        if (typeof value !== 'boolean') {
+            throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
+        }
+        mediaPlayer.enableSubtitles(value);
+    };
 
-        return isSubtitleVisible;
+     /**
+     * function used to retrieve if subtitle is enable or not
+     * @method isSubtitlesEnabled
+     * @access public
+     * @memberof OrangeHasPlayer#
+     * @retrun {boolean} true if the download of subtitle is enabled
+    */
+    this.isSubtitlesEnabled = function() {
+        _isPlayerInitialized();
+       return mediaPlayer.isSubtitleEnabled();
     };
 
     /**
