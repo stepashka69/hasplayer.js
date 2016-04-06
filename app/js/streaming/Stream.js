@@ -86,6 +86,7 @@ MediaPlayer.dependencies.Stream = function() {
         protectionController,
         initializedeferred = null,
 
+        reloadTimeout = null,
         isReloading = false,
 
         startClockTime = -1,
@@ -125,6 +126,7 @@ MediaPlayer.dependencies.Stream = function() {
                 // 1- seeks the buffer controllers at the desired time
                 // 2- once data is present in the buffers, then we can set the current time to the <video> component (see onBufferUpdated()) 
                 seekTime = time;
+                this.system.unmapHandler("bufferUpdated");
                 this.system.mapHandler("bufferUpdated", undefined, onBufferUpdated.bind(this));
                 startBuffering.call(this, seekTime);
             } else {
@@ -861,7 +863,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.setCurrentTime(time);
         },
 
-        bufferingCompleted = function() {
+        onBufferingCompleted = function() {
 
             // if there is at least one buffer controller that has not completed buffering yet do nothing
             if ((videoController && !videoController.isBufferingCompleted()) || (audioController && !audioController.isBufferingCompleted())) {
@@ -874,11 +876,6 @@ MediaPlayer.dependencies.Stream = function() {
                 this.mediaSourceExt.signalEndOfStream(mediaSource);
             }
         },
-
-        segmentLoadingFailed = function() {
-            stopBuffering.call(this);
-        },
-
 
         // 'startTimeFound' event raised by video controller when start time has been found
         // startTime = video live edge for live streams
@@ -1067,6 +1064,28 @@ MediaPlayer.dependencies.Stream = function() {
             textController.seeked();
         },
 
+        // Called when a BufferController failed to download or buffer a segment 
+        onSegmentLoadingFailed = function(segmentRequest) {
+            var self = this;
+
+            this.debug.log("[Stream] Segment loading failed: start time = " + segmentRequest.startTime + ", duration = " + segmentRequest.duration);
+
+            if (this.manifestExt.getIsDynamic(manifest) && !isReloading) {
+                // For Live streams, then we try to reload the session
+                isReloading = true;
+                var delay = segmentRequest.duration;
+                this.debug.info("[Stream] Reload session in " + delay + " s.");
+                reloadTimeout = setTimeout(function() {
+                    reloadTimeout = null;
+                    //pause.call(self);
+                    self.system.notify("manifestUpdate", true);
+                }, delay * 1000);
+            } else {
+                // For VOD streams, we seek at recovery time
+                seek.call(this, (segmentRequest.startTime + segmentRequest.duration));
+            }
+        },
+
         onVisibilitychange = function() {
 
             if (document.hidden === true || startClockTime === -1) {
@@ -1111,10 +1130,9 @@ MediaPlayer.dependencies.Stream = function() {
         notify: undefined,
 
         setup: function() {
-            this.system.mapHandler("bufferingCompleted", undefined, bufferingCompleted.bind(this));
-            this.system.mapHandler("segmentLoadingFailed", undefined, segmentLoadingFailed.bind(this));
             this.system.mapHandler("startTimeFound", undefined, onStartTimeFound.bind(this));
-            this.system.mapHandler("needForReload", undefined, onReload.bind(this));
+            this.system.mapHandler("segmentLoadingFailed", undefined, onSegmentLoadingFailed.bind(this));
+            this.system.mapHandler("bufferingCompleted", undefined, onBufferingCompleted.bind(this));
 
             /* @if PROTECTION=true */
             // Protection event handlers
@@ -1249,6 +1267,9 @@ MediaPlayer.dependencies.Stream = function() {
             // Trick mode seeking timeout
             clearTimeout(tmSeekTimeout);
 
+            // Stop reload timeout
+            clearTimeout(reloadTimeout);
+
             self.videoModel.setMute(false);
 
             //document.removeEventListener("visibilityChange");
@@ -1273,12 +1294,11 @@ MediaPlayer.dependencies.Stream = function() {
             this.videoModel.unlistenOnParent("fullscreenchange", fullScreenListener);
             this.videoModel.unlistenOnParent("webkitfullscreenchange", fullScreenListener);
 
-            this.system.unmapHandler("bufferUpdated");
-            this.system.unmapHandler("liveEdgeFound");
-            this.system.unmapHandler("bufferingCompleted");
-            this.system.unmapHandler("segmentLoadingFailed");
-            this.system.unmapHandler("needForReload");
             this.system.unmapHandler("streamsComposed", undefined, streamsComposed);
+
+            this.system.unmapHandler("bufferUpdated");
+            this.system.unmapHandler("segmentLoadingFailed");
+            this.system.unmapHandler("bufferingCompleted");
 
             tearDownMediaSource.call(this).then(
                 function() {
