@@ -130,6 +130,7 @@ MediaPlayer.di.Context = function () {
             this.system.mapClass('downloadRatioRule', MediaPlayer.rules.o.DownloadRatioRule);
             this.system.mapClass('insufficientBufferRule', MediaPlayer.rules.o.InsufficientBufferRule);
             // @endif
+            this.system.mapClass('droppedFramesRule', MediaPlayer.rules.DroppedFramesRule);
             // plug message handler. When the message is notify, the contextManager is called
             this.system.mapHandler('setContext', 'contextManager', 'setContext');
         }
