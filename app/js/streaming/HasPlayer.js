@@ -16,7 +16,7 @@
  *
  */
 /*jshint -W020 */
-MediaPlayer = function() {
+MediaPlayer = function () {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
@@ -55,34 +55,36 @@ MediaPlayer = function() {
         resetting = false,
         playing = false,
         autoPlay = true,
-        source = null; // current source played
+        source = null, // current source played
+        scheduleWhilePaused = false; // should we buffer while in pause
+        
 
 
     // player state and intitialization
-    var _isReady = function() {
+    var _isReady = function () {
         return initialized && videoModel.getElement() && source && !resetting;
-    }
+    };
 
-    var _isPlayerInitialized = function() {
+    var _isPlayerInitialized = function () {
         if (!initialized) {
             throw new Error('MediaPlayer not initialized !!!');
         }
     };
 
-    var _isVideoModelInitialized = function() {
+    var _isVideoModelInitialized = function () {
         if (!videoModel.getElement()) {
             throw new Error('MediaPlayer.play(): Video element not attached to MediaPlayer');
         }
-    }
+    };
 
-    var _isSourceInitialized = function() {
+    var _isSourceInitialized = function () {
         if (!source) {
             throw new Error('MediaPlayer.play(): Source not attached to MediaPlayer');
         }
-    }
+    };
 
     // event connection
-    var _connectEvents = function() {
+    var _connectEvents = function () {
         //this.addEventListener('loadedMetadata', _onloaded.bind(this));
         this.addEventListener('metricsAdded', _metricsAdded.bind(this));
         this.addEventListener('error', _onError.bind(this));
@@ -91,7 +93,7 @@ MediaPlayer = function() {
     };
 
     // event disptach
-    var _dispatchBitrateEvent = function(type, value) {
+    var _dispatchBitrateEvent = function (type, value) {
         var event = document.createEvent("CustomEvent");
         event.initCustomEvent(type, false, false, {
             type: value.streamType,
@@ -104,7 +106,7 @@ MediaPlayer = function() {
         videoModel.getElement().dispatchEvent(event);
     };
 
-    var _metricsAdded = function(e) {
+    var _metricsAdded = function (e) {
         switch (e.data.metric) {
             case "ManifestReady":
                 _isPlayerInitialized();
@@ -186,18 +188,18 @@ MediaPlayer = function() {
         }
     };
 
-    var _onError = function(e) {
+    var _onError = function (e) {
         error = e.data;
     };
 
-    var _onWarning = function(e) {
+    var _onWarning = function (e) {
         warning = e.data;
     };
 
     /**
      * Usefull to dispatch event of quality changed
      */
-    var _onTimeupdate = function() {
+    var _onTimeupdate = function () {
         // If not in playing state, then do not send 'play_bitrate' events, wait for 'loadeddata' event first
         if (videoModel.getPlaybackRate() === 0) {
             return;
@@ -208,7 +210,7 @@ MediaPlayer = function() {
         _detectPlayBitrateChange.call(this, audioQualityChanged);
     };
 
-    var _detectPlayBitrateChange = function(streamTab) {
+    var _detectPlayBitrateChange = function (streamTab) {
         var currentTime = videoModel.getCurrentTime(),
             currentSwitch = null,
             idToRemove = [],
@@ -227,7 +229,7 @@ MediaPlayer = function() {
         _cleanStreamTab(streamTab, idToRemove);
     };
 
-    var _cleanStreamTab = function(streamTab, idToRemove) {
+    var _cleanStreamTab = function (streamTab, idToRemove) {
         var i = 0;
 
         for (i = idToRemove.length - 1; i >= 0; i -= 1) {
@@ -237,13 +239,13 @@ MediaPlayer = function() {
 
 
     /// Private playback functions ///
-    var resetAndPlay = function() {
+    var resetAndPlay = function () {
         if (playing && streamController) {
             if (!resetting) {
                 resetting = true;
 
                 var teardownComplete = {};
-                teardownComplete[MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE] = (function() {
+                teardownComplete[MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE] = (function () {
 
                     // Finish rest of shutdown process
                     streamController = null;
@@ -267,13 +269,13 @@ MediaPlayer = function() {
         }
     };
 
-    var doAutoPlay = function() {
+    var doAutoPlay = function () {
         if (_isReady()) {
             play.call(this);
         }
     };
 
-    var play = function() {
+    var play = function () {
         _isPlayerInitialized();
         _isVideoModelInitialized();
         _isSourceInitialized();
@@ -284,7 +286,7 @@ MediaPlayer = function() {
         }
 
         playing = true;
-        
+
         // streamController Initialization
         if (!streamController) {
             streamController = system.getObject('streamController');
@@ -292,12 +294,14 @@ MediaPlayer = function() {
             streamController.setAutoPlay(autoPlay);
         }
 
-        streamController.setDefaultAudioLang(defaultAudioLang)
+        streamController.setDefaultAudioLang(defaultAudioLang);
         streamController.setDefaultSubtitleLang(defaultSubtitleLang);
         streamController.enableSubtitles(subtitlesEnabled);
         // TODO restart here !!!
-        streamController.load();
-
+        streamController.load(source.url, source.protData);
+        system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
+        system.mapOutlet("scheduleWhilePaused", "stream");
+        
     };
 
     // DIJON initialization
@@ -335,7 +339,7 @@ MediaPlayer = function() {
          * @param {callback} listener - the callback which is called when an event of the specified type occurs
          * @param {boolean} useCapture - see HTML DOM addEventListener() method specification
          */
-        addEventListener: function(type, listener, useCapture) {
+        addEventListener: function (type, listener, useCapture) {
             _isPlayerInitialized();
             if (MediaPlayer.PUBLIC_EVENTS[type] === 'hasplayer') {
                 this.eventBus.addEventListener(type, listener, useCapture);
@@ -353,7 +357,7 @@ MediaPlayer = function() {
          * @param {string} type - the event type on which the listener was registered
          * @param {callback} listener - the callback which was registered to the event type
          */
-        removeEventListener: function(type, listener) {
+        removeEventListener: function (type, listener) {
             _isPlayerInitialized();
             if (MediaPlayer.PUBLIC_EVENTS[type] === 'hasplayer') {
                 this.eventBus.removeEventListener(type, listener);
@@ -369,7 +373,7 @@ MediaPlayer = function() {
          * @memberof MediaPlayer#
          * @param {Object} video - the HTML5 video element used to decode and render the media data
          */
-        init: function(video) {
+        init: function (video) {
             if (!video) {
                 throw new Error('MediaPlayer.init(): Invalid Argument');
             }
@@ -414,14 +418,14 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @param {MetricsAgentParams} parameters - the metrics agent parameters
          */
-        loadMetricsAgent: function(parameters) {
+        loadMetricsAgent: function (parameters) {
             _isPlayerInitialized();
 
             if (typeof (MetricsAgent) !== 'undefined') {
                 metricsAgent.ref = new MetricsAgent(this, videoModel.getElement(), parameters, this.debug);
 
                 metricsAgent.deferInit = Q.defer();
-                metricsAgent.ref.init(function(activated) {
+                metricsAgent.ref.init(function (activated) {
                     this.debug.log("Metrics agent state: ", activated);
                     metricsAgent.isActivated = activated;
                     metricsAgent.deferInit.resolve();
@@ -457,7 +461,7 @@ MediaPlayer = function() {
             }
             </pre>
         */
-        load: function(stream) {
+        load: function (stream) {
             var config = {
                 video: {
                     "ABR.keepBandwidthCondition": true
@@ -492,9 +496,9 @@ MediaPlayer = function() {
             }
 
             // Wait for MetricsAgent completely intialized before starting a new session
-            Q.when(metricsAgent.ref ? metricsAgent.deferInit.promise : true).then((function() {
+            Q.when(metricsAgent.ref ? metricsAgent.deferInit.promise : true).then((function () {
 
-                if (metricsAgent.ref && metricsAgent.isActivated && url) {
+                if (metricsAgent.ref && metricsAgent.isActivated && stream && stream.url) {
                     metricsAgent.ref.createSession();
                 }
 
@@ -505,7 +509,8 @@ MediaPlayer = function() {
                 warning = null;
 
                 // here we are ready to start playing
-
+                source = stream;
+                resetAndPlay.call(this);
 
                 // mediaPlayer.attachSource(url, protData);
 
@@ -513,6 +518,63 @@ MediaPlayer = function() {
                 //     state = 'PLAYER_RUNNING';
                 // }
             }).bind(this));
+        },
+
+        /**
+        * Updates the manifest url.
+        * @method refeshManifest
+        * @access public
+        * @memberof OrangeHasPlayer#
+        * param {string} url - the updated video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
+        */
+        refreshManifest: function (url) {
+            _isPlayerInitialized();
+            streamController.refreshManifest(url);
+        },
+
+        /**
+        * Plays/resumes playback of the media.
+        * @method play
+        * @access public
+        * @memberof OrangeHasPlayer#
+        */
+        play: function () {
+            _isPlayerInitialized();
+            videoModel.play();
+        },
+
+        /**
+         * Seeks the media to the new time. For LIVE streams, this function can be used to perform seeks within the DVR window if available.
+         * @method seek
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {number} time - the new time value in seconds
+         */
+        seek: function(time) {
+            var range = null;
+
+            _isPlayerInitialized();
+
+            if (typeof time !== 'number') {
+                throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
+            }
+
+            if (!this.isLive()) {
+                if  (time < 0 || time > videoModel.getDuration()) {
+                    throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+                } else {
+                    videoModel.setCurrentTime(time);
+                }
+            } else {
+                range = this.getDVRWindowRange();
+                if (range === null) {
+                    throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
+                } else if (time < range.start || time > range.end) {
+                    throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+                } else {
+                    videoModel.setCurrentTime(time);
+                }
+            }
         },
 
         /**
@@ -526,7 +588,7 @@ MediaPlayer = function() {
          * <li>1 : stop because all the stream has been watched
          * <li>2 : stop after an error
          */
-        reset: function(reason) {
+        reset: function (reason) {
             _isPlayerInitialized();
             this.abrController.setAutoSwitchBitrate('video', 0);
             this.abrController.setAutoSwitchBitrate('audio', 0);
@@ -548,13 +610,13 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @param {boolean} enabled - true to enable subtitles, false to hide subtitles. (default false)
          */
-        enableSubtitles: function(enabled) {
+        enableSubtitles: function (enabled) {
             _isPlayerInitialized();
             if (typeof value !== 'boolean') {
                 throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
             }
             subtitlesEnabled = enabled;
-            if(streamController){
+            if (streamController) {
                 streamController.enableSubtitles(enabled);
             }
         },
@@ -567,7 +629,7 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @return {string} the version of the player
          */
-        getVersion: function() {
+        getVersion: function () {
             return VERSION;
         },
 
@@ -578,7 +640,7 @@ MediaPlayer = function() {
          * @memberof MediaPlayer#
          * @return {string} the version of the player including git tag
          */
-        getVersionFull: function() {
+        getVersionFull: function () {
             if (GIT_TAG.indexOf("@@") === -1) {
                 return VERSION + '_' + GIT_TAG;
             } else {
@@ -591,7 +653,7 @@ MediaPlayer = function() {
         * @memberof MediaPlayer#
         * @return date when the hasplayer has been built.
         */
-        getBuildDate: function() {
+        getBuildDate: function () {
             if (BUILD_DATE.indexOf("@@") === -1) {
                 return BUILD_DATE;
             } else {
@@ -604,7 +666,7 @@ MediaPlayer = function() {
          * @memberof MediaPlayer#
          * @return TBD
          */
-        getMetricsExt: function() {
+        getMetricsExt: function () {
             return this.metricsExt;
         },
 
@@ -614,7 +676,7 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @return {object} the Error object for the most recent error, or null if there has not been an error..
         */
-        getError: function() {
+        getError: function () {
             return error;
         },
 
@@ -624,7 +686,7 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @return {object} the Warning object for the most recent warning, or null if there has not been a warning..
          */
-        getWarning: function() {
+        getWarning: function () {
             return warning;
         },
 
@@ -633,8 +695,18 @@ MediaPlayer = function() {
          * @memberof MediaPlayer#
          * @return TBD
          */
-        getAutoPlay: function() {
+        getAutoPlay: function () {
             return autoPlay;
+        },
+
+        /**
+         * get the buffering behaviour while the player is in pause
+         * @access public
+         * @memberof MediaPlayer#
+         * @return {boolean} true if we continue to buffer stream while in pause
+         */
+        getScheduleWhilePaused: function () {
+            return scheduleWhilePaused;
         },
 
         /**
@@ -642,7 +714,7 @@ MediaPlayer = function() {
          * @memberof MediaPlayer#
          * @param value - .
          */
-        setAutoPlay: function(value) {
+        setAutoPlay: function (value) {
             autoPlay = value;
         },
 
@@ -654,7 +726,7 @@ MediaPlayer = function() {
          * @see {@link http://localhost:8080/OrangeHasPlayer/samples/Dash-IF/hasplayer_config.json}
          *
          */
-        setConfig: function(params) {
+        setConfig: function (params) {
             if (this.config && params) {
                 this.debug.log("[MediaPlayer] set config: " + JSON.stringify(params, null, '\t'));
                 this.config.setParams(params);
@@ -672,11 +744,21 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @param {string} lang - the default audio language based on ISO 3166-2
          */
-        setDefaultAudioLang: function(language) {
+        setDefaultAudioLang: function (language) {
             if (typeof lang !== 'string') {
                 throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
             }
             defaultAudioLang = language;
+        },
+
+        /**
+         * change the buffering behaviour while player is in pause
+         * @access public
+         * @memberof MediaPlayer#
+         * @param {boolean} value - true if it buffers stream while in pause
+         */
+        setScheduleWhilePaused: function (value) {
+            scheduleWhilePaused = value;
         },
 
         /**
@@ -688,7 +770,7 @@ MediaPlayer = function() {
          * @memberof OrangeHasPlayer#
          * @param {string} lang - the default subtitle language based on ISO 3166-2
          */
-        setDefaultSubtitleLang: function(language) {
+        setDefaultSubtitleLang: function (language) {
             if (typeof lang !== 'string') {
                 throw new Error('OrangeHasPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
@@ -867,7 +949,7 @@ MediaPlayer.PUBLIC_EVENTS = {
 * @static
 * @return true if MSE is supported, false otherwise
 */
-MediaPlayer.hasMediaSourceExtension = function() {
+MediaPlayer.hasMediaSourceExtension = function () {
 
     return new MediaPlayer.utils.Capabilities().supportsMediaSource();
 };
@@ -878,6 +960,6 @@ MediaPlayer.hasMediaSourceExtension = function() {
  * @static
  * @return true if EME is supported, false otherwise
  */
-MediaPlayer.hasMediaKeysExtension = function() {
+MediaPlayer.hasMediaKeysExtension = function () {
     return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
 };
