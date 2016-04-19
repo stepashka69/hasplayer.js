@@ -1,9 +1,9 @@
 {
   "items": [
   	{"name": "csQoE (local)",
-	 "activationUrl":"http://localhost:8082/config",
-	 "serverUrl":"http://localhost:8082/metrics",
-	 "dbServerUrl":"http://localhost:8082/metricsDB",
+	 "activationUrl":"http://localhost:8080/config",
+	 "serverUrl":"http://localhost:8080/metrics",
+	 "dbServerUrl":"http://localhost:8080/metricsDB",
 	 "collector":"HasPlayerCollector",
      "formatter":"CSQoE",
      "sendingTime": 10000
