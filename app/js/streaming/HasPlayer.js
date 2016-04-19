@@ -57,7 +57,7 @@ MediaPlayer = function () {
         autoPlay = true,
         source = null, // current source played
         scheduleWhilePaused = false; // should we buffer while in pause
-        
+
 
 
     // player state and intitialization
@@ -301,8 +301,28 @@ MediaPlayer = function () {
         streamController.load(source.url, source.protData);
         system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
         system.mapOutlet("scheduleWhilePaused", "stream");
-        
+
     };
+    
+    // TODO : remove this when migration of method getTracks will be done on all the process
+    var getTracksFromType = function (_type) {
+        switch (_type) {
+            case MediaPlayer.TRACKS_TYPE.AUDIO:
+                return streamController.getAudioTracks();
+            case MediaPlayer.TRACKS_TYPE.TEXT:
+                return streamController.getSubtitleTracks();
+        }
+    };
+    
+    var getSelectedTrackFromType = function(_type){
+         switch (_type) {
+            case MediaPlayer.TRACKS_TYPE.AUDIO:
+                return streamController.getSelectedAudioTrack();
+            case MediaPlayer.TRACKS_TYPE.TEXT:
+                return streamController.getSelectedSubtitleTrack();
+        }
+    }
+    // END TODO
 
     // DIJON initialization
     system.mapValue('system', system);
@@ -317,7 +337,6 @@ MediaPlayer = function () {
         metricsExt: undefined,
         abrController: undefined,
         metricsModel: undefined,
-        uriQueryFragModel: undefined,
         errHandler: undefined,
         config: undefined,
 
@@ -511,12 +530,6 @@ MediaPlayer = function () {
                 // here we are ready to start playing
                 source = stream;
                 resetAndPlay.call(this);
-
-                // mediaPlayer.attachSource(url, protData);
-
-                // if (mediaPlayer.getAutoPlay()) {
-                //     state = 'PLAYER_RUNNING';
-                // }
             }).bind(this));
         },
 
@@ -550,7 +563,7 @@ MediaPlayer = function () {
          * @memberof OrangeHasPlayer#
          * @param {number} time - the new time value in seconds
          */
-        seek: function(time) {
+        seek: function (time) {
             var range = null;
 
             _isPlayerInitialized();
@@ -560,7 +573,7 @@ MediaPlayer = function () {
             }
 
             if (!this.isLive()) {
-                if  (time < 0 || time > videoModel.getDuration()) {
+                if (time < 0 || time > videoModel.getDuration()) {
                     throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
                 } else {
                     videoModel.setCurrentTime(time);
@@ -574,6 +587,40 @@ MediaPlayer = function () {
                 } else {
                     videoModel.setCurrentTime(time);
                 }
+            }
+        },
+
+        /**
+         * Pauses the media playback.
+         * @method pause
+         * @access public
+         * @memberof MediaPlayer#
+         */
+        pause: function () {
+            _isPlayerInitialized();
+            if (!this.isLive()) {
+                videoModel.pause();
+            } else {
+                throw new Error('OrangeHasPlayer.pause(): pause is impossible on live stream');
+            }
+        },
+
+        /**
+         * Stops the media playback and seek back to start of stream and media. Subsequently call to play() method will restart streaming and playing from beginning.
+         * @method stop
+         * @access public
+         * @memberof OrangeHasPlayer#
+         */
+        stop: function () {
+            _isPlayerInitialized();
+            videoModel.pause();
+            //test if player is in VOD mode
+            if (!this.isLive()) {
+                videoModel.setCurrentTime(0);
+            }
+
+            if (metricsAgent.ref) {
+                metricsAgent.ref.stop();
             }
         },
 
@@ -594,13 +641,11 @@ MediaPlayer = function () {
             this.abrController.setAutoSwitchBitrate('audio', 0);
 
             this.metricsModel.addState('video', 'stopped', videoModel.getCurrentTime(), reason);
-            this.uriQueryFragModel.reset();
             source = null;
             resetAndPlay();
             if (metricsAgent.ref) {
                 metricsAgent.ref.stop();
             }
-
         },
 
         /**
@@ -620,6 +665,65 @@ MediaPlayer = function () {
                 streamController.enableSubtitles(enabled);
             }
         },
+
+
+        /////////////////////// STREAM METADATA  //////////////////////////////////////////////////////// 
+
+        /**
+         * Returns the media duration.
+         * @method getDuration
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {number} the media duration in seconds, <i>Infinity</i> for live content
+         */
+        getDuration: function () {
+            _isPlayerInitialized();
+            return videoModel.getDuration();
+        },
+
+        /**
+         * Returns true if the current stream is a live stream.
+         * @method isLive
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {boolean} true if current stream is a live stream, false otherwise
+         */
+        isLive: function () {
+            _isPlayerInitialized();
+            return videoModel.getDuration() !== Number.POSITIVE_INFINITY ? false : true;
+        },
+
+
+        /**
+         * Return available dvr range for  live stream
+         * @method isLive
+         * @access public
+         * @memberOf MediaPlayer#
+         * @return {Array} dvr range available
+         */
+        getDVRWindowRange: function () {
+            if (this.isLive()) {
+                var metric = this.metricsModel.getReadOnlyMetricsFor('video'),
+                    dvrInfo = metric ? this.metricsExt.getCurrentDVRInfo(metric) : null,
+                    range = dvrInfo ? dvrInfo.range : null;
+                return range;
+            } else {
+                return null;
+            }
+        },
+
+        /**
+         * Returns the list of available bitrates (as specified in the stream manifest).
+         * @method getVideoBitrates
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {Array<Number>} array of bitrate values
+         */
+        getVideoBitrates: function () {
+            _isPlayerInitialized();
+            return videoBitrates;
+        },
+
 
         ////////////////////////////////////////// GETTER /////////////////////////////////////////////
         /**
@@ -710,6 +814,102 @@ MediaPlayer = function () {
         },
 
         /**
+         * Sets the trick mode speed.
+         * @method setTrickModeSpeed
+         * @access public
+         * @memberof MediaPlayer#
+         * @param {number} speed - the new trick mode speed.
+         */
+        getTrickModeSpeed: function () {
+            if (streamController) {
+                return streamController.getTrickModeSpeed();
+            }
+
+            return 0;
+        },
+
+        /**
+         * Returns the current playback time.
+         * @method getPosition
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {number} the current playback time in seconds
+         */
+        getPosition: function () {
+            _isPlayerInitialized();
+            if (!this.isLive()) {
+                return videoModel.getCurrentTime();
+            } else {
+                return undefined;
+            }
+        },
+
+        /**
+         * Returns the list of tracks contained in the stream (as specified in the stream manifest) 
+         * according to the type given in parameters. if null it returns all type of tracks (audio & text)
+         * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
+         * @method getTracks
+         * @param {String} type
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {Array<Track>} the audio tracks
+         */
+        getTracks: function (type) {
+
+            _isPlayerInitialized();
+
+            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+                throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
+            }
+
+            
+
+            if (tracks[type].length === 0) {
+                if (streamController) {
+                    var selectedTracks = getTracksFromType(type);
+                    if (selectedTracks) {
+                        for (var i = 0; i < selectedTracks.length; i += 1) {
+                            tracks[type].push({
+                                id: selectedTracks[i].id,
+                                lang: selectedTracks[i].lang
+                            });
+                        }
+                    }
+                }
+            }
+
+            return tracks[type];
+        },
+        
+        /**
+         * Returns the selected track.
+         * @method getSelectedTrack
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {String} type - the track type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
+         * @return {Track} the selected audio track
+         */
+        getSelectedTrack: function(type) {
+            _isPlayerInitialized();
+            
+            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+                throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
+            }
+
+            if(streamController){
+                var selectedTrack = getSelectedTrackFromType(type);
+                return {id:selectedTrack.id, lang:selectedTrack.lang};
+            }else{
+                return null;
+            }
+
+        },
+
+
+
+        ///////////////////////////////////// SETTER ///////////////////////////////////////////
+
+        /**
          * @access public
          * @memberof MediaPlayer#
          * @param value - .
@@ -759,6 +959,68 @@ MediaPlayer = function () {
          */
         setScheduleWhilePaused: function (value) {
             scheduleWhilePaused = value;
+        },
+
+        /**
+        * Sets the trick mode speed.
+        * @method setTrickModeSpeed
+        * @access public
+        * @memberof OrangeHasPlayer#
+        * @param {number} speed - the new trick mode speed.
+        */
+        setTrickModeSpeed: function (speed) {
+            _isPlayerInitialized();
+            if (streamController) {
+                if (streamController.getTrickModeSpeed() !== speed && speed === 1) {
+                    videoModel.play();
+                } else {
+                    streamController.setTrickModeSpeed(speed);
+                }
+            }
+        },
+        
+        /**
+         * Selects the track to be playbacked .
+         * @method setTrack
+         * @access public
+         * @memberof MediaPlayer#
+         * @see [getTracks]{@link MediaPlayer#getTracks}
+         * @param {String} type - the track type to set (see @link MediaPlayer#TRACKS_TYPE)
+         * @param {Track} newTrack - the audio track to select
+         * 
+         */
+        setTrack : function(type, newTrack) {
+           
+            _isPlayerInitialized();
+
+            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+                throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
+            }
+
+            if (!newTrack || !(newTrack.id || newTrack.lang)) {
+                throw new Error('OrangeHasPlayer.setTrack(): newTrack parameter is unknown');
+            }
+
+            var selectedTrack = this.getSelectedTrack(type);
+            
+
+            if (selectedTrack && ((newTrack.id === selectedTrack.id) ||
+                (newTrack.lang === selectedTrack.lang))) {
+                this.debug.log("[OrangeHasPlayer] " + newTrack.lang + " is already selected");
+                return;
+            }
+
+           var availableTracks = getTracksFromType(type);
+
+            if (availableTracks) {
+                for (i = 0; i < availableTracks.length; i += 1) {
+                    if ((newTrack.id === availableTracks[i].id) ||
+                        (newTrack.lang === availableTracks[i].lang)) {
+                        this.setTrack(type, availableTracks[i]);
+                        return;
+                    }
+                }
+            }
         },
 
         /**
@@ -939,6 +1201,16 @@ MediaPlayer.PUBLIC_EVENTS = {
     'state_changed': 'video'
 
 };
+
+/**
+ *  expose the track's type available in has manifest. usefull to retrieve tracks list with method MediaPlayer.getTracks(<type>)
+ *  @enum 
+ */
+MediaPlayer.TRACKS_TYPE = {
+    AUDIO: "audio",
+    TEXT: "text"
+};
+
 
 /** 
  * Static Functions
