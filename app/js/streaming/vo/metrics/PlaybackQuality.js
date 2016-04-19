@@ -11,34 +11,15 @@
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.rules.SwitchRequest = function (q, p, m, rule) {
+MediaPlayer.vo.metrics.PlaybackQuality = function () {
     "use strict";
-    this.quality = q;
-    this.priority = p;
-    this.max = m;
-    this.rule = rule;
 
-    if (this.quality === undefined) {
-        this.quality = 999;
-    }
-
-    if (this.priority === undefined) {
-        this.priority = 0.5;
-    }
-
-    if (this.max === undefined) {
-        this.max = false;
-    }
-
-    if (this.rule === undefined) {
-        this.rule = "";
-    }
+    this.t = null;                  // Real-Time | Time of the measurement of the playback quality
+    this.mt = null;                 // Media-Time | Media presentation time of the measurement of the playback quality
+    this.droppedFrames = null;      // Number of dropped frames
+    this.totalVideoFrames = null;   // Number of decoded video frames
 };
 
-MediaPlayer.rules.SwitchRequest.prototype = {
-    constructor: MediaPlayer.rules.SwitchRequest,
-    NO_CHANGE: 999,
-    DEFAULT: 0.5,
-    STRONG: 1,
-    WEAK: 0
+MediaPlayer.vo.metrics.PlaybackQuality.prototype = {
+    constructor: MediaPlayer.vo.metrics.PlaybackQuality
 };
