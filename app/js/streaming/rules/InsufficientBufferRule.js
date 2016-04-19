@@ -13,7 +13,7 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-MediaPlayer.rules.InsufficientBufferRule = function () {
+MediaPlayer.rules.InsufficientBufferRule = function() {
     "use strict";
 
     var rule = "InsufficientBuffer";
@@ -26,7 +26,7 @@ MediaPlayer.rules.InsufficientBufferRule = function () {
         config: undefined,
         isStartBuffering: {},
 
-        checkIndex: function (current, metrics, data, playerState) {
+        checkIndex: function(current, metrics, data, playerState) {
             var self = this,
                 bufferLevel = self.metricsExt.getCurrentBufferLevel(metrics),
                 minBufferTime,
@@ -40,7 +40,7 @@ MediaPlayer.rules.InsufficientBufferRule = function () {
                 q = current,
                 p = MediaPlayer.rules.SwitchRequest.prototype.DEFAULT;
 
-            
+
             if (data === null) {
                 return Q.when(new MediaPlayer.rules.SwitchRequest());
             }
@@ -54,13 +54,15 @@ MediaPlayer.rules.InsufficientBufferRule = function () {
                 return Q.when(new MediaPlayer.rules.SwitchRequest());
             }
 
-            self.debug.info("[InsufficientBufferRule]["+data.type+"] Checking buffer level ... (current = " + current + ", buffer level = " + (Math.round(bufferLevel.level * 100) / 100) + ")");
+            self.debug.info("[InsufficientBufferRule][" + data.type + "] Checking buffer level ... (current = " + current +
+                ", buffer level = " + (Math.round(bufferLevel.level * 100) / 100) +
+                ", buffering = " + self.isStartBuffering[data.type] + ")");
 
             deferred = Q.defer();
 
             self.manifestExt.getMpd(self.manifestModel.getValue()).then(
                 function(mpd) {
-                    if(mpd){
+                    if (mpd) {
                         minBufferTime = self.config.getParamFor(data.type, "BufferController.minBufferTime", "number", mpd.manifest.minBufferTime);
                         switchLowerBufferRatio = self.config.getParamFor(data.type, "ABR.switchLowerBufferRatio", "number", 0.25);
                         switchLowerBufferTime = self.config.getParamFor(data.type, "ABR.switchLowerBufferTime", "number", switchLowerBufferRatio * minBufferTime);
@@ -75,9 +77,9 @@ MediaPlayer.rules.InsufficientBufferRule = function () {
                             if (bufferLevel.level >= switchDownBufferTime) {
                                 self.isStartBuffering[data.type] = false;
                             }
-                            
+
                             self.manifestExt.getRepresentationCount(data).then(
-                                function (max) {
+                                function(max) {
                                     max -= 1; // 0 based
 
                                     if (bufferLevel.level <= switchLowerBufferTime) {
@@ -88,13 +90,13 @@ MediaPlayer.rules.InsufficientBufferRule = function () {
                                         p = MediaPlayer.rules.SwitchRequest.prototype.DEFAULT;
                                     }
 
-                                    self.debug.info("[InsufficientBufferRule]["+data.type+"] SwitchRequest: q=" + q + ", p=" + p);
+                                    self.debug.info("[InsufficientBufferRule][" + data.type + "] SwitchRequest: q=" + q + ", p=" + p);
                                     deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p, false, rule));
                                 }
                             );
                         }
-                    }else{
-                        self.debug.log("[InsufficientBufferRule]["+data.type+"] Manifest not present yet");
+                    } else {
+                        self.debug.log("[InsufficientBufferRule][" + data.type + "] Manifest not present yet");
                         deferred.resolve(new MediaPlayer.rules.SwitchRequest());
                     }
                 }

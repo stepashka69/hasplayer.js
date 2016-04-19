@@ -48,12 +48,12 @@ MediaPlayer.rules.DownloadRatioRule = function() {
                 self.debug.log("[DownloadRatioRule][" + data.type + "] Checking download ratio rule... (current = " + current + ")");
 
                 if (!metrics) {
-                    self.debug.log("[DownloadRatioRule][" + data.type + "]No metrics, bailing.");
+                    self.debug.log("[DownloadRatioRule][" + data.type + "] No metrics, bailing.");
                     return Q.when(new MediaPlayer.rules.SwitchRequest());
                 }
 
                 if (lastRequest === null) {
-                    self.debug.log("[DownloadRatioRule][" + data.type + "]No requests made for this stream yet, bailing.");
+                    self.debug.log("[DownloadRatioRule][" + data.type + "] No requests made for this stream yet, bailing.");
                     return Q.when(new MediaPlayer.rules.SwitchRequest());
                 }
 
@@ -61,7 +61,7 @@ MediaPlayer.rules.DownloadRatioRule = function() {
                 downloadTime = (lastRequest.tfinish.getTime() - lastRequest.tresponse.getTime()) / 1000;
 
                 if (totalTime <= 0) {
-                    self.debug.log("[DownloadRatioRule][" + data.type + "]Don't know how long the download of the last fragment took, bailing.");
+                    self.debug.log("[DownloadRatioRule][" + data.type + "] Don't know how long the download of the last fragment took, bailing.");
                     return Q.when(new MediaPlayer.rules.SwitchRequest());
                 }
 
@@ -124,10 +124,9 @@ MediaPlayer.rules.DownloadRatioRule = function() {
                                                     self.debug.info("[DownloadRatioRule][" + data.type + "] SwitchRequest: q=" + q + "/" + (count-1) + " (" + bandwidths[q] + "), p=" + p);
                                                     deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p, false, rule));
                                                 } else {
-
                                                     for (i = count - 1; i > current; i -= 1) {
                                                         if (calculatedBandwidth > (bandwidths[i] * switchUpRatioSafetyFactor)) {
-                                                            self.debug.log("[DownloadRatioRule][" + data.type + "] bw = " + calculatedBandwidth + " results[i] * switchUpRatioSafetyFactor =" + (bandwidths[i] * switchUpRatioSafetyFactor) + " with i=" + i);
+                                                            //self.debug.log("[DownloadRatioRule][" + data.type + "] bw = " + calculatedBandwidth + " results[i] * switchUpRatioSafetyFactor =" + (bandwidths[i] * switchUpRatioSafetyFactor) + " with i=" + i);
                                                             break;
                                                         }
                                                     }
