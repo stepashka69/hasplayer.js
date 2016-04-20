@@ -303,7 +303,7 @@ MediaPlayer = function () {
         system.mapOutlet("scheduleWhilePaused", "stream");
 
     };
-    
+
     // TODO : remove this when migration of method getTracks will be done on all the process
     var getTracksFromType = function (_type) {
         switch (_type) {
@@ -313,15 +313,15 @@ MediaPlayer = function () {
                 return streamController.getSubtitleTracks();
         }
     };
-    
-    var getSelectedTrackFromType = function(_type){
-         switch (_type) {
+
+    var getSelectedTrackFromType = function (_type) {
+        switch (_type) {
             case MediaPlayer.TRACKS_TYPE.AUDIO:
                 return streamController.getSelectedAudioTrack();
             case MediaPlayer.TRACKS_TYPE.TEXT:
                 return streamController.getSelectedSubtitleTrack();
         }
-    }
+    };
     // END TODO
 
     // DIJON initialization
@@ -666,6 +666,29 @@ MediaPlayer = function () {
             }
         },
 
+        /**
+        * function used to retrieve if subtitle is enable or not
+        * @method isSubtitlesEnabled
+        * @access public
+        * @memberof OrangeHasPlayer#
+        * @retrun {boolean} true if the download of subtitle is enabled
+       */
+        isSubtitlesEnabled: function () {
+            _isPlayerInitialized();
+            return subtitlesEnabled;
+        },
+
+        /**
+         * Set to true if subtitles are displayed in a div outside video player.
+         * @method enableSubtitleExternDisplay
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {boolean} mode - true if subtitles are displayed in a div outside video player
+         */
+        enableSubtitleExternDisplay: function (mode) {
+            this.config.setParam({ 'TextTrackExtensions.displayModeExtern': mode });
+        },
+
 
         /////////////////////// STREAM METADATA  //////////////////////////////////////////////////////// 
 
@@ -710,6 +733,42 @@ MediaPlayer = function () {
             } else {
                 return null;
             }
+        },
+        
+        /**
+         * Returns the DVR window size.
+         * @method getDVRWindowSize
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {number} the DVR window size in seconds
+         */
+        getDVRWindowSize: function() {
+            _isPlayerInitialized();
+            return this.getDVRInfoMetric.call(this).mpd.timeShiftBufferDepth;
+        },
+
+
+        getDVRInfoMetric = function() {
+            var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
+            return this.metricsExt.getCurrentDVRInfo(metric);
+        },
+
+       
+        /**
+         * TBD
+         * @param  value
+         * @return DVR seek offset
+         * @access public
+         */
+        getDVRSeekOffset = function(value) {
+            var metric = this.getDVRInfoMetric.call(this),
+                val = metric.range.start + parseInt(value, 10);
+
+            if (val > metric.range.end) {
+                val = metric.range.end;
+            }
+
+            return val;
         },
 
         /**
@@ -793,6 +852,16 @@ MediaPlayer = function () {
         getWarning: function () {
             return warning;
         },
+        
+        /**
+         * function to get debug params of the player
+         * @access public
+         * @memberof MediaPlayer#
+         * @return {Object} the debug object 
+         */
+        getDebug: function() {
+            return this.debug;
+        },
 
         /**
          * @access public
@@ -862,7 +931,7 @@ MediaPlayer = function () {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
-            
+
 
             if (tracks[type].length === 0) {
                 if (streamController) {
@@ -880,7 +949,7 @@ MediaPlayer = function () {
 
             return tracks[type];
         },
-        
+
         /**
          * Returns the selected track.
          * @method getSelectedTrack
@@ -889,20 +958,76 @@ MediaPlayer = function () {
          * @param {String} type - the track type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
          * @return {Track} the selected audio track
          */
-        getSelectedTrack: function(type) {
+        getSelectedTrack: function (type) {
             _isPlayerInitialized();
-            
+
             if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
-            if(streamController){
+            if (streamController) {
                 var selectedTrack = getSelectedTrackFromType(type);
-                return {id:selectedTrack.id, lang:selectedTrack.lang};
-            }else{
+                return { id: selectedTrack.id, lang: selectedTrack.lang };
+            } else {
                 return null;
             }
 
+        },
+
+
+        /**
+         * Returns the audio mute status.
+         * @method getMute
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {boolean} true if the audio is muted, false otherwise
+         */
+        getMute: function () {
+            _isPlayerInitialized();
+            return videoModel.getMute();
+        },
+
+        /**
+         * Sets the audio mute status.
+         * @method setMute
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {boolean} state - true to mute audio, false otherwise
+         */
+        setMute: function (state) {
+            _isPlayerInitialized();
+            if (typeof state !== 'boolean') {
+                throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
+            }
+            videoModel.setMute(state);
+        },
+
+        /**
+         * Returns the audio volume level.
+         * @method getVolume
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {number} the current audio volume level, from 0.0 (silent) to 1.0 (loudest)
+         */
+        getVolume: function () {
+            _isPlayerInitialized();
+            return videoModel.getVolume();
+        },
+
+        /**
+         * Sets the audio volume level.
+         * @method setVolume
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {number} volume - the audio volume level, from 0.0 (silent) to 1.0 (loudest)
+         */
+        setVolume: function (volume) {
+            _isPlayerInitialized();
+            if ((typeof volume !== 'number') || volume < 0 || volume > 1) {
+                throw new Error('OrangeHasPlayer.setVolume(): Invalid Arguments');
+            }
+
+            videoModel.setVolume(volume);
         },
 
 
@@ -978,7 +1103,7 @@ MediaPlayer = function () {
                 }
             }
         },
-        
+
         /**
          * Selects the track to be playbacked .
          * @method setTrack
@@ -989,8 +1114,8 @@ MediaPlayer = function () {
          * @param {Track} newTrack - the audio track to select
          * 
          */
-        setTrack : function(type, newTrack) {
-           
+        setTrack: function (type, newTrack) {
+
             _isPlayerInitialized();
 
             if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
@@ -1002,7 +1127,7 @@ MediaPlayer = function () {
             }
 
             var selectedTrack = this.getSelectedTrack(type);
-            
+
 
             if (selectedTrack && ((newTrack.id === selectedTrack.id) ||
                 (newTrack.lang === selectedTrack.lang))) {
@@ -1010,10 +1135,10 @@ MediaPlayer = function () {
                 return;
             }
 
-           var availableTracks = getTracksFromType(type);
+            var availableTracks = getTracksFromType(type);
 
             if (availableTracks) {
-                for (i = 0; i < availableTracks.length; i += 1) {
+                for (var i = 0; i < availableTracks.length; i += 1) {
                     if ((newTrack.id === availableTracks[i].id) ||
                         (newTrack.lang === availableTracks[i].lang)) {
                         this.setTrack(type, availableTracks[i]);
@@ -1037,15 +1162,59 @@ MediaPlayer = function () {
                 throw new Error('OrangeHasPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
             defaultSubtitleLang = language;
+        },
+
+        /**
+         * Sets some parameters values.
+         * TODO : this metod should be replace by MediaPlayer#setConfig
+         * @method setParams
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {PlayerParams} params - parameter(s) value(s) to set.
+         */
+        setParams: function (params) {
+            _isPlayerInitialized();
+            this.setConfig(params);
+        },
+        
+        /**
+         * Enables or disables debug information in the browser console.
+         * @method setDebug
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {boolean} value - true to enable debug information, false to disable
+         */
+        setDebug : function(value) {
+            _isPlayerInitialized();
+            if (typeof value !== 'boolean') {
+                throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
+            }
+            if (value === true) {
+                debugData.level = 4;
+                this.debug.setLevel(4);
+            } else {
+                debugData.level = 0;
+                this.debug.setLevel(0);
+            }
+        },
+        
+        /**
+         * Returns the terminal ID.
+         * @method fullscreenChanged
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @return {string} the terminal ID 
+         */
+        getTerminalId = function() {
+            var browser = fingerprint_browser(),
+                os = fingerprint_os();
+
+            return os.name + "-" + os.bits + "-" + browser.name;
         }
 
     };
 
 };
-
-
-
-
 
 
 /**
