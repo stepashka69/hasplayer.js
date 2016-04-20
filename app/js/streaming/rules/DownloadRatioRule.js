@@ -16,14 +16,14 @@
 MediaPlayer.rules.DownloadRatioRule = function() {
     "use strict";
 
-    var rule = "DownloadRatio";
-
     return {
         debug: undefined,
         manifestExt: undefined,
         metricsExt: undefined,
         manifestModel: undefined,
         config: undefined,
+
+        name: "DownloadRatioRule",
 
         checkIndex: function(current, metrics, data) {
             var self = this,
@@ -122,7 +122,7 @@ MediaPlayer.rules.DownloadRatioRule = function() {
                                                     p = MediaPlayer.rules.SwitchRequest.prototype.WEAK;
 
                                                     self.debug.info("[DownloadRatioRule][" + data.type + "] SwitchRequest: q=" + q + "/" + (count-1) + " (" + bandwidths[q] + "), p=" + p);
-                                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p, false, rule));
+                                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p));
                                                 } else {
                                                     for (i = count - 1; i > current; i -= 1) {
                                                         if (calculatedBandwidth > (bandwidths[i] * switchUpRatioSafetyFactor)) {
@@ -135,7 +135,7 @@ MediaPlayer.rules.DownloadRatioRule = function() {
                                                     p = MediaPlayer.rules.SwitchRequest.prototype.STRONG;
 
                                                     self.debug.info("[DownloadRatioRule][" + data.type + "] SwitchRequest: q=" + q + "/" + (count-1) + " (" + bandwidths[q] + "), p=" + p);
-                                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p, false, rule));
+                                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p));
                                                 }
                                             }
                                         );

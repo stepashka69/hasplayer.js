@@ -16,8 +16,6 @@
 MediaPlayer.rules.InsufficientBufferRule = function() {
     "use strict";
 
-    var rule = "InsufficientBuffer";
-
     return {
         debug: undefined,
         manifestExt: undefined,
@@ -25,6 +23,8 @@ MediaPlayer.rules.InsufficientBufferRule = function() {
         manifestModel: undefined,
         config: undefined,
         isStartBuffering: {},
+
+        name: "InsufficientBufferRule",
 
         checkIndex: function(current, metrics, data, playerState) {
             var self = this,
@@ -91,7 +91,7 @@ MediaPlayer.rules.InsufficientBufferRule = function() {
                                     }
 
                                     self.debug.info("[InsufficientBufferRule][" + data.type + "] SwitchRequest: q=" + q + ", p=" + p);
-                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p, false, rule));
+                                    deferred.resolve(new MediaPlayer.rules.SwitchRequest(q, p));
                                 }
                             );
                         }
