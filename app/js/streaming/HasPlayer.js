@@ -280,7 +280,7 @@ MediaPlayer = function () {
         _isVideoModelInitialized();
         _isSourceInitialized();
 
-        if (!MediaPlayer.supportsMediaSource()) {
+        if (!MediaPlayer.hasMediaSourceExtension()) {
             this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE, "MediaSource extension not supported by the browser");
             return;
         }
@@ -350,6 +350,7 @@ MediaPlayer = function () {
     return {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
+        notifier: undefined,
         debug: undefined,
         eventBus: undefined,
         metricsExt: undefined,
@@ -499,11 +500,10 @@ MediaPlayer = function () {
             </pre>
         */
         load: function (stream) {
-            
             // patch to be retro compatible with old syntax
             if(arguments && arguments.length > 0 && typeof arguments[0] !== 'object'){
                 console.warn('You are using "depreacted" call of the method load, please refer to the documentation to change prameters call');
-                stream = _parseLoadArguments(arguments);
+                stream = _parseLoadArguments.apply(null,arguments);
             }
             
             var config = {
@@ -682,7 +682,7 @@ MediaPlayer = function () {
          */
         enableSubtitles: function (enabled) {
             _isPlayerInitialized();
-            if (typeof value !== 'boolean') {
+            if (typeof enabled !== 'boolean') {
                 throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
             }
             subtitlesEnabled = enabled;
@@ -711,7 +711,7 @@ MediaPlayer = function () {
          * @param {boolean} mode - true if subtitles are displayed in a div outside video player
          */
         enableSubtitleExternDisplay: function (mode) {
-            this.config.setParam({ 'TextTrackExtensions.displayModeExtern': mode });
+            this.config.setParams({ 'TextTrackExtensions.displayModeExtern': mode });
         },
 
 
@@ -1183,7 +1183,7 @@ MediaPlayer = function () {
          * @param {string} lang - the default audio language based on ISO 3166-2
          */
         setDefaultAudioLang: function (language) {
-            if (typeof lang !== 'string') {
+            if (typeof language !== 'string') {
                 throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
             }
             defaultAudioLang = language;
@@ -1199,11 +1199,57 @@ MediaPlayer = function () {
          * @param {string} lang - the default subtitle language based on ISO 3166-2
          */
         setDefaultSubtitleLang: function (language) {
-            if (typeof lang !== 'string') {
+            if (typeof language !== 'string') {
                 throw new Error('OrangeHasPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
             defaultSubtitleLang = language;
         },
+
+        /////////// ADVANCED CONFIGURATION
+
+        /**
+         * Player parameters object.
+         * All parameters values are applied for any stream type. Parameters can be overriden specifically for audio and video track by setting
+         * parameters values in the params.audio and params.video objects.
+         * @typedef PlayerParams
+         * @type Object
+         * @property {number} BufferController.minBufferTimeForPlaying - Minimum buffer level before playing, in seconds (default value = 0)
+         * @property {number} BufferController.minBufferTime - Minimum buffer size, in seconds (default value = 16)
+         * @property {number} ABR.minBandwidth - Minimum bandwidth to be playbacked (default value = -1)
+         * @property {number} ABR.maxBandwidth - Maximum bandwidth to be playbacked (default value = -1)
+         * @property {number} ABR.minQuality - Minimum quality index (start from 0) to be playbacked (default value = -1)
+         * @property {number} ABR.maxQuality - Maximum quality index (start from 0) to be playbacked (default value = -1)
+         * @property {boolean} ABR.switchUpIncrementally - Switch up quality incrementally, or not (default value = false)
+         * @property {number} ABR.switchUpRatioSafetyFactor - Switch up bandwith ratio safety factor (default value = 1.5)
+         * @property {boolean} ABR.latencyInBandwidth - Include (or not) latency in bandwidth (default value = true)
+         * @property {number} ABR.switchLowerBufferTime - Buffer level (in seconds) under which switching down to lowest quality occurs (default value = -1)
+         * @property {number} ABR.switchLowerBufferRatio - Buffer level (as percentage of buffer size) under which switching down to lowest quality occurs (default value = 0.25)
+         * @property {number} ABR.switchDownBufferTime - Buffer level (in seconds) under which switching down quality occur, if unsufficient bandwidth (default value = -1)
+         * @property {number} ABR.switchDownBufferRatio - Buffer level (as percentage of buffer size) under which switching down quality occurs, if unsufficient bandwidth (default value = 0.5)
+         * @property {number} ABR.switchUpBufferTime - Buffer level (in seconds) upper which switching up quality occurs, if sufficient bandwidth (default value = -1)
+         * @property {number} ABR.switchUpBufferRatio - Buffer level (as percentage of buffer size) upper which switching up quality occurs, if sufficient bandwidth (default value = 0.75)
+         * @property {number} ManifestLoader.RetryAttempts - Number of retry attempts for downloading manifest file when it fails (default value = 2)
+         * @property {number} ManifestLoader.RetryInterval - Interval (in milliseconds) between each retry attempts for downloading manifest file (default value = 500)
+         * @property {number} FragmentLoader.RetryAttempts - Number of retry attempts for downloading segment files when it fails (default value = 2)
+         * @property {number} FragmentLoader.RetryInterval - Interval (in milliseconds) between each retry attempts for downloading segment files (default value = 500)
+         * @property {Object} video - Video parameters (parameters for video track)
+         * @property {Object} audio - audio parameters (parameters for audio track)
+         */
+
+        /**
+         * Sets the initial quality to be downloaded for the given track type.
+         * This method has to be used before each call to load() method to set the initial quality.
+         * Otherwise, the initial quality is set according to previous bandwidth condition.
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @see [setConfig]{@link OrangeHasPlayer#setConfig} to set quality boundaries
+         * @param {string} type - the track type ('video' or 'audio')
+         * @param {number} value - the new initial quality index (starting from 0) to be downloaded
+         */
+        setInitialQualityFor: function(type, value) {
+            initialQuality[type] = value;
+        },
+
 
         /**
          * Sets some parameters values.
