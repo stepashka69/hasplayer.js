@@ -27,7 +27,7 @@ var orangeHasPlayer = null,
  *
  **********************************************************************************************************************/
 function createHasPlayer(isSubtitleExternDisplay) {
-    orangeHasPlayer = new OrangeHasPlayer();
+    orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
     // @if ADSPLAYER
     adsPlayer = new AdsPlayer(video);
