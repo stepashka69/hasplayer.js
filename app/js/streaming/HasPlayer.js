@@ -734,7 +734,7 @@ MediaPlayer = function () {
                 return null;
             }
         },
-        
+
         /**
          * Returns the DVR window size.
          * @method getDVRWindowSize
@@ -742,25 +742,25 @@ MediaPlayer = function () {
          * @memberof OrangeHasPlayer#
          * @return {number} the DVR window size in seconds
          */
-        getDVRWindowSize: function() {
+        getDVRWindowSize: function () {
             _isPlayerInitialized();
             return this.getDVRInfoMetric.call(this).mpd.timeShiftBufferDepth;
         },
 
 
-        getDVRInfoMetric = function() {
+        getDVRInfoMetric = function () {
             var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
             return this.metricsExt.getCurrentDVRInfo(metric);
         },
 
-       
+
         /**
          * TBD
          * @param  value
          * @return DVR seek offset
          * @access public
          */
-        getDVRSeekOffset = function(value) {
+        getDVRSeekOffset = function (value) {
             var metric = this.getDVRInfoMetric.call(this),
                 val = metric.range.start + parseInt(value, 10);
 
@@ -852,15 +852,36 @@ MediaPlayer = function () {
         getWarning: function () {
             return warning;
         },
-        
+
         /**
          * function to get debug params of the player
          * @access public
          * @memberof MediaPlayer#
          * @return {Object} the debug object 
          */
-        getDebug: function() {
+        getDebug: function () {
             return this.debug;
+        },
+        
+        /**
+         * Enables or disables debug information in the browser console.
+         * @method setDebug
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {boolean} value - true to enable debug information, false to disable
+         */
+        setDebug: function (value) {
+            _isPlayerInitialized();
+            if (typeof value !== 'boolean') {
+                throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
+            }
+            if (value === true) {
+                debugData.level = 4;
+                this.debug.setLevel(4);
+            } else {
+                debugData.level = 0;
+                this.debug.setLevel(0);
+            }
         },
 
         /**
@@ -873,6 +894,15 @@ MediaPlayer = function () {
         },
 
         /**
+        * @access public
+        * @memberof MediaPlayer#
+        * @param value - .
+        */
+        setAutoPlay: function (value) {
+            autoPlay = value;
+        },
+
+        /**
          * get the buffering behaviour while the player is in pause
          * @access public
          * @memberof MediaPlayer#
@@ -880,6 +910,16 @@ MediaPlayer = function () {
          */
         getScheduleWhilePaused: function () {
             return scheduleWhilePaused;
+        },
+
+        /**
+         * change the buffering behaviour while player is in pause
+         * @access public
+         * @memberof MediaPlayer#
+         * @param {boolean} value - true if it buffers stream while in pause
+         */
+        setScheduleWhilePaused: function (value) {
+            scheduleWhilePaused = value;
         },
 
         /**
@@ -895,6 +935,24 @@ MediaPlayer = function () {
             }
 
             return 0;
+        },
+
+        /**
+         * Sets the trick mode speed.
+         * @method setTrickModeSpeed
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {number} speed - the new trick mode speed.
+         */
+        setTrickModeSpeed: function (speed) {
+            _isPlayerInitialized();
+            if (streamController) {
+                if (streamController.getTrickModeSpeed() !== speed && speed === 1) {
+                    videoModel.play();
+                } else {
+                    streamController.setTrickModeSpeed(speed);
+                }
+            }
         },
 
         /**
@@ -951,6 +1009,50 @@ MediaPlayer = function () {
         },
 
         /**
+         * Selects the track to be playbacked.
+         * @method setTrack
+         * @access public
+         * @memberof MediaPlayer#
+         * @see [getTracks]{@link MediaPlayer#getTracks}
+         * @param {String} type - the track type to set (see @link MediaPlayer#TRACKS_TYPE)
+         * @param {Track} newTrack - the audio track to select
+         * 
+         */
+        setTrack: function (type, newTrack) {
+
+            _isPlayerInitialized();
+
+            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+                throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
+            }
+
+            if (!newTrack || !(newTrack.id || newTrack.lang)) {
+                throw new Error('OrangeHasPlayer.setTrack(): newTrack parameter is unknown');
+            }
+
+            var selectedTrack = this.getSelectedTrack(type);
+
+
+            if (selectedTrack && ((newTrack.id === selectedTrack.id) ||
+                (newTrack.lang === selectedTrack.lang))) {
+                this.debug.log("[OrangeHasPlayer] " + newTrack.lang + " is already selected");
+                return;
+            }
+
+            var availableTracks = getTracksFromType(type);
+
+            if (availableTracks) {
+                for (var i = 0; i < availableTracks.length; i += 1) {
+                    if ((newTrack.id === availableTracks[i].id) ||
+                        (newTrack.lang === availableTracks[i].lang)) {
+                        this.setTrack(type, availableTracks[i]);
+                        return;
+                    }
+                }
+            }
+        },
+
+        /**
          * Returns the selected track.
          * @method getSelectedTrack
          * @access public
@@ -973,7 +1075,6 @@ MediaPlayer = function () {
             }
 
         },
-
 
         /**
          * Returns the audio mute status.
@@ -1035,15 +1136,6 @@ MediaPlayer = function () {
         ///////////////////////////////////// SETTER ///////////////////////////////////////////
 
         /**
-         * @access public
-         * @memberof MediaPlayer#
-         * @param value - .
-         */
-        setAutoPlay: function (value) {
-            autoPlay = value;
-        },
-
-        /**
          * function to set some player configuration parameters
          * @access public
          * @memberof MediaPlayer#
@@ -1057,8 +1149,6 @@ MediaPlayer = function () {
                 this.config.setParams(params);
             }
         },
-
-
 
         /**
          * Sets the default audio language. If the default language is available in the stream,
@@ -1074,78 +1164,6 @@ MediaPlayer = function () {
                 throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
             }
             defaultAudioLang = language;
-        },
-
-        /**
-         * change the buffering behaviour while player is in pause
-         * @access public
-         * @memberof MediaPlayer#
-         * @param {boolean} value - true if it buffers stream while in pause
-         */
-        setScheduleWhilePaused: function (value) {
-            scheduleWhilePaused = value;
-        },
-
-        /**
-        * Sets the trick mode speed.
-        * @method setTrickModeSpeed
-        * @access public
-        * @memberof OrangeHasPlayer#
-        * @param {number} speed - the new trick mode speed.
-        */
-        setTrickModeSpeed: function (speed) {
-            _isPlayerInitialized();
-            if (streamController) {
-                if (streamController.getTrickModeSpeed() !== speed && speed === 1) {
-                    videoModel.play();
-                } else {
-                    streamController.setTrickModeSpeed(speed);
-                }
-            }
-        },
-
-        /**
-         * Selects the track to be playbacked .
-         * @method setTrack
-         * @access public
-         * @memberof MediaPlayer#
-         * @see [getTracks]{@link MediaPlayer#getTracks}
-         * @param {String} type - the track type to set (see @link MediaPlayer#TRACKS_TYPE)
-         * @param {Track} newTrack - the audio track to select
-         * 
-         */
-        setTrack: function (type, newTrack) {
-
-            _isPlayerInitialized();
-
-            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
-                throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
-            }
-
-            if (!newTrack || !(newTrack.id || newTrack.lang)) {
-                throw new Error('OrangeHasPlayer.setTrack(): newTrack parameter is unknown');
-            }
-
-            var selectedTrack = this.getSelectedTrack(type);
-
-
-            if (selectedTrack && ((newTrack.id === selectedTrack.id) ||
-                (newTrack.lang === selectedTrack.lang))) {
-                this.debug.log("[OrangeHasPlayer] " + newTrack.lang + " is already selected");
-                return;
-            }
-
-            var availableTracks = getTracksFromType(type);
-
-            if (availableTracks) {
-                for (var i = 0; i < availableTracks.length; i += 1) {
-                    if ((newTrack.id === availableTracks[i].id) ||
-                        (newTrack.lang === availableTracks[i].lang)) {
-                        this.setTrack(type, availableTracks[i]);
-                        return;
-                    }
-                }
-            }
         },
 
         /**
@@ -1176,28 +1194,7 @@ MediaPlayer = function () {
             _isPlayerInitialized();
             this.setConfig(params);
         },
-        
-        /**
-         * Enables or disables debug information in the browser console.
-         * @method setDebug
-         * @access public
-         * @memberof OrangeHasPlayer#
-         * @param {boolean} value - true to enable debug information, false to disable
-         */
-        setDebug : function(value) {
-            _isPlayerInitialized();
-            if (typeof value !== 'boolean') {
-                throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
-            }
-            if (value === true) {
-                debugData.level = 4;
-                this.debug.setLevel(4);
-            } else {
-                debugData.level = 0;
-                this.debug.setLevel(0);
-            }
-        },
-        
+
         /**
          * Returns the terminal ID.
          * @method fullscreenChanged
@@ -1205,7 +1202,7 @@ MediaPlayer = function () {
          * @memberof OrangeHasPlayer#
          * @return {string} the terminal ID 
          */
-        getTerminalId = function() {
+        getTerminalId = function () {
             var browser = fingerprint_browser(),
                 os = fingerprint_os();
 
