@@ -315,6 +315,9 @@ MediaPlayer = function () {
     };
 
     var getSelectedTrackFromType = function (_type) {
+        if (!streamController) {
+            return null;
+        }
         switch (_type) {
             case MediaPlayer.TRACKS_TYPE.AUDIO:
                 return streamController.getSelectedAudioTrack();
@@ -1008,11 +1011,9 @@ MediaPlayer = function () {
 
             _isPlayerInitialized();
 
-            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+            if (!type || (type !== MediaPlayer.TRACKS_TYPE.AUDIO && type !== MediaPlayer.TRACKS_TYPE.TEXT)) {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
-
-
 
             if (tracks[type].length === 0) {
                 if (streamController) {
@@ -1045,7 +1046,7 @@ MediaPlayer = function () {
 
             _isPlayerInitialized();
 
-            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+            if (!type || (type !== MediaPlayer.TRACKS_TYPE.AUDIO && type !== MediaPlayer.TRACKS_TYPE.TEXT)) {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
@@ -1054,7 +1055,6 @@ MediaPlayer = function () {
             }
 
             var selectedTrack = this.getSelectedTrack(type);
-
 
             if (selectedTrack && ((newTrack.id === selectedTrack.id) ||
                 (newTrack.lang === selectedTrack.lang))) {
@@ -1086,17 +1086,17 @@ MediaPlayer = function () {
         getSelectedTrack: function (type) {
             _isPlayerInitialized();
 
-            if (!type || type !== MediaPlayer.TRACKS_TYPE.AUDIO || MediaPlayer.TRACKS_TYPE.TEXT) {
+            if (!type || (type !== MediaPlayer.TRACKS_TYPE.AUDIO && type !== MediaPlayer.TRACKS_TYPE.TEXT)) {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
-            if (streamController) {
-                var selectedTrack = getSelectedTrackFromType(type);
-                return { id: selectedTrack.id, lang: selectedTrack.lang };
-            } else {
+            var selectedTrack = getSelectedTrackFromType(type);
+
+            if (!selectedTrack) {
                 return null;
             }
 
+            return { id: selectedTrack.id, lang: selectedTrack.lang };
         },
 
         /**
