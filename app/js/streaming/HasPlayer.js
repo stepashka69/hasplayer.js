@@ -322,6 +322,24 @@ MediaPlayer = function () {
                 return streamController.getSelectedSubtitleTrack();
         }
     };
+
+
+    // parse the arguments of load function to make an object
+    var _parseLoadArguments = function () {
+        if (arguments && arguments.length > 0) {
+            var params = {};
+            // restaure url
+            if (typeof arguments[0] === 'string') {
+                params.url = arguments[0];
+            }
+            //restaure protData
+            if (arguments[1]) {
+                params.protData = arguments[1];
+            }
+            return params;
+        }
+
+    };
     // END TODO
 
     // DIJON initialization
@@ -481,6 +499,13 @@ MediaPlayer = function () {
             </pre>
         */
         load: function (stream) {
+            
+            // patch to be retro compatible with old syntax
+            if(arguments && arguments.length > 0 && typeof arguments[0] !== 'object'){
+                console.warn('You are using "depreacted" call of the method load, please refer to the documentation to change prameters call');
+                stream = _parseLoadArguments(arguments);
+            }
+            
             var config = {
                 video: {
                     "ABR.keepBandwidthCondition": true
@@ -748,7 +773,7 @@ MediaPlayer = function () {
         },
 
 
-        getDVRInfoMetric = function () {
+        getDVRInfoMetric: function () {
             var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
             return this.metricsExt.getCurrentDVRInfo(metric);
         },
@@ -760,7 +785,7 @@ MediaPlayer = function () {
          * @return DVR seek offset
          * @access public
          */
-        getDVRSeekOffset = function (value) {
+        getDVRSeekOffset: function (value) {
             var metric = this.getDVRInfoMetric.call(this),
                 val = metric.range.start + parseInt(value, 10);
 
@@ -862,7 +887,7 @@ MediaPlayer = function () {
         getDebug: function () {
             return this.debug;
         },
-        
+
         /**
          * Enables or disables debug information in the browser console.
          * @method setDebug
@@ -876,10 +901,8 @@ MediaPlayer = function () {
                 throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
             }
             if (value === true) {
-                debugData.level = 4;
                 this.debug.setLevel(4);
             } else {
-                debugData.level = 0;
                 this.debug.setLevel(0);
             }
         },
@@ -1202,7 +1225,7 @@ MediaPlayer = function () {
          * @memberof OrangeHasPlayer#
          * @return {string} the terminal ID 
          */
-        getTerminalId = function () {
+        getTerminalId: function () {
             var browser = fingerprint_browser(),
                 os = fingerprint_os();
 
