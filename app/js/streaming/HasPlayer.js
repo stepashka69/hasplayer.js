@@ -35,11 +35,6 @@ MediaPlayer = function () {
         audioQualityChanged = [],
         error = null,
         warning = null,
-        metricsAgent = {
-            ref: null,
-            deferInit: null,
-            isActivated: false
-        },
         tracks = {
             video: [],
             audio: [],
@@ -57,8 +52,8 @@ MediaPlayer = function () {
         playing = false,
         autoPlay = true,
         source = null, // current source played
-        scheduleWhilePaused = false; // should we buffer while in pause
-
+        scheduleWhilePaused = false, // should we buffer while in pause
+        plugins = {};
 
 
     // player state and intitialization
@@ -437,6 +432,11 @@ MediaPlayer = function () {
             // connect default events
             _connectEvents.call(this);
             debugController.init();
+
+            // Initialize already loaded plugins
+            for (var plugin in plugins) {
+                plugins[plugin].init(this);
+            }
         },
 
         /**
@@ -460,7 +460,7 @@ MediaPlayer = function () {
          * @memberof OrangeHasPlayer#
          * @param {MetricsAgentParams} parameters - the metrics agent parameters
          */
-        loadMetricsAgent: function (parameters) {
+        /*loadMetricsAgent: function (parameters) {
             _isPlayerInitialized();
 
             if (typeof (MetricsAgent) !== 'undefined') {
@@ -475,8 +475,7 @@ MediaPlayer = function () {
             } else {
                 throw new Error('OrangeHasPlayer.loadMetricsAgent(): MetricsAgent is undefined');
             }
-        },
-
+        },*/
 
 
         /////////// PLAYBACK
@@ -504,20 +503,22 @@ MediaPlayer = function () {
             </pre>
         */
         load: function (stream) {
+            var i,
+                pluginsInitDefer = [],
+                config = {
+                    video: {
+                        "ABR.keepBandwidthCondition": true
+                    },
+                    audio: {
+                        "ABR.keepBandwidthCondition": true
+                    }
+                };
+
             // patch to be retro compatible with old syntax
             if (arguments && arguments.length > 0 && typeof arguments[0] !== 'object') {
                 console.warn('You are using "depreacted" call of the method load, please refer to the documentation to change prameters call');
                 stream = _parseLoadArguments.apply(null, arguments);
             }
-
-            var config = {
-                video: {
-                    "ABR.keepBandwidthCondition": true
-                },
-                audio: {
-                    "ABR.keepBandwidthCondition": true
-                }
-            };
 
             tracks.audio = [];
             tracks.text = [];
@@ -543,18 +544,22 @@ MediaPlayer = function () {
                 initialQuality.audio = -1;
             }
 
-            // Wait for MetricsAgent completely intialized before starting a new session
-            Q.when(metricsAgent.ref ? metricsAgent.deferInit.promise : true).then((function () {
+            // Set config to set 'keepBandwidthCondition' parameter
+            this.setConfig(config);
 
-                if (metricsAgent.ref && metricsAgent.isActivated && stream && stream.url) {
-                    metricsAgent.ref.createSession();
+            // Reset last error and warning
+            error = null;
+            warning = null;
+
+            // Wait for plugins completely intialized before starting a new session
+            for (i = 0; i < plugins.length; i++) {
+                pluginsInitDefer.push(plugins[i].deferInit);
+            }
+            Q.all(pluginsInitDefer).then((function () {
+                // Notify plugins a new stream is loaded
+                for (var plugin in plugins) {
+                    plugins[plugin].load(stream.url);
                 }
-
-                // Set config to set 'keepBandwidthCondition' parameter
-                this.setConfig(config);
-
-                error = null;
-                warning = null;
 
                 // here we are ready to start playing
                 source = stream;
@@ -648,8 +653,9 @@ MediaPlayer = function () {
                 videoModel.setCurrentTime(0);
             }
 
-            if (metricsAgent.ref) {
-                metricsAgent.ref.stop();
+            // Notify plugins that current stream is stopped
+            for (var plugin in plugins) {
+                plugins[plugin].stop();
             }
         },
 
@@ -672,8 +678,10 @@ MediaPlayer = function () {
             this.metricsModel.addState('video', 'stopped', videoModel.getCurrentTime(), reason);
             source = null;
             resetAndPlay();
-            if (metricsAgent.ref) {
-                metricsAgent.ref.stop();
+
+            // Notify plugins that player is reset
+            for (var plugin in plugins) {
+                plugins[plugin].stop();
             }
         },
 
@@ -861,6 +869,15 @@ MediaPlayer = function () {
             } else {
                 return 'Not a builded version';
             }
+        },
+
+        /**
+         * @access public
+         * @memberof MediaPlayer#
+         * @return TBD
+         */
+        getVideoModel: function() {
+            return videoModel;
         },
 
         /**
@@ -1329,7 +1346,7 @@ MediaPlayer = function () {
 
         /**
          * Returns the terminal ID.
-         * @method fullscreenChanged
+         * @method getTerminalId
          * @access public
          * @memberof OrangeHasPlayer#
          * @return {string} the terminal ID 
@@ -1339,10 +1356,56 @@ MediaPlayer = function () {
                 os = fingerprint_os();
 
             return os.name + "-" + os.bits + "-" + browser.name;
+        },
+
+        /**
+         * Loads a MediaPlayer plugin.
+         * @method loadPlugin
+         * @access public
+         * @memberof OrangeHasPlayer#
+         * @param {string} plugin - the plugin object name
+         * @param params - the plugin parameters
+         */
+        loadPlugin: function (plugin, params) {
+            var instance;
+
+            if (plugin === undefined) {
+                throw new Error('MediaPlayer.loadPlugin(): plugin undefined');
+            }
+
+            // Create plugin instance
+            instance = new plugin();
+
+            // Check plugin API
+            if (instance.name === undefined ||
+                instance.version  === undefined ||
+                instance.initialized  === undefined ||
+                instance.init  === undefined ||
+                instance.load  === undefined ||
+                instance.stop  === undefined ||
+                instance.reset === undefined) {
+                throw new Error('MediaPlayer.loadPlugin(): plugin API not compliant');
+            }
+
+            if (plugins[instance.name]) {
+                // Plugin already loaded
+                return;
+            }
+
+            this.debug.log("[MediaPlayer] Load plugin '" + instance.name + "' (v" + instance.version + ")");
+
+            // Store plugin
+            plugins[instance.name] = instance;
+
+            // Initialize plugin (if player initialized)
+            instance.deferInit = Q.defer();
+            if (initialized) {
+                instance.init(this, params, function () {
+                    instance.deferInit.resolve();
+                });
+            }
         }
-
     };
-
 };
 
 
