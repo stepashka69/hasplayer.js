@@ -35,11 +35,6 @@ MediaPlayer = function () {
         audioQualityChanged = [],
         error = null,
         warning = null,
-        tracks = {
-            video: [],
-            audio: [],
-            text: []
-        },
         defaultAudioLang = 'und',
         defaultSubtitleLang = 'und',
         subtitlesEnabled = false,
@@ -216,7 +211,7 @@ MediaPlayer = function () {
             currentSwitch = streamTab[i];
             if (currentTime >= currentSwitch.mediaStartTime) {
                 _dispatchBitrateEvent('play_bitrate', currentSwitch);
-                this.debug.log("[OrangeHasPlayer][" + currentSwitch.streamType + "] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t=" + currentSwitch.mediaStartTime + "(" + videoModel.getPlaybackRate() + ")");
+                this.debug.log("[MediaPlayer][" + currentSwitch.streamType + "] send play_bitrate - b=" + currentSwitch.switchedQuality + ", t=" + currentSwitch.mediaStartTime + "(" + videoModel.getPlaybackRate() + ")");
                 // And remove when it's played
                 idToRemove.push(i);
             }
@@ -301,16 +296,20 @@ MediaPlayer = function () {
     };
 
     // TODO : remove this when migration of method getTracks will be done on all the process
-    var getTracksFromType = function (_type) {
+    var _getTracksFromType = function (_type) {
+        if (!streamController) {
+            return null;
+        }
         switch (_type) {
             case MediaPlayer.TRACKS_TYPE.AUDIO:
                 return streamController.getAudioTracks();
             case MediaPlayer.TRACKS_TYPE.TEXT:
                 return streamController.getSubtitleTracks();
         }
+        return null;
     };
 
-    var getSelectedTrackFromType = function (_type) {
+    var _getSelectedTrackFromType = function (_type) {
         if (!streamController) {
             return null;
         }
@@ -320,6 +319,22 @@ MediaPlayer = function () {
             case MediaPlayer.TRACKS_TYPE.TEXT:
                 return streamController.getSelectedSubtitleTrack();
         }
+        return null;
+    };
+
+    var _setTrackFromType = function (_type, _track) {
+        if (!streamController) {
+            return null;
+        }
+        switch (_type) {
+            case MediaPlayer.TRACKS_TYPE.AUDIO:
+                streamController.setAudioTrack(_track);
+                break;
+            case MediaPlayer.TRACKS_TYPE.TEXT:
+                streamController.setSubtitleTrack(_track);
+                break;
+        }
+        return null;
     };
 
 
@@ -566,7 +581,7 @@ MediaPlayer = function () {
         setDebug: function (value) {
             _isPlayerInitialized();
             if (typeof value !== 'boolean') {
-                throw new Error('OrangeHasPlayer.setDebug(): Invalid Arguments');
+                throw new Error('MediaPlayer.setDebug(): Invalid Arguments');
             }
             if (value === true) {
                 this.debug.setLevel(4);
@@ -683,7 +698,7 @@ MediaPlayer = function () {
          */
         setDefaultAudioLang: function (language) {
             if (typeof language !== 'string') {
-                throw new Error('OrangeHasPlayer.setDefaultAudioLang(): Invalid Arguments');
+                throw new Error('MediaPlayer.setDefaultAudioLang(): Invalid Arguments');
             }
             defaultAudioLang = language;
         },
@@ -699,7 +714,7 @@ MediaPlayer = function () {
          */
         setDefaultSubtitleLang: function (language) {
             if (typeof language !== 'string') {
-                throw new Error('OrangeHasPlayer.setDefaultSubtitleLang(): Invalid Arguments');
+                throw new Error('MediaPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
             defaultSubtitleLang = language;
         },
@@ -745,9 +760,6 @@ MediaPlayer = function () {
                 console.warn('You are using "depreacted" call of the method load, please refer to the documentation to change prameters call');
                 stream = _parseLoadArguments.apply(null, arguments);
             }
-
-            tracks.audio = [];
-            tracks.text = [];
 
             videoQualityChanged = [];
             audioQualityChanged = [];
@@ -817,21 +829,21 @@ MediaPlayer = function () {
             _isPlayerInitialized();
 
             if (typeof time !== 'number') {
-                throw new Error('OrangeHasPlayer.seek(): Invalid Arguments');
+                throw new Error('MediaPlayer.seek(): Invalid Arguments');
             }
 
             if (!this.isLive()) {
                 if (time < 0 || time > videoModel.getDuration()) {
-                    throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+                    throw new Error('MediaPlayer.seek(): seek value outside available time range');
                 } else {
                     videoModel.setCurrentTime(time);
                 }
             } else {
                 range = this.getDVRWindowRange();
                 if (range === null) {
-                    throw new Error('OrangeHasPlayer.seek(): impossible for live stream');
+                    throw new Error('MediaPlayer.seek(): impossible for live stream');
                 } else if (time < range.start || time > range.end) {
-                    throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
+                    throw new Error('MediaPlayer.seek(): seek value outside available time range');
                 } else {
                     videoModel.setCurrentTime(time);
                 }
@@ -849,7 +861,7 @@ MediaPlayer = function () {
             if (!this.isLive()) {
                 videoModel.pause();
             } else {
-                throw new Error('OrangeHasPlayer.pause(): pause is impossible on live stream');
+                throw new Error('MediaPlayer.pause(): pause is impossible on live stream');
             }
         },
 
@@ -1071,6 +1083,7 @@ MediaPlayer = function () {
 
         /**
          * Returns the Error object for the most recent error
+         * @method getError
          * @access public
          * @memberof MediaPlayer#
          * @return {object} the Error object for the most recent error, or null if there has not been an error
@@ -1081,6 +1094,7 @@ MediaPlayer = function () {
 
         /**
          * Returns the Warning object for the most recent warning
+         * @method getWarning
          * @access public
          * @memberof MediaPlayer#
          * @return {object} the Warning object for the most recent warning, or null if there has not been a warning
@@ -1092,14 +1106,13 @@ MediaPlayer = function () {
         /////////////////////// TRACKS
 
         /**
-         * Returns the list of tracks contained in the stream (as specified in the stream manifest) 
-         * according to the type given in parameters. if null it returns all type of tracks (audio & text)
+         * Returns the list of available tracks for the stream type (as specified in the stream manifest) 
          * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
          * @method getTracks
-         * @param {String} type
          * @access public
+         * @param {String} type - the stream type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
          * @memberof MediaPlayer#
-         * @return {Array<Track>} the audio tracks
+         * @return {Array<Track>} the available tracks for the stream type
          */
         getTracks: function (type) {
 
@@ -1109,21 +1122,21 @@ MediaPlayer = function () {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
-            if (tracks[type].length === 0) {
-                if (streamController) {
-                    var selectedTracks = getTracksFromType(type);
-                    if (selectedTracks) {
-                        for (var i = 0; i < selectedTracks.length; i += 1) {
-                            tracks[type].push({
-                                id: selectedTracks[i].id,
-                                lang: selectedTracks[i].lang
-                            });
-                        }
-                    }
-                }
+            var _tracks = _getTracksFromType(type);
+
+            if (!_tracks) {
+                return [];
             }
 
-            return tracks[type];
+            var tracks = [];
+            for (var i = 0; i < _tracks.length; i += 1) {
+                tracks.push({
+                    id: _tracks[i].id,
+                    lang: _tracks[i].lang
+                });
+            }
+
+            return tracks;
         },
 
         /**
@@ -1132,7 +1145,7 @@ MediaPlayer = function () {
          * @access public
          * @memberof MediaPlayer#
          * @see [getTracks]{@link MediaPlayer#getTracks}
-         * @param {String} type - the stream type (see @link MediaPlayer#TRACKS_TYPE)
+         * @param {String} type - the stream type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
          * @param {Track} track - the track to select
          * 
          */
@@ -1145,36 +1158,37 @@ MediaPlayer = function () {
             }
 
             if (!track || !(track.id || track.lang)) {
-                throw new Error('OrangeHasPlayer.setTrack(): track parameter is unknown');
+                throw new Error('MediaPlayer.setTrack(): track parameter is unknown');
             }
 
-            var selectedTrack = this.getSelectedTrack(type);
+            var _tracks = _getTracksFromType(type);
 
-            if (selectedTrack && ((track.id === selectedTrack.id) ||
-                (track.lang === selectedTrack.lang))) {
-                this.debug.log("[OrangeHasPlayer] " + track.lang + " is already selected");
+            if (!_tracks) {
+                this.debug.error("[MediaPlayer] No available track for type " + type);
                 return;
             }
 
-            var availableTracks = getTracksFromType(type);
+            var selectedTrack = _getSelectedTrackFromType(type);
 
-            if (availableTracks) {
-                for (var i = 0; i < availableTracks.length; i += 1) {
-                    if ((track.id === availableTracks[i].id) ||
-                        (track.lang === availableTracks[i].lang)) {
-                        this.setTrack(type, availableTracks[i]);
-                        return;
-                    }
+            if (selectedTrack && ((track.id === selectedTrack.id) || (track.lang === selectedTrack.lang))) {
+                this.debug.log("[MediaPlayer] " + type + " track [" + track.id + " - " + track.lang + "] is already selected");
+                return;
+            }
+
+            for (var i = 0; i < _tracks.length; i += 1) {
+                if ((track.id === _tracks[i].id) || (track.lang === _tracks[i].lang)) {
+                    _setTrackFromType(type, _tracks[i]);
+                    return;
                 }
             }
         },
 
         /**
-         * Returns the selected track.
+         * Returns the selected track for the stream type.
          * @method getSelectedTrack
          * @access public
          * @memberof MediaPlayer#
-         * @param {String} type - the track type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
+         * @param {String} type - the stream type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
          * @return {Track} the selected audio track
          */
         getSelectedTrack: function (type) {
@@ -1184,13 +1198,16 @@ MediaPlayer = function () {
                 throw new Error('MediaPlayer Invalid Argument - "type" should be defined and shoud be kind of MediaPlayer.TRACKS_TYPE');
             }
 
-            var selectedTrack = getSelectedTrackFromType(type);
+            var _track = _getSelectedTrackFromType(type);
 
-            if (!selectedTrack) {
+            if (!_track) {
                 return null;
             }
 
-            return { id: selectedTrack.id, lang: selectedTrack.lang };
+            return {
+                id: _track.id,
+                lang: _track.lang
+            };
         },
 
         /////////// SUBTITLES DISPLAY
@@ -1205,7 +1222,7 @@ MediaPlayer = function () {
         enableSubtitles: function (enabled) {
             _isPlayerInitialized();
             if (typeof enabled !== 'boolean') {
-                throw new Error('OrangeHasPlayer.setSubtitleVisibility(): Invalid Arguments');
+                throw new Error('MediaPlayer.setSubtitleVisibility(): Invalid Arguments');
             }
             subtitlesEnabled = enabled;
             if (streamController) {
@@ -1260,7 +1277,7 @@ MediaPlayer = function () {
         setMute: function (state) {
             _isPlayerInitialized();
             if (typeof state !== 'boolean') {
-                throw new Error('OrangeHasPlayer.setMute(): Invalid Arguments');
+                throw new Error('MediaPlayer.setMute(): Invalid Arguments');
             }
             videoModel.setMute(state);
         },
@@ -1287,7 +1304,7 @@ MediaPlayer = function () {
         setVolume: function (volume) {
             _isPlayerInitialized();
             if ((typeof volume !== 'number') || volume < 0 || volume > 1) {
-                throw new Error('OrangeHasPlayer.setVolume(): Invalid Arguments');
+                throw new Error('MediaPlayer.setVolume(): Invalid Arguments');
             }
 
             videoModel.setVolume(volume);
