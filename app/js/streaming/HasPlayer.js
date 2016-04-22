@@ -20,7 +20,8 @@ MediaPlayer = function () {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
-    var VERSION = '1.3.0_dev',
+    var VERSION_DASHJS = "1.2.0",
+        VERSION = '1.3.0_dev',
         GIT_TAG = '@@REVISION',
         BUILD_DATE = '@@TIMESTAMP',
         context = new MediaPlayer.di.Context(), // default context
@@ -504,11 +505,11 @@ MediaPlayer = function () {
         */
         load: function (stream) {
             // patch to be retro compatible with old syntax
-            if(arguments && arguments.length > 0 && typeof arguments[0] !== 'object'){
+            if (arguments && arguments.length > 0 && typeof arguments[0] !== 'object') {
                 console.warn('You are using "depreacted" call of the method load, please refer to the documentation to change prameters call');
-                stream = _parseLoadArguments.apply(null,arguments);
+                stream = _parseLoadArguments.apply(null, arguments);
             }
-            
+
             var config = {
                 video: {
                     "ABR.keepBandwidthCondition": true
@@ -840,6 +841,16 @@ MediaPlayer = function () {
         },
 
         /**
+         * get the HAS version
+         * @access public
+         * @memberof MediaPlayer#
+         * @return hasplayer version
+         */
+        getVersionDashJS: function () {
+            return VERSION_DASHJS;
+        },
+
+        /**
         * @access public
         * @memberof MediaPlayer#
         * @return date when the hasplayer has been built.
@@ -1154,10 +1165,6 @@ MediaPlayer = function () {
             videoModel.setVolume(volume);
         },
 
-
-
-        ///////////////////////////////////// SETTER ///////////////////////////////////////////
-
         /**
          * function to set some player configuration parameters
          * @access public
@@ -1246,8 +1253,64 @@ MediaPlayer = function () {
          * @param {string} type - the track type ('video' or 'audio')
          * @param {number} value - the new initial quality index (starting from 0) to be downloaded
          */
-        setInitialQualityFor: function(type, value) {
+        setInitialQualityFor: function (type, value) {
             initialQuality[type] = value;
+        },
+
+        
+        /**
+         * get metrics for stream type
+         * @access public
+         * @memberof MediaPlayer#
+         * @param  type - stream type, video or audio.
+         * @return metrics array for the selected type
+         */
+        getMetricsFor: function(type) {
+            var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
+            return metrics;
+        },
+
+        /**
+         * get current quality for a stream
+         * @access public
+         * @memberof MediaPlayer#
+         * @param  type - stream type, video or audio.
+         * @return current quality for the selected type.
+         */
+        getQualityFor: function(type) {
+            return this.abrController.getQualityFor(type);
+        },
+
+        /**
+         * select quality level for audio or video stream.
+         * If you want to set limit up and down for video for instance, you have to use setConfig function.
+         * @access public
+         * @memberof MediaPlayer#
+         * @param type - audio or video stream type.
+         * @param value - selected quality level, id of the quality not bitrate.
+         */
+        setQualityFor: function(type, value) {
+            this.abrController.setPlaybackQuality(type, value);
+        },
+
+        /**
+         * function to get auto switch quality status.
+         * @access public
+         * @memberof MediaPlayer#
+         * @return auto switch quality, true or false.
+         */
+        getAutoSwitchQuality: function() {
+            return this.abrController.getAutoSwitchBitrate();
+        },
+
+        /**
+         * function to enable or disable auto switch quality by ABR controller.
+         * @access public
+         * @memberof MediaPlayer#
+         * @param value - true or false auto switch quality
+         */
+        setAutoSwitchQuality: function(value) {
+            this.abrController.setAutoSwitchBitrate(value);
         },
 
 
@@ -1381,6 +1444,12 @@ MediaPlayer.PUBLIC_EVENTS = {
      * @param {object} event.data.url - the current manifest url
      */
     'manifestUrlUpdate': 'hasplayer',
+
+    /**
+     * The metricChanged event is fired when metrics are refreshed,
+     * TBD
+     */
+    'metricChanged' : 'hasplayer',
 
     /**
      * The 'play_bitrate' event is fired when the current played bitrate has changed.
