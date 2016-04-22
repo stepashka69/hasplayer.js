@@ -677,7 +677,7 @@ MediaPlayer = function () {
 
             this.metricsModel.addState('video', 'stopped', videoModel.getCurrentTime(), reason);
             source = null;
-            resetAndPlay();
+            resetAndPlay.call(this);
 
             // Notify plugins that player is reset
             for (var plugin in plugins) {
