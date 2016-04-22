@@ -5,7 +5,7 @@ var orangeHasPlayer = null,
     config = null,
     video = null,
     currentStreamInfos = null,
-    configMetrics = {
+    confMetricsAgent = {
         'name': 'Prisme (local)',
         'activationUrl': '',
         'serverUrl': 'http://localhost:8080/metrics',
@@ -29,20 +29,20 @@ var orangeHasPlayer = null,
 function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
-    // @if ADSPLAYER
-    adsPlayer = new AdsPlayer(video);
-    // @endif
+
     orangeHasPlayer.init(video);
+    orangeHasPlayer.setDebug(true);
     orangeHasPlayer.enableSubtitleExternDisplay(isSubtitleExternDisplay);
     orangeHasPlayer.setInitialQualityFor('video', 0);
     orangeHasPlayer.setInitialQualityFor('audio', 0);
 
     /* hasPlayerConfig_dev */
     loadHasPlayerConfig('json/hasplayer_config.json');
-    /* hasPlayerConfig_dev */
-    //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
-    orangeHasPlayer.setDebug(true);
+    // Load plugins
+    orangeHasPlayer.loadPlugin(MetricsAgent, confMetricsAgent);
+    //orangeHasPlayer.loadPlugin(AdsPlayer);
+
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.enableSubtitles(false);
