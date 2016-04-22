@@ -59,6 +59,7 @@ MediaPlayer.di.Context = function () {
             // MediaPlayer.dependencies.*
             this.system.mapSingleton('abrController', MediaPlayer.dependencies.AbrController);
             this.system.mapClass('bufferController', MediaPlayer.dependencies.BufferController);
+            this.system.mapClass('fragmentInfoController', MediaPlayer.dependencies.FragmentInfoController);
             this.system.mapSingleton('bufferExt', MediaPlayer.dependencies.BufferExtensions);
             this.system.mapSingleton('errHandler', MediaPlayer.dependencies.ErrorHandler);
             this.system.mapClass('eventController', MediaPlayer.dependencies.EventController);

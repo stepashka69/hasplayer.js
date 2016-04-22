@@ -295,13 +295,14 @@ PlayerPanel.prototype.setDuration = function(duration) {
 PlayerPanel.prototype.setPlayingTime = function(time) {
     var progress;
 
-    this.elapsedTimeSpan.textContent = setTimeWithSeconds(time);
     if (this.videoDuration !== Infinity) {
+        this.elapsedTimeSpan.textContent = setTimeWithSeconds(time);
         progress = (time / this.videoDuration) * 100;
         this.seekbar.style.width = progress + '%';
     } else {
         var range = orangeHasPlayer.getDVRWindowRange();
         if (range !== null && time > 0) {
+            this.elapsedTimeSpan.textContent = setTimeWithSeconds(range.start);
             this.durationTimeSpan.textContent = setTimeWithSeconds(range.end);
             progress = ((time - range.start) / (range.end - range.start)) * 100;
             this.seekbar.style.width = progress + '%';
