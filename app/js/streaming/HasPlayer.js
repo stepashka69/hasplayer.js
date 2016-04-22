@@ -235,7 +235,7 @@ MediaPlayer = function () {
 
 
     /// Private playback functions ///
-    var resetAndPlay = function () {
+    var _resetAndPlay = function () {
         if (playing && streamController) {
             if (!resetting) {
                 resetting = true;
@@ -252,7 +252,7 @@ MediaPlayer = function () {
                     this.debug.log("[MediaPlayer] Player is stopped");
 
                     if (_isReady.call(this)) {
-                        doAutoPlay.call(this);
+                        _doAutoPlay.call(this);
                     }
                 }).bind(this);
                 streamController.subscribe(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE, teardownComplete, undefined, true);
@@ -260,18 +260,18 @@ MediaPlayer = function () {
             }
         } else {
             if (_isReady.call(this)) {
-                doAutoPlay.call(this);
+                _doAutoPlay.call(this);
             }
         }
     };
 
-    var doAutoPlay = function () {
+    var _doAutoPlay = function () {
         if (_isReady()) {
-            play.call(this);
+            _play.call(this);
         }
     };
 
-    var play = function () {
+    var _play = function () {
         _isPlayerInitialized();
         _isVideoModelInitialized();
         _isSourceInitialized();
@@ -563,7 +563,7 @@ MediaPlayer = function () {
 
                 // here we are ready to start playing
                 source = stream;
-                resetAndPlay.call(this);
+                _resetAndPlay.call(this);
             }).bind(this));
         },
 
@@ -677,7 +677,7 @@ MediaPlayer = function () {
 
             this.metricsModel.addState('video', 'stopped', videoModel.getCurrentTime(), reason);
             source = null;
-            resetAndPlay.call(this);
+            _resetAndPlay.call(this);
 
             // Notify plugins that player is reset
             for (var plugin in plugins) {
