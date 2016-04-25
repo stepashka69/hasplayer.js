@@ -641,7 +641,7 @@ MediaPlayer = function () {
          */
         setQualityFor: function (type, value) {
             _isPlayerInitialized();
-            if (typeof value !== 'boolean') {
+            if (typeof value !== 'number') {
                 throw new Error('MediaPlayer.setQualityFor(): Invalid Arguments');
             }
             this.abrController.setPlaybackQuality(type, value);
