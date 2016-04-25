@@ -671,9 +671,9 @@ MediaPlayer.dependencies.StreamController = function() {
             }
         },
 
-        seek: function(time) {
+        seek: function(time, autoplay) {
             if (activeStream) {
-                activeStream.seek(time);
+                activeStream.seek(time, autoplay);
             }
         },
     };

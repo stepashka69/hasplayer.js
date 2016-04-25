@@ -202,9 +202,9 @@ MediaPlayer = function(aContext) {
          * html5 video currentTime parameter is better to use than this function.
          * @access public
          */
-        seek = function(value) {
+        seek = function(value, autoplay) {
 
-            streamController.seek(value);
+            streamController.seek(value, autoplay);
         },
 
         /**

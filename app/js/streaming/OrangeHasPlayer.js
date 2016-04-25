@@ -525,7 +525,7 @@ OrangeHasPlayer = function() {
             } else if (time < range.start || time > range.end) {
                 throw new Error('OrangeHasPlayer.seek(): seek value outside available time range');
             } else {
-                video.currentTime = time;
+                mediaPlayer.seek(time, true);
             }
         }
     };
