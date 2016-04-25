@@ -101,9 +101,9 @@ MediaPlayer = function () {
         switch (e.data.metric) {
             case "ManifestReady":
                 _isPlayerInitialized();
-                this.debug.log("[HasPlayer] ManifestReady");
+                this.debug.log("[MediaPlayer] ManifestReady");
                 videoBitrates = this.metricsExt.getBitratesForType('video');
-                this.debug.log("[HasPlayer] video bitrates: " + JSON.stringify(videoBitrates));
+                this.debug.log("[MediaPlayer] video bitrates: " + JSON.stringify(videoBitrates));
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('manifest_loaded', false, false, {});
                 videoModel.getElement().dispatchEvent(event);
@@ -120,7 +120,7 @@ MediaPlayer = function () {
                             width: this.metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: this.metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        this.debug.log("[HasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
+                        this.debug.log("[MediaPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
                     }
                 } else if (e.data.stream == "audio") {
                     audioBitrates = this.metricsExt.getBitratesForType(e.data.stream);
@@ -132,7 +132,7 @@ MediaPlayer = function () {
                             width: this.metricsExt.getVideoWidthForRepresentation(e.data.value.to),
                             height: this.metricsExt.getVideoHeightForRepresentation(e.data.value.to)
                         });
-                        this.debug.log("[HasPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
+                        this.debug.log("[MediaPlayer][" + e.data.stream + "] send download_bitrate - b=" + videoBitrates[e.data.value.lto]);
                     }
                 }
                 break;
@@ -159,7 +159,7 @@ MediaPlayer = function () {
                 }
                 break;
             case "BufferLevel":
-                //this.debug.log("[HasPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
+                //this.debug.log("[MediaPlayer] BufferLevel = "+e.data.value.level+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('bufferLevel_updated', false, false, {
                     type: e.data.stream,
@@ -168,7 +168,7 @@ MediaPlayer = function () {
                 videoModel.getElement().dispatchEvent(event);
                 break;
             case "State":
-                //this.debug.log("[HasPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
+                //this.debug.log("[MediaPlayer] State = "+e.data.value.current+" for type = "+e.data.stream);
                 event = document.createEvent("CustomEvent");
                 event.initCustomEvent('state_changed', false, false, {
                     type: e.data.stream,
@@ -356,6 +356,13 @@ MediaPlayer = function () {
     };
     // END TODO
 
+
+    var _getDVRInfoMetric = function () {
+        var metrics = this.metricsModel.getReadOnlyMetricsFor('video'),
+            dvrInfo = metrics ? this.metricsExt.getCurrentDVRInfo(metrics) : null;
+        return dvrInfo;
+    };
+
     // DIJON initialization
     system.mapValue('system', system);
     system.mapOutlet('system');
@@ -402,20 +409,22 @@ MediaPlayer = function () {
         },
 
         /**
-         * get the HAS version
+         * Returns the version of dash.js from which this player has been built.
+         * @method getVersionDashJS
          * @access public
          * @memberof MediaPlayer#
-         * @return hasplayer version
+         * @return {string} the dash.js version
          */
         getVersionDashJS: function () {
             return VERSION_DASHJS;
         },
 
         /**
-        * @access public
-        * @memberof MediaPlayer#
-        * @return date when the hasplayer has been built.
-        */
+         * Returns the date at which this player has been built.
+         * @access public
+         * @memberof MediaPlayer#
+         * @return {string} the date at which this player has been built
+         */
         getBuildDate: function () {
             if (BUILD_DATE.indexOf("@@") === -1) {
                 return BUILD_DATE;
@@ -447,10 +456,10 @@ MediaPlayer = function () {
             videoModel.setElement(video);
 
             // in case of init is called another time
-            if (playing && streamController) {
+            /*if (playing && streamController) {
                 streamController.reset();
                 playing = false;
-            }
+            }*/
             debugController = new MediaPlayer.dependencies.DebugController();
             // connect default events
             _connectEvents.call(this);
@@ -467,17 +476,16 @@ MediaPlayer = function () {
         /**
          * Registers a listener on the specified event.
          * The possible event types are:
-         * <li>'error' (see [error]{@link HasPlayer#event:error} event specification)
-         * <li>'warning' (see [warning]{@link HasPlayer#event:warning} event specification)
-         * <li>'subtitlesStyleChanged' (see [subtitlesStyleChanged]{@link HasPlayer#event:subtitlesStyleChanged} event specification)
-         * <li>'manifestUrlUpdate' (see [manifestUrlUpdate]{@link HasPlayer#event:manifestUrlUpdate} event specification)
-         * <li>'play_bitrate' (see [play_bitrate]{@link HasPlayer#event:play_bitrate} event specification)
-         * <li>'download_bitrate' (see [download_bitrate]{@link HasPlayer#event:download_bitrate} event specification)
-         * <li>'bufferLevel_updated' (see [bufferLevel_updated]{@link HasPlayer#event:bufferLevel_updated} event specification)
-         * <li>'state_changed' (see [state_changed]{@link HasPlayer#event:state_changed} event specification)
+         * <li>'error' (see [error]{@link MediaPlayer#event:error} event specification)
+         * <li>'warning' (see [warning]{@link MediaPlayer#event:warning} event specification)
+         * <li>'manifestUrlUpdate' (see [manifestUrlUpdate]{@link MediaPlayer#event:manifestUrlUpdate} event specification)
+         * <li>'play_bitrate' (see [play_bitrate]{@link MediaPlayer#event:play_bitrate} event specification)
+         * <li>'download_bitrate' (see [download_bitrate]{@link MediaPlayer#event:download_bitrate} event specification)
+         * <li>'bufferLevel_updated' (see [bufferLevel_updated]{@link MediaPlayer#event:bufferLevel_updated} event specification)
+         * <li>'state_changed' (see [state_changed]{@link MediaPlayer#event:state_changed} event specification)
          * @method addEventListener
          * @access public
-         * @memberof HasPlayer#
+         * @memberof MediaPlayer#
          * @param {string} type - the event type for listen to, either any HTML video element event or player event.
          * @param {callback} listener - the callback which is called when an event of the specified type occurs
          * @param {boolean} useCapture - see HTML DOM addEventListener() method specification
@@ -495,8 +503,8 @@ MediaPlayer = function () {
          * Unregisters the listener previously registered with the addEventListener() method.
          * @method removeEventListener
          * @access public
-         * @memberof HasPlayer#
-         * @see [addEventListener]{@link HasPlayer#addEventListener}
+         * @memberof MediaPlayer#
+         * @see [addEventListener]{@link MediaPlayer#addEventListener}
          * @param {string} type - the event type on which the listener was registered
          * @param {callback} listener - the callback which was registered to the event type
          */
@@ -515,7 +523,7 @@ MediaPlayer = function () {
          * Returns the video model object.
          * @access public
          * @memberof MediaPlayer#
-         * @return the video model object
+         * @return {object} the video model object
          */
         getVideoModel: function() {
             return videoModel;
@@ -525,7 +533,7 @@ MediaPlayer = function () {
          * Returns the debug object.
          * @access public
          * @memberof MediaPlayer#
-         * @return the debug object 
+         * @return {object} the debug object 
          */
         getDebug: function () {
             return this.debug;
@@ -535,7 +543,7 @@ MediaPlayer = function () {
          * Returns the metrics extension object.
          * @access public
          * @memberof MediaPlayer#
-         * @return the metrics extension object
+         * @return {object} the metrics extension object
          */
         getMetricsExt: function () {
             return this.metricsExt;
@@ -544,12 +552,10 @@ MediaPlayer = function () {
         /////////// CONFIG
 
         /**
-         * Sets some player configuration parameters
+         * Sets player configuration parameters.
          * @access public
          * @memberof MediaPlayer#
-         * @param params - configuration parameters
-         * @see {@link http://localhost:8080/OrangeHasPlayer/samples/Dash-IF/hasplayer_config.json}
-         *
+         * @param {PlayerParams} params - parameter(s) value(s) to set.
          */
         setConfig: function (params) {
             if (this.config && params) {
@@ -557,17 +563,7 @@ MediaPlayer = function () {
                 this.config.setParams(params);
             }
         },
-
-        /**
-         * Sets some parameters values.
-         * TODO : this metod should be replace by MediaPlayer#setConfig
-         * @method setParams
-         * @access public
-         * @memberof MediaPlayer#
-         * @param {PlayerParams} params - parameter(s) value(s) to set.
-         */
         setParams: function (params) {
-            _isPlayerInitialized();
             this.setConfig(params);
         },
 
@@ -594,7 +590,7 @@ MediaPlayer = function () {
          * Returns the autoplay state.
          * @access public
          * @memberof MediaPlayer#
-         * @return the autoplay state
+         * @return {boolean} the autoplay state
          */
         getAutoPlay: function () {
             return autoPlay;
@@ -604,7 +600,7 @@ MediaPlayer = function () {
          * Sets the autoplay state.
          * @access public
          * @memberof MediaPlayer#
-         * @param {boolean} value - the new autoplay state
+         * @param {boolean} value - true to activate autoplay, false to disable autoplay
          */
         setAutoPlay: function (value) {
             autoPlay = value;
@@ -625,25 +621,29 @@ MediaPlayer = function () {
         },
 
         /**
-         * Returns the current quality for a stream type
+         * Returns the current quality for a stream type.
          * @access public
          * @memberof MediaPlayer#
          * @param {string} type - stream type, 'video' or 'audio'
-         * @return the current quality level as an index of the quality (in bitrate ascending order)
+         * @return {number} the current quality level as an index of the quality (in bitrate ascending order)
          */
-        getQualityFor: function(type) {
+        getQualityFor: function (type) {
+            _isPlayerInitialized();
             return this.abrController.getQualityFor(type);
         },
 
         /**
-         * Selects the quality level for a stream type.
-         * If you want to set limit up and down for video for instance, you have to use setConfig function.
+         * Selects the quality for a stream type.
          * @access public
          * @memberof MediaPlayer#
          * @param {string} type - stream type, 'video' or 'audio'
          * @param {number} value - the selected quality level as an index of the quality (in bitrate ascending order)
          */
-        setQualityFor: function(type, value) {
+        setQualityFor: function (type, value) {
+            _isPlayerInitialized();
+            if (typeof value !== 'boolean') {
+                throw new Error('MediaPlayer.setQualityFor(): Invalid Arguments');
+            }
             this.abrController.setPlaybackQuality(type, value);
         },
 
@@ -651,9 +651,10 @@ MediaPlayer = function () {
          * Returns the auto switch quality state.
          * @access public
          * @memberof MediaPlayer#
-         * @return the auto switch quality state
+         * @return {boolean} the auto switch quality state
          */
         getAutoSwitchQuality: function() {
+            _isPlayerInitialized();
             return this.abrController.getAutoSwitchBitrate();
         },
 
@@ -664,6 +665,10 @@ MediaPlayer = function () {
          * @param {boolean} value - the new auto switch quality state
          */
         setAutoSwitchQuality: function(value) {
+            _isPlayerInitialized();
+            if (typeof value !== 'boolean') {
+                throw new Error('MediaPlayer.setAutoSwitchQuality(): Invalid Arguments');
+            }
             this.abrController.setAutoSwitchBitrate(value);
         },
 
@@ -671,7 +676,7 @@ MediaPlayer = function () {
          * Returns the buffering behaviour while the player is in pause.
          * @access public
          * @memberof MediaPlayer#
-         * @return {boolean} true if we continue to buffer stream while in pause
+         * @return {boolean} true if the player still buffers stream while in pause
          */
         getScheduleWhilePaused: function () {
             return scheduleWhilePaused;
@@ -681,16 +686,18 @@ MediaPlayer = function () {
          * Sets the buffering behaviour while player is in pause.
          * @access public
          * @memberof MediaPlayer#
-         * @param {boolean} value - true if it buffers stream while in pause
+         * @param {boolean} value - true if the player has to buffer stream while in pause
          */
         setScheduleWhilePaused: function (value) {
+            if (typeof value !== 'boolean') {
+                throw new Error('MediaPlayer.setScheduleWhilePaused(): Invalid Arguments');
+            }
             scheduleWhilePaused = value;
         },
 
         /**
          * Sets the default audio language. If the default language is available in the stream,
          * the corresponding audio track is selected. Otherwise, the first declared audio track in the manifest is selected.
-         * This function has to be called before any other function 
          * @method setDefaultAudioLang
          * @access public
          * @memberof MediaPlayer#
@@ -706,7 +713,6 @@ MediaPlayer = function () {
         /**
          * Sets the default subtitle language. If the default language is available in the stream,
          * the corresponding subtitle track is selected. Otherwise, the first declared subtitle track in the manifest is selected.
-         * This function has to be called before any other function 
          * @method setDefaultSubtitleLang
          * @access public
          * @memberof MediaPlayer#
@@ -892,8 +898,8 @@ MediaPlayer = function () {
          * @memberof MediaPlayer#
          * @param {number} reason - the reason for stopping the player.
          * Possible values are:
-         * <li>0 : stop during streaming (ex: browser has been closed)
-         * <li>1 : stop because all the stream has been watched
+         * <li>0 : stop during streaming at user request
+         * <li>1 : stop when all streams are completed
          * <li>2 : stop after an error
          */
         reset: function (reason) {
@@ -907,7 +913,7 @@ MediaPlayer = function () {
 
             /*var loop = videoModel.getElement().loop;
             if (url) {
-                this.metricsModel.addSession(null, url, loop, null, "HasPlayer.js_" + this.getVersion());
+                this.metricsModel.addSession(null, url, loop, null, "MediaPlayer.js_" + this.getVersion());
             }*/
 
             _resetAndPlay.call(this, reason);
@@ -919,11 +925,13 @@ MediaPlayer = function () {
         },
 
         /**
-        * Updates the manifest url.
+        * Updates the manifest URL. This method is used to provide an update of the manifest URL when the original
+        * URL provided in load() method is no more valid (for example if it has expired when signed)
+        * (see [manifestUrlUpdate]{@link MediaPlayer#event:manifestUrlUpdate} event specification).
         * @method refeshManifest
         * @access public
         * @memberof MediaPlayer#
-        * param {string} url - the updated video stream's manifest (MPEG DASH, Smooth Streaming or HLS) url
+        * param {string} url - the updated video stream's manifest URL
         */
         refreshManifest: function (url) {
             _isPlayerInitialized();
@@ -958,11 +966,11 @@ MediaPlayer = function () {
         },
 
         /**
-         * Returns the current playback time.
+         * Returns the current playback time/position.
          * @method getPosition
          * @access public
          * @memberof MediaPlayer#
-         * @return {number} the current playback time in seconds
+         * @return {number} the current playback time/position in seconds
          */
         getPosition: function () {
             _isPlayerInitialized();
@@ -974,21 +982,21 @@ MediaPlayer = function () {
         },
 
         /**
-         * Return available dvr range for  live stream
+         * Return the available DVR window range in case of live streams.
          * @method isLive
          * @access public
          * @memberOf MediaPlayer#
-         * @return {Array} dvr range available
+         * @return {object} range - the DVR window range
+         * @return {number} range.start - the DVR window range start time
+         * @return {number} range.end - the DVR window range end time
          */
         getDVRWindowRange: function () {
-            if (this.isLive()) {
-                var metric = this.metricsModel.getReadOnlyMetricsFor('video'),
-                    dvrInfo = metric ? this.metricsExt.getCurrentDVRInfo(metric) : null,
-                    range = dvrInfo ? dvrInfo.range : null;
-                return range;
-            } else {
+            _isPlayerInitialized();
+            if (!this.isLive()) {
                 return null;
             }
+            var dvrInfo = _getDVRInfoMetric();
+            return dvrInfo ? dvrInfo.range : null;
         },
 
         /**
@@ -1000,15 +1008,14 @@ MediaPlayer = function () {
          */
         getDVRWindowSize: function () {
             _isPlayerInitialized();
-            return this.getDVRInfoMetric.call(this).mpd.timeShiftBufferDepth;
+            if (!this.isLive()) {
+                return null;
+            }
+            // TODO: get timeShiftBufferDepth
+            return null;
+            // var dvrInfo = _getDVRInfoMetric();
+            // return dvrInfo ? dvrInfo.mpd.timeShiftBufferDepth : null;;
         },
-
-
-        getDVRInfoMetric: function () {
-            var metric = this.metricsModel.getReadOnlyMetricsFor('video') || this.metricsModel.getReadOnlyMetricsFor('audio');
-            return this.metricsExt.getCurrentDVRInfo(metric);
-        },
-
 
         /**
          * TBD
@@ -1017,11 +1024,15 @@ MediaPlayer = function () {
          * @access public
          */
         getDVRSeekOffset: function (value) {
-            var metric = this.getDVRInfoMetric.call(this),
-                val = metric.range.start + parseInt(value, 10);
+            _isPlayerInitialized();
+            if (!this.isLive()) {
+                return null;
+            }
+            var dvrInfo = _getDVRInfoMetric(),
+                val = dvrInfo.range.start + value;
 
-            if (val > metric.range.end) {
-                val = metric.range.end;
+            if (val > dvrInfo.range.end) {
+                val = dvrInfo.range.end;
             }
 
             return val;
@@ -1040,11 +1051,11 @@ MediaPlayer = function () {
         },
 
         /**
-         * Returns the metrics for stream type
+         * Returns the metrics for stream type.
          * @access public
          * @memberof MediaPlayer#
          * @param {string} type - stream type, 'video' or 'audio'
-         * @return the metrics array for the selected type
+         * @return {Array} the metrics array for the selected type
          */
         getMetricsFor: function(type) {
             var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
@@ -1058,7 +1069,7 @@ MediaPlayer = function () {
          * @method setTrickModeSpeed
          * @access public
          * @memberof MediaPlayer#
-         * @return the current trick mode speed
+         * @return {number} the current trick mode speed
          */
         getTrickModeSpeed: function () {
             if (streamController) {
@@ -1089,7 +1100,7 @@ MediaPlayer = function () {
         /////////////////////// ERROR/WARNING
 
         /**
-         * Returns the Error object for the most recent error
+         * Returns the Error object for the most recent error.
          * @method getError
          * @access public
          * @memberof MediaPlayer#
@@ -1100,7 +1111,7 @@ MediaPlayer = function () {
         },
 
         /**
-         * Returns the Warning object for the most recent warning
+         * Returns the Warning object for the most recent warning.
          * @method getWarning
          * @access public
          * @memberof MediaPlayer#
@@ -1113,7 +1124,7 @@ MediaPlayer = function () {
         /////////////////////// TRACKS
 
         /**
-         * Returns the list of available tracks for the stream type (as specified in the stream manifest) 
+         * Returns the list of available tracks for the stream type (as specified in the stream manifest). 
          * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
          * @method getTracks
          * @access public
@@ -1196,7 +1207,7 @@ MediaPlayer = function () {
          * @access public
          * @memberof MediaPlayer#
          * @param {String} type - the stream type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
-         * @return {Track} the selected audio track
+         * @return {Track} the selected track
          */
         getSelectedTrack: function (type) {
             _isPlayerInitialized();
@@ -1220,29 +1231,29 @@ MediaPlayer = function () {
         /////////// SUBTITLES DISPLAY
 
         /**
-         * Enable / disable subtitles.
+         * Enable or disables subtitles processing.
          * @method enableSubtitles
          * @access public
          * @memberof MediaPlayer#
-         * @param {boolean} enabled - true to enable subtitles, false to hide subtitles. (default false)
+         * @param {boolean} value - true to enable subtitles, false to disables subtitles processing (by default subtitles are disabled)
          */
-        enableSubtitles: function (enabled) {
+        enableSubtitles: function (value) {
             _isPlayerInitialized();
-            if (typeof enabled !== 'boolean') {
-                throw new Error('MediaPlayer.setSubtitleVisibility(): Invalid Arguments');
+            if (typeof value !== 'boolean') {
+                throw new Error('MediaPlayer.enableSubtitles(): Invalid Arguments');
             }
-            subtitlesEnabled = enabled;
+            subtitlesEnabled = value;
             if (streamController) {
-                streamController.enableSubtitles(enabled);
+                streamController.enableSubtitles(subtitlesEnabled);
             }
         },
 
         /**
-        * function used to retrieve if subtitle is enable or not
+        * Returns the subtitles processing state.
         * @method isSubtitlesEnabled
         * @access public
         * @memberof MediaPlayer#
-        * @retrun {boolean} true if the download of subtitle is enabled
+        * @retrun {boolean} true if subtitles are enabled, false otherwise
        */
         isSubtitlesEnabled: function () {
             _isPlayerInitialized();
@@ -1250,20 +1261,23 @@ MediaPlayer = function () {
         },
 
         /**
-         * Set to true if subtitles are displayed in a div outside video player.
+         * Enables or disables subtitles display in a div outside video player.
          * @method enableSubtitleExternDisplay
          * @access public
          * @memberof MediaPlayer#
          * @param {boolean} mode - true if subtitles are displayed in a div outside video player
          */
-        enableSubtitleExternDisplay: function (mode) {
-            this.config.setParams({ 'TextTrackExtensions.displayModeExtern': mode });
+        enableSubtitleExternDisplay: function (value) {
+            if (typeof value !== 'boolean') {
+                throw new Error('MediaPlayer.enableSubtitleExternDisplay(): Invalid Arguments');
+            }
+            this.config.setParams({'TextTrackExtensions.displayModeExtern': value});
         },
 
         /////////// AUDIO VOLUME
 
         /**
-         * Returns the audio mute status.
+         * Returns the audio mute state.
          * @method getMute
          * @access public
          * @memberof MediaPlayer#
@@ -1275,18 +1289,18 @@ MediaPlayer = function () {
         },
 
         /**
-         * Sets the audio mute status.
+         * Sets the audio mute state.
          * @method setMute
          * @access public
          * @memberof MediaPlayer#
-         * @param {boolean} state - true to mute audio, false otherwise
+         * @param {boolean} value - true to mute audio, false otherwise
          */
-        setMute: function (state) {
+        setMute: function (value) {
             _isPlayerInitialized();
-            if (typeof state !== 'boolean') {
+            if (typeof value !== 'boolean') {
                 throw new Error('MediaPlayer.setMute(): Invalid Arguments');
             }
-            videoModel.setMute(state);
+            videoModel.setMute(value);
         },
 
         /**
@@ -1306,15 +1320,15 @@ MediaPlayer = function () {
          * @method setVolume
          * @access public
          * @memberof MediaPlayer#
-         * @param {number} volume - the audio volume level, from 0.0 (silent) to 1.0 (loudest)
+         * @param {number} level - the audio volume level, from 0.0 (silent) to 1.0 (loudest)
          */
-        setVolume: function (volume) {
+        setVolume: function (level) {
             _isPlayerInitialized();
-            if ((typeof volume !== 'number') || volume < 0 || volume > 1) {
+            if ((typeof level !== 'number') || level < 0 || level > 1) {
                 throw new Error('MediaPlayer.setVolume(): Invalid Arguments');
             }
 
-            videoModel.setVolume(volume);
+            videoModel.setVolume(level);
         },
 
         /////////// TERMINAL ID
@@ -1324,7 +1338,7 @@ MediaPlayer = function () {
          * @method getTerminalId
          * @access public
          * @memberof MediaPlayer#
-         * @return {string} the terminal ID 
+         * @return {string} the terminal ID (<OS name>-<OS bits>-<browser name>)
          */
         getTerminalId: function () {
             var browser = fingerprint_browser(),
@@ -1398,7 +1412,6 @@ MediaPlayer.prototype = {
 /**
  * Packages declaration
  */
-
 MediaPlayer.dependencies = {};
 MediaPlayer.dependencies.protection = {};
 MediaPlayer.dependencies.protection.servers = {};
@@ -1421,7 +1434,7 @@ MediaPlayer.PUBLIC_EVENTS = {
      * The error event is fired when an error occurs.
      * When the error event is fired, the application shall stop the player.
      *
-     * @event HasPlayer#error
+     * @event MediaPlayer#error
      * @param {object} event - the event
      * @param {object} event.type - the event type ('error')
      * @param {object} event.data - the event data
@@ -1433,7 +1446,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
     * The warning event is fired when a warning occurs.
     *
-    * @event HasPlayer#warning
+    * @event MediaPlayer#warning
     * @param {object} event - the event
     * @param {object} event.type - the event type ('warning')
     * @param {object} event.data - the event data
@@ -1445,7 +1458,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The cueEnter event is fired when a subtitle cue needs to be displayed.
      *
-     * @event HasPlayer#cueEnter
+     * @event MediaPlayer#cueEnter
      * @param {object} event - the event
      * @param {object} event.type - the event type ('cueEnter')
      * @param {object} event.data - the event data
@@ -1460,7 +1473,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The cueExit event is fired when a subtitle cue needs to be erased.
      *
-     * @event HasPlayer#cueExit
+     * @event MediaPlayer#cueExit
      * @param {object} event - the event
      * @param {object} event.type - the event type ('cueExit')
      * @param {object} event.data - the event data
@@ -1475,9 +1488,9 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The manifestUrlUpdate event is fired when the URL of the manifest may have to be refreshed,
      * since the player failed to download the manifest file (URL expiration for example).
-     * The application shall therefore provide an updated manifest URL by using the method [refreshManifest]{@link HasPlayer#refreshManifest}
+     * The application shall therefore provide an updated manifest URL by using the method [refreshManifest]{@link MediaPlayer#refreshManifest}
      *
-     * @event HasPlayer#manifestUrlUpdate
+     * @event MediaPlayer#manifestUrlUpdate
      * @param {object} event - the event
      * @param {object} event.type - the event type ('manifestUrlUpdate')
      * @param {object} event.data - the event data
@@ -1494,7 +1507,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The 'play_bitrate' event is fired when the current played bitrate has changed.
      *
-     * @event HasPlayer#play_bitrate
+     * @event MediaPlayer#play_bitrate
      * @param {CustomEvent} event - the event
      * @param {object} event.detail - the event data
      * @param {string} event.detail.type - the stream type ('audio' or 'video')
@@ -1509,7 +1522,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The download_bitrate event is fired when the current downloaded bitrate has changed.
      *
-     * @event HasPlayer#download_bitrate
+     * @event MediaPlayer#download_bitrate
      * @param {CustomEvent} event - the event
      * @param {object} event.detail - the event data
      * @param {string} event.detail.type - the stream type ('audio' or 'video')
@@ -1525,7 +1538,7 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The bufferLevel_updated event is fired when the buffer level changed.
      *
-     * @event HasPlayer#bufferLevel_updated
+     * @event MediaPlayer#bufferLevel_updated
      * @param {CustomEvent} event - the event
      * @param {object} event.detail - the event data
      * @param {string} event.detail.type - the stream type ('audio' or 'video')
@@ -1536,19 +1549,21 @@ MediaPlayer.PUBLIC_EVENTS = {
     /**
      * The state_changed event is fired when the player state changed.
      *
-     * @event HasPlayer#state_changed
+     * @event MediaPlayer#state_changed
      * @param {CustomEvent} event - the event
      * @param {object} event.detail - the event data
      * @param {string} event.detail.type - the stream type ('audio' or 'video')
      * @param {string} event.detail.state - the current state ('stopped', 'buffering', 'seeking' or 'playing')
      */
     'state_changed': 'video'
-
 };
 
 /**
- *  expose the track's type available in has manifest. usefull to retrieve tracks list with method MediaPlayer.getTracks(<type>)
- *  @enum 
+ * Exposes the available tracks types used to manage tracks (language) switching.
+ * @see [getTracks]{@link MediaPlayer#getTracks}
+ * @see [getSelectedTrack]{@link MediaPlayer#getSelectedTrack}
+ * @see [setTrack]{@link MediaPlayer#setTracks}
+ * @enum 
  */
 MediaPlayer.TRACKS_TYPE = {
     AUDIO: "audio",
@@ -1587,6 +1602,7 @@ MediaPlayer.TRACKS_TYPE = {
 /** 
  * Static Functions
  */
+
 /**
 * Returns the current browser status on MSE support.
 * @method hasMediaSourceExtension
@@ -1594,7 +1610,6 @@ MediaPlayer.TRACKS_TYPE = {
 * @return true if MSE is supported, false otherwise
 */
 MediaPlayer.hasMediaSourceExtension = function () {
-
     return new MediaPlayer.utils.Capabilities().supportsMediaSource();
 };
 
