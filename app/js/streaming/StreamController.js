@@ -403,7 +403,6 @@ MediaPlayer.dependencies.StreamController = function() {
                 },
                 function() {
                     self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.MANIFEST_ERR_NO_STREAM, "No stream/period is provided in the manifest");
-                    self.reset();
                 }
             );
         };
