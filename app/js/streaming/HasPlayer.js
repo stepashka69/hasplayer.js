@@ -50,6 +50,7 @@ MediaPlayer = function () {
         scheduleWhilePaused = false, // should we buffer while in pause
         plugins = {};
 
+    // #region Private methods
 
     // player state and intitialization
     var _isReady = function () {
@@ -363,6 +364,8 @@ MediaPlayer = function () {
         return dvrInfo;
     };
 
+    // #endregion
+
     // DIJON initialization
     system.mapValue('system', system);
     system.mapOutlet('system');
@@ -380,7 +383,7 @@ MediaPlayer = function () {
         errHandler: undefined,
         config: undefined,
 
-        /////////// VERSION
+        /////////// #region VERSION
 
         /**
          * Returns the version of the player.
@@ -432,8 +435,9 @@ MediaPlayer = function () {
                 return 'Not a builded version';
             }
         },
+        /////////// #endregion
 
-        /////////// INIT
+        /////////// #region INIT
 
         /**
          * Initialize the player.
@@ -470,8 +474,9 @@ MediaPlayer = function () {
                 plugins[plugin].init(this);
             }
         },
+        /////////// #endregion
 
-        /////////// LISTENERS
+        /////////// #region LISTENERS
 
         /**
          * Registers a listener on the specified event.
@@ -516,9 +521,9 @@ MediaPlayer = function () {
                 videoModel.unlisten(type, listener);
             }
         },
+        /////////// #endregion
 
-        /////////// COMPONENTS GETTER
-
+        /////////// #region COMPONENTS GETTER
         /**
          * Returns the video model object.
          * @access public
@@ -548,9 +553,9 @@ MediaPlayer = function () {
         getMetricsExt: function () {
             return this.metricsExt;
         },
+        /////////// #endregion
 
-        /////////// CONFIG
-
+        /////////// #region CONFIG
         /**
          * Sets player configuration parameters.
          * @access public
@@ -746,9 +751,9 @@ MediaPlayer = function () {
         getDefaultSubtitleLang: function () {
             return defaultSubtitleLang;
         },
+        /////////// #endregion
 
-        /////////// PLAYBACK
-
+        /////////// #region PLAYBACK
         /**
          * Load/open a video stream.
          * @method load
@@ -959,10 +964,9 @@ MediaPlayer = function () {
             _isPlayerInitialized();
             streamController.refreshManifest(url);
         },
+        /////////// #endregion
 
-
-        /////////////////////// STREAM METADATA 
-
+        /////////// #region STREAM METADATA 
         /**
          * Returns the media duration.
          * @method getDuration
@@ -1083,9 +1087,9 @@ MediaPlayer = function () {
             var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
             return metrics;
         },
+        /////////// #endregion
 
-        /////////////////////// TRICK MODE
-
+        /////////// #region TRICK MODE
         /**
          * Returns the current trick mode speed.
          * @method setTrickModeSpeed
@@ -1118,8 +1122,9 @@ MediaPlayer = function () {
                 }
             }
         },
+        /////////// #endregion
 
-        /////////////////////// ERROR/WARNING
+        /////////// #region ERROR/WARNING
 
         /**
          * Returns the Error object for the most recent error.
@@ -1142,9 +1147,9 @@ MediaPlayer = function () {
         getWarning: function () {
             return warning;
         },
+        /////////// #endregion
 
-        /////////////////////// TRACKS
-
+        /////////// #region TRACKS
         /**
          * Returns the list of available tracks for the stream type (as specified in the stream manifest). 
          * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
@@ -1249,9 +1254,9 @@ MediaPlayer = function () {
                 lang: _track.lang
             };
         },
+        /////////// #endregion
 
-        /////////// SUBTITLES DISPLAY
-
+        /////////// #region SUBTITLES DISPLAY
         /**
          * Enable or disables subtitles processing.
          * @method enableSubtitles
@@ -1295,8 +1300,9 @@ MediaPlayer = function () {
             }
             this.config.setParams({'TextTrackExtensions.displayModeExtern': value});
         },
+        /////////// #endregion
 
-        /////////// AUDIO VOLUME
+        /////////// #region AUDIO VOLUME
 
         /**
          * Returns the audio mute state.
@@ -1352,8 +1358,9 @@ MediaPlayer = function () {
 
             videoModel.setVolume(level);
         },
+        /////////// #endregion
 
-        /////////// TERMINAL ID
+        /////////// #region TERMINAL ID
 
         /**
          * Returns the terminal ID.
@@ -1368,8 +1375,9 @@ MediaPlayer = function () {
 
             return os.name + "-" + os.bits + "-" + browser.name;
         },
+        /////////// #endregion
 
-        /////////// PLUGINS
+        /////////// #region PLUGINS
 
         /**
          * Loads a MediaPlayer plugin.
@@ -1418,6 +1426,7 @@ MediaPlayer = function () {
                 });
             }
         }
+        /////////// #endregion
     };
 };
 
