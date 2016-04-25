@@ -1021,7 +1021,7 @@ MediaPlayer = function () {
             if (!this.isLive()) {
                 return null;
             }
-            var dvrInfo = _getDVRInfoMetric();
+            var dvrInfo = _getDVRInfoMetric.call(this);
             return dvrInfo ? dvrInfo.range : null;
         },
 
@@ -1054,7 +1054,7 @@ MediaPlayer = function () {
             if (!this.isLive()) {
                 return null;
             }
-            var dvrInfo = _getDVRInfoMetric(),
+            var dvrInfo = _getDVRInfoMetric.call(this),
                 val = dvrInfo.range.start + value;
 
             if (val > dvrInfo.range.end) {
