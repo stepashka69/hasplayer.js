@@ -339,11 +339,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     };
 
     $scope.selectAudioTrack = function(track){
-        player.setTrack(MediaPlayer.TRACKS_TYPE.AUDIO,track);
+        player.selectTrack(MediaPlayer.TRACKS_TYPE.AUDIO,track);
     };
 
     $scope.selectTextTrack = function(track){
-        player.setTrack(MediaPlayer.TRACKS_TYPE.TEXT,track);
+        player.selectTrack(MediaPlayer.TRACKS_TYPE.TEXT,track);
     };
 
     function getCribbedMetricsFor(type) {

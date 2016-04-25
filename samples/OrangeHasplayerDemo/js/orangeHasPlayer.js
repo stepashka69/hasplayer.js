@@ -222,7 +222,7 @@ function loadStream(streamInfos, optimizedZappingEnabled) {
 }
 
 function changeAudio(track) {
-    orangeHasPlayer.setTrack('audio', track);
+    orangeHasPlayer.selectTrack('audio', track);
     orangeHasPlayer.setDefaultAudioLang(track.lang);
 }
 
@@ -231,7 +231,7 @@ function enableSubtitles(enable) {
 }
 
 function changeSubtitle(track) {
-    orangeHasPlayer.setTrack('text', track);
+    orangeHasPlayer.selectTrack('text', track);
     orangeHasPlayer.setDefaultSubtitleLang(track.lang);
 }
 

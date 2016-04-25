@@ -709,6 +709,17 @@ MediaPlayer = function () {
             }
             defaultAudioLang = language;
         },
+        
+        /**
+         * Gets the default audio language.
+         * @method getDefaultAudioLang
+         * @access public
+         * @memberof MediaPlayer#
+         * @return {string} lang - the default audio language based on ISO 3166-2
+         */
+        getDefaultAudioLang: function(){
+            return defaultAudioLang;
+        },
 
         /**
          * Sets the default subtitle language. If the default language is available in the stream,
@@ -723,6 +734,17 @@ MediaPlayer = function () {
                 throw new Error('MediaPlayer.setDefaultSubtitleLang(): Invalid Arguments');
             }
             defaultSubtitleLang = language;
+        },
+
+        /**
+         * Gets the default subtitle language.
+         * @method getDefaultSubtitleLang
+         * @access public
+         * @memberof MediaPlayer#
+         * @return {string} lang - the default subtitle language based on ISO 3166-2
+         */
+        getDefaultSubtitleLang: function () {
+            return defaultSubtitleLang;
         },
 
         /////////// PLAYBACK
@@ -1159,7 +1181,7 @@ MediaPlayer = function () {
 
         /**
          * Selects the track to be playbacked for the stream type.
-         * @method setTrack
+         * @method selectTrack
          * @access public
          * @memberof MediaPlayer#
          * @see [getTracks]{@link MediaPlayer#getTracks}
@@ -1167,7 +1189,7 @@ MediaPlayer = function () {
          * @param {Track} track - the track to select
          * 
          */
-        setTrack: function (type, track) {
+        selectTrack: function (type, track) {
 
             _isPlayerInitialized();
 
