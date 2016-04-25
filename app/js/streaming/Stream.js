@@ -34,7 +34,8 @@ MediaPlayer.dependencies.Stream = function() {
         audioTrackIndex = -1,
         textController = null,
         subtitlesEnabled = false,
-        fragmentInfoController = null,
+        FragmentInfoVideoController = null,
+        FragmentInfoAudioController = null,
 
         textTrackIndex = -1,
         autoPlay = true,
@@ -172,13 +173,18 @@ MediaPlayer.dependencies.Stream = function() {
                         funcs.push(videoController.reset(errored));
                     }
 
-                    if (!!fragmentInfoController) {
-                        funcs.push(fragmentInfoController.reset(errored));
+                    if (!!FragmentInfoVideoController) {
+                        funcs.push(FragmentInfoVideoController.reset(errored));
                     }
 
                     if (!!audioController) {
                         funcs.push(audioController.reset(errored));
                     }
+
+                    if (!!FragmentInfoAudioController) {
+                        funcs.push(FragmentInfoAudioController.reset(errored));
+                    }
+                    
                     if (!!textController) {
                         funcs.push(textController.reset(errored));
                     }
@@ -602,9 +608,13 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] <video> seeking event: " + time);
 
             if(self.manifestExt.getIsDynamic(manifest) === true){
-                if (fragmentInfoController === null){
-                    fragmentInfoController = self.system.getObject("fragmentInfoController");
-                    fragmentInfoController.initialize("video", self.fragmentController, videoController);
+                if (FragmentInfoVideoController === null){
+                    FragmentInfoVideoController = self.system.getObject("fragmentInfoController");
+                    FragmentInfoVideoController.initialize("video", self.fragmentController, videoController);
+                }
+                if (FragmentInfoAudioController === null){
+                    FragmentInfoAudioController = self.system.getObject("fragmentInfoController");
+                    FragmentInfoAudioController.initialize("audio", self.fragmentController, audioController);
                 }
             }
 
@@ -792,13 +802,18 @@ MediaPlayer.dependencies.Stream = function() {
                 videoController.stop();
             }
 
-            if (fragmentInfoController) {
-                fragmentInfoController.stop();
+            if (FragmentInfoVideoController) {
+                FragmentInfoVideoController.stop();
             }
 
             if (audioController) {
                 audioController.stop();
             }
+
+            if (FragmentInfoAudioController) {
+                FragmentInfoAudioController.stop();
+            }
+
             if (textController) {
                 textController.stop();
             }
