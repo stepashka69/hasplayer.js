@@ -230,7 +230,7 @@ MediaPlayer = function () {
 
 
     /// Private playback functions ///
-    var _resetAndPlay = function () {
+    var _resetAndPlay = function (reason) {
         if (playing && streamController) {
             if (!resetting) {
                 resetting = true;
@@ -251,7 +251,7 @@ MediaPlayer = function () {
                     }
                 }).bind(this);
                 streamController.subscribe(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE, teardownComplete, undefined, true);
-                streamController.reset();
+                streamController.reset(reason);
             }
         } else {
             if (_isReady.call(this)) {
@@ -801,7 +801,7 @@ MediaPlayer = function () {
 
                 // here we are ready to start playing
                 source = stream;
-                _resetAndPlay.call(this);
+                _resetAndPlay.call(this, 0);
             }).bind(this));
         },
 
@@ -898,12 +898,19 @@ MediaPlayer = function () {
          */
         reset: function (reason) {
             _isPlayerInitialized();
-            this.abrController.setAutoSwitchBitrate('video', 0);
-            this.abrController.setAutoSwitchBitrate('audio', 0);
 
-            this.metricsModel.addState('video', 'stopped', videoModel.getCurrentTime(), reason);
+            // Reset ABR controller
+            this.setQualityFor('video', 0);
+            this.setQualityFor('audio', 0);
+
             source = null;
-            _resetAndPlay.call(this);
+
+            /*var loop = videoModel.getElement().loop;
+            if (url) {
+                this.metricsModel.addSession(null, url, loop, null, "HasPlayer.js_" + this.getVersion());
+            }*/
+
+            _resetAndPlay.call(this, reason);
 
             // Notify plugins that player is reset
             for (var plugin in plugins) {
