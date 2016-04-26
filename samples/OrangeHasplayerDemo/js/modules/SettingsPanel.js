@@ -157,7 +157,7 @@ SettingsPanel.prototype.onEnableMetrics = function() {
 SettingsPanel.prototype.onSelectMetricsAgent = function(value) {
     if (typeof MetricsAgent === 'function') {
         if (this.enableMetricsCheckbox.checked) {
-            orangeHasPlayer.loadMetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
+            orangeHasPlayer.loadPlugin(MetricsAgent, this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
         } else if (this.metricsAgent) {
             this.metricsAgent.stop();
         }
