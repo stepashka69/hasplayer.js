@@ -825,8 +825,8 @@ MediaPlayer = function () {
             warning = null;
 
             // Wait for plugins completely intialized before starting a new session
-            for (i = 0; i < plugins.length; i++) {
-                pluginsInitDefer.push(plugins[i].deferInit);
+            for(var plugin in  plugins){
+                pluginsInitDefer.push(plugin);
             }
             Q.all(pluginsInitDefer).then((function () {
                 // Notify plugins a new stream is loaded
