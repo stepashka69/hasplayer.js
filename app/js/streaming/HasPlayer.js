@@ -53,7 +53,6 @@ MediaPlayer = function () {
 //#endregion
 
 //#region Private methods
-
     // player state and intitialization
     var _isReady = function () {
         return initialized && videoModel.getElement() && source && !resetting;
@@ -832,7 +831,7 @@ MediaPlayer = function () {
             Q.all(pluginsInitDefer).then((function () {
                 // Notify plugins a new stream is loaded
                 for (var plugin in plugins) {
-                    plugins[plugin].load(stream.url);
+                    plugins[plugin].load(stream);
                 }
 
                 // here we are ready to start playing
@@ -1375,48 +1374,43 @@ MediaPlayer = function () {
 
 //#region PLUGINS
         /**
-         * Loads a MediaPlayer plugin.
-         * @method loadPlugin
+         * Adds a MediaPlayer plugin.
+         * @method addPlugin
          * @access public
          * @memberof MediaPlayer#
-         * @param {string} plugin - the plugin object name
-         * @param params - the plugin parameters
+         * @param {string} plugin - the plugin instance
          */
-        loadPlugin: function (plugin, params) {
-            var instance;
+        addPlugin: function (plugin) {
 
             if (plugin === undefined) {
-                throw new Error('MediaPlayer.loadPlugin(): plugin undefined');
+                throw new Error('MediaPlayer.addPlugin(): plugin undefined');
             }
-
-            // Create plugin instance
-            instance = new plugin(params);
 
             // Check plugin API
-            if (typeof(instance.getName) !== 'function' ||
-                typeof(instance.getVersion) !== 'function' ||
-                typeof(instance.init) !== 'function' ||
-                typeof(instance.load) !== 'function' ||
-                typeof(instance.stop) !== 'function' ||
-                typeof(instance.reset) !== 'function') {
-                throw new Error('MediaPlayer.loadPlugin(): plugin API not compliant');
+            if (typeof(plugin.getName) !== 'function' ||
+                typeof(plugin.getVersion) !== 'function' ||
+                typeof(plugin.init) !== 'function' ||
+                typeof(plugin.load) !== 'function' ||
+                typeof(plugin.stop) !== 'function' ||
+                typeof(plugin.reset) !== 'function') {
+                throw new Error('MediaPlayer.addPlugin(): plugin API not compliant');
             }
 
-            if (plugins[instance.getName()]) {
+            if (plugins[plugin.getName()]) {
                 // Reset plugin already loaded
-                plugins[instance.getName()].reset();
+                plugins[plugin.getName()].reset();
             }
 
-            this.debug.log("[MediaPlayer] Load plugin '" + instance.getName() + "' (v" + instance.getVersion() + ")");
+            this.debug.log("[MediaPlayer] Load plugin '" + plugin.getName() + "' (v" + plugin.getVersion() + ")");
 
             // Store plugin
-            plugins[instance.getName()] = instance;
+            plugins[plugin.getName()] = plugin;
 
             // Initialize plugin (if player initialized)
-            instance.deferInit = Q.defer();
+            plugin.deferInit = Q.defer();
             if (initialized) {
-                instance.init(this, function () {
-                    instance.deferInit.resolve();
+                plugin.init(this, function () {
+                    plugin.deferInit.resolve();
                 });
             }
         }
