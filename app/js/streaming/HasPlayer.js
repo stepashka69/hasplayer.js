@@ -18,6 +18,7 @@
 /*jshint -W020 */
 MediaPlayer = function () {
 
+//#region Private attributes/properties
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
     var VERSION_DASHJS = "1.2.0",
@@ -49,8 +50,9 @@ MediaPlayer = function () {
         source = null, // current source played
         scheduleWhilePaused = false, // should we buffer while in pause
         plugins = {};
+//#endregion
 
-    // #region Private methods
+//#region Private methods
 
     // player state and intitialization
     var _isReady = function () {
@@ -366,7 +368,7 @@ MediaPlayer = function () {
         return dvrInfo;
     };
 
-    // #endregion
+//#endregion
 
     // DIJON initialization
     system.mapValue('system', system);
@@ -385,8 +387,7 @@ MediaPlayer = function () {
         errHandler: undefined,
         config: undefined,
 
-        /////////// #region VERSION
-
+//#region VERSION
         /**
          * Returns the version of the player.
          * @method getVersion
@@ -437,10 +438,9 @@ MediaPlayer = function () {
                 return 'Not a builded version';
             }
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region INIT
-
+//#region INIT
         /**
          * Initialize the player.
          * @method init
@@ -478,10 +478,9 @@ MediaPlayer = function () {
                 });
             }
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region LISTENERS
-
+//#region LISTENERS
         /**
          * Registers a listener on the specified event.
          * The possible event types are:
@@ -525,9 +524,9 @@ MediaPlayer = function () {
                 videoModel.unlisten(type, listener);
             }
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region COMPONENTS GETTER
+//#region COMPONENTS GETTER
         /**
          * Returns the video model object.
          * @access public
@@ -557,9 +556,9 @@ MediaPlayer = function () {
         getMetricsExt: function () {
             return this.metricsExt;
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region CONFIG
+//#region CONFIG
         /**
          * Sets player configuration parameters.
          * @access public
@@ -755,9 +754,9 @@ MediaPlayer = function () {
         getDefaultSubtitleLang: function () {
             return defaultSubtitleLang;
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region PLAYBACK
+//#region PLAYBACK
         /**
          * Load/open a video stream.
          * @method load
@@ -963,9 +962,9 @@ MediaPlayer = function () {
             _isPlayerInitialized();
             streamController.refreshManifest(url);
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region STREAM METADATA 
+//#region STREAM METADATA 
         /**
          * Returns the media duration.
          * @method getDuration
@@ -1086,9 +1085,10 @@ MediaPlayer = function () {
             var metrics = this.metricsModel.getReadOnlyMetricsFor(type);
             return metrics;
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region TRICK MODE
+//#region TRICK MODE
+        /////////// TRICK MODE
         /**
          * Returns the current trick mode speed.
          * @method setTrickModeSpeed
@@ -1121,10 +1121,9 @@ MediaPlayer = function () {
                 }
             }
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region ERROR/WARNING
-
+//#region ERROR/WARNING
         /**
          * Returns the Error object for the most recent error.
          * @method getError
@@ -1146,9 +1145,9 @@ MediaPlayer = function () {
         getWarning: function () {
             return warning;
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region TRACKS
+//#region TRACKS
         /**
          * Returns the list of available tracks for the stream type (as specified in the stream manifest). 
          * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
@@ -1253,9 +1252,9 @@ MediaPlayer = function () {
                 lang: _track.lang
             };
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region SUBTITLES DISPLAY
+//#region SUBTITLES DISPLAY
         /**
          * Enable or disables subtitles processing.
          * @method enableSubtitles
@@ -1299,10 +1298,9 @@ MediaPlayer = function () {
             }
             this.config.setParams({'TextTrackExtensions.displayModeExtern': value});
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region AUDIO VOLUME
-
+//#region AUDIO VOLUME
         /**
          * Returns the audio mute state.
          * @method getMute
@@ -1357,10 +1355,9 @@ MediaPlayer = function () {
 
             videoModel.setVolume(level);
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region TERMINAL ID
-
+//#region TERMINAL ID
         /**
          * Returns the terminal ID.
          * @method getTerminalId
@@ -1374,10 +1371,9 @@ MediaPlayer = function () {
 
             return os.name + "-" + os.bits + "-" + browser.name;
         },
-        /////////// #endregion
+//#endregion
 
-        /////////// #region PLUGINS
-
+//#region PLUGINS
         /**
          * Loads a MediaPlayer plugin.
          * @method loadPlugin
@@ -1399,7 +1395,6 @@ MediaPlayer = function () {
             // Check plugin API
             if (typeof(instance.getName) !== 'function' ||
                 typeof(instance.getVersion) !== 'function' ||
-                typeof(instance.isInitialized) !== 'function' ||
                 typeof(instance.init) !== 'function' ||
                 typeof(instance.load) !== 'function' ||
                 typeof(instance.stop) !== 'function' ||
@@ -1425,7 +1420,7 @@ MediaPlayer = function () {
                 });
             }
         }
-        /////////// #endregion
+//#endregion
     };
 };
 
