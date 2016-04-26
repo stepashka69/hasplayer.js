@@ -279,6 +279,8 @@ MediaPlayer = function () {
 
         playing = true;
 
+        this.metricsModel.addSession(null, source.url, videoModel.getElement().loop, null, "MediaPlayer.js_" + this.getVersion());
+
         // streamController Initialization
         if (!streamController) {
             streamController = system.getObject('streamController');
@@ -471,7 +473,9 @@ MediaPlayer = function () {
 
             // Initialize already loaded plugins
             for (var plugin in plugins) {
-                plugins[plugin].init(this);
+                plugins[plugin].init(this, function () {
+                     plugins[plugin].deferInit.resolve();
+                });
             }
         },
         /////////// #endregion
@@ -938,11 +942,6 @@ MediaPlayer = function () {
 
             source = null;
 
-            /*var loop = videoModel.getElement().loop;
-            if (url) {
-                this.metricsModel.addSession(null, url, loop, null, "MediaPlayer.js_" + this.getVersion());
-            }*/
-
             _resetAndPlay.call(this, reason);
 
             // Notify plugins that player is reset
@@ -1395,33 +1394,33 @@ MediaPlayer = function () {
             }
 
             // Create plugin instance
-            instance = new plugin();
+            instance = new plugin(params);
 
             // Check plugin API
-            if (instance.name === undefined ||
-                instance.version  === undefined ||
-                instance.initialized  === undefined ||
-                instance.init  === undefined ||
-                instance.load  === undefined ||
-                instance.stop  === undefined ||
-                instance.reset === undefined) {
+            if (typeof(instance.getName) !== 'function' ||
+                typeof(instance.getVersion) !== 'function' ||
+                typeof(instance.isInitialized) !== 'function' ||
+                typeof(instance.init) !== 'function' ||
+                typeof(instance.load) !== 'function' ||
+                typeof(instance.stop) !== 'function' ||
+                typeof(instance.reset) !== 'function') {
                 throw new Error('MediaPlayer.loadPlugin(): plugin API not compliant');
             }
 
-            if (plugins[instance.name]) {
-                // Plugin already loaded
-                return;
+            if (plugins[instance.getName()]) {
+                // Reset plugin already loaded
+                plugins[instance.getName()].reset();
             }
 
-            this.debug.log("[MediaPlayer] Load plugin '" + instance.name + "' (v" + instance.version + ")");
+            this.debug.log("[MediaPlayer] Load plugin '" + instance.getName() + "' (v" + instance.getVersion() + ")");
 
             // Store plugin
-            plugins[instance.name] = instance;
+            plugins[instance.getName()] = instance;
 
             // Initialize plugin (if player initialized)
             instance.deferInit = Q.defer();
             if (initialized) {
-                instance.init(this, params, function () {
+                instance.init(this, function () {
                     instance.deferInit.resolve();
                 });
             }
@@ -1530,7 +1529,13 @@ MediaPlayer.PUBLIC_EVENTS = {
     'manifestUrlUpdate': 'hasplayer',
 
     /**
-     * The metricChanged event is fired when metrics are refreshed,
+     * The metricAdded event is fired when a new metric has been added,
+     * TBD
+     */
+    'metricAdded' : 'hasplayer',
+
+    /**
+     * The metricChanged event is fired when a metric has been updated,
      * TBD
      */
     'metricChanged' : 'hasplayer',
