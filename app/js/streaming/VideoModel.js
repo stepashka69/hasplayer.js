@@ -18,8 +18,8 @@ MediaPlayer.models.VideoModel = function () {
         stalledStreams = {},
 
         isStalled = function () {
-            for (var type in stalledStreams){
-                if(stalledStreams[type]===true) {
+            for (var type in stalledStreams) {
+                if (stalledStreams[type] === true) {
                     return true;
                 }
             }
@@ -39,13 +39,13 @@ MediaPlayer.models.VideoModel = function () {
         };
 
     return {
-        system : undefined,
-        debug : undefined,
+        system: undefined,
+        debug: undefined,
 
-        setup : function () {
+        setup: function () {
         },
 
-        reset : function () {
+        reset: function () {
             stalledStreams = [];
         },
 
@@ -63,15 +63,15 @@ MediaPlayer.models.VideoModel = function () {
             return element.paused;
         },
 
-        isSeeking: function() {
+        isSeeking: function () {
             return element.seeking;
         },
 
-        getDuration:  function () {
+        getDuration: function () {
             return element.duration;
         },
 
-        getPlaybackRate:  function () {
+        getPlaybackRate: function () {
             return element.playbackRate;
         },
 
@@ -80,12 +80,20 @@ MediaPlayer.models.VideoModel = function () {
             element.playbackRate = value;
         },
 
-        getMute:  function () {
+        getMute: function () {
             return element.muted;
         },
 
         setMute: function (value) {
             element.muted = value;
+        },
+
+        getVolume: function () {
+            return element.volume;
+        },
+
+        setVolume: function (value) {
+            element.volume = value;
         },
 
         getCurrentTime: function () {

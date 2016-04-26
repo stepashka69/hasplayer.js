@@ -1,11 +1,10 @@
 var orangeHasPlayer = null,
-    // @if ADSPLAYER
+    metricsAgent = null,
     adsPlayer = null,
-    // @endif
     config = null,
     video = null,
     currentStreamInfos = null,
-    configMetrics = {
+    confMetricsAgent = {
         'name': 'Prisme (local)',
         'activationUrl': '',
         'serverUrl': 'http://localhost:8080/metrics',
@@ -27,22 +26,24 @@ var orangeHasPlayer = null,
  *
  **********************************************************************************************************************/
 function createHasPlayer(isSubtitleExternDisplay) {
-    orangeHasPlayer = new OrangeHasPlayer();
+    orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
-    // @if ADSPLAYER
-    adsPlayer = new AdsPlayer(video);
-    // @endif
+
     orangeHasPlayer.init(video);
+    orangeHasPlayer.setDebug(true);
     orangeHasPlayer.enableSubtitleExternDisplay(isSubtitleExternDisplay);
     orangeHasPlayer.setInitialQualityFor('video', 0);
     orangeHasPlayer.setInitialQualityFor('audio', 0);
 
     /* hasPlayerConfig_dev */
     loadHasPlayerConfig('json/hasplayer_config.json');
-    /* hasPlayerConfig_dev */
-    //orangeHasPlayer.loadMetricsAgent(configMetrics);
 
-    orangeHasPlayer.setDebug(true);
+    // Load plugins
+    //metricsAgent = new MetricsAgent(confMetricsAgent);
+    //orangeHasPlayer.loadPlugin(metricsAgent);
+    //adsPlayer = new AdsPlayer(document.getElementById('demo-player-container'));
+    //orangeHasPlayer.loadPlugin(adsPlayer);
+
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.enableSubtitles(false);
@@ -99,9 +100,11 @@ function loadHasPlayerConfig(fileUrl) {
 function onload() {
     //handle onload events to get audio, subtitles tracks, etc...
     //init audio tracks
-    handleAudioData(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
+    //handleAudioData(orangeHasPlayer.getAudioTracks(), orangeHasPlayer.getSelectedAudioTrack());
+    handleAudioData(orangeHasPlayer.getTracks('audio'), orangeHasPlayer.getSelectedTrack('audio'));
     //init subtitle tracks
-    handleSubtitleData(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
+    //handleSubtitleData(orangeHasPlayer.getSubtitleTracks(), orangeHasPlayer.getSelectedSubtitleTrack());
+    handleSubtitleData(orangeHasPlayer.getTracks('text'), orangeHasPlayer.getSelectedTrack('text'));
     //init duration value for VOD content
     handleDuration(orangeHasPlayer.getDuration());
     //init bitrates graph
@@ -208,19 +211,11 @@ function loadStream(streamInfos, optimizedZappingEnabled) {
         orangeHasPlayer.setInitialQualityFor('audio', 0);
     }
     currentStreamInfos = streamInfos;
-    // @if ADSPLAYER
-    if (currentStreamInfos.mastUrl) {
-        if (adsPlayer.isPlayingAds()) {
-            adsPlayer.stop();
-        }
-        adsPlayer.start(currentStreamInfos.mastUrl);
-    }
-    // @endif
-    orangeHasPlayer.load(streamInfos.url, streamInfos.protData);
+    orangeHasPlayer.load(streamInfos);
 }
 
 function changeAudio(track) {
-    orangeHasPlayer.setAudioTrack(track);
+    orangeHasPlayer.selectTrack('audio', track);
     orangeHasPlayer.setDefaultAudioLang(track.lang);
 }
 
@@ -229,7 +224,7 @@ function enableSubtitles(enable) {
 }
 
 function changeSubtitle(track) {
-    orangeHasPlayer.setSubtitleTrack(track);
+    orangeHasPlayer.selectTrack('text', track);
     orangeHasPlayer.setDefaultSubtitleLang(track.lang);
 }
 

@@ -1237,7 +1237,7 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         setSubtitleTrack: function(subtitleTrack) {
-            subtitleTrack = selectTrack.call(this, textController, subtitleTrack, subtitleTrack);
+            textTrackIndex = selectTrack.call(this, textController, subtitleTrack, textTrackIndex);
         },
 
         getSelectedSubtitleTrack: function() {

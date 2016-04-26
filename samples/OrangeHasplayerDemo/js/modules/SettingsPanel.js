@@ -148,19 +148,23 @@ SettingsPanel.prototype.onSettingsMenuButtonClicked = function() {
 SettingsPanel.prototype.onEnableMetrics = function() {
     if (this.enableMetricsCheckbox.checked) {
         this.metricsAgentCombobox.disabled = false;
+        this.loadMetricsAgent();
     } else {
-        this.enableMetricsCheckbox.checked = true;
-        //this.metricsAgentCombobox.disabled = true;
+        this.metricsAgentCombobox.disabled = true;
+        orangeHasPlayer.removePlugin('MetricsAgent');
     }
 };
 
-SettingsPanel.prototype.onSelectMetricsAgent = function(value) {
-    if (typeof MetricsAgent === 'function') {
-        if (this.enableMetricsCheckbox.checked) {
-            orangeHasPlayer.loadMetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
-        } else if (this.metricsAgent) {
-            this.metricsAgent.stop();
-        }
+SettingsPanel.prototype.onSelectMetricsAgent = function() {
+    if (this.enableMetricsCheckbox.checked) {
+        this.loadMetricsAgent();
+    }
+};
+
+SettingsPanel.prototype.loadMetricsAgent = function() {
+    if (typeof MetricsAgent === 'function' && this.metricsAgentCombobox.selectedIndex >= 0) {
+        var metricsAgent = new MetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
+        orangeHasPlayer.addPlugin(metricsAgent);
     }
 };
 

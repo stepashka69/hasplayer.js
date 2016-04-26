@@ -20,6 +20,9 @@
         "BASE64",
         "utils",
         "MediaPlayer",
+        "OrangeHasPlayer",
+        "HasPlayer",
+        "MetricsAgent",
         "Dash",
         "WebKitMediaSource",
         "MediaSource",
@@ -39,5 +42,7 @@
         "ActiveXObject",
         "Promise",
         "define",
+        "fingerprint_browser",
+        "fingerprint_os",
         "DEBUG"]
 }
