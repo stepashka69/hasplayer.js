@@ -1378,7 +1378,7 @@ MediaPlayer = function () {
          * @method addPlugin
          * @access public
          * @memberof MediaPlayer#
-         * @param {string} plugin - the plugin instance
+         * @param {object} plugin - the plugin instance
          */
         addPlugin: function (plugin) {
 
@@ -1401,7 +1401,7 @@ MediaPlayer = function () {
                 plugins[plugin.getName()].reset();
             }
 
-            this.debug.log("[MediaPlayer] Load plugin '" + plugin.getName() + "' (v" + plugin.getVersion() + ")");
+            this.debug.log("[MediaPlayer] Add plugin '" + plugin.getName() + "' (v" + plugin.getVersion() + ")");
 
             // Store plugin
             plugins[plugin.getName()] = plugin;
@@ -1412,6 +1412,39 @@ MediaPlayer = function () {
                 plugin.init(this, function () {
                     plugin.deferInit.resolve();
                 });
+            }
+        },
+
+        /**
+         * Removes a MediaPlayer plugin.
+         * @method removePlugin
+         * @access public
+         * @memberof MediaPlayer#
+         * @param {object or string} plugin - the plugin instance (or name) to remove
+         */
+        removePlugin: function (plugin) {
+            var name;
+
+            if (plugin === undefined) {
+                throw new Error('MediaPlayer.removePlugin(): plugin undefined');
+            }
+
+            if (typeof(plugin) === 'string') {
+                name = plugin;
+            } else {
+                if (typeof(plugin.getName) !== 'function') {
+                    throw new Error('MediaPlayer.removePlugin(): plugin API not compliant');
+                }
+                name = plugin.getName();
+            }
+
+            if (plugins[name]) {
+                this.debug.log("[MediaPlayer] Remove plugin '" + name);
+                // Reset plugin
+                plugins[name].reset();
+                // delete it
+                plugins[name] = null;
+                delete plugins[name];
             }
         }
 //#endregion
