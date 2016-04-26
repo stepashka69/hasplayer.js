@@ -78,8 +78,7 @@ MediaPlayer = function () {
 
     // event connection
     var _connectEvents = function () {
-        //this.addEventListener('loadedMetadata', _onloaded.bind(this));
-        this.addEventListener('metricsAdded', _metricsAdded.bind(this));
+        this.addEventListener('metricAdded', _metricAdded.bind(this));
         this.addEventListener('error', _onError.bind(this));
         this.addEventListener('warning', _onWarning.bind(this));
         this.addEventListener('timeupdate', _onTimeupdate.bind(this));
@@ -99,7 +98,7 @@ MediaPlayer = function () {
         videoModel.getElement().dispatchEvent(event);
     };
 
-    var _metricsAdded = function (e) {
+    var _metricAdded = function (e) {
         switch (e.data.metric) {
             case "ManifestReady":
                 _isPlayerInitialized();
