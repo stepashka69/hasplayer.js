@@ -120,7 +120,7 @@ SettingsPanel.prototype.onEnableSubtitles = function() {
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
     //if subtitles have not been activated yet, initialize the first selected track
     if (!this.currentsubtitleTrack) {
-        this.currentsubtitleTrack = orangeHasPlayer.getSelectedSubtitleTrack();
+        this.currentsubtitleTrack = orangeHasPlayer.getSelectedTrack('text');
         var index = this.getTrackIndex(this.subtitleTracks, this.currentsubtitleTrack.id);
         if (index > -1) {
             this.subtitleListCombobox.selectedIndex = index;
