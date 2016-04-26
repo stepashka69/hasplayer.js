@@ -34,8 +34,9 @@ MediaPlayer.dependencies.Stream = function() {
         audioTrackIndex = -1,
         textController = null,
         subtitlesEnabled = false,
-        FragmentInfoVideoController = null,
-        FragmentInfoAudioController = null,
+        fragmentInfoVideoController = null,
+        fragmentInfoAudioController = null,
+        fragmentInfoTextController = null,
 
         textTrackIndex = -1,
         autoPlay = true,
@@ -173,20 +174,24 @@ MediaPlayer.dependencies.Stream = function() {
                         funcs.push(videoController.reset(errored));
                     }
 
-                    if (!!FragmentInfoVideoController) {
-                        funcs.push(FragmentInfoVideoController.reset(errored));
+                    if (!!fragmentInfoVideoController) {
+                        funcs.push(fragmentInfoVideoController.reset(errored));
                     }
 
                     if (!!audioController) {
                         funcs.push(audioController.reset(errored));
                     }
 
-                    if (!!FragmentInfoAudioController) {
-                        funcs.push(FragmentInfoAudioController.reset(errored));
+                    if (!!fragmentInfoAudioController) {
+                        funcs.push(fragmentInfoAudioController.reset(errored));
                     }
                     
                     if (!!textController) {
                         funcs.push(textController.reset(errored));
+                    }
+
+                    if (!!fragmentInfoTextController) {
+                        funcs.push(fragmentInfoTextController.reset(errored));
                     }
 
                     Q.all(funcs).then(
@@ -608,13 +613,19 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] <video> seeking event: " + time);
 
             if(self.manifestExt.getIsDynamic(manifest) === true){
-                if (FragmentInfoVideoController === null){
-                    FragmentInfoVideoController = self.system.getObject("fragmentInfoController");
-                    FragmentInfoVideoController.initialize("video", self.fragmentController, videoController);
+                if (fragmentInfoVideoController === null && videoController){
+                    fragmentInfoVideoController = self.system.getObject("fragmentInfoController");
+                    fragmentInfoVideoController.initialize("video", self.fragmentController, videoController);
                 }
-                if (FragmentInfoAudioController === null){
-                    FragmentInfoAudioController = self.system.getObject("fragmentInfoController");
-                    FragmentInfoAudioController.initialize("audio", self.fragmentController, audioController);
+
+                if (fragmentInfoAudioController === null && audioController){
+                    fragmentInfoAudioController = self.system.getObject("fragmentInfoController");
+                    fragmentInfoAudioController.initialize("audio", self.fragmentController, audioController);
+                }
+
+                if (fragmentInfoTextController === null && textController){
+                    fragmentInfoTextController = self.system.getObject("fragmentInfoController");
+                    fragmentInfoTextController.initialize("text", self.fragmentController, textController);
                 }
             }
 
@@ -802,20 +813,24 @@ MediaPlayer.dependencies.Stream = function() {
                 videoController.stop();
             }
 
-            if (FragmentInfoVideoController) {
-                FragmentInfoVideoController.stop();
+            if (fragmentInfoVideoController) {
+                fragmentInfoVideoController.stop();
             }
 
             if (audioController) {
                 audioController.stop();
             }
 
-            if (FragmentInfoAudioController) {
-                FragmentInfoAudioController.stop();
+            if (fragmentInfoAudioController) {
+                fragmentInfoAudioController.stop();
             }
 
             if (textController) {
                 textController.stop();
+            }
+
+            if (fragmentInfoTextController) {
+                fragmentInfoTextController.stop();
             }
         },
 
