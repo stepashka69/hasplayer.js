@@ -779,7 +779,9 @@ MediaPlayer = function () {
         */
         load: function (stream) {
             var i,
+                plugin,
                 pluginsInitDefer = [],
+                pluginsLoadDefer = [],
                 config = {
                     video: {
                         "ABR.keepBandwidthCondition": true
@@ -824,18 +826,26 @@ MediaPlayer = function () {
             warning = null;
 
             // Wait for plugins completely intialized before starting a new session
-            for(var plugin in  plugins){
-                pluginsInitDefer.push(plugin);
+            for(var name in  plugins) {
+                pluginsInitDefer.push(plugins[name].deferInit.promise);
             }
             Q.all(pluginsInitDefer).then((function () {
                 // Notify plugins a new stream is loaded
-                for (var plugin in plugins) {
-                    plugins[plugin].load(stream);
+                for (var name in plugins) {
+                    plugin = plugins[name];
+                    plugin.deferLoad = Q.defer();
+                    pluginsLoadDefer.push(plugin.deferLoad.promise);
+                    plugin.load(stream, function () {
+                        plugin.deferLoad.resolve();
+                    });
                 }
 
-                // here we are ready to start playing
-                source = stream;
-                _resetAndPlay.call(this, 0);
+                Q.all(pluginsLoadDefer).then((function () {
+                    // Once all plugins are ready, we load the stream
+                    source = stream;
+                    _resetAndPlay.call(this, 0);
+
+                }).bind(this));
             }).bind(this));
         },
 
