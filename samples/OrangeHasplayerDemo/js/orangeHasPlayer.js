@@ -40,9 +40,9 @@ function createHasPlayer(isSubtitleExternDisplay) {
 
     // Load plugins
     //metricsAgent = new MetricsAgent(confMetricsAgent);
-    //orangeHasPlayer.loadPlugin(metricsAgent);
-    //adsPlayer = new AdsPlayer(document.getElementById('demo-player-container'));
-    //orangeHasPlayer.loadPlugin(adsPlayer);
+    //orangeHasPlayer.addPlugin(metricsAgent);
+    adsPlayer = new AdsPlayer(document.getElementById('demo-player-container'));
+    orangeHasPlayer.addPlugin(adsPlayer);
 
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
