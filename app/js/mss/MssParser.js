@@ -410,17 +410,7 @@ Mss.dependencies.MssParser = function() {
             return contentProtection;
         },
 
-        /*var createCENCContentProtection = function (protectionHeader) {
-
-        var contentProtection = {};
-
-        contentProtection.schemeIdUri = "urn:mpeg:dash:mp4protection:2011";
-        contentProtection.value = "cenc";
-
-        return contentProtection;
-    };*/
-
-        createWidevineContentProtection = function(protectionHeader) {
+        createWidevineContentProtection = function(/*protectionHeader*/) {
 
             var contentProtection = {},
                 keySystem = this.system.getObject("ksWidevine");
@@ -484,25 +474,18 @@ Mss.dependencies.MssParser = function() {
                 contentProtection["cenc:default_KID"] = KID;
                 contentProtections.push(contentProtection);
 
-                // For chrome, create ContentProtection for Widevine as a CENC protection
-                if (navigator.userAgent.indexOf("Chrome") >= 0) {
-                    //contentProtections.push(createCENCContentProtection(manifest.Protection.ProtectionHeader));
-                    contentProtection = createWidevineContentProtection.call(this, protectionHeader);
-                    contentProtection["cenc:default_KID"] = KID;
-                    contentProtections.push(contentProtection);
-                }
+                // Create ContentProtection for Widevine (as a CENC protection)
+                contentProtection = createWidevineContentProtection.call(this, protectionHeader);
+                contentProtection["cenc:default_KID"] = KID;
+                /* @if VOWV=true */
+                contentProtection.pssh = {
+                    __text: Mss.dependencies.createVOWidevinePssh(KID, this.debug)
+                };
+                contentProtections.push(contentProtection);
+                /* @endif */
 
                 mpd.ContentProtection = (contentProtections.length > 1) ? contentProtections : contentProtections[0];
                 mpd.ContentProtection_asArray = contentProtections;
-                /* @endif */
-
-                /* @if VOWV=true */
-                if (navigator.userAgent.indexOf("Chrome") >= 0) {
-                    contentProtections[contentProtections.length - 1].pssh = {
-                        __text: Mss.dependencies.createVOWidevinePssh(getKIDFromProtectionHeader(protectionHeader), this.debug)
-                    };
-                }
-                /* @endif */
 
                 /* @if PROTECTION=false */
                 /* @exec sendError('MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED','"protected content detected but protection module is not included."') */
