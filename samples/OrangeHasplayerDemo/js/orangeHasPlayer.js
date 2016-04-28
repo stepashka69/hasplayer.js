@@ -48,6 +48,7 @@ function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.enableSubtitles(false);
     registerHasPlayerEvents();
+    registerAdsPlayerEvents();
 }
 
 function registerHasPlayerEvents() {
@@ -66,7 +67,15 @@ function registerHasPlayerEvents() {
     orangeHasPlayer.addEventListener('state_changed', onStateChanged);
     orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
     orangeHasPlayer.addEventListener('manifestUrlUpdate', onManifestUrlUpdate);
+}
 
+function registerAdsPlayerEvents() {
+    adsPlayer.addEventListener('adStart',function(){
+        video.style.visibility = 'hidden';
+    });
+    adsPlayer.addEventListener('adEnd',function(){
+        video.style.visibility = 'visible';
+    });
 }
 
 function loadHasPlayerConfig(fileUrl) {
