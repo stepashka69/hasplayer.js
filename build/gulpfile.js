@@ -5,6 +5,7 @@ var gulp = require('gulp'),
     // gulp packages
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
+    preprocess = require('gulp-preprocess'),
     rename = require('gulp-rename'),
     // custom import
     option = require('./gulp/option'),
@@ -19,7 +20,7 @@ var config = {
 var options = {
     protection:true,
     analytics:false,
-    vow:false,
+    vowv:false,
     hls:true,
     mss:true
 };
@@ -53,6 +54,7 @@ gulp.task('clean', function(){
 gulp.task('build',['clean'],function(){
     return gulp.src(sourcesGlob)
     .pipe(concat(config.libName+'.js'))
+    .pipe(preprocess({context:gulp.option.all()}))
     .pipe(gulp.dest(config.distDir))
     .pipe(uglify())
     .pipe(rename(config.libName+'.min.js'))
