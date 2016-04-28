@@ -650,7 +650,7 @@ MediaPlayer = function () {
             if (typeof value !== 'number') {
                 throw new Error('MediaPlayer.setQualityFor(): Invalid Arguments');
             }
-            this.abrController.setPlaybackQuality(type, value);
+            this.abrController.setQualityFor(type, value);
         },
 
         /**
@@ -807,13 +807,13 @@ MediaPlayer = function () {
 
             // Set initial quality if first stream
             if (initialQuality.video >= 0) {
-                this.abrController.setPlaybackQuality('video', initialQuality.video);
+                this.abrController.setQualityFor('video', initialQuality.video);
                 config.video["ABR.keepBandwidthCondition"] = false;
                 initialQuality.video = -1;
             }
 
             if (initialQuality.audio >= 0) {
-                this.abrController.setPlaybackQuality('audio', initialQuality.audio);
+                this.abrController.setQualityFor('audio', initialQuality.audio);
                 config.audio["ABR.keepBandwidthCondition"] = false;
                 initialQuality.audio = -1;
             }
