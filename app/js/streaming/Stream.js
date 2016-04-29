@@ -1300,8 +1300,6 @@ MediaPlayer.dependencies.Stream = function() {
             // Stop reload timeout
             clearTimeout(reloadTimeout);
 
-            self.videoModel.setMute(false);
-
             //document.removeEventListener("visibilityChange");
 
             this.videoModel.unlisten("play", playListener);
