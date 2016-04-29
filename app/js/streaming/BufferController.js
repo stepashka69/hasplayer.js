@@ -389,6 +389,13 @@ MediaPlayer.dependencies.BufferController = function() {
                         // Check buffer level
                         checkIfSufficientBuffer.call(self);
                     }
+                }, function(e) {
+                    signalSegmentBuffered.call(self);
+                    if (e.name) {
+                        self.errHandler.sendError(e.name, e.message, e.data);
+                    } else {
+                        self.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.INTERNAL_ERROR, "Internal error while processing media segment", e.message);
+                    }
                 }
             );
         },
