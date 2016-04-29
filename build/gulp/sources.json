@@ -22,6 +22,7 @@
         "../app/js/streaming/Context.js",
         "../app/js/streaming/ContextManager.js",
         "../app/js/streaming/Debug.js",
+        "../app/js/streaming/DebugController.js",
         "../app/js/streaming/ErrorHandler.js",
         "../app/js/streaming/EventBus.js",
         "../app/js/streaming/EventController.js",
