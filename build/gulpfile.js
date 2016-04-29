@@ -3,6 +3,8 @@ var gulp = require('gulp'),
     // node packages
     del = require('del'),
     path = require('path'),
+	git = require('git-rev'),
+	fs = require('fs'),
     // gulp packages
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
@@ -10,10 +12,17 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     umd = require('gulp-umd'),
     jshint = require('gulp-jshint'),
+	banner = require('gulp-banner'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
 
+var pkg = { revision : '',
+			timeStamp : '',
+			licence : ''},
+	LICENSE = '../LICENSE';
+			
+var comment = '<%= pkg.licence %>\n\n/* Last build : <%= pkg.timeStamp %> / git revision : <%= pkg.revision %> */\n\n';
 
 var config = {
     distDir:'../dist',
@@ -64,7 +73,17 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('build',['clean', 'lint'], function(){
+gulp.task('gitRev', function() {
+	git.short(function (str) {
+		pkg.revision = str;
+	});
+	fs.readFile(LICENSE, null, function(err, _data) {
+		pkg.licence = _data;
+    });
+	pkg.timeStamp = new Date().getDate()+"."+(new Date().getMonth()+1)+"."+(new Date().getFullYear())+"_"+(new Date().getHours())+":"+(new Date().getMinutes())+":"+(new Date().getSeconds());
+ });
+
+gulp.task('build',['clean', 'lint','gitRev'], function(){
     return gulp.src(sourcesGlob)
     .pipe(concat(config.libName+'.js'))
     .pipe(preprocess({context:gulp.option.all()}))
@@ -76,6 +95,9 @@ gulp.task('build',['clean', 'lint'], function(){
     }))
     .pipe(gulp.dest(config.distDir))
     .pipe(uglify())
+	.pipe(banner(comment, {
+		pkg: pkg
+	}))
     .pipe(rename(config.libName+'.min.js'))
     .pipe(gulp.dest(config.distDir));
 });
