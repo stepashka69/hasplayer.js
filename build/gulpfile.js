@@ -2,11 +2,13 @@
 var gulp = require('gulp'),
     // node packages
     del = require('del'),
+    path = require('path'),
     // gulp packages
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
     preprocess = require('gulp-preprocess'),
     rename = require('gulp-rename'),
+    umd = require('gulp-umd'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -55,6 +57,12 @@ gulp.task('build',['clean'],function(){
     return gulp.src(sourcesGlob)
     .pipe(concat(config.libName+'.js'))
     .pipe(preprocess({context:gulp.option.all()}))
+    .pipe(umd({
+        namespace:function(){
+            return 'MediaPlayer';
+        },
+        template:path.join(__dirname, 'gulp/umd.js')
+    }))
     .pipe(gulp.dest(config.distDir))
     .pipe(uglify())
     .pipe(rename(config.libName+'.min.js'))
