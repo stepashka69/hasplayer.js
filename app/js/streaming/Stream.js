@@ -1257,8 +1257,6 @@ MediaPlayer.dependencies.Stream = function() {
             // Trick mode seeking timeout
             clearTimeout(tmSeekTimeout);
 
-            self.videoModel.setMute(false);
-
             //document.removeEventListener("visibilityChange");
 
             this.videoModel.unlisten("play", playListener);
