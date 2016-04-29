@@ -818,27 +818,6 @@ MediaPlayer = function () {
                 initialQuality.audio = -1;
             }
 
-            for (var plugin in plugins) {
-                if (plugin === "AdsPlayer") {
-                     plugins[plugin].addEventListener('adStart',
-                         function() {
-                              videoModel.getElement().style.visibility = 'hidden';
-                              document.getElementById("adsVideoPlayer").style.visibility = 'visible';
-                              console.log('mainVideo :' + videoModel.getElement().style.visibility);
-                              console.log('adsVideo  :' + document.getElementById("adsVideoPlayer").style.visibility);
-                          }, false);
- 
-                      // a ad has finished
-                      plugins[plugin].addEventListener('adEnd',
-                          function() {
-                              videoModel.getElement().style.visibility = 'visible';
-                              document.getElementById("adsVideoPlayer").style.visibility = 'hidden';
-                              console.log('mainVideo :' + videoModel.getElement().style.visibility);
-                              console.log('adsVideo  :' + document.getElementById("adsVideoPlayer").style.visibility);
-                          }, false);
-                  }
-              }
-
             // Set config to set 'keepBandwidthCondition' parameter
             this.setConfig(config);
 
