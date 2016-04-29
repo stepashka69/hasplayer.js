@@ -9,6 +9,7 @@ var gulp = require('gulp'),
     preprocess = require('gulp-preprocess'),
     rename = require('gulp-rename'),
     umd = require('gulp-umd'),
+    jshint = require('gulp-jshint'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -32,28 +33,38 @@ option.init(process.argv,options);
 
 // create the final globs for sources according to options
 var sourcesGlob = sources.libs.concat(sources.default);
+var sourcesWithoutLib;
 if(gulp.option('protection')){
     sourcesGlob = sourcesGlob.concat(sources.protection);
+	sourcesWithoutLib = sources.default.concat(sources.protection);
 }
 
 if(gulp.option('hls')){
      sourcesGlob = sourcesGlob.concat(sources.hls);
+	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.hls);
 }
 
 if(gulp.option('mss')){
      sourcesGlob = sourcesGlob.concat(sources.mss);
+	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.mss);
 }
 
 if(gulp.option('vowv')){
      sourcesGlob = sourcesGlob.concat(sources.vowv);
+	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.vowv);
 }
 
 gulp.task('clean', function(){
     return del([config.distDir],{force:true, dot:true});
 });
 
+gulp.task('lint', function() {
+  return gulp.src(sourcesWithoutLib)
+    .pipe(jshint())
+    .pipe(jshint.reporter('jshint-stylish'));
+});
 
-gulp.task('build',['clean'],function(){
+gulp.task('build',['clean', 'lint'], function(){
     return gulp.src(sourcesGlob)
     .pipe(concat(config.libName+'.js'))
     .pipe(preprocess({context:gulp.option.all()}))
