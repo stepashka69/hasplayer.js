@@ -66,7 +66,7 @@ gulp.task('build',['clean'],function(){
     .pipe(gulp.dest(config.distDir))
     .pipe(uglify())
     .pipe(rename(config.libName+'.min.js'))
-    .pipe(gulp.dest(config.distDir))
+    .pipe(gulp.dest(config.distDir));
 });
 
 
