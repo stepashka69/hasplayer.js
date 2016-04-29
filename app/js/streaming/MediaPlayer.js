@@ -778,8 +778,7 @@ MediaPlayer = function () {
             </pre>
         */
         load: function (stream) {
-            var i,
-                plugin,
+            var plugin,
                 pluginsInitDefer = [],
                 pluginsLoadDefer = [],
                 config = {
