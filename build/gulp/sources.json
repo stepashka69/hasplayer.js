@@ -1,5 +1,5 @@
 {
-    "libs":[
+    "libs": [
         "../app/lib/base64.js",
         "../app/lib/dijon.js",
         "../app/lib/long.js",
@@ -7,14 +7,14 @@
         "../app/lib/objectiron.js",
         "../app/lib/q.js",
         "../app/lib/xml2json.js",
-        "../app/lib/mp4lib/mp4lib.js"
-        "../app/lib/mp4lib/mp4lib-fields.js"
+        "../app/lib/mp4lib/mp4lib.js",
+        "../app/lib/mp4lib/mp4lib-fields.js",
         "../app/lib/mp4lib/mp4lib-boxes.js",
         "../app/lib/mpegts/mpegts.js",
         "../app/lib/mpegts/*",
         "../app/lib/fingerprint/*"
     ],
-    "default":[
+    "default": [
         "../app/js/streaming/MediaPlayer.js",
         "../app/js/streaming/AbrController.js",
         "../app/js/streaming/BufferController.js",
@@ -57,7 +57,7 @@
         "../app/js/utils/DOMParser.js",
         "../app/js/utils/ObjectIron.js"
     ],
-    "protection":[
+    "protection": [
         "../app/js/streaming/protection/CommonEncryption.js",
         "../app/js/streaming/protection/ProtectionController.js",
         "../app/js/streaming/protection/ProtectionExtensions.js",
@@ -68,24 +68,24 @@
         "../app/js/streaming/protection/servers/*",
         "../app/js/streaming/protection/vo/*"
     ],
-    "hls":[
+    "hls": [
         "../app/js/hls/*"
     ],
-    "mss":[
+    "mss": [
         "../app/js/mss/Mss.js",
         "../app/js/mss/MssParser.js",
         "../app/js/mss/MssHandler.js",
         "../app/js/mss/MssFragmentController.js"
     ],
-    "vowv":[
+    "vowv": [
         "../app/js/mss/VoWvPssh.js"
     ],
-    "analytics":[
+    "analytics": [
         "../app/js/utils/analytics.js"
     ],
 
-    "dash-if":{
-        "js":[
+    "dash-if": {
+        "js": [
             "../samples/Dash-IF/lib/angular/*",
             "../samples/Dash-IF/lib/angular.treeview/angular.treeview.min.js",
             "../samples/Dash-IF/lib/bootstrap/js/bootstrap.min.js",
@@ -94,10 +94,10 @@
             "../samples/Dash-IF/lib/jquery.ui/*.js",
             "../samples/Dash-IF/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js",
             "../samples/Dash-IF/lib/video/*.js",
-            "../samples/Dash-IF/js/browser.min.js"
+            "../samples/Dash-IF/js/browser.min.js",
             "../samples/Dash-IF/js/metrics.js",
             "../samples/Dash-IF/js/controllers/*",
-            "../samples/Dash-IF/js/main.js",
+            "../samples/Dash-IF/js/main.js"
 
         ]
     }
