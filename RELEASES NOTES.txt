@@ -1,3 +1,10 @@
+### Release Notes v1.2.7.1 (2016/05/02)
+* Bugs fixing:
+* - Mute state reset when load a new stream
+* - Crash in HLs demultiplexing when no audio packet in stream
+* - MANIFEST_ERR_PARSE (instead of DOWNLOAD_ERR_MANIFEST) when failed to download HLS variant stream playlist
+* Add new errors for HLS demultiplexing errors ('HLS_DEMUX_ERROR')
+
 ### Release Notes v1.2.7 (2016/03/22)
 * Bugs fixing:
 * - HLS support on Firefox
