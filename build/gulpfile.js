@@ -1,4 +1,4 @@
-'use strict';
+use strict';
 var gulp = require('gulp'),
     // node packages
     del = require('del'),
@@ -21,7 +21,7 @@ var pkg = { revision : '',
 			timeStamp : '',
 			licence : ''},
 	LICENSE = '../LICENSE';
-			
+
 var comment = '<%= pkg.licence %>\n\n/* Last build : <%= pkg.timeStamp %> / git revision : <%= pkg.revision %> */\n\n';
 
 var config = {
@@ -41,26 +41,21 @@ var options = {
 option.init(process.argv,options);
 
 // create the final globs for sources according to options
-var sourcesGlob = sources.libs.concat(sources.default);
-var sourcesWithoutLib;
+var sourcesGlob = sources.default;
 if(gulp.option('protection')){
     sourcesGlob = sourcesGlob.concat(sources.protection);
-	sourcesWithoutLib = sources.default.concat(sources.protection);
 }
 
 if(gulp.option('hls')){
      sourcesGlob = sourcesGlob.concat(sources.hls);
-	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.hls);
 }
 
 if(gulp.option('mss')){
      sourcesGlob = sourcesGlob.concat(sources.mss);
-	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.mss);
 }
 
 if(gulp.option('vowv')){
      sourcesGlob = sourcesGlob.concat(sources.vowv);
-	 sourcesWithoutLib = sourcesWithoutLib.concat(sources.vowv);
 }
 
 gulp.task('clean', function(){
@@ -68,7 +63,7 @@ gulp.task('clean', function(){
 });
 
 gulp.task('lint', function() {
-  return gulp.src(sourcesWithoutLib)
+  return gulp.src(sourcesGlob)
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'));
 });
@@ -84,6 +79,8 @@ gulp.task('gitRev', function() {
  });
 
 gulp.task('build',['clean', 'lint','gitRev'], function(){
+    // integrate libs after doing lint
+    sourcesGlob =  sources.libs.concat(sourcesGlob);
     return gulp.src(sourcesGlob)
     .pipe(concat(config.libName+'.js'))
     .pipe(preprocess({context:gulp.option.all()}))
