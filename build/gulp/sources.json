@@ -11,6 +11,7 @@
         "../app/lib/mp4lib/mp4lib-fields.js",
         "../app/lib/mp4lib/mp4lib-boxes.js",
         "../app/lib/mpegts/mpegts.js",
+		"../app/lib/mpegts/psi.js",
         "../app/lib/mpegts/*",
         "../app/lib/fingerprint/*"
     ],
@@ -31,6 +32,7 @@
         "../app/js/streaming/FragmentController.js",
         "../app/js/streaming/FragmentLoader.js",
         "../app/js/streaming/FragmentModel.js",
+		"../app/js/streaming/FragmentInfoController.js",
         "../app/js/streaming/ManifestLoader.js",
         "../app/js/streaming/ManifestUpdater.js",
         "../app/js/streaming/ManifestModel.js",
@@ -51,6 +53,7 @@
         "../app/js/streaming/rules/*",
         "../app/js/streaming/vo/*",
         "../app/js/streaming/vo/metrics/*",
+		"../app/js/dash/Dash.js",
         "../app/js/dash/**/*",
         "../app/js/streaming/protection/ProtectionModel.js",
         "../app/js/utils/CopyMethods.js",
