@@ -84,6 +84,7 @@ MediaPlayer.dependencies.Stream = function() {
         tmSeekTimeout,
         tmSeekValue,
         tmEndDetected = false,
+        muteState = false,
 
         eventController = null,
         protectionController,
@@ -1397,11 +1398,11 @@ MediaPlayer.dependencies.Stream = function() {
                 enableTrickMode = (speed !== 1) ? true : false,
                 currentVideoTime,
                 seekValue,
-                enableMute = function() {
+                restoreMute = function() {
                     if (self.videoModel.getCurrentTime() > (currentVideoTime + 1)) {
-                        self.videoModel.unlisten("timeupdate", enableMute);
-                        self.debug.info("[Stream] Set mute: false");
-                        self.videoModel.setMute(false);
+                        self.videoModel.unlisten("timeupdate", restoreMute);
+                        self.debug.info("[Stream] Set mute: "+muteState+", the mute state before using trick mode.");
+                        self.videoModel.setMute(muteState);
                     }
                 };
 
@@ -1417,7 +1418,10 @@ MediaPlayer.dependencies.Stream = function() {
 
             if (enableTrickMode && tmState === "Stopped") {
                 self.debug.info("[Stream] Set mute: true");
-                self.videoModel.setMute(true);
+                muteState = self.videoModel.getMute();
+                if (!muteState) {
+                    self.videoModel.setMute(true);
+                }
                 self.videoModel.pause();
             } else if (!enableTrickMode) {
                 tmSpeed = 1;
@@ -1438,7 +1442,7 @@ MediaPlayer.dependencies.Stream = function() {
                 if (!enableTrickMode) {
                     self.debug.info("[Stream] Trick mode: Stopped, current time = " + currentVideoTime);
                     tmState = "Stopped";
-                    self.videoModel.listen("timeupdate", enableMute);
+                    self.videoModel.listen("timeupdate", restoreMute);
                     currentVideoTime = tmEndDetected ? self.getStartTime() : currentVideoTime;
                     seek.call(self, tmEndDetected ? self.getStartTime() : currentVideoTime, true);
                 } else {
