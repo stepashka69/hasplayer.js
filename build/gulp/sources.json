@@ -7,7 +7,9 @@
         "../app/lib/objectiron.js",
         "../app/lib/q.js",
         "../app/lib/xml2json.js",
-        "../app/lib/mp4lib/*",
+        "../app/lib/mp4lib/mp4lib.js"
+        "../app/lib/mp4lib/mp4lib-fields.js"
+        "../app/lib/mp4lib/mp4lib-boxes.js",
         "../app/lib/mpegts/mpegts.js",
         "../app/lib/mpegts/*",
         "../app/lib/fingerprint/*"
@@ -80,5 +82,23 @@
     ],
     "analytics":[
         "../app/js/utils/analytics.js"
-    ]
+    ],
+
+    "dash-if":{
+        "js":[
+            "../samples/Dash-IF/lib/angular/*",
+            "../samples/Dash-IF/lib/angular.treeview/angular.treeview.min.js",
+            "../samples/Dash-IF/lib/bootstrap/js/bootstrap.min.js",
+            "../samples/Dash-IF/lib/flot/*.js",
+            "../samples/Dash-IF/lib/jquery/jquery-1.10.2.min.js",
+            "../samples/Dash-IF/lib/jquery.ui/*.js",
+            "../samples/Dash-IF/lib/jquery.ui.labeledslider/jquery.ui.labeledslider.js",
+            "../samples/Dash-IF/lib/video/*.js",
+            "../samples/Dash-IF/js/browser.min.js"
+            "../samples/Dash-IF/js/metrics.js",
+            "../samples/Dash-IF/js/controllers/*",
+            "../samples/Dash-IF/js/main.js",
+
+        ]
+    }
 }
