@@ -53,11 +53,6 @@ MediaPlayer = function () {
 //#endregion
 
 //#region Private methods
-    // player state and intitialization
-    var _isReady = function () {
-        return initialized && videoModel.getElement() && source && !resetting;
-    };
-
     var _isPlayerInitialized = function () {
         if (!initialized) {
             throw new Error('MediaPlayer not initialized !!!');
@@ -76,13 +71,48 @@ MediaPlayer = function () {
         }
     };
 
-    // event connection
-    var _connectEvents = function () {
-        this.addEventListener('metricAdded', _metricAdded.bind(this));
-        this.addEventListener('error', _onError.bind(this));
-        this.addEventListener('warning', _onWarning.bind(this));
-        this.addEventListener('timeupdate', _onTimeupdate.bind(this));
+    var _play = function () {
+        _isPlayerInitialized();
+        _isVideoModelInitialized();
+        _isSourceInitialized();
+
+        if (!MediaPlayer.hasMediaSourceExtension()) {
+            this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE, "MediaSource extension not supported by the browser");
+            return;
+        }
+
+        playing = true;
+
+        this.metricsModel.addSession(null, source.url, videoModel.getElement().loop, null, "MediaPlayer.js_" + this.getVersion());
+
+        // streamController Initialization
+        if (!streamController) {
+            streamController = system.getObject('streamController');
+            streamController.setVideoModel(videoModel);
+            streamController.setAutoPlay(autoPlay);
+        }
+
+        streamController.setDefaultAudioLang(defaultAudioLang);
+        streamController.setDefaultSubtitleLang(defaultSubtitleLang);
+        streamController.enableSubtitles(subtitlesEnabled);
+        // TODO restart here !!!
+        streamController.load(source.url, source.protData);
+        system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
+        system.mapOutlet("scheduleWhilePaused", "stream");
+
     };
+
+    // player state and intitialization
+    var _isReady = function () {
+        return initialized && videoModel.getElement() && source && !resetting;
+    };
+
+    var _doAutoPlay = function () {
+        if (_isReady()) {
+            _play.call(this);
+        }
+    };
+
 
     // event disptach
     var _dispatchBitrateEvent = function (type, value) {
@@ -97,6 +127,7 @@ MediaPlayer = function () {
         });
         videoModel.getElement().dispatchEvent(event);
     };
+
 
     var _metricAdded = function (e) {
         switch (e.data.metric) {
@@ -188,18 +219,12 @@ MediaPlayer = function () {
         warning = e.data;
     };
 
-    /**
-     * Usefull to dispatch event of quality changed
-     */
-    var _onTimeupdate = function () {
-        // If not in playing state, then do not send 'play_bitrate' events, wait for 'loadeddata' event first
-        if (videoModel.getPlaybackRate() === 0) {
-            return;
+    var _cleanStreamTab = function (streamTab, idToRemove) {
+        var i = 0;
+
+        for (i = idToRemove.length - 1; i >= 0; i -= 1) {
+            streamTab.splice(i, 1);
         }
-        // Check for video playing quality change
-        _detectPlayBitrateChange.call(this, videoQualityChanged);
-        // Check for audio playing quality change
-        _detectPlayBitrateChange.call(this, audioQualityChanged);
     };
 
     var _detectPlayBitrateChange = function (streamTab) {
@@ -221,13 +246,33 @@ MediaPlayer = function () {
         _cleanStreamTab(streamTab, idToRemove);
     };
 
-    var _cleanStreamTab = function (streamTab, idToRemove) {
-        var i = 0;
 
-        for (i = idToRemove.length - 1; i >= 0; i -= 1) {
-            streamTab.splice(i, 1);
+    /**
+     * Usefull to dispatch event of quality changed
+     */
+    var _onTimeupdate = function () {
+        // If not in playing state, then do not send 'play_bitrate' events, wait for 'loadeddata' event first
+        if (videoModel.getPlaybackRate() === 0) {
+            return;
         }
+        // Check for video playing quality change
+        _detectPlayBitrateChange.call(this, videoQualityChanged);
+        // Check for audio playing quality change
+        _detectPlayBitrateChange.call(this, audioQualityChanged);
     };
+
+
+
+
+    // event connection
+    var _connectEvents = function () {
+        this.addEventListener('metricAdded', _metricAdded.bind(this));
+        this.addEventListener('error', _onError.bind(this));
+        this.addEventListener('warning', _onWarning.bind(this));
+        this.addEventListener('timeupdate', _onTimeupdate.bind(this));
+    };
+
+
 
 
     /// Private playback functions ///
@@ -261,42 +306,7 @@ MediaPlayer = function () {
         }
     };
 
-    var _doAutoPlay = function () {
-        if (_isReady()) {
-            _play.call(this);
-        }
-    };
 
-    var _play = function () {
-        _isPlayerInitialized();
-        _isVideoModelInitialized();
-        _isSourceInitialized();
-
-        if (!MediaPlayer.hasMediaSourceExtension()) {
-            this.errHandler.sendError(MediaPlayer.dependencies.ErrorHandler.prototype.CAPABILITY_ERR_MEDIASOURCE, "MediaSource extension not supported by the browser");
-            return;
-        }
-
-        playing = true;
-
-        this.metricsModel.addSession(null, source.url, videoModel.getElement().loop, null, "MediaPlayer.js_" + this.getVersion());
-
-        // streamController Initialization
-        if (!streamController) {
-            streamController = system.getObject('streamController');
-            streamController.setVideoModel(videoModel);
-            streamController.setAutoPlay(autoPlay);
-        }
-
-        streamController.setDefaultAudioLang(defaultAudioLang);
-        streamController.setDefaultSubtitleLang(defaultSubtitleLang);
-        streamController.enableSubtitles(subtitlesEnabled);
-        // TODO restart here !!!
-        streamController.load(source.url, source.protData);
-        system.mapValue("scheduleWhilePaused", scheduleWhilePaused);
-        system.mapOutlet("scheduleWhilePaused", "stream");
-
-    };
 
     // TODO : remove this when migration of method getTracks will be done on all the process
     var _getTracksFromType = function (_type) {
@@ -539,7 +549,7 @@ MediaPlayer = function () {
          * Returns the debug object.
          * @access public
          * @memberof MediaPlayer#
-         * @return {object} the debug object 
+         * @return {object} the debug object
          */
         getDebug: function () {
             return this.debug;
@@ -715,7 +725,7 @@ MediaPlayer = function () {
             }
             defaultAudioLang = language;
         },
-        
+
         /**
          * Gets the default audio language.
          * @method getDefaultAudioLang
@@ -778,8 +788,7 @@ MediaPlayer = function () {
             </pre>
         */
         load: function (stream) {
-            var i,
-                pluginsInitDefer = [],
+            var pluginsInitDefer = [],
                 config = {
                     video: {
                         "ABR.keepBandwidthCondition": true
@@ -962,7 +971,7 @@ MediaPlayer = function () {
         },
 //#endregion
 
-//#region STREAM METADATA 
+//#region STREAM METADATA
         /**
          * Returns the media duration.
          * @method getDuration
@@ -1147,7 +1156,7 @@ MediaPlayer = function () {
 
 //#region TRACKS
         /**
-         * Returns the list of available tracks for the stream type (as specified in the stream manifest). 
+         * Returns the list of available tracks for the stream type (as specified in the stream manifest).
          * The tracks list can be retrieved once the video 'loadeddata' event has been fired.
          * @method getTracks
          * @access public
@@ -1188,7 +1197,7 @@ MediaPlayer = function () {
          * @see [getTracks]{@link MediaPlayer#getTracks}
          * @param {String} type - the stream type according to MediaPlayer.TRACKS_TYPE (see @link MediaPlayer#TRACKS_TYPE)
          * @param {Track} track - the track to select
-         * 
+         *
          */
         selectTrack: function (type, track) {
 
@@ -1620,7 +1629,7 @@ MediaPlayer.PUBLIC_EVENTS = {
  * @see [getTracks]{@link MediaPlayer#getTracks}
  * @see [getSelectedTrack]{@link MediaPlayer#getSelectedTrack}
  * @see [setTrack]{@link MediaPlayer#setTracks}
- * @enum 
+ * @enum
  */
 MediaPlayer.TRACKS_TYPE = {
     AUDIO: "audio",
@@ -1656,7 +1665,7 @@ MediaPlayer.TRACKS_TYPE = {
  * @property {Object}   audio - audio parameters (parameters for audio track)
  */
 
-/** 
+/**
  * Static Functions
  */
 
