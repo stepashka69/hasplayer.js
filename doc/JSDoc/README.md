@@ -23,13 +23,15 @@ Add hasplayer.js to the end of the body.
 </body>
 ```
 
-Now comes the good stuff. We need to create an OrangeHasPlayer. Then we need to initialize it, attach it to our "videoPlayer" and then tell it where to get the video from. We will do this in an anonymous self executing function, that way it will run as soon as the page loads. So, here is how we do it:
+Now comes the good stuff. We need to create an MediaPlayer. Then we need to initialize it, attach it to our "videoPlayer" and then tell it where to get the video from. We will do this in an anonymous self executing function, that way it will run as soon as the page loads. So, here is how we do it:
 ``` js
 (function(){
-    var url = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest";
-	var orangeHasPlayer = new OrangeHasPlayer();
-    orangeHasPlayer.init(document.querySelector("#videoPlayer"));
-    orangeHasPlayer.load(url);
+    var stream = {
+        url: "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest"
+    };
+    var mediaPlayer = new MediaPlayer();
+    MediaPlayer.init(document.querySelector("#videoPlayer"));
+    MediaPlayer.load(stream);
 })();
 ```
 
@@ -38,7 +40,7 @@ When it is all done, it should look similar to this:
 <!doctype html>
 <html>
     <head>
-        <title>Hasplayer.js Rocks</title>
+        <title>hasplayer.js Rocks</title>
     </head>
     <body>
         <div>
@@ -47,10 +49,12 @@ When it is all done, it should look similar to this:
         <script src="yourPathToHasplayer/hasplayer.js"></script>
         <script>
             (function(){
-                var url = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest";
-				var orangeHasPlayer = new OrangeHasPlayer();
-				orangeHasPlayer.init(document.querySelector("#videoPlayer"));
-				orangeHasPlayer.load(url);
+                var stream = {
+                    url: "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest"
+                };
+                var mediaPlayer = new MediaPlayer();
+                mediaPlayer.init(document.querySelector("#videoPlayer"));
+                mediaPlayer.load(stream);
             })();
         </script>
     </body>
@@ -71,15 +75,18 @@ In the case of protected content, here is an example illustrating setting of the
         <script src="yourPathToHasplayer/hasplayer.js"></script>
         <script>
             (function(){
-                var url = "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest";
-				var protData = {
-					com.microsoft.playready: {
-						laURL: "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
-						customData: "B2C99B73-CA41-4003-84A3AA16CE92B304"
-					};
-				var orangeHasPlayer = new OrangeHasPlayer();
-				orangeHasPlayer.init(document.querySelector("#videoPlayer"));
-				orangeHasPlayer.load(url, protData);
+                var stream = {
+                    url: "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
+                    protData: {
+                        com.microsoft.playready: {
+                            laURL: "http://roap.purplecast.us/test/services/StandardPlayReadyAquireLicenseByContent.cfm?distrib=olps",
+                            customData: "B2C99B73-CA41-4003-84A3AA16CE92B304"
+                        }
+                    }
+                };
+                var mediaPlayer = new MediaPlayer();
+                mediaPlayer.init(document.querySelector("#videoPlayer"));
+                mediaPlayer.load(stream);
             })();
         </script>
     </body>
@@ -87,34 +94,34 @@ In the case of protected content, here is an example illustrating setting of the
 ```
 ## Events
 
-OrangeHasPlayer offers events to be notified of differents events on video streaming. Those events are, for a part, sent by the HTML5 video element, and for an other part, sent by hasPlayer.js.
+MediaPlayer offers events to be notified of differents events on video streaming. Those events are, for a part, sent by the HTML5 video element, and for an other part, sent by hasPlayer.js.
  
 ```
-function registerHasPlayerEvents() {
-    // OrangeHasPlayer events
-	orangeHasPlayer.addEventListener("error", onError);
-    orangeHasPlayer.addEventListener("warning", onWarning);
-	orangeHasPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
-	orangeHasPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
-	orangeHasPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
+function registerMediaPlayerEvents() {
+    // MediaPlayer events
+    mediaPlayer.addEventListener("error", onError);
+    mediaPlayer.addEventListener("warning", onWarning);
+    mediaPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
+    mediaPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
+    mediaPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
     // <video> element events
-    orangeHasPlayer.addEventListener("loadeddata", onload);
-	orangeHasPlayer.addEventListener("play", onPlay);
-	orangeHasPlayer.addEventListener("pause", onPause);
-	orangeHasPlayer.addEventListener("timeupdate", onTimeUpdate);
-    orangeHasPlayer.addEventListener("volumechange", onVolumeChange);
+    mediaPlayer.addEventListener("loadeddata", onload);
+    mediaPlayer.addEventListener("play", onPlay);
+    mediaPlayer.addEventListener("pause", onPause);
+    mediaPlayer.addEventListener("timeupdate", onTimeUpdate);
+    mediaPlayer.addEventListener("volumechange", onVolumeChange);
 };
 ```
 For instance, callback function looks like this :
 ```
 function onPlayBitrateChanged(e) {
-	handlePlayBitrate(e.detail.bitrate, e.detail.time);
+    handlePlayBitrate(e.detail.bitrate, e.detail.time);
 };
 ```
 
 ### Errors
 
-The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer (see OrangeHasplayer's [addEventListener()](OrangeHasPlayer.html#addEventListener) function).
+The following table provides the list of the errors and warnings that can be notified by the MediaPlayer (see MediaPlayer's [addEventListener()](MediaPlayer.html#addEventListener) function).
 
 <!-- ERRORS_TABLE -->
 
