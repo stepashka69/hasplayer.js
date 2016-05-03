@@ -470,7 +470,7 @@ MediaPlayer = function () {
             //debugController.init();
 
             // create DebugController
-            debugController = system.getObject('debugController'); //new MediaPlayer.dependencies.DebugController();
+            debugController = system.getObject('debugController');
 
             // Initialize already loaded plugins
             for (var plugin in plugins) {
