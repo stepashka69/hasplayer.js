@@ -325,7 +325,7 @@ MediaPlayer = function () {
         return null;
     };
 
-    var _setTrackFromType = function (_type, _track) {
+    var _selectTrackFromType = function (_type, _track) {
         if (!streamController) {
             return null;
         }
@@ -1053,9 +1053,11 @@ MediaPlayer = function () {
 
         /**
          * TBD
+         * @method getDVRSeekOffset
+         * @access public
+         * @memberof MediaPlayer#
          * @param  value
          * @return DVR seek offset
-         * @access public
          */
         getDVRSeekOffset: function (value) {
             _isPlayerInitialized();
@@ -1211,7 +1213,7 @@ MediaPlayer = function () {
             }
 
             if (!track || !(track.id || track.lang)) {
-                throw new Error('MediaPlayer.setTrack(): track parameter is unknown');
+                throw new Error('MediaPlayer.selectTrack(): track parameter is unknown');
             }
 
             var _tracks = _getTracksFromType(type);
@@ -1230,7 +1232,7 @@ MediaPlayer = function () {
 
             for (var i = 0; i < _tracks.length; i += 1) {
                 if ((track.id === _tracks[i].id) || (track.lang === _tracks[i].lang)) {
-                    _setTrackFromType(type, _tracks[i]);
+                    _selectTrackFromType(type, _tracks[i]);
                     return;
                 }
             }
@@ -1431,7 +1433,7 @@ MediaPlayer = function () {
          * @method removePlugin
          * @access public
          * @memberof MediaPlayer#
-         * @param {object or string} plugin - the plugin instance (or name) to remove
+         * @param {object|string} plugin - the plugin instance (or name) to remove
          */
         removePlugin: function (plugin) {
             var name;
@@ -1631,7 +1633,7 @@ MediaPlayer.PUBLIC_EVENTS = {
  * Exposes the available tracks types used to manage tracks (language) switching.
  * @see [getTracks]{@link MediaPlayer#getTracks}
  * @see [getSelectedTrack]{@link MediaPlayer#getSelectedTrack}
- * @see [setTrack]{@link MediaPlayer#setTracks}
+ * @see [selectTrack]{@link MediaPlayer#selectTrack}
  * @enum 
  */
 MediaPlayer.TRACKS_TYPE = {
