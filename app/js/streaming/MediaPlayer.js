@@ -368,14 +368,16 @@ MediaPlayer = function () {
 
 //#endregion
 
-    // DIJON initialization
+//#region DIJON initialization
     system.mapValue('system', system);
     system.mapOutlet('system');
     system.injectInto(context);
+//#endregion
 
     return {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
+//#region dependencies
         notifier: undefined,
         debug: undefined,
         eventBus: undefined,
@@ -384,6 +386,7 @@ MediaPlayer = function () {
         metricsModel: undefined,
         errHandler: undefined,
         config: undefined,
+//#endregion
 
 //#region VERSION
         /**
@@ -1464,7 +1467,6 @@ MediaPlayer = function () {
     };
 };
 
-
 /**
  * @class
  * @classdesc MediaPlayer is the object used by the webapp to instanciante and control hasplayer.
@@ -1473,7 +1475,7 @@ MediaPlayer.prototype = {
     constructor: MediaPlayer
 };
 
-
+//#region Packages
 /**
  * Packages declaration
  */
@@ -1489,8 +1491,9 @@ MediaPlayer.vo.protection = {};
 MediaPlayer.rules = {};
 MediaPlayer.rules.o = {};
 MediaPlayer.di = {};
+//#endregion
 
-
+//#region Enums
 /**
  * ENUMS
  */
@@ -1640,7 +1643,9 @@ MediaPlayer.TRACKS_TYPE = {
     AUDIO: "audio",
     TEXT: "text"
 };
+//#endregion
 
+//#region Player parameters
 /**
  * Player parameters object.
  * All parameters values are applied for any stream type. Parameters can be overriden specifically for audio and video track by setting
@@ -1669,9 +1674,11 @@ MediaPlayer.TRACKS_TYPE = {
  * @property {Object}   video - Video parameters (parameters for video track)
  * @property {Object}   audio - audio parameters (parameters for audio track)
  */
+//#endregion
 
+//#region Static functions
 /** 
- * Static Functions
+ * Static functions
  */
 
 /**
@@ -1693,3 +1700,4 @@ MediaPlayer.hasMediaSourceExtension = function () {
 MediaPlayer.hasMediaKeysExtension = function () {
     return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
 };
+//#endregion
