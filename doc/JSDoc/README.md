@@ -123,5 +123,6 @@ function onPlayBitrateChanged(e) {
 
 The following table provides the list of the errors and warnings that can be notified by the MediaPlayer (see MediaPlayer's [addEventListener()](MediaPlayer.html#addEventListener) function).
 
-<!-- ERRORS_TABLE -->
+<!-- build:ERRORS_TABLE -->
+<!-- endbuild -->
 
