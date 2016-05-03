@@ -12,6 +12,7 @@ var gulp = require('gulp'),
     umd = require('gulp-umd'),
     jshint = require('gulp-jshint'),
     banner = require('gulp-banner'),
+	jsdoc = require('gulp-jsdoc'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -27,6 +28,11 @@ var comment = '<%= pkg.licence %>\n\n/* Last build : <%= pkg.timeStamp %> / git 
 
 var config = {
     distDir: '../dist',
+	doc :{
+		dir: '../dist/doc/',
+		template:'../node_modules/gulp-jsdoc/node_modules/ink-docstrap/template',
+		readMe:'../doc/JSDoc/README.md',
+		fileSource:'../app/js/streaming/MediaPlayer.js'},
     libName: 'hasplayer'
 };
 
@@ -58,6 +64,14 @@ if (gulp.option('mss')) {
 if (gulp.option('vowv')) {
     sourcesGlob = sourcesGlob.concat(sources.vowv);
 }
+
+gulp.task('doc', function() {
+	return gulp.src([config.doc.fileSource, config.doc.readMe])
+	.pipe(jsdoc(config.doc.dir, {path:config.doc.template, 
+								'theme': 'cyborg',
+								'copyright': 'Orange Copyright ©',
+								'navType': 'vertical'}));
+});
 
 gulp.task('clean', function() {
     return del([config.distDir], {
