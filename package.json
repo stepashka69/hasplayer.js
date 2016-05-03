@@ -2,7 +2,7 @@
   "name": "hasplayerjs",
   "version": "1.3.0",
   "scripts": {
-    "build": "cd build && gulp build -protection=true",
+    "build": "cd build && gulp build -protection=true && gulp build-samples",
     "test": "node node_modules/intern/runner.js config=testIntern/testsCommon.js"
   },
   "devDependencies": {
@@ -14,10 +14,13 @@
     "gulp-html-replace": "^1.5.5",
     "gulp-jsdoc": "^0.1.5",
     "gulp-jshint": "^2.0.0",
+    "gulp-minify-css": "^1.2.4",
     "gulp-preprocess": "^2.0.0",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
     "gulp-uglify": "^1.5.3",
     "gulp-umd": "^0.2.0",
+    "gulp-usemin": "^0.3.22",
     "intern": "^3.1.1",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.1.0",

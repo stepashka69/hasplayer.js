@@ -14,6 +14,10 @@ var gulp = require('gulp'),
     banner = require('gulp-banner'),
 	jsdoc = require('gulp-jsdoc'),
 	replaceHtml = require('gulp-html-replace'),
+    // used to intercat with .html files
+    usemin = require('gulp-usemin'),
+    replace = require('gulp-replace'),
+    minifyCss = require('gulp-minify-css'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -132,14 +136,42 @@ gulp.task('build', ['clean', 'lint', 'gitRev'], function() {
         .pipe(gulp.dest(config.distDir));
 });
 
-// gulp.task("copy", function(){
-//
-// });
-//
-// // build for dash-if app
-// gulp.task('build-dashif', function() {
-//
-// });
+// sample build
+gulp.task('build-samples',['build-dashif','build-demoplayer','build-orangehasplayerdemo']);
+
+
+// build for dash-if app
+gulp.task('build-dashif', function() {
+    return gulp.src('../samples/Dash-IF/index.html')
+    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
+    .pipe(usemin({
+        inlinecss:[minifyCss, 'concat'],
+    }))
+    .pipe(gulp.dest(config.distDir+'/samples/dashif/'));
+
+});
+
+gulp.task('build-orangehasplayerdemo', function(){
+    return gulp.src('../samples/OrangeHasPlayerDemo/index.html')
+    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
+    .pipe(usemin({
+        inlinecss:[minifyCss, 'concat'],
+    }))
+    .pipe(gulp.dest(config.distDir+'/samples/orangeHasplayerDemo/'));
+});
+
+gulp.task('build-demoplayer', function(){
+    return gulp.src('../samples/DemoPlayer/index.html')
+    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
+    .pipe(usemin())
+    .pipe(gulp.dest(config.distDir+'/samples/DemoPlayer/'));
+});
+
+
+gulp.task('watch', function(){});
+
+gulp.task('serve', function(){});
+
 
 
 // grunt build_hasplayer -proxy=true -metricsAgent=true -analytics=false -vovw=true
