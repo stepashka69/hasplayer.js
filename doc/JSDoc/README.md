@@ -87,7 +87,7 @@ In the case of protected content, here is an example illustrating setting of the
 ```
 ## Events
 
-OrangeHasPlayer offers events to be notified of differents events on video streaming. Those events are, for a part, sent by the HTML5 video element, and for an other part, sent by hasPlayer.js.
+MediaPlayer offers events to be notified of differents events on video streaming. Those events are, for a part, sent by the HTML5 video element, and for an other part, sent by hasPlayer.js.
  
 ```
 function registerHasPlayerEvents() {
@@ -114,7 +114,8 @@ function onPlayBitrateChanged(e) {
 
 ### Errors
 
-The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer (see OrangeHasplayer's [addEventListener()](OrangeHasPlayer.html#addEventListener) function).
+The following table provides the list of the errors and warnings that can be notified by the OrangeHasPlayer (see MediaPlayer's [addEventListener()](MediaPlayer.html#addEventListener) function).
 
-<!-- ERRORS_TABLE -->
+<!-- build:ERRORS_TABLE -->
+<!-- endbuild -->
 

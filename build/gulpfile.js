@@ -13,6 +13,7 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     banner = require('gulp-banner'),
 	jsdoc = require('gulp-jsdoc'),
+	replaceHtml = require('gulp-html-replace'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -32,6 +33,7 @@ var config = {
 		dir: '../dist/doc/',
 		template:'../node_modules/gulp-jsdoc/node_modules/ink-docstrap/template',
 		readMe:'../doc/JSDoc/README.md',
+		errorTable:'../doc/JSDoc/HasPlayerErrors.html',
 		fileSource:'../app/js/streaming/MediaPlayer.js'},
     libName: 'hasplayer'
 };
@@ -65,12 +67,21 @@ if (gulp.option('vowv')) {
     sourcesGlob = sourcesGlob.concat(sources.vowv);
 }
 
-gulp.task('doc', function() {
+gulp.task('generateDoc', function() {
 	return gulp.src([config.doc.fileSource, config.doc.readMe])
 	.pipe(jsdoc(config.doc.dir, {path:config.doc.template, 
 								'theme': 'cyborg',
 								'copyright': 'Orange Copyright ©',
-								'navType': 'vertical'}));
+								'navType': 'vertical'}))
+	.pipe(gulp.dest(config.doc.dir));
+});
+
+gulp.task('doc',['generateDoc'], function() {
+	return gulp.src(['../dist/doc/index.html'])
+	.pipe(replaceHtml({'ERRORS_TABLE':{
+		src:fs.readFileSync(config.doc.errorTable).toString(),
+		tpl: '<div src="%f".js></div>'}}))
+	.pipe(gulp.dest(config.doc.dir));
 });
 
 gulp.task('clean', function() {
