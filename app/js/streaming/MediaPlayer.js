@@ -1428,7 +1428,7 @@ MediaPlayer = function () {
          * @method removePlugin
          * @access public
          * @memberof MediaPlayer#
-         * @param {object or string} plugin - the plugin instance (or name) to remove
+         * @param {object | string} plugin - the plugin instance (or name) to remove
          */
         removePlugin: function (plugin) {
             var name;
