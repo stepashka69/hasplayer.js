@@ -71,8 +71,9 @@ MediaPlayer.dependencies.DebugController = function() {
     
 
     return {
-        debug:undefined,
-        init: function() {
+        debug: undefined,
+
+        setup: function() {
             window.addEventListener('keydown', _handleKeyPressedEvent.bind(this));
         }
     };

@@ -464,10 +464,13 @@ MediaPlayer = function () {
                 streamController.reset();
                 playing = false;
             }*/
-            debugController = new MediaPlayer.dependencies.DebugController();
+
             // connect default events
             _connectEvents.call(this);
-            debugController.init();
+            //debugController.init();
+
+            // create DebugController
+            debugController = system.getObject('debugController'); //new MediaPlayer.dependencies.DebugController();
 
             // Initialize already loaded plugins
             for (var plugin in plugins) {
