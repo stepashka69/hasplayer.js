@@ -113,7 +113,6 @@ MediaPlayer = function () {
         }
     };
 
-
     // event disptach
     var _dispatchBitrateEvent = function (type, value) {
         var event = document.createEvent("CustomEvent");
