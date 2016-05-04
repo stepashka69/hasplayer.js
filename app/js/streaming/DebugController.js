@@ -15,7 +15,7 @@
  * @constructs DebugController
  * @description A class which allow to download debug data on specific keybord shortcut
  */
-MediaPlayer.dependencies.DebugController = function() {
+MediaPlayer.utils.DebugController = function() {
     'use strict';
     
     // debug data configuration
@@ -71,13 +71,14 @@ MediaPlayer.dependencies.DebugController = function() {
     
 
     return {
-        debug:undefined,
-        init: function() {
+        debug: undefined,
+
+        setup: function() {
             window.addEventListener('keydown', _handleKeyPressedEvent.bind(this));
         }
     };
 };
 
-MediaPlayer.dependencies.DebugController.prototype = {
-    constructor: MediaPlayer.dependencies.DebugController
+MediaPlayer.utils.DebugController.prototype = {
+    constructor: MediaPlayer.utils.DebugController
 };

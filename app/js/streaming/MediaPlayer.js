@@ -325,7 +325,7 @@ MediaPlayer = function () {
         return null;
     };
 
-    var _setTrackFromType = function (_type, _track) {
+    var _selectTrackFromType = function (_type, _track) {
         if (!streamController) {
             return null;
         }
@@ -368,14 +368,16 @@ MediaPlayer = function () {
 
 //#endregion
 
-    // DIJON initialization
+//#region DIJON initialization
     system.mapValue('system', system);
     system.mapOutlet('system');
     system.injectInto(context);
+//#endregion
 
     return {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
+//#region dependencies
         notifier: undefined,
         debug: undefined,
         eventBus: undefined,
@@ -384,6 +386,7 @@ MediaPlayer = function () {
         metricsModel: undefined,
         errHandler: undefined,
         config: undefined,
+//#endregion
 
 //#region VERSION
         /**
@@ -464,10 +467,13 @@ MediaPlayer = function () {
                 streamController.reset();
                 playing = false;
             }*/
-            debugController = new MediaPlayer.dependencies.DebugController();
+
             // connect default events
             _connectEvents.call(this);
-            debugController.init();
+            //debugController.init();
+
+            // create DebugController
+            debugController = system.getObject('debugController');
 
             // Initialize already loaded plugins
             for (var plugin in plugins) {
@@ -1050,9 +1056,11 @@ MediaPlayer = function () {
 
         /**
          * TBD
+         * @method getDVRSeekOffset
+         * @access public
+         * @memberof MediaPlayer#
          * @param  value
          * @return DVR seek offset
-         * @access public
          */
         getDVRSeekOffset: function (value) {
             _isPlayerInitialized();
@@ -1208,7 +1216,7 @@ MediaPlayer = function () {
             }
 
             if (!track || !(track.id || track.lang)) {
-                throw new Error('MediaPlayer.setTrack(): track parameter is unknown');
+                throw new Error('MediaPlayer.selectTrack(): track parameter is unknown');
             }
 
             var _tracks = _getTracksFromType(type);
@@ -1227,7 +1235,7 @@ MediaPlayer = function () {
 
             for (var i = 0; i < _tracks.length; i += 1) {
                 if ((track.id === _tracks[i].id) || (track.lang === _tracks[i].lang)) {
-                    _setTrackFromType(type, _tracks[i]);
+                    _selectTrackFromType(type, _tracks[i]);
                     return;
                 }
             }
@@ -1428,7 +1436,7 @@ MediaPlayer = function () {
          * @method removePlugin
          * @access public
          * @memberof MediaPlayer#
-         * @param {object or string} plugin - the plugin instance (or name) to remove
+         * @param {object|string} plugin - the plugin instance (or name) to remove
          */
         removePlugin: function (plugin) {
             var name;
@@ -1459,7 +1467,6 @@ MediaPlayer = function () {
     };
 };
 
-
 /**
  * @class
  * @classdesc MediaPlayer is the object used by the webapp to instanciante and control hasplayer.
@@ -1468,7 +1475,7 @@ MediaPlayer.prototype = {
     constructor: MediaPlayer
 };
 
-
+//#region Packages
 /**
  * Packages declaration
  */
@@ -1484,8 +1491,9 @@ MediaPlayer.vo.protection = {};
 MediaPlayer.rules = {};
 MediaPlayer.rules.o = {};
 MediaPlayer.di = {};
+//#endregion
 
-
+//#region Enums
 /**
  * ENUMS
  */
@@ -1628,14 +1636,16 @@ MediaPlayer.PUBLIC_EVENTS = {
  * Exposes the available tracks types used to manage tracks (language) switching.
  * @see [getTracks]{@link MediaPlayer#getTracks}
  * @see [getSelectedTrack]{@link MediaPlayer#getSelectedTrack}
- * @see [setTrack]{@link MediaPlayer#setTracks}
+ * @see [selectTrack]{@link MediaPlayer#selectTrack}
  * @enum 
  */
 MediaPlayer.TRACKS_TYPE = {
     AUDIO: "audio",
     TEXT: "text"
 };
+//#endregion
 
+//#region Player parameters
 /**
  * Player parameters object.
  * All parameters values are applied for any stream type. Parameters can be overriden specifically for audio and video track by setting
@@ -1664,9 +1674,11 @@ MediaPlayer.TRACKS_TYPE = {
  * @property {Object}   video - Video parameters (parameters for video track)
  * @property {Object}   audio - audio parameters (parameters for audio track)
  */
+//#endregion
 
+//#region Static functions
 /** 
- * Static Functions
+ * Static functions
  */
 
 /**
@@ -1688,3 +1700,4 @@ MediaPlayer.hasMediaSourceExtension = function () {
 MediaPlayer.hasMediaKeysExtension = function () {
     return new MediaPlayer.utils.Capabilities().supportsMediaKeys();
 };
+//#endregion

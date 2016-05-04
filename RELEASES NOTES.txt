@@ -1,3 +1,10 @@
+### Release Notes v1.2.7.1 (2016/05/02)
+* Bugs fixing:
+* - Mute state reset when load a new stream
+* - Crash in HLs demultiplexing when no audio packet in stream
+* - MANIFEST_ERR_PARSE (instead of DOWNLOAD_ERR_MANIFEST) when failed to download HLS variant stream playlist
+* Add new errors for HLS demultiplexing errors ('HLS_DEMUX_ERROR')
+
 ### Release Notes v1.2.7 (2016/03/22)
 * Bugs fixing:
 * - HLS support on Firefox
@@ -16,8 +23,8 @@
 * - subtitles enable/disable management
 * OrangeHasPlayer: Add function to manage subtitles display outside video element
 
-### Release Notes v1.2.6.2 (2016/01/21)
-* Add robustness for input stream discontinuities
+### Release Notes v1.2.6.2 (2016/01/26)
+* Add robustness in case of input stream discontinuities (HLS)
 
 ### Release Notes v1.2.6.1 (2016/01/20)
 * Add configuration parameters "RetryAttempts" and "RetryInterval" for manifest and segments downloading
