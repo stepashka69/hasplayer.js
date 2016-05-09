@@ -82,14 +82,12 @@ gulp.task("default", function(cb) {
 });
 
 
-
-
 gulp.task('generateDoc', function() {
     return gulp.src([config.doc.fileSource, config.doc.readMe])
         .pipe(jsdoc(config.doc.dir, {
             path: config.doc.template,
-            'theme': 'cyborg',
-            'copyright': 'Orange Copyright ©',
+            'theme': 'united',
+            'linenums': true,
             'navType': 'vertical'
         }))
         .pipe(gulp.dest(config.doc.dir));
