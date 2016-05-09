@@ -101,9 +101,15 @@ function registerMediaPlayerEvents() {
     // MediaPlayer events
     mediaPlayer.addEventListener("error", onError);
     mediaPlayer.addEventListener("warning", onWarning);
-    mediaPlayer.addEventListener("subtitlesStyleChanged", onSubtitlesStyleChanged);
+    mediaPlayer.addEventListener("cueEnter", onCueEnter);
+    mediaPlayer.addEventListener("cueExit", onCueExit);
     mediaPlayer.addEventListener("play_bitrate", onPlayBitrateChanged);
     mediaPlayer.addEventListener("download_bitrate", onDownloadBitrateChanged);
+    mediaPlayer.addEventListener("manifestUrlUpdate", onManifestUrlUpdate);
+    mediaPlayer.addEventListener("metricAdded", onMetricAdded);
+    mediaPlayer.addEventListener("metricChanged", onMetricChanged);
+    mediaPlayer.addEventListener("bufferLevel_updated", onBufferLevelUpdated);
+    mediaPlayer.addEventListener("state_changed", onStateChanged);
     // <video> element events
     mediaPlayer.addEventListener("loadeddata", onload);
     mediaPlayer.addEventListener("play", onPlay);
