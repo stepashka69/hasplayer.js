@@ -4,6 +4,7 @@ var gulp = require('gulp'),
     path = require('path'),
     git = require('git-rev'),
     fs = require('fs'),
+    runSequence = require('run-sequence'),
     // gulp packages
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
@@ -12,12 +13,13 @@ var gulp = require('gulp'),
     umd = require('gulp-umd'),
     jshint = require('gulp-jshint'),
     banner = require('gulp-banner'),
-	jsdoc = require('gulp-jsdoc'),
-	replaceHtml = require('gulp-html-replace'),
+    jsdoc = require('gulp-jsdoc'),
+    replaceHtml = require('gulp-html-replace'),
     // used to intercat with .html files
     usemin = require('gulp-usemin'),
     replace = require('gulp-replace'),
     minifyCss = require('gulp-minify-css'),
+    zip = require('gulp-zip'),
     // custom import
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
@@ -33,12 +35,13 @@ var comment = '<%= pkg.licence %>\n\n/* Last build : <%= pkg.timeStamp %> / git 
 
 var config = {
     distDir: '../dist',
-	doc :{
-		dir: '../dist/doc/',
-		template:'../node_modules/gulp-jsdoc/node_modules/ink-docstrap/template',
-		readMe:'../doc/JSDoc/README.md',
-		errorTable:'../doc/JSDoc/HasPlayerErrors.html',
-		fileSource:'../app/js/streaming/MediaPlayer.js'},
+    doc: {
+        dir: '../dist/doc/',
+        template: '../node_modules/gulp-jsdoc/node_modules/ink-docstrap/template',
+        readMe: '../doc/JSDoc/README.md',
+        errorTable: '../doc/JSDoc/HasPlayerErrors.html',
+        fileSource: '../app/js/streaming/MediaPlayer.js'
+    },
     libName: 'hasplayer'
 };
 
@@ -71,21 +74,36 @@ if (gulp.option('vowv')) {
     sourcesGlob = sourcesGlob.concat(sources.vowv);
 }
 
-gulp.task('generateDoc', function() {
-	return gulp.src([config.doc.fileSource, config.doc.readMe])
-	.pipe(jsdoc(config.doc.dir, {path:config.doc.template, 
-								'theme': 'cyborg',
-								'copyright': 'Orange Copyright ©',
-								'navType': 'vertical'}))
-	.pipe(gulp.dest(config.doc.dir));
+
+gulp.task("default", function(cb) {
+    runSequence('build', ['build-samples', 'doc'],
+        'zip',
+        cb);
 });
 
-gulp.task('doc',['generateDoc'], function() {
-	return gulp.src(['../dist/doc/index.html'])
-	.pipe(replaceHtml({'ERRORS_TABLE':{
-		src:fs.readFileSync(config.doc.errorTable).toString(),
-		tpl: '<div src="%f".js></div>'}}))
-	.pipe(gulp.dest(config.doc.dir));
+
+
+
+gulp.task('generateDoc', function() {
+    return gulp.src([config.doc.fileSource, config.doc.readMe])
+        .pipe(jsdoc(config.doc.dir, {
+            path: config.doc.template,
+            'theme': 'cyborg',
+            'copyright': 'Orange Copyright ©',
+            'navType': 'vertical'
+        }))
+        .pipe(gulp.dest(config.doc.dir));
+});
+
+gulp.task('doc', ['generateDoc'], function() {
+    return gulp.src(['../dist/doc/index.html'])
+        .pipe(replaceHtml({
+            'ERRORS_TABLE': {
+                src: fs.readFileSync(config.doc.errorTable).toString(),
+                tpl: '<div src="%f".js></div>'
+            }
+        }))
+        .pipe(gulp.dest(config.doc.dir));
 });
 
 gulp.task('clean', function() {
@@ -109,8 +127,8 @@ gulp.task('gitRev', function() {
         pkg.licence = _data;
     });
     pkg.timeStamp = new Date().getDate() + "." + (new Date().getMonth() + 1) +
-    "." + (new Date().getFullYear()) + "_" + (new Date().getHours()) + ":" +
-    (new Date().getMinutes()) + ":" + (new Date().getSeconds());
+        "." + (new Date().getFullYear()) + "_" + (new Date().getHours()) + ":" +
+        (new Date().getMinutes()) + ":" + (new Date().getSeconds());
 });
 
 gulp.task('build', ['clean', 'lint', 'gitRev'], function() {
@@ -137,40 +155,52 @@ gulp.task('build', ['clean', 'lint', 'gitRev'], function() {
 });
 
 // sample build
-gulp.task('build-samples',['build-dashif','build-demoplayer','build-orangehasplayerdemo']);
+gulp.task('build-samples', ['build-dashif', 'build-demoplayer', 'build-orangehasplayerdemo', 'copy-index']);
 
 
 // build for dash-if app
 gulp.task('build-dashif', function() {
     return gulp.src('../samples/Dash-IF/index.html')
-    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
-    .pipe(usemin({
-        inlinecss:[minifyCss, 'concat'],
-    }))
-    .pipe(gulp.dest(config.distDir+'/samples/dashif/'));
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(usemin({
+            inlinecss: [minifyCss, 'concat'],
+        }))
+        .pipe(gulp.dest(config.distDir + '/samples/dashif/'));
 
 });
 
-gulp.task('build-orangehasplayerdemo', function(){
+gulp.task('build-orangehasplayerdemo', function() {
     return gulp.src('../samples/OrangeHasPlayerDemo/index.html')
-    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
-    .pipe(usemin({
-        inlinecss:[minifyCss, 'concat'],
-    }))
-    .pipe(gulp.dest(config.distDir+'/samples/orangeHasplayerDemo/'));
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(usemin({
+            inlinecss: [minifyCss, 'concat'],
+        }))
+        .pipe(gulp.dest(config.distDir + '/samples/orangeHasplayerDemo/'));
 });
 
-gulp.task('build-demoplayer', function(){
+gulp.task('build-demoplayer', function() {
     return gulp.src('../samples/DemoPlayer/index.html')
-    .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/,'<script src="../../'+config.libName+'.js"></script>'))
-    .pipe(usemin())
-    .pipe(gulp.dest(config.distDir+'/samples/DemoPlayer/'));
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(usemin())
+        .pipe(gulp.dest(config.distDir + '/samples/DemoPlayer/'));
+});
+
+gulp.task('copy-index', function() {
+    return gulp.src('gulp/index.html')
+        .pipe(gulp.dest(config.distDir));
+});
+
+gulp.task('zip', function() {
+    return gulp.src(config.distDir + '/**/*')
+        .pipe(zip(config.libName + '.js.zip'))
+        .pipe(gulp.dest(config.distDir));
 });
 
 
-gulp.task('watch', function(){});
 
-gulp.task('serve', function(){});
+gulp.task('watch', function() {});
+
+gulp.task('serve', function() {});
 
 
 
