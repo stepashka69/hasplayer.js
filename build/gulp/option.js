@@ -12,7 +12,7 @@ var uppCase = function(obj) {
     }
 
     return newObj;
-}
+};
 
 // Get or set an option value.
 var option = gulp.option = module.exports = function(key, value) {
@@ -29,7 +29,7 @@ option.init = function(obj, defaultParams) {
     data = nopt(null, null, obj, 2);
     delete data.argv;
     if (defaultParams) {
-        data = Object.assign(data, defaultParams)
+        data = Object.assign(data, defaultParams);
     }
     data = uppCase(data);
     return data;
@@ -37,4 +37,4 @@ option.init = function(obj, defaultParams) {
 
 option.all = function() {
     return data;
-}
+};
