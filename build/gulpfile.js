@@ -21,17 +21,12 @@ var gulp = require('gulp'),
     minifyCss = require('gulp-minify-css'),
     zip = require('gulp-zip'),
     // custom import
+    package = require('../package.json')
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
 
-var pkg = {
-        revision: '',
-        timeStamp: '',
-        licence: ''
-    },
-    LICENSE = '../LICENSE';
 
-var comment = '<%= pkg.licence %>\n\n/* Last build : <%= pkg.timeStamp %> / git revision : <%= pkg.revision %> */\n\n';
+var comment = '<%= package.copyright %>\n\n/* Last build : <%= package.date %>_<%= package.time %> / git revision : <%= package.revision %> */\n\n';
 
 var config = {
     distDir: '../dist',
@@ -41,8 +36,7 @@ var config = {
         readMe: '../doc/JSDoc/README.md',
         errorTable: '../doc/JSDoc/HasPlayerErrors.html',
         fileSource: '../app/js/streaming/MediaPlayer.js'
-    },
-    libName: 'hasplayer'
+    }
 };
 
 var options = {
@@ -74,13 +68,11 @@ if (gulp.option('vowv')) {
     sourcesGlob = sourcesGlob.concat(sources.vowv);
 }
 
-
 gulp.task("default", function(cb) {
     runSequence('build', ['build-samples', 'doc'],
         'zip',
         cb);
 });
-
 
 gulp.task('generateDoc', function() {
     return gulp.src([config.doc.fileSource, config.doc.readMe])
@@ -113,27 +105,26 @@ gulp.task('clean', function() {
 
 gulp.task('lint', function() {
     return gulp.src(sourcesGlob)
-        .pipe(jshint())
+        .pipe(jshint({latedef: false}))
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('gitRev', function() {
+gulp.task('package-info', function() {
     git.short(function(str) {
-        pkg.revision = str;
+        package.revision = str;
     });
-    fs.readFile(LICENSE, null, function(err, _data) {
-        pkg.licence = _data;
+    fs.readFile('../LICENSE', null, function(err, _data) {
+        package.copyright = _data;
     });
-    pkg.timeStamp = new Date().getDate() + "." + (new Date().getMonth() + 1) +
-        "." + (new Date().getFullYear()) + "_" + (new Date().getHours()) + ":" +
-        (new Date().getMinutes()) + ":" + (new Date().getSeconds());
+    package.date = (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + (new Date().getFullYear());
+    package.time = (new Date().getHours()) + ":" + (new Date().getMinutes()) + ":" + (new Date().getSeconds());
 });
 
-gulp.task('build', ['clean', 'lint', 'gitRev'], function() {
+gulp.task('build', ['clean', 'package-info', 'lint'], function() {
     // integrate libs after doing lint
     sourcesGlob = sources.libs.concat(sourcesGlob);
     return gulp.src(sourcesGlob)
-        .pipe(concat(config.libName + '.js'))
+        .pipe(concat(package.name))
         .pipe(preprocess({
             context: gulp.option.all()
         }))
@@ -146,9 +137,9 @@ gulp.task('build', ['clean', 'lint', 'gitRev'], function() {
         .pipe(gulp.dest(config.distDir))
         .pipe(uglify())
         .pipe(banner(comment, {
-            pkg: pkg
+            package: package
         }))
-        .pipe(rename(config.libName + '.min.js'))
+        .pipe(rename(package.name.replace('.js', '.min.js')))
         .pipe(gulp.dest(config.distDir));
 });
 
@@ -159,7 +150,7 @@ gulp.task('build-samples', ['build-dashif', 'build-demoplayer', 'build-orangehas
 // build for dash-if app
 gulp.task('build-dashif', function() {
     return gulp.src('../samples/Dash-IF/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
         .pipe(usemin({
             inlinecss: [minifyCss, 'concat'],
         }))
@@ -169,14 +160,14 @@ gulp.task('build-dashif', function() {
 
 gulp.task('build-demoplayer', function() {
     return gulp.src('../samples/DemoPlayer/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
         .pipe(usemin())
         .pipe(gulp.dest(config.distDir + '/samples/DemoPlayer/'));
 });
 
 gulp.task('build-orangehasplayerdemo', function() {
     return gulp.src('../samples/OrangeHasPlayerDemo/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
         .pipe(usemin({
             inlinecss: [minifyCss, 'concat'],
         }))
@@ -190,11 +181,9 @@ gulp.task('copy-index', function() {
 
 gulp.task('zip', function() {
     return gulp.src(config.distDir + '/**/*')
-        .pipe(zip(config.libName + '.js.zip'))
+        .pipe(zip(package.name + '.zip'))
         .pipe(gulp.dest(config.distDir));
 });
-
-
 
 gulp.task('watch', function() {});
 
