@@ -134,6 +134,10 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
             },
             template: path.join(__dirname, 'gulp/umd.js')
         }))
+        .pipe(replace(/@@TIMESTAMP/, pkg.timeStamp))
+        .pipe(banner(comment, {
+            pkg: pkg
+        }))
         .pipe(gulp.dest(config.distDir))
         .pipe(uglify())
         .pipe(banner(comment, {
