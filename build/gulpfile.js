@@ -163,8 +163,15 @@ gulp.task('build-dashif', function() {
         .pipe(usemin({
             inlinecss: [minifyCss, 'concat'],
         }))
-        .pipe(gulp.dest(config.distDir + '/samples/dashif/'));
+        .pipe(gulp.dest(config.distDir + '/samples/Dash-IF/'));
 
+});
+
+gulp.task('build-demoplayer', function() {
+    return gulp.src('../samples/DemoPlayer/index.html')
+        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
+        .pipe(usemin())
+        .pipe(gulp.dest(config.distDir + '/samples/DemoPlayer/'));
 });
 
 gulp.task('build-orangehasplayerdemo', function() {
@@ -173,14 +180,7 @@ gulp.task('build-orangehasplayerdemo', function() {
         .pipe(usemin({
             inlinecss: [minifyCss, 'concat'],
         }))
-        .pipe(gulp.dest(config.distDir + '/samples/orangeHasplayerDemo/'));
-});
-
-gulp.task('build-demoplayer', function() {
-    return gulp.src('../samples/DemoPlayer/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + config.libName + '.js"></script>'))
-        .pipe(usemin())
-        .pipe(gulp.dest(config.distDir + '/samples/DemoPlayer/'));
+        .pipe(gulp.dest(config.distDir + '/samples/OrangeHasPlayerDemo/'));
 });
 
 gulp.task('copy-index', function() {
