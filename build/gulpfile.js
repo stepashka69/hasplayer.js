@@ -21,7 +21,7 @@ var gulp = require('gulp'),
     minifyCss = require('gulp-minify-css'),
     zip = require('gulp-zip'),
     // custom import
-    package = require('../package.json')
+    package = require('../package.json'),
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
 
@@ -134,9 +134,10 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
             },
             template: path.join(__dirname, 'gulp/umd.js')
         }))
-        .pipe(replace(/@@TIMESTAMP/, pkg.timeStamp))
+        .pipe(replace(/@@TIMESTAMP/, package.date+'_'+package.time))
+        .pipe(replace(/@@REVISION/, package.revision))
         .pipe(banner(comment, {
-            pkg: pkg
+            package: package
         }))
         .pipe(gulp.dest(config.distDir))
         .pipe(uglify())
