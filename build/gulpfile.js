@@ -71,6 +71,7 @@ if (gulp.option('vowv')) {
 gulp.task("default", function(cb) {
     runSequence('build', ['build-samples', 'doc'],
         'zip',
+        'version',
         cb);
 });
 
@@ -118,6 +119,10 @@ gulp.task('package-info', function() {
     });
     package.date = (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + (new Date().getFullYear());
     package.time = (new Date().getHours()) + ":" + (new Date().getMinutes()) + ":" + (new Date().getSeconds());
+});
+
+gulp.task('version', function() {
+    fs.writeFileSync(config.distDir + '/version.properties', 'VERSION=' + package.version);
 });
 
 gulp.task('build', ['clean', 'package-info', 'lint'], function() {
