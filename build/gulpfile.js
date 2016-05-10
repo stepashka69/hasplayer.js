@@ -70,6 +70,7 @@ if (gulp.option('vowv')) {
 
 gulp.task("default", function(cb) {
     runSequence('build', ['build-samples', 'doc'],
+        'releases-notes',
         'zip',
         'version',
         cb);
@@ -117,8 +118,8 @@ gulp.task('package-info', function() {
     fs.readFile('../LICENSE', null, function(err, _data) {
         package.copyright = _data;
     });
-    package.date = (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + (new Date().getFullYear());
-    package.time = (new Date().getHours()) + ":" + (new Date().getMinutes()) + ":" + (new Date().getSeconds());
+    package.date = (new Date().getFullYear()) + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate());
+    package.time = (new Date().getHours()) + ':' + (new Date().getMinutes()) + ':' + (new Date().getSeconds());
 });
 
 gulp.task('version', function() {
@@ -157,7 +158,6 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
 // sample build
 gulp.task('build-samples', ['build-dashif', 'build-demoplayer', 'build-orangehasplayerdemo', 'copy-index']);
 
-
 // build for dash-if app
 gulp.task('build-dashif', function() {
     return gulp.src('../samples/Dash-IF/index.html')
@@ -185,8 +185,16 @@ gulp.task('build-orangehasplayerdemo', function() {
         .pipe(gulp.dest(config.distDir + '/samples/OrangeHasPlayerDemo/'));
 });
 
-gulp.task('copy-index', function() {
+gulp.task('copy-index', ['package-info'], function() {
     return gulp.src('gulp/index.html')
+        .pipe(replace(/@@VERSION/, package.version))
+        .pipe(replace(/@@VERSION/, package.version))
+        .pipe(replace(/@@DATE/, package.date))
+        .pipe(gulp.dest(config.distDir));
+});
+
+gulp.task('releases-notes', function() {
+    return gulp.src('../RELEASES NOTES.txt')
         .pipe(gulp.dest(config.distDir));
 });
 
