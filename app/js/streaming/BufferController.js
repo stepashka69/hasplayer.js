@@ -911,10 +911,10 @@ MediaPlayer.dependencies.BufferController = function() {
                             }
                         );
                     }
-                } else {
+                } /*else {
                     // For VOD streams, signal end of stream
-                    //signalStreamComplete.call(self);
-                }
+                    signalStreamComplete.call(self);
+                }*/
             }
         },
 
