@@ -874,83 +874,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     ////////////////////////////////////////
     //
-    // Metrics Agent Setup
-    //
-    ////////////////////////////////////////
-
-    $scope.metricsAgentAvailable = (typeof MetricsAgent == 'function') ? true : false;
-    $scope.metricsAgentActive = false;
-
-
-    $scope.setMetricsAgent = function (value) {
-        $scope.metricsAgentActive = value;
-        if (typeof MetricsAgent == 'function') {
-            if ($scope.metricsAgentActive) {
-                metricsAgent = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-                $scope.metricsAgentVersion = metricsAgent.getVersion();
-                metricsAgent.init(function (activated) {
-                    $scope.metricsAgentActive = activated;
-                    console.log("Metrics agent state: ", activated);
-                    setTimeout(function (){
-                        $scope.$apply();
-                    }, 500);
-                    if (activated === false) {
-                        alert("Metrics agent not available!");
-                    }
-                });
-            } else if (metricsAgent) {
-                metricsAgent.stop();
-            }
-        }
-    };
-
-    /*$scope.metricsAgentAvailable = function () {
-        if (typeof MetricsAgent == 'function') {
-            return true;
-        }
-        return false;
-    };*/
-
-
-    ////////////////////////////////////////
-    //
-    // Metrics Agent Configuration
-    //
-    ////////////////////////////////////////
-    if ($scope.metricsAgentAvailable) {
-        configMetrics = [
-            {"name": "csQoE (local)",
-             "activationUrl":"http://localhost:8080/config",
-             "serverUrl":"http://localhost:8080/metrics",
-             "dbServerUrl":"http://localhost:8080/metricsDB",
-             "collector":"HasPlayerCollector",
-             "formatter":"CSQoE",
-             "sendingTime": 10000
-            }];
-        $scope.configMetrics = configMetrics;
-        $scope.selected_metric_option = $scope.configMetrics[0];
-
-        var reqMA = new XMLHttpRequest();
-        reqMA.onload = function () {
-            if (reqMA.status === 200) {
-                configMetrics = JSON.parse(reqMA.responseText);
-                $scope.configMetrics = configMetrics.items;
-                $scope.selected_metric_option = $scope.configMetrics[0];
-            }
-        };
-        reqMA.open("GET", "./metricsagent_config.json", true);
-        reqMA.setRequestHeader("Content-type", "application/json");
-        reqMA.send();
-    }
-
-    $scope.setMetricOption = function (metricOption) {
-        $scope.selected_metric_option = metricOption;
-        console.log($scope.selected_metric_option.name);
-    };
-
-
-    ////////////////////////////////////////
-    //
     // Page Setup
     //
     ////////////////////////////////////////
@@ -1134,10 +1057,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
         
         player.reset(0);
-
-        if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
-            metricsAgent.createSession();
-        }
 
         initPlayer();
     };
