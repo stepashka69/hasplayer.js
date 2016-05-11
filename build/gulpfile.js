@@ -21,12 +21,12 @@ var gulp = require('gulp'),
     replace = require('gulp-replace'),
     zip = require('gulp-zip'),
     // custom import
-    package = require('../package.json'),
+    pkg = require('../package.json'),
     option = require('./gulp/option'),
     sources = require('./gulp/sources.json');
 
 
-var comment = '<%= package.copyright %>\n\n/* Last build : <%= package.date %>_<%= package.time %> / git revision : <%= package.revision %> */\n\n';
+var comment = '<%= pkg.copyright %>\n\n/* Last build : <%= pkg.date %>_<%= pkg.time %> / git revision : <%= pkg.revision %> */\n\n';
 
 var config = {
     distDir: '../dist',
@@ -99,10 +99,12 @@ gulp.task('doc', ['generateDoc'], function() {
 });
 
 gulp.task('clean', function() {
-    return del([config.distDir], {
-        force: true,
-        dot: true
-    });
+    return function(done) {
+        del([config.distDir], {
+            force: true,
+            dot: true
+        }, done);
+    };
 });
 
 gulp.task('lint', function() {
@@ -113,24 +115,24 @@ gulp.task('lint', function() {
 
 gulp.task('package-info', function() {
     git.short(function(str) {
-        package.revision = str;
+        pkg.revision = str;
     });
     fs.readFile('../LICENSE', null, function(err, _data) {
-        package.copyright = _data;
+        pkg.copyright = _data;
     });
-    package.date = (new Date().getFullYear()) + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate());
-    package.time = (new Date().getHours()) + ':' + (new Date().getMinutes()) + ':' + (new Date().getSeconds());
+    pkg.date = (new Date().getFullYear()) + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate());
+    pkg.time = (new Date().getHours()) + ':' + (new Date().getMinutes()) + ':' + (new Date().getSeconds());
 });
 
 gulp.task('version', function() {
-    fs.writeFileSync(config.distDir + '/version.properties', 'VERSION=' + package.version);
+    fs.writeFileSync(config.distDir + '/version.properties', 'VERSION=' + pkg.version);
 });
 
 gulp.task('build', ['clean', 'package-info', 'lint'], function() {
     // integrate libs after doing lint
     sourcesGlob = sources.libs.concat(sourcesGlob);
     return gulp.src(sourcesGlob)
-        .pipe(concat(package.name))
+        .pipe(concat(pkg.name))
         .pipe(preprocess({
             context: gulp.option.all()
         }))
@@ -140,26 +142,26 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
             },
             template: path.join(__dirname, 'gulp/umd.js')
         }))
-        .pipe(replace(/VERSION[\s*]=[\s*]['\\](\d.\d.\d_dev)['\\]/g, 'VERSION = \'' + package.version + '\''))
-        .pipe(replace(/@@TIMESTAMP/, package.date + '_' + package.time))
-        .pipe(replace(/@@REVISION/, package.revision))
+        .pipe(replace(/VERSION[\s*]=[\s*]['\\](\d.\d.\d_dev)['\\]/g, 'VERSION = \'' + pkg.version + '\''))
+        .pipe(replace(/@@TIMESTAMP/, pkg.date + '_' + pkg.time))
+        .pipe(replace(/@@REVISION/, pkg.revision))
         .pipe(banner(comment, {
-            package: package
+            pkg: pkg
         }))
         .pipe(gulp.dest(config.distDir))
         .pipe(uglify())
         .pipe(banner(comment, {
-            package: package
+            pkg: pkg
         }))
-        .pipe(rename(package.name.replace('.js', '.min.js')))
+        .pipe(rename(pkg.name.replace('.js', '.min.js')))
         .pipe(gulp.dest(config.distDir));
 });
 
 // sample build
 gulp.task('build-samples', ['build-dashif', 'build-demoplayer', 'build-orangehasplayerdemo', 'copy-index']);
 
-var replaceSourcesByBuild = function () {
-    return replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>');
+var replaceSourcesByBuild = function() {
+    return replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + pkg.name + '"></script>');
 };
 
 gulp.task('build-dashif', function() {
@@ -182,8 +184,8 @@ gulp.task('build-orangehasplayerdemo', function() {
 
 gulp.task('copy-index', ['package-info'], function() {
     return gulp.src('gulp/index.html')
-        .pipe(replace(/@@VERSION/g, package.version))
-        .pipe(replace(/@@DATE/, package.date))
+        .pipe(replace(/@@VERSION/g, pkg.version))
+        .pipe(replace(/@@DATE/, pkg.date))
         .pipe(gulp.dest(config.distDir));
 });
 
@@ -194,10 +196,6 @@ gulp.task('releases-notes', function() {
 
 gulp.task('zip', function() {
     return gulp.src(config.distDir + '/**/*')
-        .pipe(zip(package.name + '.zip'))
+        .pipe(zip(pkg.name + '.zip'))
         .pipe(gulp.dest(config.distDir));
 });
-
-gulp.task('watch', function() {});
-
-gulp.task('serve', function() {});
