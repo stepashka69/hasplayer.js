@@ -16,9 +16,9 @@ var gulp = require('gulp'),
     jsdoc = require('gulp-jsdoc'),
     replaceHtml = require('gulp-html-replace'),
     // used to intercat with .html files
-    usemin = require('gulp-usemin'),
+    //usemin = require('gulp-usemin'),
+    //minifyCss = require('gulp-minify-css'),
     replace = require('gulp-replace'),
-    minifyCss = require('gulp-minify-css'),
     zip = require('gulp-zip'),
     // custom import
     package = require('../package.json'),
@@ -107,7 +107,7 @@ gulp.task('clean', function() {
 
 gulp.task('lint', function() {
     return gulp.src(sourcesGlob)
-        .pipe(jshint({latedef: false}))
+        .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
@@ -158,37 +158,31 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
 // sample build
 gulp.task('build-samples', ['build-dashif', 'build-demoplayer', 'build-orangehasplayerdemo', 'copy-index']);
 
-// build for dash-if app
-gulp.task('build-dashif', function() {
-    return gulp.src('../samples/Dash-IF/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
-        .pipe(usemin({
-            inlinecss: [minifyCss, 'concat'],
-        }))
-        .pipe(gulp.dest(config.distDir + '/samples/Dash-IF/'));
+var replaceSourcesByBuild = function () {
+    return replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>');
+};
 
+gulp.task('build-dashif', function() {
+    return gulp.src(['../samples/Dash-IF/**'])
+        .pipe(replaceSourcesByBuild())
+        .pipe(gulp.dest(config.distDir + '/samples/Dash-IF/'));
 });
 
 gulp.task('build-demoplayer', function() {
-    return gulp.src('../samples/DemoPlayer/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
-        .pipe(usemin())
+    return gulp.src(['../samples/DemoPlayer/**'])
+        .pipe(replaceSourcesByBuild())
         .pipe(gulp.dest(config.distDir + '/samples/DemoPlayer/'));
 });
 
 gulp.task('build-orangehasplayerdemo', function() {
-    return gulp.src('../samples/OrangeHasPlayerDemo/index.html')
-        .pipe(replace(/<!-- sources -->([\s\S]*?)<!-- endsources -->/, '<script src="../../' + package.name + '"></script>'))
-        .pipe(usemin({
-            inlinecss: [minifyCss, 'concat'],
-        }))
+    return gulp.src(['../samples/OrangeHasPlayerDemo/**'])
+        .pipe(replaceSourcesByBuild())
         .pipe(gulp.dest(config.distDir + '/samples/OrangeHasPlayerDemo/'));
 });
 
 gulp.task('copy-index', ['package-info'], function() {
     return gulp.src('gulp/index.html')
-        .pipe(replace(/@@VERSION/, package.version))
-        .pipe(replace(/@@VERSION/, package.version))
+        .pipe(replace(/@@VERSION/g, package.version))
         .pipe(replace(/@@DATE/, package.date))
         .pipe(gulp.dest(config.distDir));
 });
@@ -207,7 +201,3 @@ gulp.task('zip', function() {
 gulp.task('watch', function() {});
 
 gulp.task('serve', function() {});
-
-
-
-// grunt build_hasplayer -proxy=true -metricsAgent=true -analytics=false -vovw=true
