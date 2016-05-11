@@ -690,33 +690,6 @@ function launchPlayer() {
     initControlBar();
 }
 
-function initMetricsAgent() {
-
-    if (!enableMetrics || (typeof MetricsAgent != 'function')) {
-        launchPlayer();
-        return;
-    }
-
-    var req = new XMLHttpRequest();
-    req.onload = function () {
-        if (req.status === 200) {
-            var conf = JSON.parse(req.responseText);
-
-            metricsAgent = new MetricsAgent(player, video, conf.items[0], player.getDebug());
-            metricsAgent.init(function (activated) {
-                metricsAgentActive = activated;
-                console.log("Metrics agent state: ", activated);
-                launchPlayer();
-            });
-        } else {
-            launchPlayer();
-        }
-    };
-    req.open("GET", "./metricsagent_config.json", true);
-    req.setRequestHeader("Content-type", "application/json");
-    req.send();
-}
-
 function onLoad () {
 
     //appendText(navigator.userAgent);
@@ -744,7 +717,7 @@ function onLoad () {
 		hideMetrics();
     }
 
-    initMetricsAgent();
+    launchPlayer();
 }
 
 function onUnload () {
