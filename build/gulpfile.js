@@ -179,6 +179,8 @@ gulp.task('build-demoplayer', function() {
 gulp.task('build-orangehasplayerdemo', function() {
     return gulp.src(['../samples/OrangeHasPlayerDemo/**'])
         .pipe(replaceSourcesByBuild())
+        .pipe(replace(/<!-- metricsagent -->([\s\S]*?)<!-- \/metricsagent -->/, '<script src="../../metricsagent.js"></script>'))
+        .pipe(replace(/<!-- adsplayer -->([\s\S]*?)<!-- \/adsplayer -->/, '<script src="../../adsplayer.js"></script>'))
         .pipe(gulp.dest(config.distDir + '/samples/OrangeHasPlayerDemo/'));
 });
 
