@@ -487,11 +487,12 @@ Mss.dependencies.MssParser = function() {
                 contentProtection.pssh = {
                     __text: Mss.dependencies.createVOWidevinePssh(KID, this.debug)
                 };
-                contentProtections.push(contentProtection);
                 /* @endif */
+                contentProtections.push(contentProtection);
 
                 mpd.ContentProtection = (contentProtections.length > 1) ? contentProtections : contentProtections[0];
                 mpd.ContentProtection_asArray = contentProtections;
+                /* @endif */
 
                 /* @if PROTECTION=false */
                 /* @exec sendError('MediaPlayer.dependencies.ErrorHandler.prototype.MEDIA_ERR_ENCRYPTED','"protected content detected but protection module is not included."') */

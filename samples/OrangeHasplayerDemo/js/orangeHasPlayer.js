@@ -39,16 +39,20 @@ function createHasPlayer(isSubtitleExternDisplay) {
     loadHasPlayerConfig('json/hasplayer_config.json');
 
     // Load plugins
-    //metricsAgent = new MetricsAgent(confMetricsAgent);
-    //orangeHasPlayer.addPlugin(metricsAgent);
-    adsPlayer = new AdsPlayer(document.getElementById('VideoModule'));
-    orangeHasPlayer.addPlugin(adsPlayer);
+    if (typeof MetricsAgent == 'function') {
+        metricsAgent = new MetricsAgent(confMetricsAgent);
+        orangeHasPlayer.addPlugin(metricsAgent);
+    }
+    if (typeof AdsPlayer == 'function') {
+        adsPlayer = new AdsPlayer(document.getElementById('VideoModule'));
+        orangeHasPlayer.addPlugin(adsPlayer);
+        registerAdsPlayerEvents();
+    }
 
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.enableSubtitles(false);
     registerHasPlayerEvents();
-    registerAdsPlayerEvents();
 }
 
 function registerHasPlayerEvents() {
@@ -70,12 +74,14 @@ function registerHasPlayerEvents() {
 }
 
 function registerAdsPlayerEvents() {
-    adsPlayer.addEventListener('adStart',function(){
-        video.style.visibility = 'hidden';
-    });
-    adsPlayer.addEventListener('adEnd',function(){
-        video.style.visibility = 'visible';
-    });
+    if (adsPlayer) {
+        adsPlayer.addEventListener('adStart',function(){
+            video.style.visibility = 'hidden';
+        });
+        adsPlayer.addEventListener('adEnd',function(){
+            video.style.visibility = 'visible';
+        });
+    }
 }
 
 function loadHasPlayerConfig(fileUrl) {
