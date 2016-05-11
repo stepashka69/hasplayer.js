@@ -98,13 +98,14 @@ gulp.task('doc', ['generateDoc'], function() {
         .pipe(gulp.dest(config.doc.dir));
 });
 
-gulp.task('clean', function() {
-    return function(done) {
-        del([config.distDir], {
+gulp.task('clean', function(done) {
+    return (function() {
+        del([config.distDir + '**/*'], {
             force: true,
             dot: true
-        }, done);
-    };
+        });
+        done();
+    })();
 });
 
 gulp.task('lint', function() {
