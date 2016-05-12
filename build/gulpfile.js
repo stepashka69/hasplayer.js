@@ -42,7 +42,7 @@ var config = {
 var options = {
     protection: true,
     analytics: false,
-    vowv: false,
+    vowv: true,
     hls: true,
     mss: true
 };
