@@ -127,7 +127,7 @@ define(function(require) {
                 audio: {
                     setAudioLanguage: {
                         streams: [
-                            streams.MSS_LIVE_1
+                            streams.MSS_LIVE_MULTI_AUDIO
                         ]
                     }
                 },

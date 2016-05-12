@@ -23,7 +23,9 @@ define({
         "name": "Arte (multi-audio)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+        "audioTracks": [{lang:'fra', id:'audio101_fra'}, {lang:'deu', id:'audio102_deu'}],
+        "defaultAudioLang": 'deu'
     },
     MSS_LIVE_SUBT_1: {
         "name": "France 2 (subtitles)",
