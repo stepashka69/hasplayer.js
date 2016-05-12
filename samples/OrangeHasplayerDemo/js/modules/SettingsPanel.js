@@ -239,7 +239,7 @@ SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
     var i;
 
     for (i = 0; i < tracks.length; i += 1) {
-        if (currentTrack === tracks[i]) {
+        if (currentTrack.lang === tracks[i].lang) {
             combo.selectedIndex = i;
         }
     }
