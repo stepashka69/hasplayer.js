@@ -83,6 +83,7 @@ define({
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+        "subtitleTracks": [{lang:'fra', id:'textstream_fra'}, {lang:'fre', id:'textstream_fre'}],
         "defaultSubtitleLang": 'fra'
     },
     MSS_VOD_MULTI_AUDIO: {
