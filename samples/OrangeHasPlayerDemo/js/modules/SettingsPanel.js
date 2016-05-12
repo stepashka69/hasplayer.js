@@ -267,4 +267,6 @@ SettingsPanel.prototype.reset = function() {
     this.audioBufferLength.innerHTML = "";
     this.enableSubtitlesCheckbox.checked = false;
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
+    //reset trick mode value to speed = 1
+    this.TrickModeSpeed.selectedIndex = 7;
 };
