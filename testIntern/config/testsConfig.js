@@ -172,7 +172,7 @@ define(function(require) {
                             ['MEDIA_ERR_CODEC_UNSUPPORTED', 'MEDIA_ERR_SRC_NOT_SUPPORTED'],
                             ['MEDIA_ERR_CODEC_UNSUPPORTED'],
                             ['MEDIA_ERR_CODEC_UNSUPPORTED'],
-                            ['MANIFEST_ERR_PARSE']
+                            ['DOWNLOAD_ERR_MANIFEST']
                         ]
                     }
                 }

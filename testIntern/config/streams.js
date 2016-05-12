@@ -5,7 +5,7 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
-        "videoBitrates": [226000, 400000, 680000, 1200000, 2100000],
+        "videoBitrates": [226000, 416000, 680000, 1200000, 2100000],
         "audioTracks": [{lang:'qad', id:'audio102_qad'}, {lang:'fra', id:'audio101_fra'}],
         "video_fragment_pattern":"(video)",
         "audio_fragment_pattern":"(audio)",
