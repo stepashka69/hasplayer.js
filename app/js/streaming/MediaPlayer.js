@@ -1077,9 +1077,9 @@ MediaPlayer = function () {
                 return null;
             }
             var dvrInfo = _getDVRInfoMetric.call(this),
-                val = dvrInfo.range.start + value;
+                val = dvrInfo ? dvrInfo.range.start + value : null;
 
-            if (val > dvrInfo.range.end) {
+            if (val && val > dvrInfo.range.end) {
                 val = dvrInfo.range.end;
             }
 
