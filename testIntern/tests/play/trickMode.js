@@ -68,7 +68,7 @@ define([
             });
         };
 
-        var test = function (speed) {
+        var test = function (speed, isMuteBeforeTrick) {
 
             registerSuite({
                 name: NAME,
@@ -84,6 +84,8 @@ define([
                         return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT)
                         .then(function (playing) {
                             assert.isTrue(playing);
+                            tests.log(NAME, 'before trick test, mute = '+ isMuteBeforeTrick);
+                            return command.execute(player.setMute,[isMuteBeforeTrick]);
                         });
                     });
                 },
@@ -135,6 +137,11 @@ define([
                         return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT)
                         .then(function (playing) {
                             assert.isTrue(playing);
+                            return command.execute(player.getMute);
+                        })
+                        .then(function (isMute) {
+                            tests.log(NAME, 'after trick test, mute = '+ isMute);
+                            assert.isTrue(isMute === isMuteBeforeTrick);
                         });
                     });
                 }
@@ -149,7 +156,7 @@ define([
 
             // Performs trick play with differents speeds
             for (j = 0; j < speedValues.length; j++) {
-                test(speedValues[j]);
+                test(speedValues[j],j%2 === 0? true:false);
             }
         }
 

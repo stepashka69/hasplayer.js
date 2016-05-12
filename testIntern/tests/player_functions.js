@@ -39,6 +39,14 @@ define([], function () {
             orangeHasPlayer.seek(pos);
         },
 
+        setMute: function(isMute) {
+            orangeHasPlayer.setMute(isMute);
+        },
+
+        getMute: function() {
+            return orangeHasPlayer.getMute();
+        },
+
         setTrickModeSpeed: function(speed) {
             orangeHasPlayer.setTrickModeSpeed(speed);
         },
