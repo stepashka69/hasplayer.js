@@ -75,7 +75,7 @@ define(function(require) {
 
                     seekDVR: {
                         streams: [
-                            streams.MSS_LIVE_2
+                            streams.MSS_LIVE_DVR
                         ],
                         seekCount: 5
                     },
