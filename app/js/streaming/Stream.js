@@ -622,8 +622,7 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         onSeeking = function() {
-            var time = this.videoModel.getCurrentTime(),
-                self = this;
+            var time = this.videoModel.getCurrentTime();
 
             this.debug.info("[Stream] <video> seeking event: " + time);
 
