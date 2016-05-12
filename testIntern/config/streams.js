@@ -5,7 +5,7 @@ define({
         "protocol": "MSS",
         "type": "Live",
         "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S2.isml/Manifest",
-        "videoBitrates": [226000, 400000, 680000, 1200000, 2100000],
+        "videoBitrates": [226000, 416000, 680000, 1200000, 2100000],
         "audioTracks": [{lang:'qad', id:'audio102_qad'}, {lang:'fra', id:'audio101_fra'}],
         "video_fragment_pattern":"(video)",
         "audio_fragment_pattern":"(audio)",
@@ -23,7 +23,9 @@ define({
         "name": "Arte (multi-audio)",
         "protocol": "MSS",
         "type": "Live",
-        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest"
+        "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+        "audioTracks": [{lang:'fra', id:'audio101_fra'}, {lang:'deu', id:'audio102_deu'}],
+        "defaultAudioLang": 'deu'
     },
     MSS_LIVE_SUBT_1: {
         "name": "France 2 (subtitles)",
@@ -81,6 +83,7 @@ define({
         "protocol": "MSS",
         "type": "VOD",
         "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+        "subtitleTracks": [{lang:'fra', id:'textstream_fra'}, {lang:'fre', id:'textstream_fre'}],
         "defaultSubtitleLang": 'fra'
     },
     MSS_VOD_MULTI_AUDIO: {

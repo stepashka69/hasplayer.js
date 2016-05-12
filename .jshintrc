@@ -1,7 +1,7 @@
 {
     "noarg": true,
     "noempty": true,
-    "latedef": true,
+    "latedef": false,
     "undef": true,
     "unused": true,
     "strict": false,
@@ -20,6 +20,9 @@
         "BASE64",
         "utils",
         "MediaPlayer",
+        "OrangeHasPlayer",
+        "HasPlayer",
+        "MetricsAgent",
         "Dash",
         "WebKitMediaSource",
         "MediaSource",
@@ -39,5 +42,7 @@
         "ActiveXObject",
         "Promise",
         "define",
+        "fingerprint_browser",
+        "fingerprint_os",
         "DEBUG"]
 }

@@ -12,7 +12,7 @@ define(function(require) {
                     play: {
                         streams: [
                             streams.MSS_LIVE_1,
-                            streams.MSS_LIVE_2,
+                            //streams.MSS_LIVE_2,
                             streams.MSS_VOD_1,
                             streams.MSS_VOD_2,
                             streams.HLS_LIVE_1,
@@ -42,7 +42,7 @@ define(function(require) {
                     zapping: {
                         streams: [
                             streams.MSS_LIVE_1,
-                            streams.MSS_LIVE_2,
+                            //streams.MSS_LIVE_2,
                             streams.MSS_LIVE_MULTI_AUDIO,
                             streams.MSS_LIVE_SUBT_1,
                             streams.MSS_VOD_1,
@@ -55,7 +55,7 @@ define(function(require) {
                         streams: [
                             streams.MSS_LIVE_1,
                             streams.MSS_LIVE_DRM_1,
-                            streams.MSS_LIVE_2,
+                            //streams.MSS_LIVE_2,
                             streams.MSS_LIVE_MULTI_AUDIO,
                             streams.MSS_LIVE_DRM_2,
                             streams.MSS_LIVE_SUBT_1,
@@ -75,7 +75,7 @@ define(function(require) {
 
                     seekDVR: {
                         streams: [
-                            streams.MSS_LIVE_2
+                            streams.MSS_LIVE_DVR
                         ],
                         seekCount: 5
                     },
@@ -103,12 +103,13 @@ define(function(require) {
                     },
                     getAudioLanguages: {
                         streams: [
-                            streams.MSS_LIVE_1
+                            streams.MSS_LIVE_MULTI_AUDIO
                         ]
                     },
                     getSubtitleLanguages: {
                         streams: [
-                            streams.MSS_LIVE_SUBT_2
+                            //streams.MSS_LIVE_SUBT_2
+                            streams.MSS_VOD_4
                         ]
                     },
                     getDuration: {
@@ -127,7 +128,7 @@ define(function(require) {
                 audio: {
                     setAudioLanguage: {
                         streams: [
-                            streams.MSS_LIVE_1
+                            streams.MSS_LIVE_MULTI_AUDIO
                         ]
                     }
                 },
@@ -148,7 +149,7 @@ define(function(require) {
                 error: {
                     downloadErrorContent:{
                         streams:[
-                            streams.MSS_LIVE_2
+                            streams.MSS_LIVE_1
                         ],
                         warnCode:"DOWNLOAD_ERR_CONTENT",
                         errorCode:"DOWNLOAD_ERR_CONTENT"
@@ -172,7 +173,7 @@ define(function(require) {
                             ['MEDIA_ERR_CODEC_UNSUPPORTED', 'MEDIA_ERR_SRC_NOT_SUPPORTED'],
                             ['MEDIA_ERR_CODEC_UNSUPPORTED'],
                             ['MEDIA_ERR_CODEC_UNSUPPORTED'],
-                            ['MANIFEST_ERR_PARSE']
+                            ['DOWNLOAD_ERR_MANIFEST']
                         ]
                     }
                 }

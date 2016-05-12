@@ -1,3 +1,11 @@
+### Release Notes v1.3.0 (2016/05/13)
+* Refactored and enriched MediaPlayer API
+* Add MediaPlayer plugins framework
+* Add new ABR rule considering dropped frames
+* DVR mode enhancement for MSS with FrgmentInfo requests to keep DVR window up to date
+* Optimized VOD streams management (no manifest refresh while switching tracks, ...)
+* Build: use gulp framework (instead of grunt)
+
 ### Release Notes v1.2.7.1 (2016/05/02)
 * Bugs fixing:
 * - Mute state reset when load a new stream

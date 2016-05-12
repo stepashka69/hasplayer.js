@@ -8,7 +8,7 @@ define([], function () {
                 streamsPanel.loadTVMSource(stream, function(tvmStream) {
                     orangeHasPlayer.load(tvmStream.url, tvmStream.protData);
                 })
-            } else {    
+            } else {
                 orangeHasPlayer.load(stream.url, stream.protData);
             }
         },
@@ -52,15 +52,15 @@ define([], function () {
         },
 
         getAudioLanguages: function() {
-            return orangeHasPlayer.getAudioTracks();
+            return orangeHasPlayer.getTracks(MediaPlayer.TRACKS_TYPE.AUDIO);
         },
 
         getSelectedAudioLanguage: function() {
-            return orangeHasPlayer.getSelectedAudioTrack();
+            return orangeHasPlayer.getSelectedTrack(MediaPlayer.TRACKS_TYPE.AUDIO);
         },
 
         setSelectedAudioLanguage: function(audioTrack) {
-            return orangeHasPlayer.setAudioTrack(audioTrack);
+            return orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.AUDIO,audioTrack);
         },
 
         setDefaultAudioLanguage: function(lang) {
@@ -68,19 +68,19 @@ define([], function () {
         },
 
         getSubtitleLanguages: function() {
-            return orangeHasPlayer.getSubtitleTracks();
+            return orangeHasPlayer.getTracks(MediaPlayer.TRACKS_TYPE.TEXT);
         },
 
         getSelectedSubtitleLanguage: function() {
-            return orangeHasPlayer.getSelectedSubtitleTrack();
+            return orangeHasPlayer.getSelectedTrack(MediaPlayer.TRACKS_TYPE.TEXT);
         },
 
         setSelectedSubtitleLanguage: function(subtitleTrack) {
-            return orangeHasPlayer.setSubtitleTrack(subtitleTrack);
+            return orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.TEXT,subtitleTrack);
         },
 
         setSubtitlesVisibility: function(state) {
-            return orangeHasPlayer.setSubtitleVisibility(state);
+            return orangeHasPlayer.enableSubtitles(state);
         },
 
         setDefaultSubtitleLanguage: function(lang) {
@@ -117,7 +117,7 @@ define([], function () {
                 orangeHasPlayer.addEventListener('error', onError);
             }
         },
-        
+
         getWarningCode: function(done){
             var warning = orangeHasPlayer.getWarning(),
                 onWarning = function(warn){

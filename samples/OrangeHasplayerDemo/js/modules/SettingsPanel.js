@@ -120,7 +120,7 @@ SettingsPanel.prototype.onEnableSubtitles = function() {
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
     //if subtitles have not been activated yet, initialize the first selected track
     if (!this.currentsubtitleTrack) {
-        this.currentsubtitleTrack = orangeHasPlayer.getSelectedSubtitleTrack();
+        this.currentsubtitleTrack = orangeHasPlayer.getSelectedTrack('text');
         var index = this.getTrackIndex(this.subtitleTracks, this.currentsubtitleTrack.id);
         if (index > -1) {
             this.subtitleListCombobox.selectedIndex = index;
@@ -148,19 +148,23 @@ SettingsPanel.prototype.onSettingsMenuButtonClicked = function() {
 SettingsPanel.prototype.onEnableMetrics = function() {
     if (this.enableMetricsCheckbox.checked) {
         this.metricsAgentCombobox.disabled = false;
+        this.loadMetricsAgent();
     } else {
-        this.enableMetricsCheckbox.checked = true;
-        //this.metricsAgentCombobox.disabled = true;
+        this.metricsAgentCombobox.disabled = true;
+        orangeHasPlayer.removePlugin('MetricsAgent');
     }
 };
 
-SettingsPanel.prototype.onSelectMetricsAgent = function(value) {
-    if (typeof MetricsAgent === 'function') {
-        if (this.enableMetricsCheckbox.checked) {
-            orangeHasPlayer.loadMetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
-        } else if (this.metricsAgent) {
-            this.metricsAgent.stop();
-        }
+SettingsPanel.prototype.onSelectMetricsAgent = function() {
+    if (this.enableMetricsCheckbox.checked) {
+        this.loadMetricsAgent();
+    }
+};
+
+SettingsPanel.prototype.loadMetricsAgent = function() {
+    if (typeof MetricsAgent === 'function' && this.metricsAgentCombobox.selectedIndex >= 0) {
+        var metricsAgent = new MetricsAgent(this.metricsConfig.items[this.metricsAgentCombobox.selectedIndex]);
+        orangeHasPlayer.addPlugin(metricsAgent);
     }
 };
 
@@ -235,7 +239,7 @@ SettingsPanel.prototype.selectCombo = function(tracks, combo, currentTrack) {
     var i;
 
     for (i = 0; i < tracks.length; i += 1) {
-        if (currentTrack === tracks[i]) {
+        if (currentTrack.lang === tracks[i].lang) {
             combo.selectedIndex = i;
         }
     }
@@ -261,4 +265,6 @@ SettingsPanel.prototype.reset = function() {
     this.currentsubtitleTrack = null;
     this.videoBufferLength.innerHTML = "";
     this.audioBufferLength.innerHTML = "";
+    this.enableSubtitlesCheckbox.checked = false;
+    enableSubtitles(this.enableSubtitlesCheckbox.checked);
 };

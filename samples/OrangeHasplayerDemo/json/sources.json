@@ -298,6 +298,13 @@
         {
             "type": "VOD",
             "protocol": "MSS",
+            "name": "Elephant Dream Viaccess",
+            "url": "http://harmonic.e2e.purpledrm.com.edgesuite.net:80/Content/SS/VOD/yjO9VXw7-ElephantsDreamH264720p/ElephantsDream.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
             "name": "SuperSpeedway",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"

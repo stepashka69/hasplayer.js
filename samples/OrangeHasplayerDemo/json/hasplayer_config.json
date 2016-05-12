@@ -50,6 +50,12 @@
     "// ABR.switchUpBufferTime" : "The buffer size (in seconds) lower limit before switching up, if defined it overrides ABR.switchUpBufferRatio",
     "ABR.switchUpBufferTime": -1,
 
+    "// ABR.droppedFramesMinRatio" : "The number of dropped frames (as a ratio to total video frames) from which switching up quality is disabled",
+    "ABR.switchUpBufferRatio": 0.1,
+
+    "// ABR.droppedFramesMaxRatio" : "The number of dropped frames (as a ratio to total video frames) from which quality is switched down",
+    "ABR.switchUpBufferRatio": 0.3,
+
     "// ManifestLoader.RetryAttempts" : "The number of retry attempts for downloading manifest file when it fails",
     "ManifestLoader.RetryAttempts": -1,
 

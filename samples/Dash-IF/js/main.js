@@ -339,11 +339,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     };
 
     $scope.selectAudioTrack = function(track){
-        player.setAudioTrack(track);
+        player.selectTrack(MediaPlayer.TRACKS_TYPE.AUDIO,track);
     };
 
     $scope.selectTextTrack = function(track){
-        player.setSubtitleTrack(track);
+        player.selectTrack(MediaPlayer.TRACKS_TYPE.TEXT,track);
     };
 
     function getCribbedMetricsFor(type) {
@@ -472,13 +472,13 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     function onload(/*e*/) {
         //init audio tracks
-        $scope.audioTracks = player.getAudioTracks();
+        $scope.audioTracks = player.getTracks(MediaPlayer.TRACKS_TYPE.AUDIO);
         if ($scope.audioTracks !== null) {
             $scope.audioData = $scope.audioTracks[0];
         }
         //init subtitles tracks
         player.enableSubtitles(true);
-        $scope.textTracks = player.getSubtitleTracks();
+        $scope.textTracks = player.getTracks(MediaPlayer.TRACKS_TYPE.TEXT);
         if ($scope.textTracks !== null) {
             $scope.textData = $scope.textTracks[0];
         }
@@ -751,8 +751,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     ////////////////////////////////////////
 
     video = document.querySelector(".dash-video-player video");
-    context = new MediaPlayer.di.Context();
-    player = new MediaPlayer(context);
+    player = new MediaPlayer();
 
     $scope.version = player.getVersion();
     $scope.versionFull = player.getVersionFull();
@@ -760,7 +759,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.buildDate = player.getBuildDate();
 
 
-    player.startup();
+    player.init(video);
     player.addEventListener("error", onError.bind(this));
     player.addEventListener("metricChanged", metricChanged.bind(this));
     player.addEventListener("subtitlesStyleChanged",onSubtitlesStyleChanged.bind(this));
@@ -770,7 +769,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     video.addEventListener("fullscreenchange", onFullScreenChange.bind(this));
     video.addEventListener("mozfullscreenchange", onFullScreenChange.bind(this));
     video.addEventListener("webkitfullscreenchange", onFullScreenChange.bind(this));
-    player.attachView(video);
     player.setAutoPlay(true);
     player.getDebug().setLevel(4);
     if (config) {
@@ -873,83 +871,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         player.setTrickModeSpeed(newSpeed);
         $scope.trickModeSpeed = "x" + newSpeed;
     };
-
-    ////////////////////////////////////////
-    //
-    // Metrics Agent Setup
-    //
-    ////////////////////////////////////////
-
-    $scope.metricsAgentAvailable = (typeof MetricsAgent == 'function') ? true : false;
-    $scope.metricsAgentActive = false;
-
-
-    $scope.setMetricsAgent = function (value) {
-        $scope.metricsAgentActive = value;
-        if (typeof MetricsAgent == 'function') {
-            if ($scope.metricsAgentActive) {
-                metricsAgent = new MetricsAgent(player, video, $scope.selected_metric_option, player.getDebug());
-                $scope.metricsAgentVersion = metricsAgent.getVersion();
-                metricsAgent.init(function (activated) {
-                    $scope.metricsAgentActive = activated;
-                    console.log("Metrics agent state: ", activated);
-                    setTimeout(function (){
-                        $scope.$apply();
-                    }, 500);
-                    if (activated === false) {
-                        alert("Metrics agent not available!");
-                    }
-                });
-            } else if (metricsAgent) {
-                metricsAgent.stop();
-            }
-        }
-    };
-
-    /*$scope.metricsAgentAvailable = function () {
-        if (typeof MetricsAgent == 'function') {
-            return true;
-        }
-        return false;
-    };*/
-
-
-    ////////////////////////////////////////
-    //
-    // Metrics Agent Configuration
-    //
-    ////////////////////////////////////////
-    if ($scope.metricsAgentAvailable) {
-        configMetrics = [
-            {"name": "csQoE (local)",
-             "activationUrl":"http://localhost:8080/config",
-             "serverUrl":"http://localhost:8080/metrics",
-             "dbServerUrl":"http://localhost:8080/metricsDB",
-             "collector":"HasPlayerCollector",
-             "formatter":"CSQoE",
-             "sendingTime": 10000
-            }];
-        $scope.configMetrics = configMetrics;
-        $scope.selected_metric_option = $scope.configMetrics[0];
-
-        var reqMA = new XMLHttpRequest();
-        reqMA.onload = function () {
-            if (reqMA.status === 200) {
-                configMetrics = JSON.parse(reqMA.responseText);
-                $scope.configMetrics = configMetrics.items;
-                $scope.selected_metric_option = $scope.configMetrics[0];
-            }
-        };
-        reqMA.open("GET", "./metricsagent_config.json", true);
-        reqMA.setRequestHeader("Content-type", "application/json");
-        reqMA.send();
-    }
-
-    $scope.setMetricOption = function (metricOption) {
-        $scope.selected_metric_option = metricOption;
-        console.log($scope.selected_metric_option.name);
-    };
-
 
     ////////////////////////////////////////
     //
@@ -1123,11 +1044,11 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         $scope.textData = null;
 
         // ORANGE: reset ABR controller
-        player.setQualityFor("video", 0);
-        player.setQualityFor("audio", 0);
+        player.setInitialQualityFor("video", 0);
+        player.setInitialQualityFor("audio", 0);
 
         $scope.playbackRate = "x1";
-        player.attachSource($scope.selectedItem.url, $scope.selectedItem.protData);
+        player.load($scope.selectedItem);
     }
 
     $scope.doLoad = function () {
@@ -1136,10 +1057,6 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         }
         
         player.reset(0);
-
-        if ((typeof MetricsAgent == 'function') && ($scope.metricsAgentActive)) {
-            metricsAgent.createSession();
-        }
 
         initPlayer();
     };
