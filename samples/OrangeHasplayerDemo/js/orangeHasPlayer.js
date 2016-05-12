@@ -39,10 +39,6 @@ function createHasPlayer(isSubtitleExternDisplay) {
     loadHasPlayerConfig('json/hasplayer_config.json');
 
     // Load plugins
-    if (typeof MetricsAgent == 'function') {
-        metricsAgent = new MetricsAgent(confMetricsAgent);
-        orangeHasPlayer.addPlugin(metricsAgent);
-    }
     if (typeof AdsPlayer == 'function') {
         adsPlayer = new AdsPlayer(document.getElementById('VideoModule'));
         orangeHasPlayer.addPlugin(adsPlayer);
