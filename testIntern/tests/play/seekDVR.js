@@ -39,15 +39,17 @@ define([
             i, j;
 
         var generateSeekPos = function () {
-            var pos = Math.round(Math.random() * (_dvrRange.end - _dvrRange.start) * 100) / 100;
+            var pos = _dvrRange? Math.round(Math.random() * (_dvrRange.end - _dvrRange.start) * 100) / 100 : null;
             
-            pos = _dvrRange.start + pos;
-           
-            if (pos > (_dvrRange.end - PROGRESS_DELAY)) {
-                pos -= PROGRESS_DELAY;
-            }
-            if (pos < (_dvrRange.start + PROGRESS_DELAY)) {
-                pos += PROGRESS_DELAY;
+            if (pos) {
+                pos = _dvrRange.start + pos;
+               
+                if (pos > (_dvrRange.end - PROGRESS_DELAY)) {
+                    pos -= PROGRESS_DELAY;
+                }
+                if (pos < (_dvrRange.start + PROGRESS_DELAY)) {
+                    pos += PROGRESS_DELAY;
+                }
             }
             return pos;
         };
@@ -88,6 +90,7 @@ define([
                     })
                     .then(function (dvrRange) {
                         _dvrRange = dvrRange;
+                        assert.isTrue(_dvrRange !== null);
                         tests.log(NAME, 'dvrRange start: ' + _dvrRange.start+' end: '+_dvrRange.end);
                         seekPos = generateSeekPos();
                         tests.log(NAME, 'Seek: ' + seekPos);
