@@ -114,6 +114,7 @@ var handlePlayState = function(state) {
     if (state === true) {
         playerPanel.hideLoadingElement();
         graphPanel.timer.start();
+        settingsPanel.resetSpeedValue();
     } else {
         graphPanel.timer.pause();
     }

@@ -257,6 +257,11 @@ SettingsPanel.prototype.resetCombo = function(tracks, combo) {
     combo.style.visibility = 'hidden';
 };
 
+SettingsPanel.prototype.resetSpeedValue = function(){
+    //reset trick mode value to speed = 1
+    this.TrickModeSpeed.selectedIndex = 7;
+};
+
 SettingsPanel.prototype.reset = function() {
     this.resetCombo(this.audioTracks, this.audioListCombobox);
     this.resetCombo(this.subtitleTracks, this.subtitleListCombobox);
@@ -267,6 +272,5 @@ SettingsPanel.prototype.reset = function() {
     this.audioBufferLength.innerHTML = "";
     this.enableSubtitlesCheckbox.checked = false;
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
-    //reset trick mode value to speed = 1
-    this.TrickModeSpeed.selectedIndex = 7;
+    this.resetSpeedValue();
 };
