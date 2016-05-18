@@ -8,6 +8,8 @@ If your intent is to use the player code without contributing back to this proje
 
 If your goal is to improve or extend the code and contribute back to this project, then you should make your changes in, and submit a pull request against, the DEVELOPMENT branch. 
 
+Learn more about versions and roadmap on the [wiki](https://github.com/Orange-OpenSource/hasplayer.js/wiki).
+
 ## Quick Start
 
 ### Reference Player
@@ -19,22 +21,15 @@ If your goal is to improve or extend the code and contribute back to this projec
 ### Install Dependencies
 
 1. [install nodejs](http://nodejs.org/)
-2. [install grunt](http://gruntjs.com/getting-started)
-    * npm install -g grunt-cli
+2. [install gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
+    * npm install -g gulp
 
 ### Build / Run
 
-1. Change directories to the build folder
-    * cd build/
-2. Install all Node Modules defined in package.json 
-    * npm install
-3. Run build task
-    * grunt build
-4. You can also check for other available targter by running:
-    * grunt help
+npm build
 
 The build task can be configured in order to select supported protocol(s) and to integrate or not EME support. For exemple:
-    * grunt build -protocol mss -no-protection ( = mss support only, no EME support)
+    * npm build -hls=false -protection=false (= no hls support, no EME support)
 
 ## Demo
 
