@@ -49,24 +49,14 @@ MediaPlayer.dependencies.TextController = function() {
         },
 
         updateRepresentations = function(data, periodInfo) {
-            var self = this,
-                deferred = Q.defer(),
-                manifest = self.manifestModel.getValue();
-            self.manifestExt.getDataIndex(data, manifest, periodInfo.index).then(
-                function(idx) {
-                    self.manifestExt.getAdaptationsForPeriod(manifest, periodInfo).then(
-                        function(adaptations) {
-                            self.manifestExt.getRepresentationsForAdaptation(manifest, adaptations[idx]).then(
-                                function(representations) {
-                                    deferred.resolve(representations);
-                                }
-                            );
-                        }
-                    );
-                }
-            );
+            var adaptations,
+                manifest = this.manifestModel.getValue(),
+                idx;
 
-            return deferred.promise;
+            idx = this.manifestExt.getDataIndex(data, manifest, periodInfo.index);
+
+            adaptations = this.manifestExt.getAdaptationsForPeriod(manifest, periodInfo);
+            return this.manifestExt.getRepresentationsForAdaptation(manifest, adaptations[idx]);
         },
 
         onBytesLoaded = function(request, response) {
@@ -101,12 +91,11 @@ MediaPlayer.dependencies.TextController = function() {
             self.setBuffer(buffer);
             self.setMediaSource(source);
 
-            self.updateData(data, periodInfo).then(
-                function() {
-                    initialized = true;
-                    startPlayback.call(self);
-                }
-            );
+            self.updateData(data, periodInfo);
+
+            initialized = true;
+            
+            startPlayback.call(self);
         },
 
         setPeriodInfo: function(value) {
@@ -146,22 +135,12 @@ MediaPlayer.dependencies.TextController = function() {
         },
 
         updateData: function(dataValue, periodInfoValue) {
-            var self = this,
-                deferred = Q.defer();
-
             data = dataValue;
             periodInfo = periodInfoValue;
 
-            updateRepresentations.call(self, data, periodInfo).then(
-                function(representations) {
-                    availableRepresentations = representations;
-                    setState.call(self, READY);
-                    startPlayback.call(self);
-                    deferred.resolve();
-                }
-            );
-
-            return deferred.promise;
+            availableRepresentations = updateRepresentations.call(this, data, periodInfo);
+            setState.call(this, READY);
+            startPlayback.call(this);
         },
 
         reset: function(errored) {
