@@ -299,6 +299,7 @@ h1 {
     top: 0;
     left: 0;
     width: 100%;
+    zIndex: "1";
 }
 
 .ads-image {
@@ -307,6 +308,7 @@ h1 {
     left: 0;
     width: 100%;
     height = '100%';
+    zIndex: "2";
 }
 
 .adskip-button {
@@ -324,4 +326,5 @@ h1 {
 
 .adskip-button1 {
     cursor: pointer;
+    zIndex: "4";
 }
