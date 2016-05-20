@@ -1,6 +1,46 @@
 {
     "items": [
+         {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Test Ahmad",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://localhost:8080/adsPlayer.js/demo/MAST_VAST_FILES/TestMast.xml",
+            "browsers": "cdsbi"
+        },
+		{
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Big Buck Bunny + PUB video midroll",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://2is7server2.rd.francetelecom.com/testsMAST/02_MAST_midroll.xml",
+            "browsers": "cdsbi"
+        },
         {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Big Buck Bunny + PUB video preroll",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://2is7server2.rd.francetelecom.com/testsMAST/01_MAST_preroll.xml",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Big Buck Bunny + PUB video preroll + midroll",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://2is7server2.rd.francetelecom.com/testsMAST/04_MAST_preroll_midroll.xml",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Big Buck Bunny + PUB image preroll",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://2is7server2.rd.francetelecom.com/testsMAST/06_MAST_preroll_image.xml",
+            "browsers": "cdsbi"
+        },        
+		{
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV1",
