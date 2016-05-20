@@ -615,8 +615,6 @@ function parseUrlParams () {
 
             if ((name === 'file') || (name === 'url')) {
                 streamSource.url = value + anchor;
-            } else if (name === 'metrics') {
-                enableMetrics = true;
             } else if ((name === 'debug') && (value !== 'false')) {
                 document.getElementById('debugInfos').style.visibility="visible";
             } else if (name === 'netBalancer') {
