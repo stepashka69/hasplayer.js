@@ -40,7 +40,7 @@ Mss.dependencies.MssParser = function() {
         xmlDoc = null,
         baseURL = null,
 
-        mapPeriod = function() {
+        mapPeriod = function(minBufferTime) {
             var period = {},
                 adaptations = [],
                 adaptation,
@@ -53,7 +53,7 @@ Mss.dependencies.MssParser = function() {
             // For each StreamIndex node, create an AdaptationSet element
             for (i = 0; i < smoothNode.childNodes.length; i++) {
                 if (smoothNode.childNodes[i].nodeName === "StreamIndex") {
-                    adaptation = mapAdaptationSet.call(this, smoothNode.childNodes[i]);
+                    adaptation = mapAdaptationSet.call(this, smoothNode.childNodes[i], minBufferTime);
                     if (adaptation !== null) {
                         adaptations.push(adaptation);
                     }
@@ -68,7 +68,7 @@ Mss.dependencies.MssParser = function() {
             return period;
         },
 
-        mapAdaptationSet = function(streamIndex) {
+        mapAdaptationSet = function(streamIndex, minBufferTime) {
 
             var adaptationSet = {},
                 representations = [],
@@ -123,7 +123,7 @@ Mss.dependencies.MssParser = function() {
             segments = segmentTemplate.SegmentTimeline.S_asArray;
             this.metricsModel.addDVRInfo(adaptationSet.contentType, new Date(), {
                 start: segments[0].t / segmentTemplate.timescale,
-                end: (segments[segments.length - 1].t + segments[segments.length - 1].d)  / segmentTemplate.timescale
+                end: (segments[segments.length - 1].t + segments[segments.length - 1].d- minBufferTime*10000000.0)  / segmentTemplate.timescale
             });
 
 
@@ -456,7 +456,7 @@ Mss.dependencies.MssParser = function() {
             }
 
             // Map period node to manifest root node
-            mpd.Period = mapPeriod.call(this);
+            mpd.Period = mapPeriod.call(this, mpd.minBufferTime);
             mpd.Period_asArray = [mpd.Period];
 
             // Initialize period start time
