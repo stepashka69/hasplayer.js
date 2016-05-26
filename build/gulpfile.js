@@ -13,6 +13,7 @@ var gulp = require('gulp'),
     umd = require('gulp-umd'),
     jshint = require('gulp-jshint'),
     banner = require('gulp-banner'),
+    footer = require('gulp-footer'),
     jsdoc = require('gulp-jsdoc'),
     replaceHtml = require('gulp-html-replace'),
     // used to intercat with .html files
@@ -27,6 +28,9 @@ var gulp = require('gulp'),
 
 
 var comment = '<%= pkg.copyright %>\n\n/* Last build : <%= pkg.date %>_<%= pkg.time %> / git revision : <%= pkg.revision %> */\n\n';
+
+var jshint_ignore_start = '/* jshint ignore:start */\n';
+var jshint_ignore_end = '\n/* jshint ignore:end */';
 
 var config = {
     distDir: '../dist',
@@ -151,6 +155,8 @@ gulp.task('build', ['clean', 'package-info', 'lint'], function() {
         }))
         .pipe(gulp.dest(config.distDir))
         .pipe(uglify())
+        .pipe(banner(jshint_ignore_start))
+        .pipe(footer(jshint_ignore_end))
         .pipe(banner(comment, {
             pkg: pkg
         }))
