@@ -26,16 +26,21 @@ Learn more about versions and roadmap on the [wiki](https://github.com/Orange-Op
 
 ### Build / Run
 
-npm build
+npm run build
 
-The build task can be configured in order to select supported protocol(s) and to integrate or not EME support. For exemple:
-    * npm build -hls=false -protection=false (= no hls support, no EME support)
+The build task can be configured in order to select supported protocol(s) and to integrate or not EME support.
+For example:
+
+1. No hls support, no EME support:
+    * npm build -hls=false -protection=false
+2. No hls support, no MSS support:
+    * npm build -hls=false -mss=false
 
 ## Demo
 
 A builded version of the hasplayer.js and samples is available ah this address:
 
-http://tv-has.orange-labs.fr/hasplayer/
+http://orange-opensource.github.io/hasplayer.js
 
 ## License
 
@@ -95,3 +100,12 @@ When it is all done, it should look similar to this:
     </body>
 </html>
 ```
+
+## Documentation
+
+Full [API Documentation](http://orange-opensource.github.io/hasplayer.js/dev/doc/index.html) is available describing MediaPlayer public methods and events.
+
+This API documentation can be generated using following gulp command:
+
+npm run doc
+
