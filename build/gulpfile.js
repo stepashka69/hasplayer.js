@@ -118,7 +118,7 @@ gulp.task('package-info', function() {
     git.short(function(str) {
         pkg.revision = str;
     });
-    fs.readFile('../LICENSE', null, function(err, _data) {
+    fs.readFile('../COPYRIGHT', null, function(err, _data) {
         pkg.copyright = _data;
     });
     pkg.date = (new Date().getFullYear()) + '-' + (new Date().getMonth() + 1) + '-' + (new Date().getDate());
