@@ -3,13 +3,13 @@
 * Add MediaPlayer plugins framework
 * Add new ABR rule considering dropped frames
 * DVR mode enhancement for MSS with FrgmentInfo requests to keep DVR window up to date
-* Optimized VOD streams management (no manifest refresh while switching tracks, ...)
+* Corrected VOD streams management (no manifest refresh while switching tracks, ...)
 * Build: use gulp framework (instead of grunt)
 
 ### Release Notes v1.2.7.1 (2016/05/02)
 * Bugs fixing:
 * - Mute state reset when load a new stream
-* - Crash in HLs demultiplexing when no audio packet in stream
+* - Crash in HLS demultiplexing when no audio packet in stream
 * - MANIFEST_ERR_PARSE (instead of DOWNLOAD_ERR_MANIFEST) when failed to download HLS variant stream playlist
 * Add new errors for HLS demultiplexing errors ('HLS_DEMUX_ERROR')
 
