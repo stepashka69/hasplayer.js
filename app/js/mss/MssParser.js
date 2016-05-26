@@ -438,7 +438,9 @@ Mss.dependencies.MssParser = function() {
                 protection = this.domParser.getChildNode(smoothNode, 'Protection'),
                 protectionHeader = null,
                 KID,
+                realDuration,
                 firstSegment,
+                lastSegment,
                 adaptationTimeOffset,
                 i;
 
@@ -506,8 +508,17 @@ Mss.dependencies.MssParser = function() {
                 // Therefore, set period start time to the higher adaptation start time
                 if (mpd.type === "static" && adaptations[i].contentType !== 'text') {
                     firstSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[0];
+                    lastSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray.length-1];
                     adaptationTimeOffset = parseFloat(firstSegment.t) / TIME_SCALE_100_NANOSECOND_UNIT;
                     period.start = (period.start === 0) ? adaptationTimeOffset : Math.max(period.start, adaptationTimeOffset);
+                     //get last segment start time, add the duration of this last segment
+                    realDuration = (lastSegment.t + lastSegment.d) / TIME_SCALE_100_NANOSECOND_UNIT;
+                    //detect difference between announced duration (in MSS manifest) and real duration => in any case, we want that the video element sends the ended event.
+                    //set the smallest value between all the adaptations
+                    if (!isNaN(realDuration) && realDuration < mpd.mediaPresentationDuration) {
+                        mpd.mediaPresentationDuration = realDuration;
+                        period.duration = realDuration;
+                    }
                 }
 
                 // Propagate content protection information into each adaptation

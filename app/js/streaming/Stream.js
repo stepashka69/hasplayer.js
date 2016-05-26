@@ -578,7 +578,17 @@ MediaPlayer.dependencies.Stream = function() {
         },
 
         onDurationchange = function() {
-            this.debug.info("[Stream] <video> durationchange event: " + this.videoModel.getDuration());
+            var duration = this.videoModel.getDuration(),
+                manifestDuration;
+
+            this.debug.info("[Stream] <video> durationchange event: " + duration);
+            if (duration !== Infinity) {
+                manifestDuration = this.getDuration();
+                //detect the real duration has been changed by a last mp4 chunck with a duration greater than the announced value
+                if (!isNaN(duration) && duration > manifestDuration) {
+                    this.mediaSourceExt.setDuration(mediaSource, manifestDuration);
+                }
+            }
         },
 
         onRatechange = function() {
