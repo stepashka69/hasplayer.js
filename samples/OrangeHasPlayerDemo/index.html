@@ -265,171 +265,173 @@
 
                 <div class="stream-url"></div>
                 <div id="demo-player-container" class="demo-player" tabindex="0">
-                    <div id="VideoModule" class="op-video">
-                        <video id="player" class="player"></video>
-                        <div id="adsOverlay"></div>
-                    </div>
-                    <div id="LoadingModule" class="op-loading op-none">
-                        <div class="spinner">
-                            <div class="spinner-container container1">
-                                <div class="circle1"></div>
-                                <div class="circle2"></div>
-                                <div class="circle3"></div>
-                                <div class="circle4"></div>
-                            </div>
-                            <div class="spinner-container container2">
-                                <div class="circle1"></div>
-                                <div class="circle2"></div>
-                                <div class="circle3"></div>
-                                <div class="circle4"></div>
-                            </div>
-                            <div class="spinner-container container3">
-                                <div class="circle1"></div>
-                                <div class="circle2"></div>
-                                <div class="circle3"></div>
-                                <div class="circle4"></div>
+                    <div id="VideoPlayerContainer">
+                        <div id="VideoModule" class="op-video">
+                            <video id="player" class="player"></video>
+                            <div id="adsOverlay"></div>
+                        </div>
+                        <div id="LoadingModule" class="op-loading op-none">
+                            <div class="spinner">
+                                <div class="spinner-container container1">
+                                    <div class="circle1"></div>
+                                    <div class="circle2"></div>
+                                    <div class="circle3"></div>
+                                    <div class="circle4"></div>
+                                </div>
+                                <div class="spinner-container container2">
+                                    <div class="circle1"></div>
+                                    <div class="circle2"></div>
+                                    <div class="circle3"></div>
+                                    <div class="circle4"></div>
+                                </div>
+                                <div class="spinner-container container3">
+                                    <div class="circle1"></div>
+                                    <div class="circle2"></div>
+                                    <div class="circle3"></div>
+                                    <div class="circle4"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="MenuModule" class="op-menu op-hidden-translate-up" min-width="886px" max-width="1279px">
-                        <div class="op-menu-items">
-                            <a id="languagesButton" class="op-menu-item op-menu-languages stop-anchor" data-menu="languages" role="button">
-                                Langue
-                            </a>
-                            <a id="videoQualityButton" class="op-menu-item op-settings-menu-quality stop-anchor" data-settings="quality" role="button">
-                                Qualité vidéo
-                            </a>
+                        <div id="MenuModule" class="op-menu op-hidden-translate-up" min-width="886px" max-width="1279px">
+                            <div class="op-menu-items">
+                                <a id="languagesButton" class="op-menu-item op-menu-languages stop-anchor" data-menu="languages" role="button">
+                                    Langue
+                                </a>
+                                <a id="videoQualityButton" class="op-menu-item op-settings-menu-quality stop-anchor" data-settings="quality" role="button">
+                                    Qualité vidéo
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div id="MiddleContainer" class="op-middle-container disabled" min-width="886px" max-width="1279px">
-                        <div class="op-close op-hidden" id="CloseCrossModule">
-                            <a class="stop-anchor">
-                                <!-- inject:close:svg -->
-                                <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><path fill="#444444" d="M28.9,24L28.9,24l-8-8l8-8l0,0c0.1-0.1,0.1-0.2,0.2-0.3c0.1-0.3,0-0.6-0.2-0.9l-3.8-3.8 c-0.2-0.2-0.6-0.3-0.9-0.2c-0.1,0-0.2,0.1-0.3,0.2l0,0l-8,8l-8-8l0,0C7.9,3,7.8,2.9,7.7,2.9c-0.3-0.1-0.6,0-0.9,0.2L3.1,6.8 C2.8,7.1,2.8,7.4,2.9,7.7C2.9,7.8,3,7.9,3.1,8l0,0l8,8l-8,8l0,0c-0.1,0.1-0.1,0.2-0.2,0.3c-0.1,0.3,0,0.6,0.2,0.9l3.8,3.8   c0.2,0.2,0.6,0.3,0.9,0.2c0.1,0,0.2-0.1,0.3-0.2l0,0l8-8l8,8l0,0c0.1,0.1,0.2,0.1,0.3,0.2c0.3,0.1,0.6,0,0.9-0.2l3.8-3.8    c0.2-0.2,0.3-0.6,0.2-0.9C29.1,24.2,29,24.1,28.9,24z"></path></svg>
-                                <!-- endinject -->
-                            </a>
-                        </div>
-                        <div class="op-screen op-languages op-hidden" id="LanguagesModule" min-width="886px" max-width="1279px">
-                            <div class="op-languages-container">
-                                <div>
-                                    <div class="op-double-panel" id="languages-double-panel">
-                                        <div class="op-summary">
-                                            <div class="op-languages-title">Choix de la langue</div>
-                                        </div>
-                                        <div class="op-panel-container">
-                                            <div class="op-languages-title">Choix des sous-titres</div>
+                        <div id="MiddleContainer" class="op-middle-container disabled" min-width="886px" max-width="1279px">
+                            <div class="op-close op-hidden" id="CloseCrossModule">
+                                <a class="stop-anchor">
+                                    <!-- inject:close:svg -->
+                                    <svg version="1.1" baseProfile="tiny" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve"><path fill="#444444" d="M28.9,24L28.9,24l-8-8l8-8l0,0c0.1-0.1,0.1-0.2,0.2-0.3c0.1-0.3,0-0.6-0.2-0.9l-3.8-3.8 c-0.2-0.2-0.6-0.3-0.9-0.2c-0.1,0-0.2,0.1-0.3,0.2l0,0l-8,8l-8-8l0,0C7.9,3,7.8,2.9,7.7,2.9c-0.3-0.1-0.6,0-0.9,0.2L3.1,6.8 C2.8,7.1,2.8,7.4,2.9,7.7C2.9,7.8,3,7.9,3.1,8l0,0l8,8l-8,8l0,0c-0.1,0.1-0.1,0.2-0.2,0.3c-0.1,0.3,0,0.6,0.2,0.9l3.8,3.8   c0.2,0.2,0.6,0.3,0.9,0.2c0.1,0,0.2-0.1,0.3-0.2l0,0l8-8l8,8l0,0c0.1,0.1,0.2,0.1,0.3,0.2c0.3,0.1,0.6,0,0.9-0.2l3.8-3.8    c0.2-0.2,0.3-0.6,0.2-0.9C29.1,24.2,29,24.1,28.9,24z"></path></svg>
+                                    <!-- endinject -->
+                                </a>
+                            </div>
+                            <div class="op-screen op-languages op-hidden" id="LanguagesModule" min-width="886px" max-width="1279px">
+                                <div class="op-languages-container">
+                                    <div>
+                                        <div class="op-double-panel" id="languages-double-panel">
+                                            <div class="op-summary">
+                                                <div class="op-languages-title">Choix de la langue</div>
+                                            </div>
+                                            <div class="op-panel-container">
+                                                <div class="op-languages-title">Choix des sous-titres</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="op-screen op-settings-quality op-hidden" id="QualityModule" min-width="886px" max-width="1279px">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="op-quality-title">La qualité vidéo s'adapte au débit Internet</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <ul>
-                                                <li>Haute <span id="highBitrateSpan">1.2</span></li>
-                                                <li class="op-quality-current">Reçue <span id="bandwith-binding">1.2</span> Mbits</li>
-                                                <li>Basse <span id="lowBitrateSpan">0.2</span></li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="ControlBarModule" class="op-control-bar" min-width="886px" max-width="1279px">
-                        <div class="op-seek-bar" id="SeekBarModule" min-width="886px" max-width="1279px">
-                            <div class="op-seek-bar-time op-seek-bar-time-elapsed">
-                                <span>00:00:00</span>
-                            </div>
-                            <div class="bar-container">
-                                <div class="bar-background"></div>
-                                <div class="bar-seek" id="seekBar"></div>
-                            </div>
-                            <div class="op-seek-bar-time op-seek-bar-time-remaining">
-                                <span>00:00:00</span>
+                            <div class="op-screen op-settings-quality op-hidden" id="QualityModule" min-width="886px" max-width="1279px">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="op-quality-title">La qualité vidéo s'adapte au débit Internet</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <ul>
+                                                    <li>Haute <span id="highBitrateSpan">1.2</span></li>
+                                                    <li class="op-quality-current">Reçue <span id="bandwith-binding">1.2</span> Mbits</li>
+                                                    <li>Basse <span id="lowBitrateSpan">0.2</span></li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div class="op-controls">
-                            <div class="op-control-left">
-                                <a role="button" id="menuButton" title="Menu" class="tooltip first op-control-menu stop-anchor">
-                                    <div class="op-control">
-                                    <!-- inject:menu:svg -->
-                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Menu"><path fill="#000000" d="M1 4h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 14h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 24h30v4.286h-30v-4.286z"></path></svg>
-                                    <!-- endinject -->
-                                    </div>
-                                </a>
+                        <div id="ControlBarModule" class="op-control-bar" min-width="886px" max-width="1279px">
+                            <div class="op-seek-bar" id="SeekBarModule" min-width="886px" max-width="1279px">
+                                <div class="op-seek-bar-time op-seek-bar-time-elapsed">
+                                    <span>00:00:00</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar-background"></div>
+                                    <div class="bar-seek" id="seekBar"></div>
+                                </div>
+                                <div class="op-seek-bar-time op-seek-bar-time-remaining">
+                                    <span>00:00:00</span>
+                                </div>
                             </div>
-                            <div class="op-control-center">
-                                <a role="button" id="previousChannel" title="Flux précédent" class="tooltip op-chainemoins stop-anchor">
-                                    <div class="op-control">
-                                        <!-- inject:chainemoins:svg -->
-                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne précédente">    <g id="chaine-">        <g id="svg_5">            <path id="svg_6" d="m0.300001,4.670589v19.764704h5.435294v2.594118h20.629411v-2.594118h5.435293v-19.764704h-31.499998l0,0zm15.688235,20.505881c-0.617648,0 -1.111765,-0.494118 -1.111765,-1.111765c0,-0.617647 0.494117,-1.111763 1.111765,-1.111763c0.617646,0 1.111764,0.494116 1.111764,1.111763c0.123529,0.617647 -0.494118,1.111765 -1.111764,1.111765zm13.217647,-3.705883h-26.435294v-14.082351h26.435294v14.082351l0,0z" fill="#434343"></path>            <g id="svg_7">                <rect id="svg_8" height="2.470588" width="9.388235" fill="#434343" y="13.194118" x="11.294118"></rect>            </g>        </g>    </g></svg>
-                                    <!-- endinject -->
-                                    </div>
-                                </a>
-                                <a id="button-playpause" role="button" title="Play" class="tooltip op-play stop-anchor">
-                                    <div class="op-control">
-                                        <!-- inject:play2:svg -->
-                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Play">
-                                        <path id="svg_1" d="m3.626999,31.24099l26.127003,-15.241442l-26.127003,-15.235536l0,30.476978z" fill="#000000">
-                                        </path>
-                                        </svg>
+                            <div class="op-controls">
+                                <div class="op-control-left">
+                                    <a role="button" id="menuButton" title="Menu" class="tooltip first op-control-menu stop-anchor">
+                                        <div class="op-control">
+                                        <!-- inject:menu:svg -->
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Menu"><path fill="#000000" d="M1 4h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 14h30v4.286h-30v-4.286z"></path><path fill="#000000" d="M1 24h30v4.286h-30v-4.286z"></path></svg>
                                         <!-- endinject -->
-                                        <!-- inject:pause:svg -->
-                                        <!--?xml version="1.0" encoding="utf-8" ?-->
-                                        <svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Pause">
-                                        <g id="pause">
-                                            <g>
-                                                <rect id="svg_12" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="1.3">
-                                                </rect>
-                                                <rect id="svg_13" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="19.182475">
-                                                </rect>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="op-control-center">
+                                    <a role="button" id="previousChannel" title="Flux précédent" class="tooltip op-chainemoins stop-anchor">
+                                        <div class="op-control">
+                                            <!-- inject:chainemoins:svg -->
+                                            <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne précédente">    <g id="chaine-">        <g id="svg_5">            <path id="svg_6" d="m0.300001,4.670589v19.764704h5.435294v2.594118h20.629411v-2.594118h5.435293v-19.764704h-31.499998l0,0zm15.688235,20.505881c-0.617648,0 -1.111765,-0.494118 -1.111765,-1.111765c0,-0.617647 0.494117,-1.111763 1.111765,-1.111763c0.617646,0 1.111764,0.494116 1.111764,1.111763c0.123529,0.617647 -0.494118,1.111765 -1.111764,1.111765zm13.217647,-3.705883h-26.435294v-14.082351h26.435294v14.082351l0,0z" fill="#434343"></path>            <g id="svg_7">                <rect id="svg_8" height="2.470588" width="9.388235" fill="#434343" y="13.194118" x="11.294118"></rect>            </g>        </g>    </g></svg>
+                                        <!-- endinject -->
+                                        </div>
+                                    </a>
+                                    <a id="button-playpause" role="button" title="Play" class="tooltip op-play stop-anchor">
+                                        <div class="op-control">
+                                            <!-- inject:play2:svg -->
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Play">
+                                            <path id="svg_1" d="m3.626999,31.24099l26.127003,-15.241442l-26.127003,-15.235536l0,30.476978z" fill="#000000">
+                                            </path>
+                                            </svg>
+                                            <!-- endinject -->
+                                            <!-- inject:pause:svg -->
+                                            <!--?xml version="1.0" encoding="utf-8" ?-->
+                                            <svg version="1.1" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" xml:space="preserve" aria-label="Pause">
+                                            <g id="pause">
+                                                <g>
+                                                    <rect id="svg_12" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="1.3">
+                                                    </rect>
+                                                    <rect id="svg_13" height="27.126805" width="11.517526" fill="#424242" fill-rule="evenodd" y="2.286598" x="19.182475">
+                                                    </rect>
+                                                </g>
                                             </g>
-                                        </g>
-                                        </svg>
+                                            </svg>
+                                            <!-- endinject -->
+                                        </div>
+                                    </a>
+                                    <a role="button" id="nextChannel" title="Flux suivant" class="tooltip op-chaineplus stop-anchor">
+                                        <div class="op-control">
+                                            <!-- inject:chaineplus:svg -->
+                                            <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne suivante">    <g id="chaine_x2B__1_">        <g id="svg_1">            <path id="svg_2" d="m0.299999,4.774015v19.655905h5.43937v2.596062h20.521259v-2.596062h5.439371v-19.655905h-31.4l0,0zm15.7,20.397637c-0.61811,0 -1.112599,-0.494488 -1.112599,-1.112598c0,-0.618109 0.49449,-1.112597 1.112599,-1.112597c0.618112,0 1.112597,0.494488 1.112597,1.112597c0.123621,0.618111 -0.494486,1.112598 -1.112597,1.112598zm13.227559,-3.70866h-26.331496v-14.092914h26.331496v14.092914l0,0z" fill="#424242"></path>            <g id="svg_3">                <rect id="svg_4" height="9.395276" width="2.472441" fill="#424242" y="9.842519" x="14.763778"></rect>                <rect id="svg_5" height="2.472441" width="9.395276" fill="#424242" y="13.180314" x="11.302361"></rect>            </g>        </g>    </g></svg>
                                         <!-- endinject -->
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="op-control-right">
+                                    <a id="button-volume" role="button" title="Volume" class="tooltip op-sound stop-anchor">
+                                        <div class="op-control">
+                                            <!-- inject:son:svg -->
+                                            <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOn" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: block;">    <g id="svg_11">        <path fill="#000000" d="m20.561682,27.761684v2.641121c0,0 -3.081308,-2.641121 -3.521494,-3.081308c-1.46729,-1.320564 -2.934581,-2.641123 -4.401871,-3.961685c-0.440186,-0.440184 -1.027103,-0.586912 -1.614017,-0.586912c-3.228038,0 -6.309347,0 -9.537384,0c-0.146729,0 -0.440187,0 -0.586916,0v-13.645797c0,0 7.189721,0 10.1243,0c0.586914,0 1.173832,-0.293457 1.760747,-0.586917c2.494391,-2.200934 4.988786,-4.548598 7.483178,-6.749532c0.14673,-0.146729 0.14673,-0.146729 0.293457,-0.293458v26.264489l0,0l0,0z" id="svg_8"></path>        <path fill="#000000" d="m27.164488,23.653273l-0.146729,-0.14673c-0.440189,-0.440187 -0.58692,-1.027103 -0.293459,-1.614019c1.17383,-1.760748 1.907476,-3.814955 1.907476,-6.015887s-0.586916,-4.25514 -1.760748,-6.015888c-0.293459,-0.586916 -0.146729,-1.173832 0.293459,-1.614018l0.146729,-0.146729c0.586914,-0.440187 1.32056,-0.293459 1.760746,0.293457c2.787851,3.961682 3.228037,10.271029 -0.14673,14.966354c-0.440184,0.586918 -1.173828,0.733648 -1.760744,0.293461l0,0z" id="svg_9"></path>        <path fill="#000000" d="m23.496264,11.328037v0c0.586916,-0.440187 1.467289,-0.293458 1.760746,0.293458c1.32056,2.200934 1.614019,5.72243 -0.146729,8.51028c-0.440184,0.586916 -1.173832,0.733644 -1.760746,0.293459v0c-0.440189,-0.440186 -0.58692,-1.027103 -0.293459,-1.614017c0.586918,-0.880379 0.880373,-1.907478 0.880373,-2.934581s-0.293455,-2.054206 -0.733644,-2.934581c-0.293459,-0.586915 -0.146729,-1.17383 0.293459,-1.614017l0,0z" id="svg_10"></path>    </g></svg>
+                                            <!-- endinject -->
+                                            <!-- inject:mute:svg -->
+                                            <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: none;">    <g id="svg_7">        <path id="svg_4" d="m20.89936,27.96454v2.68648c0,0 -3.13423,-2.68648 -3.58197,-3.13422c-1.49249,-1.34324 -2.98498,-2.68649 -4.47747,-4.02972c-0.44775,-0.44774 -1.04474,-0.59699 -1.64174,-0.59699c-3.28348,0 -6.41771,0 -9.70118,0c-0.14925,0 -0.44775,0 -0.597,0v-13.88015c0,0 7.3132,0 10.29818,0c0.59699,0 1.19399,-0.2985 1.79099,-0.597c2.53723,-2.23873 5.07446,-4.62672 7.6117,-6.86545c0.14925,-0.14925 0.14925,-0.14925 0.29849,-0.2985v26.71556l0,0z" fill="#000000"></path>        <path id="svg_5" d="m24.32462,11.58148l6.88038,5.9625l-1.95516,2.25515l-6.88038,-5.9625l1.95516,-2.25515z" fill="#000000"></path>        <path id="svg_6" d="m31.12889,13.49038l-6.43711,6.43711l-2.11038,-2.11038l6.43711,-6.43711l2.11038,2.11038z" fill="#000000"></path>    </g></svg>
+                                            <!-- endinject -->
+                                        </div>
+                                    </a>
+                                    <a role="button" id="button-fullscreen" title="Plein écran" class="tooltip last op-zoom stop-anchor">
+                                        <div class="op-control">
+                                            <!-- inject:zoom_Big:svg -->
+                                            <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" aria-label="Plein écran"><g>  <path fill="#464545" d="M10.3,19.6h11.8v-7.1H10.3V19.6z M30.1,27.3v-5.2h1.6v6.7H25v-1.5L30.1,27.3z M7,27.3v1.5H0.2v-6.7h1.6v5.2     L7,27.3z M1.9,4.9v5.2H0.2V3.4H7v1.5L1.9,4.9z M30.3,5h-5.2V3.4h6.7v6.7h-1.5L30.3,5z"></path></g></svg>
+                                            <!-- endinject -->
+                                            <!-- inject:zoom_Small:svg -->
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Plein écran"><path fill="#000000" d="M26.1 9.2v3.9h2.4v-6.3h-6.7v2.4z"></path><path fill="#000000" d="M26.1 22.5h-4.3v2.4h6.7v-6.4h-2.4z"></path><path fill="#000000" d="M5.9 22.5v-4h-2.4v6.4h6.7v-2.4z"></path><path fill="#000000" d="M5.9 9.2h4.3v-2.4h-6.7v6.3h2.4z"></path><path fill="#000000" d="M10.6 12.8h10.7v6h-10.7v-6z"></path></svg>
+                                            <!-- endinject -->
+                                        </div>
+                                    </a>
+                                    <div id="panel-volume" role="slide" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% sound" class="op-container-volume op-hidden">
+                                        <span id="volumeLabel" class="op-volume-value">100</span>
+                                        <input id="slider-volume" class="op-volume op-range100" type="range" min="0" max="100" value="100">
                                     </div>
-                                </a>
-                                <a role="button" id="nextChannel" title="Flux suivant" class="tooltip op-chaineplus stop-anchor">
-                                    <div class="op-control">
-                                        <!-- inject:chaineplus:svg -->
-                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" xml:space="preserve" aria-label="Chaîne suivante">    <g id="chaine_x2B__1_">        <g id="svg_1">            <path id="svg_2" d="m0.299999,4.774015v19.655905h5.43937v2.596062h20.521259v-2.596062h5.439371v-19.655905h-31.4l0,0zm15.7,20.397637c-0.61811,0 -1.112599,-0.494488 -1.112599,-1.112598c0,-0.618109 0.49449,-1.112597 1.112599,-1.112597c0.618112,0 1.112597,0.494488 1.112597,1.112597c0.123621,0.618111 -0.494486,1.112598 -1.112597,1.112598zm13.227559,-3.70866h-26.331496v-14.092914h26.331496v14.092914l0,0z" fill="#424242"></path>            <g id="svg_3">                <rect id="svg_4" height="9.395276" width="2.472441" fill="#424242" y="9.842519" x="14.763778"></rect>                <rect id="svg_5" height="2.472441" width="9.395276" fill="#424242" y="13.180314" x="11.302361"></rect>            </g>        </g>    </g></svg>
-                                    <!-- endinject -->
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="op-control-right">
-                                <a id="button-volume" role="button" title="Volume" class="tooltip op-sound stop-anchor">
-                                    <div class="op-control">
-                                        <!-- inject:son:svg -->
-                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOn" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: block;">    <g id="svg_11">        <path fill="#000000" d="m20.561682,27.761684v2.641121c0,0 -3.081308,-2.641121 -3.521494,-3.081308c-1.46729,-1.320564 -2.934581,-2.641123 -4.401871,-3.961685c-0.440186,-0.440184 -1.027103,-0.586912 -1.614017,-0.586912c-3.228038,0 -6.309347,0 -9.537384,0c-0.146729,0 -0.440187,0 -0.586916,0v-13.645797c0,0 7.189721,0 10.1243,0c0.586914,0 1.173832,-0.293457 1.760747,-0.586917c2.494391,-2.200934 4.988786,-4.548598 7.483178,-6.749532c0.14673,-0.146729 0.14673,-0.146729 0.293457,-0.293458v26.264489l0,0l0,0z" id="svg_8"></path>        <path fill="#000000" d="m27.164488,23.653273l-0.146729,-0.14673c-0.440189,-0.440187 -0.58692,-1.027103 -0.293459,-1.614019c1.17383,-1.760748 1.907476,-3.814955 1.907476,-6.015887s-0.586916,-4.25514 -1.760748,-6.015888c-0.293459,-0.586916 -0.146729,-1.173832 0.293459,-1.614018l0.146729,-0.146729c0.586914,-0.440187 1.32056,-0.293459 1.760746,0.293457c2.787851,3.961682 3.228037,10.271029 -0.14673,14.966354c-0.440184,0.586918 -1.173828,0.733648 -1.760744,0.293461l0,0z" id="svg_9"></path>        <path fill="#000000" d="m23.496264,11.328037v0c0.586916,-0.440187 1.467289,-0.293458 1.760746,0.293458c1.32056,2.200934 1.614019,5.72243 -0.146729,8.51028c-0.440184,0.586916 -1.173832,0.733644 -1.760746,0.293459v0c-0.440189,-0.440186 -0.58692,-1.027103 -0.293459,-1.614017c0.586918,-0.880379 0.880373,-1.907478 0.880373,-2.934581s-0.293455,-2.054206 -0.733644,-2.934581c-0.293459,-0.586915 -0.146729,-1.17383 0.293459,-1.614017l0,0z" id="svg_10"></path>    </g></svg>
-                                        <!-- endinject -->
-                                        <!-- inject:mute:svg -->
-                                        <!--?xml version="1.0" encoding="utf-8" ?--><svg id="volumeOff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Volume" style="display: none;">    <g id="svg_7">        <path id="svg_4" d="m20.89936,27.96454v2.68648c0,0 -3.13423,-2.68648 -3.58197,-3.13422c-1.49249,-1.34324 -2.98498,-2.68649 -4.47747,-4.02972c-0.44775,-0.44774 -1.04474,-0.59699 -1.64174,-0.59699c-3.28348,0 -6.41771,0 -9.70118,0c-0.14925,0 -0.44775,0 -0.597,0v-13.88015c0,0 7.3132,0 10.29818,0c0.59699,0 1.19399,-0.2985 1.79099,-0.597c2.53723,-2.23873 5.07446,-4.62672 7.6117,-6.86545c0.14925,-0.14925 0.14925,-0.14925 0.29849,-0.2985v26.71556l0,0z" fill="#000000"></path>        <path id="svg_5" d="m24.32462,11.58148l6.88038,5.9625l-1.95516,2.25515l-6.88038,-5.9625l1.95516,-2.25515z" fill="#000000"></path>        <path id="svg_6" d="m31.12889,13.49038l-6.43711,6.43711l-2.11038,-2.11038l6.43711,-6.43711l2.11038,2.11038z" fill="#000000"></path>    </g></svg>
-                                        <!-- endinject -->
-                                    </div>
-                                </a>
-                                <a role="button" id="button-fullscreen" title="Plein écran" class="tooltip last op-zoom stop-anchor">
-                                    <div class="op-control">
-                                        <!-- inject:zoom_Big:svg -->
-                                        <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve" aria-label="Plein écran"><g>  <path fill="#464545" d="M10.3,19.6h11.8v-7.1H10.3V19.6z M30.1,27.3v-5.2h1.6v6.7H25v-1.5L30.1,27.3z M7,27.3v1.5H0.2v-6.7h1.6v5.2     L7,27.3z M1.9,4.9v5.2H0.2V3.4H7v1.5L1.9,4.9z M30.3,5h-5.2V3.4h6.7v6.7h-1.5L30.3,5z"></path></g></svg>
-                                        <!-- endinject -->
-                                        <!-- inject:zoom_Small:svg -->
-                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32" aria-label="Plein écran"><path fill="#000000" d="M26.1 9.2v3.9h2.4v-6.3h-6.7v2.4z"></path><path fill="#000000" d="M26.1 22.5h-4.3v2.4h6.7v-6.4h-2.4z"></path><path fill="#000000" d="M5.9 22.5v-4h-2.4v6.4h6.7v-2.4z"></path><path fill="#000000" d="M5.9 9.2h4.3v-2.4h-6.7v6.3h2.4z"></path><path fill="#000000" d="M10.6 12.8h10.7v6h-10.7v-6z"></path></svg>
-                                        <!-- endinject -->
-                                    </div>
-                                </a>
-                                <div id="panel-volume" role="slide" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% sound" class="op-container-volume op-hidden">
-                                    <span id="volumeLabel" class="op-volume-value">100</span>
-                                    <input id="slider-volume" class="op-volume op-range100" type="range" min="0" max="100" value="100">
                                 </div>
                             </div>
                         </div>

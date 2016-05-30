@@ -28,6 +28,7 @@ var orangeHasPlayer = null,
 function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
+   videoPlayerContainer = document.getElementById('VideoPlayerContainer');
 
     orangeHasPlayer.init(video);
     orangeHasPlayer.setDebug(true);
@@ -72,10 +73,10 @@ function registerHasPlayerEvents() {
 function registerAdsPlayerEvents() {
     if (adsPlayer) {
         adsPlayer.addEventListener('adStart',function(){
-            video.style.visibility = 'hidden';
+            videoPlayerContainer.style.visibility = 'hidden';
         });
         adsPlayer.addEventListener('adEnd',function(){
-            video.style.visibility = 'visible';
+            videoPlayerContainer.style.visibility = 'visible';
         });
     }
 }
