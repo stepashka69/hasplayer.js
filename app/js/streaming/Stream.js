@@ -490,16 +490,21 @@ MediaPlayer.dependencies.Stream = function() {
                 speed,
                 ratio = 0.9,
                 seekValue,
+                videoEndedEvent,
                 delay,
                 _seek = function(delay, seekValue) {
                     if (self.videoModel.getCurrentTime() === self.getStartTime() || tmEndDetected) {
                         self.debug.log("[Stream] Trick mode (x" + tmSpeed + "): stop");
+                        if (tmEndDetected) {
+                            videoEndedEvent = new Event('ended');
+                            self.videoModel.getElement().dispatchEvent(videoEndedEvent);
+                        }
                         return;
                     }
                     if (seekValue < self.getStartTime()) {
                         seekValue = self.getStartTime();
                     } else if (seekValue >= self.videoModel.getDuration()) {
-                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;
+                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;                       
                         tmEndDetected = true;
                     }
                     if (delay > 0) {

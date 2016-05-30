@@ -511,8 +511,8 @@ Mss.dependencies.MssParser = function() {
                     lastSegment = adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray[adaptations[i].SegmentTemplate.SegmentTimeline.S_asArray.length-1];
                     adaptationTimeOffset = parseFloat(firstSegment.t) / TIME_SCALE_100_NANOSECOND_UNIT;
                     period.start = (period.start === 0) ? adaptationTimeOffset : Math.max(period.start, adaptationTimeOffset);
-                     //get last segment start time, add the duration of this last segment
-                    realDuration = (lastSegment.t + lastSegment.d) / TIME_SCALE_100_NANOSECOND_UNIT;
+                    //get last segment start time, add the duration of this last segment
+                    realDuration = parseFloat(((lastSegment.t + lastSegment.d) / TIME_SCALE_100_NANOSECOND_UNIT).toFixed(3));
                     //detect difference between announced duration (in MSS manifest) and real duration => in any case, we want that the video element sends the ended event.
                     //set the smallest value between all the adaptations
                     if (!isNaN(realDuration) && realDuration < mpd.mediaPresentationDuration) {
