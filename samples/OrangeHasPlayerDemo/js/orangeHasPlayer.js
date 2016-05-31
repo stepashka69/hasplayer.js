@@ -3,6 +3,7 @@ var orangeHasPlayer = null,
     adsPlayer = null,
     config = null,
     video = null,
+    videoPlayerContainer = null,
     currentStreamInfos = null,
     confMetricsAgent = {
         'name': 'Prisme (local)',
@@ -28,7 +29,7 @@ var orangeHasPlayer = null,
 function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
-   videoPlayerContainer = document.getElementById('VideoPlayerContainer');
+    videoPlayerContainer = document.getElementById('VideoPlayerContainer');
 
     orangeHasPlayer.init(video);
     orangeHasPlayer.setDebug(true);
