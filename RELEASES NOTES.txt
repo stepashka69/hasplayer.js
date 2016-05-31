@@ -1,9 +1,9 @@
 ### Release Notes v1.3.1 (2016/05/31)
 * Bugs fixing:
 * - No error raised when empty challenge received from CDM
-* - MANIFEST_ERR_NO_VIDEO/AUDIO raised even if video/audio data
+* - MANIFEST_ERR_NO_VIDEO/AUDIO raised even if video/audio track in manifest
 * - Regression on stream reset process that locks the player
-* - Missing HTTP status code when raising DOWNLOAD_ERR_CONTENT error
+* - Missing HTTP status code when raising DOWNLOAD_ERR_CONTENT
 * - 'ended' event may not be raised on <video> element when reaching end of stream
 * - Byte-range requests for DASH
 
