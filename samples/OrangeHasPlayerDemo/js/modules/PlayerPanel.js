@@ -558,7 +558,7 @@ PlayerPanel.prototype.addLanguageLine = function(audioTrack, selectedAudioTrack)
     var html = this.createLanguageLine(audioTrack, selectedAudioTrack, 'language'),
         languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
-    document.getElementById(audioTrack.id).addEventListener('click', this.onLanguageRadioClicked.bind(this));
+    document.getElementById(audioTrack.id ?audioTrack.id:audioTrack.lang).addEventListener('click', this.onLanguageRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {

@@ -84,7 +84,7 @@ SettingsPanel.prototype.initMetricsAgentOptions = function() {
 
 SettingsPanel.prototype.audioChanged = function(e) {
     changeAudio(this.audioTracks[e.target.selectedIndex]);
-    document.getElementById(this.audioTracks[e.target.selectedIndex].id).checked = true;
+    document.getElementById(this.audioTracks[e.target.selectedIndex].id ? this.audioTracks[e.target.selectedIndex].id : this.audioTracks[e.target.selectedIndex].lang ).checked = true;
 };
 
 SettingsPanel.prototype.subtitleChanged = function(e) {
