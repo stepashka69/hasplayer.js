@@ -97,7 +97,7 @@ SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
         i = 0,
         len = 0;
     for (i = 0, len = tracks.length; i < len; i += 1) {
-        if (tracks[i].id === id) {
+        if (tracks[i].lang === id) {
             index = i;
             break;
         }
@@ -220,9 +220,9 @@ SettingsPanel.prototype.addCombo = function(tracks, combo) {
 
     for (i = 0; i < tracks.length; i += 1) {
         option = document.createElement('option');
-        option.text = tracks[i].id;
+        option.text = tracks[i].id || tracks[i].lang;
         option.value = tracks[i].lang;
-        option.id = tracks[i].id;
+        option.id = tracks[i].lang;
 
         try {
             combo.add(option, null); //Standard
