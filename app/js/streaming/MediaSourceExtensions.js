@@ -53,6 +53,8 @@ MediaPlayer.dependencies.MediaSourceExtensions.prototype = {
         var i,
             updating = false;
 
+        if (source.readyState !== 'open') return source.duration;
+
         for (i = 0; i < source.sourceBuffers.length; i++) {
             if(source.sourceBuffers[i].updating){
                 updating = true;
