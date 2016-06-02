@@ -89,7 +89,7 @@ SettingsPanel.prototype.audioChanged = function(e) {
 
 SettingsPanel.prototype.subtitleChanged = function(e) {
     changeSubtitle(this.subtitleTracks[e.target.selectedIndex]);
-    document.getElementById(this.subtitleTracks[e.target.selectedIndex].id).checked = true;
+    document.getElementById(this.subtitleTracks[e.target.selectedIndex].id ? this.subtitleTracks[e.target.selectedIndex].id : this.subtitleTracks[e.target.selectedIndex].lang ).checked = true;
 };
 
 SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
@@ -97,7 +97,8 @@ SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
         i = 0,
         len = 0;
     for (i = 0, len = tracks.length; i < len; i += 1) {
-        if (tracks[i].lang === id) {
+        if((tracks[i].id && tracks[i].id === id) ||
+           (tracks[i].lang && tracks[i].lang === id)){
             index = i;
             break;
         }

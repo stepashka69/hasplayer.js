@@ -565,7 +565,7 @@ PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitle
     var html = this.createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle'),
         subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
-    document.getElementById(subtitleTrack.id).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
+    document.getElementById(subtitleTrack.id ?subtitleTrack.id:subtitleTrack.lang).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
