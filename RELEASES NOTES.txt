@@ -1,3 +1,10 @@
+### Release Notes v1.3.2 (2016/06/06)
+* - Add support for subtitles in external xml file
+* Bugs fixing:
+* - Regression on IE11 (player on failure)
+* - Correct rounding issue for end of stream detection by the <video> element
+* - Correct issue for multi-lines subtitles
+
 ### Release Notes v1.3.1 (2016/05/31)
 * Bugs fixing:
 * - No error raised when empty challenge received from CDM
