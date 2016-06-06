@@ -84,11 +84,13 @@ SettingsPanel.prototype.initMetricsAgentOptions = function() {
 
 SettingsPanel.prototype.audioChanged = function(e) {
     changeAudio(this.audioTracks[e.target.selectedIndex]);
+    //change audio language in PlayerPanel.
     document.getElementById(this.audioTracks[e.target.selectedIndex].id ? this.audioTracks[e.target.selectedIndex].id : this.audioTracks[e.target.selectedIndex].lang ).checked = true;
 };
 
 SettingsPanel.prototype.subtitleChanged = function(e) {
     changeSubtitle(this.subtitleTracks[e.target.selectedIndex]);
+    //change subtitle language in PlayerPanel.
     document.getElementById(this.subtitleTracks[e.target.selectedIndex].id ? this.subtitleTracks[e.target.selectedIndex].id : this.subtitleTracks[e.target.selectedIndex].lang ).checked = true;
 };
 
@@ -107,8 +109,8 @@ SettingsPanel.prototype.getTrackIndex = function(tracks, id) {
     return index;
 };
 
-SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track) {
-    var index = this.getTrackIndex(this.audioTracks, track);
+SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track_id) {
+    var index = this.getTrackIndex(this.audioTracks, track_id);
 
     if (index > -1) {
         changeAudio(this.audioTracks[index]);
@@ -125,12 +127,14 @@ SettingsPanel.prototype.onEnableSubtitles = function() {
         var index = this.getTrackIndex(this.subtitleTracks, this.currentsubtitleTrack.id);
         if (index > -1) {
             this.subtitleListCombobox.selectedIndex = index;
+            //init subtitle language in PlayerPanel too.
+            document.getElementById(this.subtitleTracks[index].id ? this.subtitleTracks[index].id : this.subtitleTracks[index].lang ).checked = true;
         }
     }
 };
 
-SettingsPanel.prototype.onSubtitleChangedFromPlayer = function(track) {
-    var index = this.getTrackIndex(this.subtitleTracks, track);
+SettingsPanel.prototype.onSubtitleChangedFromPlayer = function(track_id) {
+    var index = this.getTrackIndex(this.subtitleTracks, track_id);
 
     if (index > -1) {
         changeSubtitle(this.subtitleTracks[index]);

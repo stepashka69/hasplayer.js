@@ -537,7 +537,7 @@ PlayerPanel.prototype.enableMiddleContainer = function(enabled) {
 };
 
 PlayerPanel.prototype.createLanguageLine = function(track, selectedTrack, type) {
-    var checked = (track.id && selectedTrack.id === track.id) || (track.lang && selectedTrack.lang === track.lang) ? 'checked="checked"' : '',
+    var checked = selectedTrack ? (track.id && selectedTrack.id === track.id) || (track.lang && selectedTrack.lang === track.lang) ? 'checked="checked"' : '' : false,
         lang = (track.lang || track.id),
         html = '<div class="op-languages-line">' +
         '<input type="radio" name="' + type + '" id="' + (track.id || track.lang) + '" value="' + (track.id || track.lang) + '" ' + checked + ' >' +
@@ -570,7 +570,7 @@ PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitle
 
 PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
     var i = 0;
-    if (_audioTracks && _currenTrack) {
+    if (_audioTracks) {
         for (i = 0; i < _audioTracks.length; i += 1) {
             this.addLanguageLine(_audioTracks[i], _currenTrack);
         }
@@ -580,7 +580,7 @@ PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
 PlayerPanel.prototype.updateSubtitleData = function(_subtitleTracks, _selectedSubtitleTrack) {
     var i = 0;
 
-    if (_subtitleTracks && _selectedSubtitleTrack) {
+    if (_subtitleTracks) {
         for (i = 0; i < _subtitleTracks.length; i += 1) {
             this.addSubtitleLine(_subtitleTracks[i], _selectedSubtitleTrack);
         }
