@@ -1118,6 +1118,59 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
         return deferred.promise;
     };
 
+    ///////////////////////////////// WebTV VOD //////////////////////////////////
+
+    if(vars && vars.hasOwnProperty("webtv-vod")){
+        $scope.showWEBTVVod = true;
+    }else{
+        $scope.showWEBTVVod = false;
+    }
+
+    // get webtv config
+    var webtvConfigReq = new XMLHttpRequest();
+    var webtvConfig;
+    webtvConfigReq.onload = function() {
+        if (webtvConfigReq.status === 200) {
+            webtvConfig = JSON.parse(webtvConfigReq.responseText);
+            $scope.webtv_login_url = webtvConfig.webtv_login_url;
+            $scope.webtv_video_playing_infos_url = webtvConfig.webtv_video_playing_infos_url;
+        }
+    };
+    webtvConfigReq.open("GET", "webtv_vod_config.json", true);
+    webtvConfigReq.setRequestHeader("Content-type", "application/json");
+    webtvConfigReq.send();
+
+    $scope.doGetVODWebtvInfo = function(){
+        sendJsonReq($scope.webtv_login_url).then(function(){
+            sendJsonReq($scope.webtv_video_playing_infos_url).then(function(response){
+                var videoInfos = JSON.parse(response);
+                if(videoInfos.error){
+                    alert("ERROR :"+videoInfos.error.code+"\n"+videoInfos.error.message);
+                }else{
+                    console.log(videoInfos);
+                    var protData = {};
+                    if(videoInfos.response.protectionData){
+                        for(var i=0;i<videoInfos.response.protectionData.length; i++){
+                            var prData = videoInfos.response.protectionData[i];
+                            prData.laURL = prData.laUrl;
+                            prData.cdmData = videoInfos.response.drmToken;
+                            protData[prData.keySystem] = prData;
+                        }
+                    }
+                    $scope.selectedItem = {
+                        'url':videoInfos.response.url,
+                        'protData':protData
+                    };
+                    setProtectionData();
+                    $scope.$apply();
+                }
+            });
+        });
+    };
+
+
+    //////////////////////////////// WebTV VOD ///////////////////////////////////
+
     ///////////////////////////////// RIGHTV ////////////////////////////////////
     if (vars && vars.hasOwnProperty("rightv")) {
         $scope.showRIGHTv = true;//(vars.rightv === "true");
