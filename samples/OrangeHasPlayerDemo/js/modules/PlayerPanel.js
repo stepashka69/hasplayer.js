@@ -136,6 +136,8 @@ PlayerPanel.prototype.setupEventListeners = function() {
 
     this.video.addEventListener('waiting', this.onWaiting.bind(this));
     this.video.addEventListener('playing', this.onPlaying.bind(this));
+
+    minivents.on('subtitle-radio-clicked', this.onSubtitleEnableChanged.bind(this));
 };
 
 
@@ -439,6 +441,9 @@ PlayerPanel.prototype.onFullScreenClicked = function() {
         document.getElementById('demo-player-container').className = 'demo-player';
     }
     if (this.subtitlesCSSStyle) {
+        if (this.isSubtitleExternDisplay) {
+            this.subTitles.style.left = ((this.video.clientWidth / 2) - (this.subTitles.clientWidth / 2)) + 'px'; // center subtitle on the video
+        }
         this.applySubtitlesCSSStyle(this.subtitlesCSSStyle);
     }
 };
@@ -477,15 +482,15 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
 };
 
 PlayerPanel.prototype.enterSubtitle = function(subtitleData) {
-    var style = subtitleData.style;
+    if (orangeHasPlayer.isSubtitlesEnabled()) {
+        this.subtitlesCSSStyle = subtitleData.style;
     
-    this.subtitlesCSSStyle = style;
-   
-    this.applySubtitlesCSSStyle(style);
+        this.applySubtitlesCSSStyle(subtitleData.style);
 
     if (this.isSubtitleExternDisplay && subtitleData.text) {
         this.subTitles.innerText = subtitleData.text;   // write the text
         this.subTitles.style.left = ((this.video.clientWidth / 2) - (this.subTitles.clientWidth/2))+'px';  // center subtitle on the video
+    }
     }
 };
 
@@ -498,6 +503,12 @@ PlayerPanel.prototype.cleanSubtitlesDiv = function(){
 
 PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
     this.cleanSubtitlesDiv();
+};
+
+PlayerPanel.prototype.onSubtitleEnableChanged = function(enable) {
+    if (!enable) {
+        this.cleanSubtitlesDiv();
+    }
 };
 
 PlayerPanel.prototype.onLanguagesClicked = function() {
