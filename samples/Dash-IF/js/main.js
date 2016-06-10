@@ -1112,6 +1112,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
             }
         };
         req.open("GET", url, true);
+        req.withCredentials=true;
         req.setRequestHeader("Content-type", "application/json");
         req.send();
 
