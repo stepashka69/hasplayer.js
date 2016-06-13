@@ -1,3 +1,7 @@
+### Release Notes v1.3.3 (2016/06/13)
+* Bugs fixing:
+* - Correct PlayReady CDM data to disable proactive (pre-delivery) license acquisition
+
 ### Release Notes v1.3.2 (2016/06/06)
 * - Add support for subtitles in external xml file
 * Bugs fixing:
