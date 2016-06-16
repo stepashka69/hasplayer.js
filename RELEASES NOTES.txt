@@ -1,4 +1,4 @@
-### Release Notes v1.3.4 (2016/06/17)
+### Release Notes v1.3.4 (2016/06/16)
 * Bugs fixing:
 * - Correct regression on abandon request rule
 * - Correct 'ended' event detection when trick mode is enabled
