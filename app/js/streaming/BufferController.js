@@ -863,6 +863,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment for time: " + segmentTime);
                 self.indexHandler.getSegmentRequestForTime(_currentRepresentation, segmentTime).then(onFragmentRequest.bind(self), function (){
                     currentDownloadQuality = -1;
+                    doStop.call(self);
                     signalSegmentBuffered.call(self);
                 });
             }
@@ -879,16 +880,16 @@ MediaPlayer.dependencies.BufferController = function() {
             }
 
             if (request !== null) {
+                //if trick mode enbaled, get the request to get I Frame data.
+                if (trickModeEnabled) {
+                    request = self.indexHandler.getIFrameRequest(request);
+                }
+                
                 // If we have already loaded the given fragment ask for the next one. Otherwise prepare it to get loaded
                 if (self.fragmentController.isFragmentLoadedOrPending(self, request)) {
                     self.debug.log("[BufferController][" + type + "] new fragment request => already loaded or pending");
                     self.indexHandler.getNextSegmentRequest(_currentRepresentation).then(onFragmentRequest.bind(self));
                 } else {
-                    //if trick mode enbaled, get the request to get I Frame data.
-                    if (trickModeEnabled) {
-                        request = self.indexHandler.getIFrameRequest(request);
-                    }
-
                     // Download the segment
                     self.fragmentController.prepareFragmentForLoading(self, request, onBytesLoadingStart, onBytesLoaded, onBytesError, null /*signalStreamComplete*/ );
                     sendRequest.call(self);
@@ -1202,41 +1203,24 @@ MediaPlayer.dependencies.BufferController = function() {
 
         onFragmentLoadProgress = function(evt) {
             var self = this,
-                i = 0,
-                len = 0,
-                type = evt.data.request.streamType,
-                metricsHttp = evt.data.httpRequestMetrics,
-                lastTraceTime = evt.data.lastTraceTime,
-                currentTime,
+                currentQuality = this.abrController.getQualityFor(type),
+                i,
                 rules;
 
-            //self.debug.log("[BufferController]["+type+"] Download request " + evt.data.request.url + " is in progress");
+            // Check only if not at lowest quality
+            if (this.abrController.isMinQuality(type, data, currentQuality)) {
+                return;
+            }
 
             rules = self.abrRulesCollection.getRules(MediaPlayer.rules.BaseRulesCollection.prototype.ABANDON_FRAGMENT_RULES);
             var callback = function(switchRequest) {
-
-                var newQuality = switchRequest.quality,
-                    abrCurrentQuality = self.abrController.getQualityFor(type);
-
-                if (newQuality < abrCurrentQuality) {
-                    self.debug.info("[BufferController][" + type + "] Abandon current fragment : " + evt.data.request.url);
-
-                    currentTime = new Date();
-
-                    metricsHttp.tfinish = currentTime;
-                    metricsHttp.bytesLength = evt.data.request.bytesLoaded;
-
-                    self.metricsModel.appendHttpTrace(metricsHttp,
-                        currentTime,
-                        currentTime.getTime() - lastTraceTime.getTime(), [evt.data.request.bytesLoaded ? evt.data.request.bytesLoaded : 0]);
-
+                if (switchRequest.quality < currentQuality) {
                     self.fragmentController.abortRequestsForModel(fragmentModel);
-                    self.debug.info("[BufferController][" + type + "] Segment download abandonned => Retry segment download at lowest quality");
-                    self.abrController.setQualityFor(type, newQuality);
+                    self.debug.info("[BufferController][" + type + "] Abandon current segment download");
                 }
             };
 
-            for (i = 0, len = rules.length; i < len; i += 1) {
+            for (i = 0; i < rules.length; i++) {
                 rules[i].execute(evt.data.request, callback);
             }
         },
@@ -1405,6 +1389,11 @@ MediaPlayer.dependencies.BufferController = function() {
             if (languageChanged) {
                 self.debug.log("[BufferController][" + type + "] Language changed");
                 cancelCheckBufferTimeout.call(this);
+                //for xml subtitles file, reset cues and restart buffering
+                if (type === 'text' && (data.mimeType === 'application/ttml+xml')) {
+                    buffer.abort();
+                    doStart.call(self);
+                }
             }
         },
 
@@ -1616,10 +1605,6 @@ MediaPlayer.dependencies.BufferController = function() {
                 return deferred.promise;
             }
             trickModeEnabled = enabled;
-
-            if (this.fragmentController.setSampleDuration) {
-                this.fragmentController.setSampleDuration(trickModeEnabled);
-            }
 
             if (trickModeEnabled) {
                 // Trick mode enabled

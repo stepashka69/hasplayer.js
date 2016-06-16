@@ -492,6 +492,18 @@
                     </div>
                 </div>
 
+                <div class="panel" id="webtv-vodPanel" ng-show="showWEBTVVod">
+                    <div class="panel-heading panel-top">
+                        <span class="panel-title">VOD WebTV</span>
+                    </div>
+                    <div class="panel-body">
+                        login_url: <input type="text" class="form-control" placeholder="login url" ng-model="webtv_login_url">
+                        playable_videos_url: <input type="text" class="form-control" placeholder="video playing infos url" ng-model="webtv_video_playing_infos_url">
+                        <button class="btn btn-primary" ng-disabled="!video_external_id" type="button" ng-click="doGetVODWebtvInfo()" style="border-radius: 0;">Get VOD playing Info</button>
+                    </div>
+                </div>
+
+
                 <div class="panel" id="orangeVodPanel" ng-show="showOrangeTV">
                     <div class="panel-heading panel-top">
                         <span class="panel-title">Orange VOD</span>

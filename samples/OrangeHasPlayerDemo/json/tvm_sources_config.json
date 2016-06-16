@@ -1,33 +1,44 @@
 {
-    "server": "http://chaines-tv.orange.fr/live-webapp/v2/PC/",
-    "channels":[
-        {
-            "id":192,
-            "name":"TF1"
-        },
-        {
-            "id":118,
-            "name":"M6"
-        },
-        {
-            "id":119,
-            "name":"W9"
-        },
-        {
-            "id":4,
-            "name":"France 2"
-        },
-        {
-            "id":446,
-            "name":"NT1"
-        },
-        {   "id":444,
-            "name":"NRJ 12"
-        },
-        {   "id":300,
-            "name":"ARTE HALO"
-        }
-
-
-    ]
+    "Live": {
+        "baseUrl": "http://chaines-tv.orange.fr/live-webapp/v2/PC/channels/",
+        "streams":[
+            {
+                "name": "TF1",
+                "url": 192
+            },
+            {
+                "name": "France2",
+                "url": 4
+            },
+            {
+                "name":"M6",
+                "url":118
+            },
+            {
+                "name": "W9",
+                "url": 119
+            },
+            {
+                "name": "NT1",
+                "url": 446
+            },
+            {
+                "name": "NRJ12",
+                "url": 444
+            },
+            {
+                "name": "ARTE (HALO)",
+                "url": 300
+            }
+        ]
+    },
+    "VOD": {
+        "baseUrl": "http://tv-a-la-demande.orange.fr/catchup-webapp/user/channels/",
+        "streams":[
+            {
+                "name": "France2",
+                "url": "catchuptv_france2/videos/FR2CU0034129"
+            }
+        ]
+    }
 }

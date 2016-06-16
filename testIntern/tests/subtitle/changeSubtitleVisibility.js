@@ -34,6 +34,7 @@ define([
 
         // Test variables
         var command = null,
+            _selectedSubtitleTrack,
             i;
 
         var test = function (stream) {
@@ -48,9 +49,14 @@ define([
                 },
 
                 play: function() {
-                    tests.logLoadStream(NAME, stream);
-                    return command.execute(player.setDefaultSubtitleLanguage,[stream.defaultSubtitleLang])
+                    tests.log(NAME, 'enable subtitles external display');
+                    return command.execute(player.enableSubtitleExternDisplay,[true])
                     .then(function () {
+                        tests.log(NAME, 'set default subtitles language to '+stream.defaultSubtitleLang);
+                        return command.execute(player.setDefaultSubtitleLanguage,[stream.defaultSubtitleLang]);
+                    })
+                    .then(function () {
+                        tests.logLoadStream(NAME, stream);
                         return command.execute(player.loadStream, [stream]);
                     })
                     .then(function () {
@@ -58,16 +64,34 @@ define([
                         return tests.executeAsync(command, video.isPlaying, [PROGRESS_DELAY], ASYNC_TIMEOUT);
                     })
                     .then(function() {
+                        tests.log(NAME, 'enable subtitles');
                         return command.execute(player.setSubtitlesVisibility,[true]);
                     })
                     .then(function () {
+                        tests.log(NAME, 'check subtitles display');
+                        return command.sleep(5 * 1000).execute(player.getSubtitlesVisibility);
+                    })
+                    .then( function (subtitleDisplay) {
+                        assert.isTrue(subtitleDisplay === true);
                         tests.log(NAME, 'subtitles visibility ok');
                         return command.execute(player.getSelectedSubtitleLanguage);
                     })
                     .then(function (subtitleTrack) {
+                         _selectedSubtitleTrack = subtitleTrack;
                         tests.log(NAME, 'current subtitleTrack lang = '+subtitleTrack.lang);
                         tests.log(NAME, 'default subtitleTrack lang = '+stream.defaultSubtitleLang);
                         assert.isTrue(subtitleTrack.lang === stream.defaultSubtitleLang);
+                        return tests.executeAsync(command, player.waitForEvent, ['cueEnter'], config.asyncTimeout);
+                    })
+                    .then(function (subtitlesData) {
+                        for (var i = 0; i < stream.subtitleTracks.length; i++) {
+                            if (stream.subtitleTracks[i].lang === _selectedSubtitleTrack.lang) {
+                                assert.isTrue(subtitlesData.data.style.backgroundColor === stream.subtitleTracks[i].style.backgroundColor);
+                                assert.isTrue(subtitlesData.data.style.color === stream.subtitleTracks[i].style.color);
+                                break;
+                            }
+                        }
+                        tests.log(NAME, 'subtitle data style is OK');
                         return command.execute(player.setSubtitlesVisibility,[false]);
                     })
                     .then(function () {

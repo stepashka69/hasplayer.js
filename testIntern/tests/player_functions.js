@@ -68,11 +68,11 @@ define([], function () {
         },
 
         setSelectedAudioLanguage: function(audioTrack) {
-            return orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.AUDIO,audioTrack);
+            orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.AUDIO,audioTrack);
         },
 
         setDefaultAudioLanguage: function(lang) {
-            return orangeHasPlayer.setDefaultAudioLang(lang);
+            orangeHasPlayer.setDefaultAudioLang(lang);
         },
 
         getSubtitleLanguages: function() {
@@ -84,15 +84,23 @@ define([], function () {
         },
 
         setSelectedSubtitleLanguage: function(subtitleTrack) {
-            return orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.TEXT,subtitleTrack);
+            orangeHasPlayer.selectTrack(MediaPlayer.TRACKS_TYPE.TEXT,subtitleTrack);
         },
 
         setSubtitlesVisibility: function(state) {
-            return orangeHasPlayer.enableSubtitles(state);
+            orangeHasPlayer.enableSubtitles(state);
+        },
+
+        getSubtitlesVisibility: function() {
+            return orangeHasPlayer.isSubtitlesEnabled();
+        },
+
+        enableSubtitleExternDisplay: function(state) {
+            orangeHasPlayer.enableSubtitleExternDisplay(state);
         },
 
         setDefaultSubtitleLanguage: function(lang) {
-            return orangeHasPlayer.setDefaultSubtitleLang(lang);
+            orangeHasPlayer.setDefaultSubtitleLang(lang);
         },
 
         isLive: function() {
@@ -104,9 +112,9 @@ define([], function () {
         },
 
         waitForEvent: function (event, done) {
-            var onEventHandler = function() {
+            var onEventHandler = function(param) {
                     orangeHasPlayer.removeEventListener(event, onEventHandler);
-                    done(true);
+                    done(param ? param : true);
                 };
 
             orangeHasPlayer.addEventListener(event, onEventHandler);

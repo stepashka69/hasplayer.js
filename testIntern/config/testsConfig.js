@@ -122,6 +122,13 @@ define(function(require) {
                             streams.MSS_VOD_1,
                             streams.MSS_LIVE_1
                         ]
+                    },
+                    endedEvent: {
+                        streams: [
+                            streams.MSS_VOD_1,
+                            streams.MSS_VOD_2,
+                            streams.MSS_VOD_3
+                        ] 
                     }
                 },
 
