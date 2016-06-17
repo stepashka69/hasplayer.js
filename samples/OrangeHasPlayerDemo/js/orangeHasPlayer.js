@@ -224,6 +224,11 @@ function loadStream(streamInfos, optimizedZappingEnabled) {
         orangeHasPlayer.setInitialQualityFor('audio', 0);
     }
     currentStreamInfos = streamInfos;
+
+    var startTime = settingsPanel.getStartTime();
+    if (startTime.length > 0) {
+        currentStreamInfos.startTime = startTime;
+    }
     orangeHasPlayer.load(streamInfos);
 }
 
