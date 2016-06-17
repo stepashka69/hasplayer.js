@@ -340,6 +340,25 @@ MediaPlayer.utils.TTMLParser = function() {
             return returnTime;
         },
 
+        computeCellResolution = function(cellResolution) {
+            if (!cellResolution) {
+                //default cell resolution defined in TTML documentation
+                cellResolution = '32 15';
+            }
+
+            var computedCellResolution = cellResolution,
+                i = 0;
+           
+
+            computedCellResolution = computedCellResolution.split(' ');
+
+            for (i = 0; i < computedCellResolution.length; i += 1) {
+                computedCellResolution[i] = parseFloat(computedCellResolution[i]);
+            }
+
+            return computedCellResolution;
+        },
+
         computeTextOutline = function(textOutline, cellResolution, defaultColor) {
             var computedTextOutline = {
                     color: null,
@@ -379,6 +398,7 @@ MediaPlayer.utils.TTMLParser = function() {
         computeFontSize = function(fontSize, cellResolution) {
             var formatFontSize,
                 cellsSize,
+                i,
                 computedFontSize = fontSize;
 
             if (fontSize) {
@@ -394,10 +414,15 @@ MediaPlayer.utils.TTMLParser = function() {
                 case 'c':
                     //define fontSize in %
                     cellsSize = fontSize.replace(/\s/g, '').split('c');
-                    if (cellsSize.length > 1) {
-                        computedFontSize = (parseFloat(cellsSize[1] / cellResolution[1], 10) * 100).toFixed(1) + '%';
+
+                    for (i = 0; i < cellsSize.length; i += 1) {
+                        cellsSize[i] = parseFloat(cellsSize[i]);
+                    }
+
+                    if (isNaN(cellsSize[1])) {
+                        computedFontSize = (cellsSize[0] / cellResolution[1] * 100).toFixed(1) + '%';
                     } else {
-                        computedFontSize = (parseFloat(cellsSize[0] / cellResolution[1], 10) * 100).toFixed(1) + '%';
+                        computedFontSize = (cellsSize[1] / cellResolution[1] * 100).toFixed(1) + '%';
                     }
                     break;
                 case 'px':
@@ -528,12 +553,8 @@ MediaPlayer.utils.TTMLParser = function() {
                                             extent = findStyleElement.call(this, [textDatas[j], region, divBody], 'extent');
 
                                             cellResolution = findParameterElement.call(this, [textDatas[j], region, divBody, nodeTt], globalPrefParameterNameSpace, 'cellResolution');
-                                            if (!cellResolution) {
-                                                //default cell resolution defined in TTML documentation
-                                                cellResolution = '32 15';
-                                            }
+                                            cellResolution = computeCellResolution(cellResolution);
 
-                                            cellResolution = cellResolution.split(' ');
                                             cssStyle.textOutline = computeTextOutline(textOutline, cellResolution, cssStyle.color);
                                             cssStyle.fontSize = computeFontSize(cssStyle.fontSize, cellResolution);
                                         }
@@ -565,12 +586,7 @@ MediaPlayer.utils.TTMLParser = function() {
                                     extent = findStyleElement.call(this, [region, divBody], 'extent');
 
                                     cellResolution = findParameterElement.call(this, [region, divBody], globalPrefParameterNameSpace, 'cellResolution');
-                                    if (!cellResolution) {
-                                        //default cell resolution defined in TTML documentation
-                                        cellResolution = '32 15';
-                                    }
-
-                                    cellResolution = cellResolution.split(' ');
+                                    cellResolution = computeCellResolution(cellResolution);
 
                                     cssStyle.textOutline = computeTextOutline(textOutline, cellResolution, cssStyle.color);
                                     cssStyle.fontSize = computeFontSize(cssStyle.fontSize, cellResolution);
