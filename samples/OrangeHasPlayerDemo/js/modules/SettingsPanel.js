@@ -12,6 +12,7 @@ var SettingsPanel = function() {
 
     // Settings
     this.settingsMenuButton = null;
+    this.startTime = null;
     this.enableMetricsCheckbox = null;
     this.enableOptimzedZappingCheckbox = null;
     this.metricsAgentCombobox = null;
@@ -30,6 +31,7 @@ SettingsPanel.prototype.init = function() {
     this.enableSubtitlesCheckbox = document.getElementById('enable-subtitles');
     this.subtitleListCombobox = document.getElementById('subtitleCombo');
     this.settingsMenuButton = document.getElementById('settingsMenuButton');
+    this.startTime = document.getElementById('start_time');
     this.metricsAgentCombobox = document.getElementById('metrics-agent-options');
     this.enableMetricsCheckbox = document.getElementById('enable-metrics-agent');
     this.defaultAudioLangCombobox = document.getElementById('default_audio_language');
@@ -57,6 +59,12 @@ SettingsPanel.prototype.setupEventListeners = function() {
 
     minivents.on('language-radio-clicked', this.onLanguageChangedFromPlayer.bind(this));
     minivents.on('subtitle-radio-clicked', this.onSubtitleChangedFromPlayer.bind(this));
+};
+
+SettingsPanel.prototype.getStartTime = function() {
+    if (this.startTime) {
+        return this.startTime.value;
+    }
 };
 
 SettingsPanel.prototype.initMetricsAgentOptions = function() {
