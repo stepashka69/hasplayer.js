@@ -470,7 +470,7 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
 
     if (style) {
         if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
-            fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100 + 'px';
+            fontSize = (this.video.clientHeight * parseFloat(style.fontSize.substr(0, style.fontSize.length - 1))) / 100 + 'px';
         }
 
         if (style.backgroundColor && style.backgroundColor[0] === '#') {
@@ -485,6 +485,11 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
             document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
         } else {
             this.subTitles.style.bottom = (this.controlBarModule.clientHeight + (this.video.videoHeight * 0.05)) + "px"; // set the text to appear at 5% from the top of the video
+
+            if(style.textOutline.color){
+                this.subTitles.style.webkitTextStroke = hex2rgba_convert(style.textOutline.color);
+                this.subTitles.style.webkitTextStrokeWidth = parseInt((this.video.clientWidth *  parseFloat(style.textOutline.width.substr(0, style.textOutline.width.length - 1))) / 100, 10) + 'px';
+            }
 
             this.subTitles.style.position = 'absolute';
             this.subTitles.style.display = 'block';
