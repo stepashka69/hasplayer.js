@@ -129,7 +129,7 @@ SettingsPanel.prototype.onLanguageChangedFromPlayer = function(track_id) {
 SettingsPanel.prototype.onEnableSubtitles = function() {
     this.subtitleListCombobox.disabled = !this.enableSubtitlesCheckbox.checked;
     enableSubtitles(this.enableSubtitlesCheckbox.checked);
-    minivents.emit('subtitle-radio-clicked', this.enableSubtitlesCheckbox.checked)
+    minivents.emit('subtitle-radio-clicked', this.enableSubtitlesCheckbox.checked);
     //if subtitles have not been activated yet, initialize the first selected track
     if (!this.currentsubtitleTrack) {
         this.currentsubtitleTrack = orangeHasPlayer.getSelectedTrack('text');

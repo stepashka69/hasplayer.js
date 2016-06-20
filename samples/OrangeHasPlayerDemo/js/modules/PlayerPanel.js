@@ -48,7 +48,6 @@ var PlayerPanel = function(isSubtitleExternDisplay) {
     this.isMute = false;
     this.subtitlesCSSStyle = null;
     this.subTitles = null;
-    this.nbSubtitlesToDisplay = 0;
     this.isSubtitleExternDisplay = isSubtitleExternDisplay;
 };
 
@@ -505,9 +504,6 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
 };
 
 PlayerPanel.prototype.enterSubtitle = function(subtitleData) {
-    //do not delete after the first cueExit
-    this.nbSubtitlesToDisplay += 1;
-
     if (orangeHasPlayer.isSubtitlesEnabled()) {
         this.subtitlesCSSStyle = subtitleData.style;
 
@@ -528,11 +524,7 @@ PlayerPanel.prototype.cleanSubtitlesDiv = function() {
 };
 
 PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
-    if (this.nbSubtitlesToDisplay === 1) {
         this.cleanSubtitlesDiv();
-    }
-    
-    this.nbSubtitlesToDisplay -= 1;
 };
 
 PlayerPanel.prototype.onSubtitleEnableChanged = function(enable) {
