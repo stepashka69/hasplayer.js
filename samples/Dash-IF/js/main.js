@@ -109,7 +109,7 @@ app.factory("SourceTVM",["$http", "$q",function($http, $q){
                     });
 
         var formattedSource = {
-            'type': 'MSS',
+            'protocol': 'MSS',
             'name': 'Widevine TVM live-int ' + channelId + ' (' + channelName + ')',
             'url': response.url,
             'browsers': 'cdsbi'
@@ -880,7 +880,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     $scope.selectStreams = function () {
         $scope.availableStreams = $scope.streams.filter(function(item) {
-            return (item.type === $scope.streamType);
+            return (item.protocol === $scope.streamType);
         });
     };
 
@@ -979,7 +979,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     $scope.setStreamType = function (item) {
         $scope.streamType = item;
         $scope.availableStreams = $scope.streams.filter(function(item) {
-            return (item.type === $scope.streamType);
+            return (item.protocol === $scope.streamType);
         });
     };
 
