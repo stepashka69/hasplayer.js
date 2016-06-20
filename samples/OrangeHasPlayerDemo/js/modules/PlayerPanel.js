@@ -659,5 +659,6 @@ PlayerPanel.prototype.reset = function() {
 
     this.hideErrorModule();
     this.showBarsTimed();
+    this.nbSubtitlesToDisplay = 0;
     this.cleanSubtitlesDiv();
 };
