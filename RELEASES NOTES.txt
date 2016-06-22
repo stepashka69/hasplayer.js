@@ -1,3 +1,8 @@
+### Release Notes v1.3.6 (2016/06/22)
+* Bugs fixing:
+* - External TTML subtitles file management
+* - TTML style parsing
+
 ### Release Notes v1.3.5 (2016/06/17)
 * - Add 'startTime' parameter in input stream to enable playback start at given time 
 

@@ -340,6 +340,106 @@ MediaPlayer.utils.TTMLParser = function() {
             return returnTime;
         },
 
+        computeCellResolution = function(cellResolution) {
+            if (!cellResolution) {
+                //default cell resolution defined in TTML documentation
+                cellResolution = '32 15';
+            }
+
+            var computedCellResolution = cellResolution,
+                i = 0;
+
+
+            computedCellResolution = computedCellResolution.split(' ');
+
+            for (i = 0; i < computedCellResolution.length; i += 1) {
+                computedCellResolution[i] = parseFloat(computedCellResolution[i]);
+            }
+
+            return computedCellResolution;
+        },
+
+        computeTextOutline = function(textOutline, cellResolution, defaultColor) {
+            var computedTextOutline = {
+                    color: null,
+                    width: null
+                },
+                formatTextOutlineWidth,
+                textOutlineWidthIndex = 0;
+
+            if (textOutline) {
+                textOutline = textOutline.split(' ');
+                //detect if outline color has been defined, if not outline color should be set to color value
+                if (textOutline[0] && isNaN(textOutline[0][0])) {
+                    computedTextOutline.color = textOutline[0];
+                    textOutlineWidthIndex = 1;
+                } else {
+                    computedTextOutline.color = defaultColor;
+                }
+
+                //detect text outline width, the first length value
+                if (textOutline[textOutlineWidthIndex]) {
+                    //get the last character for text Outline width definition
+                    formatTextOutlineWidth = textOutline[textOutlineWidthIndex][textOutline[textOutlineWidthIndex].length - 1];
+                    switch (formatTextOutlineWidth) {
+                        //definition in cell.
+                        case 'c':
+                            textOutline[textOutlineWidthIndex] = textOutline[textOutlineWidthIndex].split('c');
+                            if (textOutline[textOutlineWidthIndex][0]) {
+                                computedTextOutline.width = (parseFloat(textOutline[textOutlineWidthIndex][0] / cellResolution[1], 10) * 100).toFixed(1) + '%';
+                            }
+                            break;
+                        case 'x':
+                            //definition in pixel
+                            computedTextOutline.width = textOutline[textOutlineWidthIndex];
+                            break;
+                    }
+                }
+            }
+            return computedTextOutline;
+        },
+
+        computeFontSize = function(fontSize, cellResolution) {
+            var formatFontSize,
+                cellsSize,
+                i,
+                computedFontSize = fontSize;
+
+            if (fontSize) {
+                //get the last character for font size definition
+                formatFontSize = fontSize[fontSize.length - 1];
+            }
+
+            switch (formatFontSize) {
+                case '%':
+                    computedFontSize = (parseFloat(1 / cellResolution[1], 10) * 100);
+                    computedFontSize = ((parseInt(fontSize.substr(0, fontSize.length - 1), 10) * computedFontSize) / 100).toFixed(1) + "%";
+                    break;
+                case 'c':
+                    //define fontSize in %
+                    cellsSize = fontSize.replace(/\s/g, '').split('c');
+
+                    for (i = 0; i < cellsSize.length; i += 1) {
+                        cellsSize[i] = parseFloat(cellsSize[i]);
+                    }
+
+                    if (isNaN(cellsSize[1])) {
+                        computedFontSize = (cellsSize[0] / cellResolution[1] * 100).toFixed(1) + '%';
+                    } else {
+                        computedFontSize = (cellsSize[1] / cellResolution[1] * 100).toFixed(1) + '%';
+                    }
+                    break;
+                case 'x':
+                    //nothing to do, fontSize has been set with an absolute value.
+                    break;
+                default:
+                    //no fontSize has been defined => '1 c'
+                    computedFontSize = (parseFloat(1 / cellResolution[1], 10) * 100).toFixed(1) + '%';
+            }
+
+            return computedFontSize;
+        },
+
         internalParse = function(data) {
             var captionArray = [],
                 errorMsg,
@@ -353,7 +453,11 @@ MediaPlayer.utils.TTMLParser = function() {
                     backgroundColor: null,
                     color: null,
                     fontSize: null,
-                    fontFamily: null
+                    fontFamily: null,
+                    textOutline: {
+                        color: null,
+                        with: null
+                    }
                 },
                 caption,
                 divBody,
@@ -361,10 +465,10 @@ MediaPlayer.utils.TTMLParser = function() {
                 textDatas,
                 j,
                 k,
-                cellsSize,
                 cellResolution,
                 extent,
                 textNodes,
+                textOutline,
                 textValue = "";
 
             try {
@@ -414,6 +518,16 @@ MediaPlayer.utils.TTMLParser = function() {
                     } else {
                         for (i = 0; i < regions.length; i += 1) {
                             caption = null;
+                            cssStyle = {
+                                backgroundColor: null,
+                                color: null,
+                                fontSize: null,
+                                fontFamily: null,
+                                textOutline: {
+                                    color: null,
+                                    with: null
+                                }
+                            };
                             region = regions[i];
 
                             globalPrefTTNameSpace = arrayUnique(globalPrefTTNameSpace.concat(getNameSpace.call(this, region, 'main')));
@@ -442,25 +556,21 @@ MediaPlayer.utils.TTMLParser = function() {
                                         //search style informations once. 
                                         if (j === 0) {
                                             cssStyle.backgroundColor = findStyleElement.call(this, [textDatas[j], region, divBody], 'backgroundColor');
+                                            if (cssStyle.backgroundColor === null) {
+                                                //set default TTML value
+                                                cssStyle.backgroundColor = 'transparent';
+                                            }
                                             cssStyle.color = findStyleElement.call(this, [textDatas[j], region, divBody], 'color');
                                             cssStyle.fontSize = findStyleElement.call(this, [textDatas[j], region, divBody], 'fontSize');
                                             cssStyle.fontFamily = findStyleElement.call(this, [textDatas[j], region, divBody], 'fontFamily');
-
+                                            textOutline = findStyleElement.call(this, [textDatas[j], region, divBody], 'textOutline');
                                             extent = findStyleElement.call(this, [textDatas[j], region, divBody], 'extent');
 
-                                            if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
-                                                extent = extent.split(' ')[1];
-                                                extent = parseFloat(extent.substr(0, extent.length - 1));
-                                                cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1), 10) * extent) / 100 + "%";
-                                            } else if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === 'c' && extent) {
-                                                cellsSize = cssStyle.fontSize.replace(/\s/g, '').split('c');
-                                                cellResolution = findParameterElement.call(this, [textDatas[j], region, divBody, nodeTt], globalPrefParameterNameSpace, 'cellResolution').split(' ');
-                                                if (cellsSize.length > 1) {
-                                                    cssStyle.fontSize = cellResolution[1] / cellsSize[1] + 'px';
-                                                } else {
-                                                    cssStyle.fontSize = cellResolution[1] / cellsSize[0] + 'px';
-                                                }
-                                            }
+                                            cellResolution = findParameterElement.call(this, [textDatas[j], region, divBody, nodeTt], globalPrefParameterNameSpace, 'cellResolution');
+                                            cellResolution = computeCellResolution(cellResolution);
+
+                                            cssStyle.textOutline = computeTextOutline(textOutline, cellResolution, cssStyle.color);
+                                            cssStyle.fontSize = computeFontSize(cssStyle.fontSize, cellResolution);
                                         }
                                         //try to detect multi lines subtitle
                                         textValue += textDatas[j].textContent + "\n";
@@ -478,17 +588,23 @@ MediaPlayer.utils.TTMLParser = function() {
                                     captionArray.push(caption);
                                 } else {
                                     cssStyle.backgroundColor = findStyleElement.call(this, [region, divBody], 'backgroundColor');
+                                    if (cssStyle.backgroundColor === null) {
+                                        //set default TTML value
+                                        cssStyle.backgroundColor = 'transparent';
+                                    }
                                     cssStyle.color = findStyleElement.call(this, [region, divBody], 'color');
                                     cssStyle.fontSize = findStyleElement.call(this, [region, divBody], 'fontSize');
                                     cssStyle.fontFamily = findStyleElement.call(this, [region, divBody], 'fontFamily');
+                                    textOutline = findStyleElement.call(this, [region, divBody], 'textOutline');
 
                                     extent = findStyleElement.call(this, [region, divBody], 'extent');
 
-                                    if (cssStyle.fontSize && cssStyle.fontSize[cssStyle.fontSize.length - 1] === '%' && extent) {
-                                        extent = extent.split(' ')[1];
-                                        extent = parseFloat(extent.substr(0, extent.length - 1));
-                                        cssStyle.fontSize = (parseInt(cssStyle.fontSize.substr(0, cssStyle.fontSize.length - 1), 10) * extent) / 100 + "%";
-                                    }
+                                    cellResolution = findParameterElement.call(this, [region, divBody], globalPrefParameterNameSpace, 'cellResolution');
+                                    cellResolution = computeCellResolution(cellResolution);
+
+                                    cssStyle.textOutline = computeTextOutline(textOutline, cellResolution, cssStyle.color);
+                                    cssStyle.fontSize = computeFontSize(cssStyle.fontSize, cellResolution);
+
                                     //line and position element have no effect on IE
                                     //For Chrome line = 80 is a percentage workaround to reorder subtitles
                                     //try to detect multi lines subtitle

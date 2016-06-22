@@ -1,99 +1,77 @@
 {
     "items": [
         {
-            "type": "Live",
-            "protocol": "HLS",
-            "name": "VIMTV1",
-            "url": "http://161.105.253.165/streaming/1.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "HLS",
-            "name": "VIMTV2",
-            "url": "http://161.105.253.165/streaming/2.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "HLS",
-            "name": "VIMTV3",
-            "url": "http://161.105.253.165/streaming/3.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "HLS",
-            "name": "VIMTV4",
-            "url": "http://161.105.253.165/streaming/4.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "HLS",
-            "name": "Envivio",
-            "url": "http://iphone.envivio.tv/iphone/downLoads/ch1/index.m3u8",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
+            "type": "VOD",
             "protocol": "MSS",
-            "name": "Norigin Media Spain with Subtitles",
-            "url": "http://80.12.13.72/jXFcOxmrQLZN6QPzmZwlLw/3450257649/13214/89042/8/live/smooth/TF1.isml/manifest",
+            "name": "Big Buck Bunny",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "type": "Live",
+            "type": "VOD",
             "protocol": "MSS",
-            "name": "Arte with Subtitles",
-            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
+            "name": "Big Buck Bunny (gzipped, AAC-HE)",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/gzip/bbb.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "type": "Live",
+            "type": "VOD",
             "protocol": "MSS",
-            "name": "France 2 with Subtitles",
-            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-41_S2.isml/Manifest",
+            "name": "Elephant Dream",
+            "url": "http://harmonic.e2e.purpledrm.com.edgesuite.net:80/Content/SS/VOD/yjO9VXw7-ElephantsDreamH264720p/ElephantsDream.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "type": "Live",
+            "type": "VOD",
             "protocol": "MSS",
-            "name": "Norigin with Subtitles",
+            "name": "SuperSpeedway",
+            "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Arte",
+            "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Volver",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "VIF S. Richard",
+            "url": "http://161.105.176.12/VIF/srichard2.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Test synchro A/V",
+            "url": "http://2is7server2.rd.francetelecom.com/VOD/Synchro/C4-52_S1.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Norigin (subtitles)",
             "url": "http://80.12.13.72/smooth/TEST_SOURCE/subtitles/Padding_OSP/Profil1/Profil1.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "type": "Live",
+            "type": "VOD",
             "protocol": "MSS",
-            "name": "Smooth + PlayReady DRM",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-         {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "Smooth TF1 Halo",
-            "url": "http://161.105.176.18/ss/OFR-TF1-IP.isml/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "Smooth TF1 Halo + DRM",
-            "url": "http://161.105.176.18/ss/OFR-TF1-IP-DRM.isml/Manifest",
-            "browsers": "cdsbi"
-        },
-
-        {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "Smooth + PlayReady DRM 2",
+            "name": "SuperSpeedway (PlayReady)",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
-            "name": "Smooth + PlayReady DRM + cdmData",
+            "name": "PlayReady + CustomData",
             "type": "VOD",
             "protocol": "MSS",
             "url": "http://161.105.194.170/VOD/VODE/Ateme3505/ATEME3505_enc452_MSS_PoP/PoP.ism/Manifest",
@@ -147,52 +125,7 @@
         {
             "type": "VOD",
             "protocol": "MSS",
-            "name": "TF1 Widevine",
-            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN/TF1-WN.ism/Manifest",
-            "browsers": "cdsbi",
-            "protData": {
-                "com.microsoft.playready": {
-                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=g+MuUfsOOFOm/ozQnpGBnw=="
-                },
-                "com.widevine.alpha": {
-                    "laURL": "http://widevine-proxy.appspot.com/proxy",
-                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
-                }
-            }
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "ERROR-TF1 Widevine - bad back Url",
-            "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN/TF1-WN.ism/Manifest",
-            "browsers": "cdsbi",
-            "protData": {
-                "com.microsoft.playready": {
-                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=g+MuUfsOOFOm/ozQnpGBnw=="
-                },
-                "com.widevine.alpha": {
-                    "laURL": "http://widevine-proxy.appspot-Orange.com/proxy",
-                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
-                }
-            }
-        },
-        {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "TF1 Widevine",
-            "url": "http://161.105.176.18/ss/ss/TF1-WN.isml/Manifest",
-            "browsers": "cdsbi",
-            "protData": {
-                "com.widevine.alpha": {
-                    "laURL": "http://widevine-proxy.appspot.com/proxy",
-                    "pssh": "AAAAY3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAAEMIARIQxXr4hC5lVZm6Epugb9e0JRoNd2lkZXZpbmVfdGVzdCIYTVRFeE1URXhNVEV4TVRFeE1URXhNUT09KgJTRDIA"
-                }
-            }
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "TF1 Widevine Test",
+            "name": "TF1 (PlayReady+Widevine)",
             "url": "http://2is7server2.rd.francetelecom.com/VOD/TF1-WN-test/TF1-WN-test.ism/Manifest",
             "browsers": "cdsbi",
             "protData": {
@@ -206,163 +139,35 @@
             }
         },
         {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "TF1 Widevine Test",
-            "url": "http://161.105.176.18/ss/ss/TF1-WN-test.isml/Manifest",
-            "browsers": "cdsbi",
-            "protData": {
-                "com.microsoft.playready": {
-                    "laURL": "http://mercury.rd.francetelecom.com/pr20/RightsManager.asmx?rid=0&hexkey=zsI+vcD1FB8Mq4/QpftMxg=="
-                },
-                "com.widevine.alpha": {
-                    "laURL": "http://widevine-proxy.appspot.com/proxy",
-                    "pssh": "AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQh7LJSxP0WBaU0gg8/ekcrhoNd2lkZXZpbmVfdGVzdCIQMzMzMzMzMzMzMzMzMzMzMyoCU0QyAA=="
-                }
-            }
-        },
-        {
             "type": "VOD",
             "protocol": "MSS",
-            "name": "SynchroAV 2 stream audio AAC+AACH",
-            "url": "http://161.105.194.170/VOD/VODE/Ateme3511/ATEME3511_clr_MSS_SynchroAV/Synchro_AV.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Big Buck Bunny + PUB video midroll",
+            "name": "Ad-insertion (preroll)",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-            "mastUrl": "http://tv-has.orange-labs.fr/testsMast/02_MAST_midroll.xml",
+            "mastUrl": "http://tv-has.orange-labs.fr/adserver/mast-vast/MAST-01_preroll.xml",
             "browsers": "cdsbi"
         },
         {
             "type": "VOD",
             "protocol": "MSS",
-            "name": "Big Buck Bunny + PUB video preroll",
+            "name": "Ad-insertion (midroll)",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-            "mastUrl": "http://tv-has.orange-labs.fr/testsMast/01_MAST_preroll.xml",
+            "mastUrl": "http://tv-has.orange-labs.fr/adserver/mast-vast/MAST-02_midroll.xml",
             "browsers": "cdsbi"
         },
         {
             "type": "VOD",
             "protocol": "MSS",
-            "name": "Big Buck Bunny + PUB video preroll + midroll",
+            "name": "Ad-insertion (preroll + midroll)",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-            "mastUrl": "http://tv-has.orange-labs.fr/testsMast/04_MAST_preroll_midroll.xml",
+            "mastUrl": "http://tv-has.orange-labs.fr/adserver/mast-vast/MAST-03_preroll-midroll.xml",
             "browsers": "cdsbi"
         },
         {
             "type": "VOD",
             "protocol": "MSS",
-            "name": "Big Buck Bunny + PUB image preroll",
+            "name": "Ad-insertion (preroll image)",
             "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-            "mastUrl": "http://tv-has.orange-labs.fr/testsMast/06_MAST_preroll_image.xml",
-            "browsers": "cdsbi"
-        },        
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Audio stream AAC HE implicit mode",
-            "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_Implicit.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Audio stream AAC HE explicit backward mode",
-            "url": "http://161.105.194.170/VOD/VODE/TVN/SS_HEAACv2_ExplicitBwd.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Volver",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/xBox/PIVOT%20VOLVER_PS-output.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Montagne",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/Montagne/EE3_SS-H264_TERRE_MONTAGNES_FR_EN_CEEFAX.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Big Buck Bunny",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Elephant Dream Viaccess",
-            "url": "http://harmonic.e2e.purpledrm.com.edgesuite.net:80/Content/SS/VOD/yjO9VXw7-ElephantsDreamH264720p/ElephantsDream.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "SuperSpeedway",
-            "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Elephants Dream (multi-audio/text)",
-            "url": "http://streams.smooth.vertigo.com/elephantsdream/Elephants_Dream_1024-h264-st-aac.ism/manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Big Buck Bunny (gzipped - AAC-HE)",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/gzip/bbb.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Volver",
-            "url": "http://2is7server1.rd.francetelecom.com/VOD/Volver/PIVOT VOLVER_PS_smooth.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Arte",
-            "url": "http://161.105.176.12/VOD/Arte/C4-51_S1.ism/manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "VIF Steph Richard",
-            "url": "http://161.105.176.12/VIF/srichard2.ism/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Anevia - Red Bull",
-            "url": "http://demo.anevia.com:3128/vod/disk1/content1/ss-ss/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "Anevia - Sintel",
-            "url": "http://demo.anevia.com:3128/vod/disk1/content2/ss-ss/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "Live",
-            "protocol": "MSS",
-            "name": "TF1 Halo/IIS 7.13",
-            "url": "http://161.105.176.13/Halo/ch1.isml/manifest",
+            "mastUrl": "http://tv-has.orange-labs.fr/adserver/mast-vast/MAST-06_preroll-image.xml",
             "browsers": "cdsbi"
         },
         {
@@ -375,6 +180,13 @@
         {
             "type": "Live",
             "protocol": "MSS",
+            "name": "France 2 (subtitles)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-41_S2.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
             "name": "France 24",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-46_S1.isml/Manifest",
             "browsers": "cdsbi"
@@ -382,42 +194,91 @@
         {
             "type": "Live",
             "protocol": "MSS",
-            "name": "Arte multi-audio",
+            "name": "Arte (multi-audio)",
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-49_S1.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "MSS",
-            "name": "LIVE - BFM-TV (DVR)",
-            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "MSS",
-            "name": "SynchroAV",
-            "url": "http://2is7server2.rd.francetelecom.com/VOD/Synchro/C4-52_S1.ism/Manifest",
+            "name": "Arte (subtitles)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp2.isml/Manifest",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "MSS",
-            "name": "SynchroAV",
-            "url": "http://2is7server2.rd.francetelecom.com/C4/C4-52_S1.isml/Manifest",
+            "name": "BFM-TV (DVR)",
+            "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+
+
+
+        {
+            "type": "Live",
+            "protocol": "HLS",
+            "name": "VIMTV1",
+            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "HLS",
+            "name": "VIMTV2",
+            "url": "http://161.105.253.165/streaming/2.m3u8",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "HLS",
+            "name": "VIMTV3",
+            "url": "http://161.105.253.165/streaming/3.m3u8",
+            "browsers": "cdsbi"
+        },
+
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Norigin Media Spain with Subtitles",
+            "url": "http://80.12.13.72/jXFcOxmrQLZN6QPzmZwlLw/3450257649/13214/89042/8/live/smooth/TF1.isml/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth + PlayReady DRM",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/selection-SD-DRM/selection-SD-DRM.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+         {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "Live",
+            "protocol": "MSS",
+            "name": "Smooth TF1 Halo + DRM",
+            "url": "http://161.105.176.18/ss/OFR-TF1-IP-DRM.isml/Manifest",
+            "browsers": "cdsbi"
+        },
+
+
+
+        {
+            "type": "VOD",
+            "protocol": "DASH",
+            "name": "Prince Of Persia (2 audios)",
+            "url": "http://localhost/VIDEO/DASH/VOD/PrinceOfPersia/manifest.mpd",
             "browsers": "cdsbi"
         },
         {
             "type": "VOD",
             "protocol": "DASH",
-            "name": "PrinceOfPersia (2 audios)",
-            "url": "http://10.194.60.110/VIDEO/DASH/VOD/PrinceOfPersia/manifest.mpd",
-            "browsers": "cdsbi"
-        },
-        {
-            "type": "VOD",
-            "protocol": "DASH",
-            "name": "DASH + PlayReady DRM",
+            "name": "Sintel (PlayReady)",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
@@ -450,238 +311,223 @@
             "browsers": "cdb"
         },
         {
-            "type": "VOD",
-            "protocol": "DASH",
-            "name": "Fraunhofer - HEACC 2.0 - Sintel",
-            "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_2_0_with_video/Sintel/sintel_480p_heaac2_0.mpd",
-            "browsers": "cdb"
-        },
-        {
-            "name": "Fraunhofer - HEACC 5.1 - 6 CH ID",
-             "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_5_1_with_video/6chId/6chId_480p_heaac5_1.mpd",
-            "browsers": "cdb"
-        },
-        {
-            "name": "Fraunhofer - HEACC 5.1 - Dream",
-            "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_5_1_with_video/ElephantsDream/elephants_dream_480p_heaac5_1.mpd",
-            "browsers": "cdb"
-        },
-        {
-            "name": "Fraunhofer - HEACC 5.1 - Sintel",
-            "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/480p_video/heaac_5_1_with_video/Sintel/sintel_480p_heaac5_1.mpd",
-            "browsers": "cdb"
-        },
-        {
-            "name": "Fraunhofer - Audio Only - Dream",
-            "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/audio_only/heaac_2_0_without_video/ElephantsDream/elephants_dream_audio_only_heaac2_0.mpd",
-            "browsers": "cdb"
-        },
-        {
-            "name": "Fraunhofer - Audio Only - Sintel",
-            "url": "http://dash.edgesuite.net/digitalprimates/fraunhofer/audio_only/heaac_2_0_without_video/Sintel/sintel_audio_only_heaac2_0.mpd",
-            "browsers": "cdb"
-        },
-        {
             "name": "Path 1 Live",
             "url": "http://dash-live-path1.edgesuite.net/dash/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "Live",
+            "protocol": "DASH",
             "name": "Unified Streaming Live",
             "url": "http://live.unified-streaming.com/loop/loop.isml/loop.mpd?format=mp4&session_id=25020",
             "browsers": ""
         },
         {
+            "type": "Live",
+            "protocol": "DASH",
             "name": "Wowza SegmentList",
             "url": "http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvlist.mpd",
             "browsers": ""
         },
         {
+            "type": "Live",
+            "protocol": "DASH",
             "name": "Wowza SegmentTemplate",
             "url": "http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvnumber.mpd",
             "browsers": ""
         },
         {
+            "type": "Live",
+            "protocol": "DASH",
             "name": "Wowza SegmentTimeline",
             "url": "http://wowzaec2demo.streamlock.net/live/bigbuckbunny/manifest_mpm4sav_mvtime.mpd",
             "browsers": ""
         },
         {
-            "name": "Thomson Live",
-            "url": "http://tvnlive.dashdemo.edgesuite.net/live/manifest.mpd",
-            "browsers": ""
-        },
-        {
-            "name": "Media Excel Live 1",
-            "url": "http://dashdemo.edgesuite.net/mediaexcel/live/ch1/dash.mpd",
-            "browsers": ""
-        },
-        {
-            "name": "Media Excel Live 2",
-            "url": "http://dashdemo.edgesuite.net/mediaexcel/live/ch2/dash.mpd",
-            "browsers": ""
-        },
-        {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Envivio",
             "url": "http://dash.edgesuite.net/envivio/dashpr/clear/Manifest.mpd",
             "browsers": "cdsbi"
         },
         {
-            "name": "Segment List",
+            "type": "VOD",
+            "protocol": "DASH",
+            "name": "Digital Primates Segment List",
             "url": "http://www.digitalprimates.net/dash/streams/gpac/mp4-main-multi-mpd-AV-NBS.mpd",
             "browsers": "cdsbi"
         },
         {
-            "name": "Segment Template",
+            "type": "VOD",
+            "protocol": "DASH",
+            "name": "Digital Primates Segment Template",
             "url": "http://www.digitalprimates.net/dash/streams/mp4-live-template/mp4-live-mpd-AV-BS.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Unified Streaming - Timeline",
             "url": "http://demo.unified-streaming.com/video/ateam/ateam.ism/ateam.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft #1",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_MP4_from_WAME/sintel_trailer-1080p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft #2",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME/sintel_trailer-1080p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft #3",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft #4",
             "url": "http://wams.edgesuite.net/media/MPTExpressionData01/ElephantsDream_1080p24_IYUV_2ch.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft #5",
             "url": "http://wams.edgesuite.net/media/MPTExpressionData02/BigBuckBunny_1080p24_IYUV_2ch.ism/manifest(format=mpd-time-csf)",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft Cenc #1",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_720p_Main_Profile_CENC/CENC/sintel_trailer-720p.ism/manifest(format=mpd-time-csf)",
             "browsers": "i"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "Microsoft Cenc #4",
             "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_CENC/CENC/sintel_trailer-1080p.ism/manifest(format=mpd-time-csf)",
             "browsers": "i"
         },
         {
-            "name": "D-Dash #1",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=2&type=full",
-            "browsers": ""
-        },
-        {
-            "name": "D-Dash #2",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=4&type=full",
-            "browsers": ""
-        },
-        {
-            "name": "D-Dash #3",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=6&type=full",
-            "browsers": ""
-        },
-        {
-            "name": "D-Dash #4",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=8&type=full",
-            "browsers": ""
-        },
-        {
-            "name": "D-Dash #5",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=10&type=full",
-            "browsers": ""
-        },
-        {
-            "name": "D-Dash #6",
-            "url": "http://www-itec.uni-klu.ac.at/dash/ddash/mpdGenerator.php?segmentlength=15&type=full",
-            "browsers": ""
-        },
-        {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 1a - Netflix",
             "url": "http://dash.edgesuite.net/dash264/TestCases/1a/netflix/exMPD_BIP_TC1.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 1a - Sony",
             "url": "http://dash.edgesuite.net/dash264/TestCases/1a/sony/SNE_DASH_SD_CASE1A_REVISED.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 1b - Envivio",
             "url": "http://dash.edgesuite.net/dash264/TestCases/1b/envivio/manifest.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 1b - Thomson",
             "url": "http://dash.edgesuite.net/dash264/TestCases/1b/thomson-networks/2/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 1c - Envivio",
             "url": "http://dash.edgesuite.net/dash264/TestCases/1c/envivio/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 2a - Envivio",
             "url": "http://dash.edgesuite.net/dash264/TestCases/2a/envivio/manifest.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 2a - Sony",
             "url": "http://dash.edgesuite.net/dash264/TestCases/2a/sony/SNE_DASH_CASE_2A_SD_REVISED.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 2a - Thomson",
             "url": "http://dash.edgesuite.net/dash264/TestCases/2a/thomson-networks/2/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 3a - Fraunhofer",
             "url": "http://dash.edgesuite.net/dash264/TestCases/3a/fraunhofer/ed.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 3b - Fraunhofer",
             "url": "http://dash.edgesuite.net/dash264/TestCases/3b/fraunhofer/elephants_dream_heaac2_0.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 3b - Sony",
             "url": "http://dash.edgesuite.net/dash264/TestCases/3b/sony/SNE_DASH_CASE3B_SD_REVISED.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 4b - Sony",
             "url": "http://dash.edgesuite.net/dash264/TestCases/4b/sony/SNE_DASH_CASE4B_SD_REVISED.mpd",
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 5a - Thomson/Envivio",
             "url": "http://dash.edgesuite.net/dash264/TestCases/5a/1/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 5b - Thomson/Envivio",
             "url": "http://dash.edgesuite.net/dash264/TestCases/5b/1/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 6c - Envivio Manifest 1",
             "url": "http://dash.edgesuite.net/dash264/TestCases/6c/envivio/manifest.mpd",
             "browsers": ""
         },
         {
+            "type": "VOD",
+            "protocol": "DASH",
             "name": "DASH-AVC/264 – test vector 6c - Envivio Manifest 2",
             "url": "http://dash.edgesuite.net/dash264/TestCases/6c/envivio/manifest2.mpd",
             "browsers": ""

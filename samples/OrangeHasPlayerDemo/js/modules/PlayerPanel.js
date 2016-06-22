@@ -56,7 +56,7 @@ PlayerPanel.prototype.init = function() {
 
     if (this.isSubtitleExternDisplay) {
         this.subTitles = document.createElement("div");
-        this.subTitles.setAttribute('id','subtitleDisplay');
+        this.subTitles.setAttribute('id', 'subtitleDisplay');
         document.getElementById('VideoModule').appendChild(this.subTitles);
     }
 
@@ -457,25 +457,55 @@ PlayerPanel.prototype.resetSeekbar = function() {
 PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
     var fontSize;
 
-    if(!this.isSubtitleExternDisplay){
-        document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
-    }else{
-        this.subTitles.style.bottom = (this.controlBarModule.clientHeight + (this.video.videoHeight * 0.05)) + "px"; // set the text to appear at 5% from the top of the video
+    function hex2rgba_convert(hex) {
+        hex = hex.replace('#', '');
+        var r = parseInt(hex.substring(0, 2), 16),
+            g = parseInt(hex.substring(2, 4), 16),
+            b = parseInt(hex.substring(4, 6), 16),
+            a = hex.length > 6 ? parseInt(hex.substring(6, 8), 16) : 255,
+            result = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
 
-        if (style) {
+        return result;
+    }
 
-            fontSize = style.fontSize;
+    if (style) {
+        if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
+            fontSize = (this.video.clientHeight * parseFloat(style.fontSize.substr(0, style.fontSize.length - 1))) / 100 + 'px';
+        }
 
-            if (style.fontSize && style.fontSize[style.fontSize.length - 1] === '%') {
-                fontSize = (this.video.clientHeight * style.fontSize.substr(0, style.fontSize.length - 1)) / 100;
+        if (style.backgroundColor && style.backgroundColor[0] === '#') {
+            style.backgroundColor = hex2rgba_convert(style.backgroundColor);
+        }
+
+        if (style.color && style.color[0] === '#') {
+            style.color = hex2rgba_convert(style.color);
+        }
+
+        if (!this.isSubtitleExternDisplay) {
+            document.getElementById('cueStyle').innerHTML = '::cue{ background-color:' + style.backgroundColor + ';color:' + style.color + ';font-size: ' + fontSize + 'px;font-family: ' + style.fontFamily + '}';
+        } else {
+            this.subTitles.style.bottom = (this.controlBarModule.clientHeight + (this.video.videoHeight * 0.05)) + "px"; // set the text to appear at 5% from the top of the video
+
+            if(style.textOutline.color && style.textOutline.color[0] === '#') {
+                this.subTitles.style.webkitTextStroke = hex2rgba_convert(style.textOutline.color);
+            }else if(style.textOutline.color){
+                this.subTitles.style.webkitTextStroke = style.textOutline.color;
             }
+
+            if (style.textOutline.width && style.textOutline.width[style.textOutline.width.length - 1] === '%') {
+                this.subTitles.style.webkitTextStrokeWidth = parseInt((this.video.clientWidth *  parseFloat(style.textOutline.width.substr(0, style.textOutline.width.length - 1))) / 100, 10) + 'px';
+            }else if (style.textOutline.width){
+                //definition is done in pixels.
+                this.subTitles.style.webkitTextStrokeWidth = style.textOutline.width;
+            }
+
             this.subTitles.style.position = 'absolute';
             this.subTitles.style.display = 'block';
             this.subTitles.style.textAlign = 'center';
             this.subTitles.style.padding = '10px';
             this.subTitles.style.backgroundColor = style.backgroundColor;
             this.subTitles.style.color = style.color;
-            this.subTitles.style.fontSize = fontSize+'px';
+            this.subTitles.style.fontSize = fontSize;
             this.subTitles.style.fontFamily = style.fontFamily;
         }
     }
@@ -484,25 +514,25 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
 PlayerPanel.prototype.enterSubtitle = function(subtitleData) {
     if (orangeHasPlayer.isSubtitlesEnabled()) {
         this.subtitlesCSSStyle = subtitleData.style;
-    
+
         this.applySubtitlesCSSStyle(subtitleData.style);
 
-    if (this.isSubtitleExternDisplay && subtitleData.text) {
-        this.subTitles.innerText = subtitleData.text;   // write the text
-        this.subTitles.style.left = ((this.video.clientWidth / 2) - (this.subTitles.clientWidth/2))+'px';  // center subtitle on the video
-    }
+        if (this.isSubtitleExternDisplay && subtitleData.text) {
+            this.subTitles.innerText = subtitleData.text; // write the text
+            this.subTitles.style.left = ((this.video.clientWidth / 2) - (this.subTitles.clientWidth / 2)) + 'px'; // center subtitle on the video
+        }
     }
 };
 
-PlayerPanel.prototype.cleanSubtitlesDiv = function(){
-    if(this.isSubtitleExternDisplay) {
-      this.subTitles.innerText = '';
-      this.subTitles.style.backgroundColor = 'rgba(0,0,0,0)';
+PlayerPanel.prototype.cleanSubtitlesDiv = function() {
+    if (this.isSubtitleExternDisplay) {
+        this.subTitles.innerText = '';
+        this.subTitles.style.backgroundColor = 'rgba(0,0,0,0)';
     }
 };
 
 PlayerPanel.prototype.exitSubtitle = function(subtitleData) {
-    this.cleanSubtitlesDiv();
+        this.cleanSubtitlesDiv();
 };
 
 PlayerPanel.prototype.onSubtitleEnableChanged = function(enable) {
@@ -569,14 +599,14 @@ PlayerPanel.prototype.addLanguageLine = function(audioTrack, selectedAudioTrack)
     var html = this.createLanguageLine(audioTrack, selectedAudioTrack, 'language'),
         languageContainer = document.querySelector('.op-summary');
     languageContainer.insertAdjacentHTML('beforeend', html);
-    document.getElementById(audioTrack.id ?audioTrack.id:audioTrack.lang).addEventListener('click', this.onLanguageRadioClicked.bind(this));
+    document.getElementById(audioTrack.id ? audioTrack.id : audioTrack.lang).addEventListener('click', this.onLanguageRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.addSubtitleLine = function(subtitleTrack, selectedSubtitleTrack) {
     var html = this.createLanguageLine(subtitleTrack, selectedSubtitleTrack, 'subtitle'),
         subtitleContainer = document.querySelector('.op-panel-container');
     subtitleContainer.insertAdjacentHTML('beforeend', html);
-    document.getElementById(subtitleTrack.id ?subtitleTrack.id:subtitleTrack.lang).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
+    document.getElementById(subtitleTrack.id ? subtitleTrack.id : subtitleTrack.lang).addEventListener('click', this.onSubtitleRadioClicked.bind(this));
 };
 
 PlayerPanel.prototype.updateAudioData = function(_audioTracks, _currenTrack) {
@@ -629,5 +659,6 @@ PlayerPanel.prototype.reset = function() {
 
     this.hideErrorModule();
     this.showBarsTimed();
+    this.nbSubtitlesToDisplay = 0;
     this.cleanSubtitlesDiv();
 };
