@@ -486,9 +486,17 @@ PlayerPanel.prototype.applySubtitlesCSSStyle = function(style) {
         } else {
             this.subTitles.style.bottom = (this.controlBarModule.clientHeight + (this.video.videoHeight * 0.05)) + "px"; // set the text to appear at 5% from the top of the video
 
-            if(style.textOutline.color){
+            if(style.textOutline.color && style.textOutline.color[0] === '#') {
                 this.subTitles.style.webkitTextStroke = hex2rgba_convert(style.textOutline.color);
+            }else if(style.textOutline.color){
+                this.subTitles.style.webkitTextStroke = style.textOutline.color;
+            }
+
+            if (style.textOutline.width && style.textOutline.width[style.textOutline.width.length - 1] === '%') {
                 this.subTitles.style.webkitTextStrokeWidth = parseInt((this.video.clientWidth *  parseFloat(style.textOutline.width.substr(0, style.textOutline.width.length - 1))) / 100, 10) + 'px';
+            }else if (style.textOutline.width){
+                //definition is done in pixels.
+                this.subTitles.style.webkitTextStrokeWidth = style.textOutline.width;
             }
 
             this.subTitles.style.position = 'absolute';
