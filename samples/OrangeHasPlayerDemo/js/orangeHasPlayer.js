@@ -3,7 +3,6 @@ var orangeHasPlayer = null,
     adsPlayer = null,
     config = null,
     video = null,
-    videoPlayerContainer = null,
     currentStreamInfos = null,
     confMetricsAgent = {
         'name': 'Prisme (local)',
@@ -29,7 +28,6 @@ var orangeHasPlayer = null,
 function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
-    videoPlayerContainer = document.getElementById('VideoPlayerContainer');
 
     orangeHasPlayer.init(video);
     orangeHasPlayer.setDebug(true);
@@ -42,9 +40,13 @@ function createHasPlayer(isSubtitleExternDisplay) {
 
     // Load plugins
     if (typeof AdsPlayer == 'function') {
-        adsPlayer = new AdsPlayer(document.getElementById('VideoModule'));
+        adsPlayer = new AdsPlayer(document.getElementById('ads-player-container'));
+        adsPlayer.addEventListener('start', onAdsPlayerToggle);
+        adsPlayer.addEventListener('end', onAdsPlayerToggle);
+        adsPlayer.addEventListener('play', onAdsPlayerPlayPause);
+        adsPlayer.addEventListener('pause', onAdsPlayerPlayPause);
+        adsPlayer.addEventListener('click', onAdsPlayerClick);
         orangeHasPlayer.addPlugin(adsPlayer);
-        registerAdsPlayerEvents();
     }
 
     orangeHasPlayer.setDefaultAudioLang('fra');
@@ -69,17 +71,6 @@ function registerHasPlayerEvents() {
     orangeHasPlayer.addEventListener('state_changed', onStateChanged);
     orangeHasPlayer.addEventListener('timeupdate', onTimeUpdate);
     orangeHasPlayer.addEventListener('manifestUrlUpdate', onManifestUrlUpdate);
-}
-
-function registerAdsPlayerEvents() {
-    if (adsPlayer) {
-        adsPlayer.addEventListener('adStart',function(){
-            videoPlayerContainer.style.visibility = 'hidden';
-        });
-        adsPlayer.addEventListener('adEnd',function(){
-            videoPlayerContainer.style.visibility = 'visible';
-        });
-    }
 }
 
 function loadHasPlayerConfig(fileUrl) {
@@ -269,4 +260,28 @@ function changePlayerState() {
 function setSeekValue(seekTime) {
     orangeHasPlayer.seek(seekTime);
 }
-/**********************************************************************************************************************/
+
+/********************************************************************************************************************
+ *
+ *
+ *                   AdsPlayer Events
+ *
+ *
+ **********************************************************************************************************************/
+
+function onAdsPlayerToggle(e) {
+    console.log("adsplayer - " + e.type);
+    var adsMode = (e.type === 'start');
+    document.getElementById('video-player-container').style.display = adsMode ? 'none' : 'block';
+    document.getElementById('ads-player-container').style.display = adsMode ? 'block' : 'none';
+}
+
+function onAdsPlayerPlayPause(e) {
+    console.log("adsplayer - " + e.type);
+    var play = (e.type === 'play');
+}
+
+function onAdsPlayerClick(e) {
+    console.log("adsplayer - " + e.type);
+    adsPlayer.pause();
+}

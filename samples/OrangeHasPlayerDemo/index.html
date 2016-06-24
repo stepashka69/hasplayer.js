@@ -205,19 +205,22 @@
 
 <!-- adsplayer -->
 <script type="text/javascript" src="../../../adsplayer.js/src/AdsPlayer.js"></script>
-<script type="text/javascript" src="../../../adsplayer.js/src/AdsMediaPlayer.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/AdsPlayerController.js"></script>
-<script type="text/javascript" src="../../../adsplayer.js/src/TrackingUriRequest.js"></script>
-<script type="text/javascript" src="../../../adsplayer.js/src/AdsTrackingEvents.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/Debug.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/ErrorHandler.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/EventBus.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/FileLoader.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/mast/MastParser.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/mast/TriggerManager.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/mast/model/Mast.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/media/ImagePlayer.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/media/VideoPlayer.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/vast/CreativePlayer.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/vast/TrackingEventsManager.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/vast/VastParser.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/vast/VastPlayerManager.js"></script>
 <script type="text/javascript" src="../../../adsplayer.js/src/vast/model/Vast.js"></script>
-<script type="text/javascript" src="../../../adsplayer.js/src/utils/DOMParser.js"></script>
+<script type="text/javascript" src="../../../adsplayer.js/src/utils/xmldom.js"></script>
 <!-- /adsplayer -->
 
 <!-- build:js orangeHasPlayerApp.js -->
@@ -265,10 +268,9 @@
 
                 <div class="stream-url"></div>
                 <div id="demo-player-container" class="demo-player" tabindex="0">
-                    <div id="VideoPlayerContainer">
+                    <div id="video-player-container">
                         <div id="VideoModule" class="op-video">
                             <video id="player" class="player"></video>
-                            <!-- <div id="adsOverlay"></div> -->
                         </div>
                         <div id="LoadingModule" class="op-loading op-none">
                             <div class="spinner">
@@ -452,6 +454,7 @@
                             <div class="op-error-description-long" id="longMessageError"></div>
                         </div>
                     </div>
+                    <div id="ads-player-container" class="demo-player op-video"/>
                 </div>
             </div>
             <div id="settings-container" class="module">

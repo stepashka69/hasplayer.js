@@ -1090,13 +1090,22 @@ div:-webkit-full-screen-ancestor:not(iframe) > .op-middle-container {
   position: relative;
   width: 100%;
   height: 100%;
-  background: black; }
-  .op-video video {
+  background: black;
+}
+.op-video video {
     width: 100%;
-    height: 100%; }
-  .op-video .stretch {
+    height: 100%;
+}
+.op-video .stretch {
     -o-object-fit: cover;
-       object-fit: cover; }
+       object-fit: cover;
+}
+.op-video image {
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    ledt: 50%;
+}
 
 @media (min-aspect-ratio: 16/9) and (view-mode: fullscreen) {
   .op-video video {
