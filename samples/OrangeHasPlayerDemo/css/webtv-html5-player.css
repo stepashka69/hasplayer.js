@@ -1100,7 +1100,7 @@ div:-webkit-full-screen-ancestor:not(iframe) > .op-middle-container {
     -o-object-fit: cover;
        object-fit: cover;
 }
-.op-video image {
+.op-video img {
     position: absolute;
     transform: translate(-50%,-50%);
     top: 50%;
