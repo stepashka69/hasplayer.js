@@ -1121,25 +1121,24 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     ///////////////////////////////// WebTV VOD //////////////////////////////////
 
-    if(vars && vars.hasOwnProperty("webtv-vod")){
+    if(vars && vars.hasOwnProperty("webtv-vod")) {
         $scope.showWEBTVVod = true;
-    }else{
+        // Get webtv config
+        var webtvConfigReq = new XMLHttpRequest();
+        var webtvConfig;
+        webtvConfigReq.onload = function() {
+            if (webtvConfigReq.status === 200) {
+                webtvConfig = JSON.parse(webtvConfigReq.responseText);
+                $scope.webtv_login_url = webtvConfig.webtv_login_url;
+                $scope.webtv_video_playing_infos_url = webtvConfig.webtv_video_playing_infos_url;
+            }
+        };
+        webtvConfigReq.open("GET", "webtv_vod_config.json", true);
+        webtvConfigReq.setRequestHeader("Content-type", "application/json");
+        webtvConfigReq.send();
+    } else {
         $scope.showWEBTVVod = false;
     }
-
-    // get webtv config
-    var webtvConfigReq = new XMLHttpRequest();
-    var webtvConfig;
-    webtvConfigReq.onload = function() {
-        if (webtvConfigReq.status === 200) {
-            webtvConfig = JSON.parse(webtvConfigReq.responseText);
-            $scope.webtv_login_url = webtvConfig.webtv_login_url;
-            $scope.webtv_video_playing_infos_url = webtvConfig.webtv_video_playing_infos_url;
-        }
-    };
-    webtvConfigReq.open("GET", "webtv_vod_config.json", true);
-    webtvConfigReq.setRequestHeader("Content-type", "application/json");
-    webtvConfigReq.send();
 
     $scope.doGetVODWebtvInfo = function(){
         sendJsonReq($scope.webtv_login_url).then(function(){
@@ -1175,25 +1174,26 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     ///////////////////////////////// RIGHTV ////////////////////////////////////
     if (vars && vars.hasOwnProperty("rightv")) {
         $scope.showRIGHTv = true;//(vars.rightv === "true");
+        // Get RIGHTv config
+        var rightvConfigReq = new XMLHttpRequest();
+        var rightvConfig;
+        rightvConfigReq.onload = function() {
+            if (rightvConfigReq.status === 200) {
+                rightvConfig = JSON.parse(rightvConfigReq.responseText);
+                $scope.rightv_service_url = rightvConfig.service_url;
+                $scope.rightv_login_url = rightvConfig.login_url;
+                $scope.rightv_order_url = rightvConfig.order_url;
+                $scope.rightv_video_playing_infos_url = rightvConfig.video_playing_infos_url;
+                $scope.licenser_base_url = rightvConfig.licenser_base_url;
+                $scope.video_external_id = rightvConfig.video_external_id;
+            }
+        };
+        rightvConfigReq.open("GET", "rightv_config.json", true);
+        rightvConfigReq.setRequestHeader("Content-type", "application/json");
+        rightvConfigReq.send();
     } else {
         $scope.showRIGHTv = false;
     }
-    var rightvConfigReq = new XMLHttpRequest();
-    var rightvConfig;
-    rightvConfigReq.onload = function() {
-        if (rightvConfigReq.status === 200) {
-            rightvConfig = JSON.parse(rightvConfigReq.responseText);
-            $scope.rightv_service_url = rightvConfig.service_url;
-            $scope.rightv_login_url = rightvConfig.login_url;
-            $scope.rightv_order_url = rightvConfig.order_url;
-            $scope.rightv_video_playing_infos_url = rightvConfig.video_playing_infos_url;
-            $scope.licenser_base_url = rightvConfig.licenser_base_url;
-            $scope.video_external_id = rightvConfig.video_external_id;
-        }
-    };
-    rightvConfigReq.open("GET", "rightv_config.json", true);
-    rightvConfigReq.setRequestHeader("Content-type", "application/json");
-    rightvConfigReq.send();
 
     $scope.doGetVideoPlayingInfo = function () {
         sendJsonReq($scope.rightv_service_url).then(function (/*response*/) {
@@ -1228,21 +1228,21 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
     ///////////////////////////////// ORANGETV ////////////////////////////////////
     if (vars && vars.hasOwnProperty("orangetv")) {
         $scope.showOrangeTV = true;
+        var orangetvConfigReq = new XMLHttpRequest();
+        var orangetvConfig;
+        orangetvConfigReq.onload = function() {
+            if (orangetvConfigReq.status === 200) {
+                orangetvConfig = JSON.parse(orangetvConfigReq.responseText);
+                $scope.orangetv_playable_videos_url = orangetvConfig.playable_videos_url;
+                $scope.orangetv_video_id = orangetvConfig.video_id;
+            }
+        };
+        orangetvConfigReq.open("GET", "orangetv_config.json", true);
+        orangetvConfigReq.setRequestHeader("Content-type", "application/json");
+        orangetvConfigReq.send();
     } else {
         $scope.showOrangeTV = false;
     }
-    var orangetvConfigReq = new XMLHttpRequest();
-    var orangetvConfig;
-    orangetvConfigReq.onload = function() {
-        if (orangetvConfigReq.status === 200) {
-            orangetvConfig = JSON.parse(orangetvConfigReq.responseText);
-            $scope.orangetv_playable_videos_url = orangetvConfig.playable_videos_url;
-            $scope.orangetv_video_id = orangetvConfig.video_id;
-        }
-    };
-    orangetvConfigReq.open("GET", "orangetv_config.json", true);
-    orangetvConfigReq.setRequestHeader("Content-type", "application/json");
-    orangetvConfigReq.send();
 
     $scope.doGetPlayableVideo = function () {
         var url = $scope.orangetv_playable_videos_url.replace('{video_id}', $scope.orangetv_video_id);
