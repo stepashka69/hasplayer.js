@@ -171,6 +171,14 @@
             "browsers": "cdsbi"
         },
         {
+            "type": "VOD",
+            "protocol": "MSS",
+            "name": "Ad-insertion (France2)",
+            "url": "http://2is7server1.rd.francetelecom.com/VOD/BBB-SD/big_buck_bunny_1080p_stereo.ism/Manifest",
+            "mastUrl": "http://tv-has.orange-labs.fr/adserver/mast-vast/France2/MAST.xml",
+            "browsers": "cdsbi"
+        },
+        {
             "type": "Live",
             "protocol": "MSS",
             "name": "France 2",
