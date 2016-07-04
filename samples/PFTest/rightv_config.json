@@ -1,8 +1,8 @@
 {
 	"service_url" : "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/service/SA?VS=NEWTV&X_WASSUP_OTV=0299124388",
 	"login_url" : "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/Login?",
-	"order_url" : "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/OrderVideo?client=json&pricing_id=76641965&price=2.99&viewing_method=streaming&payment_mode=normal&terminal_identifier=VODEW_PC&model_external_id=PC_WIN",
-    "video_playing_infos_url": "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/GetVideoPlayingInfo?client=json&resume=true&language_code=fre&model_external_id=PC_WIN&serial_number=VYIU2IJYHHF6DHQ55UJ2QKODTEZDWL6O",
+	"order_url" : "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/OrderVideo?client=json&pricing_id=76641965&price=2.99&viewing_method=streaming&payment_mode=normal&terminal_identifier=VODEW_PC&model_external_id=PC_WIN_HDCP",
+    "video_playing_infos_url": "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/GetVideoPlayingInfo?client=json&resume=true&language_code=fre&model_external_id=PC_WIN_HDCP&serial_number=AYIU2IJYHHF6DHQ55UJ2QKODTEZDWL6O",
     "licenser_base_url": "http://161.105.182.33/G8PC/RTEFacade_RIGHTV/",
-    "video_external_id": "SCORPIONXXXW0013052_S_2424VIDEO_2"
+    "video_external_id": "REVENGEALOVH0074540_H_2424VIDEO_1"
 }
