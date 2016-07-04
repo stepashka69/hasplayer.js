@@ -220,31 +220,27 @@
             "url": "http://2is7server1.rd.francetelecom.com/C4/C4-50_TVApp1.isml/Manifest",
             "browsers": "cdsbi"
         },
-
-
-
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV1",
-            "url": "http://161.105.253.165/streaming/1.m3u8",
+            "url": "http://mobiletv.orangetv-test.ro/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV2",
-            "url": "http://161.105.253.165/streaming/2.m3u8",
+            "url": "http://mobiletv.orangetv-test.ro/streaming/2.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV3",
-            "url": "http://161.105.253.165/streaming/3.m3u8",
+            "url": "http://mobiletv.orangetv-test.ro/streaming/3.m3u8",
             "browsers": "cdsbi"
         },
-
         {
             "type": "Live",
             "protocol": "MSS",
@@ -273,9 +269,6 @@
             "url": "http://161.105.176.18/ss/OFR-TF1-IP-DRM.isml/Manifest",
             "browsers": "cdsbi"
         },
-
-
-
         {
             "type": "VOD",
             "protocol": "DASH",
