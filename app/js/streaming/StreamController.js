@@ -594,7 +594,6 @@ MediaPlayer.dependencies.StreamController = function() {
             // Wait for current loading process (manifest download and updating) to be achieved
             Q.when(deferredLoading ? deferredLoading.promise : true).then(function () {
 
-                console.log("STOP: StreamController resetting");
                 // Pause the active stream, but reset only once protection controller and media key sessions have been resetted
                 self.pause();
 
@@ -612,7 +611,6 @@ MediaPlayer.dependencies.StreamController = function() {
                     protectionData = null;
 
                     // Reset the streams
-                    console.log("STOP: StreamController reset " + streams.length + " stream(s)");
                     for (i = 0, ln = streams.length; i < ln; i += 1) {
                         stream = streams[i];
                         funcs.push(stream.reset());
@@ -628,7 +626,6 @@ MediaPlayer.dependencies.StreamController = function() {
                         function() {
                             streams = [];
                             activeStream = null;
-                            console.log("STOP: StreamController reset complete");
                             self.metricsModel.addState('video', 'stopped', self.videoModel.getCurrentTime(), reason);
                             self.notify(MediaPlayer.dependencies.StreamController.eventList.ENAME_TEARDOWN_COMPLETE);
                         });
