@@ -164,7 +164,7 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
             if (request !== null) {
                 _fragmentInfoTime = request.startTime + request.duration;
 
-                request = _bufferController.getIndexHandler().getFragmentInfoRequest(request);
+                request = self.indexHandler.getFragmentInfoRequest(request);
 
                 // Download the fragment info segment
                 self.fragmentController.prepareFragmentForLoading(self, request, onBytesLoadingStart, onBytesLoaded, onBytesError, null);
@@ -204,7 +204,7 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
 
             self.debug.log("[FragmentInfoController][" + type + "] loadNextFragment for time: " + segmentTime);
 
-            _bufferController.getIndexHandler().getSegmentRequestForTime(_bufferController.getCurrentRepresentation(), segmentTime).then(onFragmentRequest.bind(self));
+            self.indexHandler.getSegmentRequestForTime(_bufferController.getCurrentRepresentation(), segmentTime).then(onFragmentRequest.bind(self));
         };
 
     return {
@@ -214,6 +214,7 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
         system: undefined,
         errHandler: undefined,
         abrRulesCollection: undefined,
+        indexHandler: undefined,
 
         initialize: function(type, fragmentController, bufferController) {
             var self = this,
@@ -239,6 +240,11 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
 
         setType: function(value) {
             type = value;
+
+            if (this.indexHandler !== undefined) {
+                this.indexHandler.setType(value);
+                this.indexHandler.setIsDynamic(true);
+            }
         },
 
         isReady: function() {
