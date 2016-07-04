@@ -868,7 +868,7 @@ MediaPlayer.dependencies.Stream = function() {
 
             manifest = self.manifestModel.getValue();
             periodInfo = updatedPeriodInfo;
-            self.debug.log("Manifest updated... set new data on buffers.");
+            self.debug.log("[Stream] Manifest updated ... set new data on buffers.");
 
             if (videoController) {
                 videoData = videoController.getData();
