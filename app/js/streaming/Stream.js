@@ -371,6 +371,20 @@ MediaPlayer.dependencies.Stream = function() {
             }
         },
 
+        stopFragmentInfoControllers = function() {
+            if (fragmentInfoVideoController) {
+                fragmentInfoVideoController.stop();
+            }
+
+            if (fragmentInfoAudioController) {
+                fragmentInfoAudioController.stop();
+            }
+
+            if (fragmentInfoTextController) {
+                fragmentInfoTextController.stop();
+            }
+        },
+
         onLoaded = function() {
             this.debug.info("[Stream] <video> loadedmetadata event");
         },
@@ -507,7 +521,7 @@ MediaPlayer.dependencies.Stream = function() {
                     if (seekValue < self.getStartTime()) {
                         seekValue = self.getStartTime();
                     } else if (seekValue >= self.videoModel.getDuration()) {
-                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;                       
+                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;
                         tmEndDetected = true;
                     }
                     if (delay > 0) {
@@ -671,24 +685,12 @@ MediaPlayer.dependencies.Stream = function() {
                 videoController.stop();
             }
 
-            if (fragmentInfoVideoController) {
-                fragmentInfoVideoController.stop();
-            }
-
             if (audioController) {
                 audioController.stop();
             }
 
-            if (fragmentInfoAudioController) {
-                fragmentInfoAudioController.stop();
-            }
-
             if (textController) {
                 textController.stop();
-            }
-
-            if (fragmentInfoTextController) {
-                fragmentInfoTextController.stop();
             }
         },
 
@@ -1101,6 +1103,8 @@ MediaPlayer.dependencies.Stream = function() {
             this.debug.info("[Stream] Reset");
 
             stopBuffering.call(this);
+
+            stopFragmentInfoControllers.call(this);
 
             pause.call(this);
 
