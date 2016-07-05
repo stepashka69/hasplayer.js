@@ -1092,7 +1092,7 @@ app.controller('DashController', ['$scope', '$window', 'Sources','SourceTVM', 'N
 
     if (vars && vars.hasOwnProperty("stream")) {
         try {
-            $scope.selectedItem = JSON.parse(BASE64.decode(vars.stream));
+            $scope.selectedItem = JSON.parse(atob(vars.stream));
             setProtectionData();
         } catch (e) {}
     }
