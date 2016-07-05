@@ -20,7 +20,6 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
         ready = false,
         started = false,
         fragmentModel = null,
-        fragmentDuration = 0,
         type,
         bufferTimeout,
         _fragmentInfoTime,
@@ -101,10 +100,6 @@ MediaPlayer.dependencies.FragmentInfoController = function() {
             segmentDownloadErrorCount = 0;
 
             this.debug.log("[FragmentInfoController][" + type + "] Media loaded ", request.url);
-
-            if (!fragmentDuration && !isNaN(request.duration)) {
-                fragmentDuration = request.duration;
-            }
 
             // ORANGE: add request and representations in function parameters, used by MssFragmentController
             data = this.fragmentController.process(response.data, request, _bufferController.getAvailableRepresentations());
