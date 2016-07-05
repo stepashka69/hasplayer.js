@@ -365,7 +365,7 @@ MediaPlayer.dependencies.Stream = function() {
                 fragmentInfoAudioController.initialize("audio", this.fragmentController, audioController);
             }
 
-            if (fragmentInfoTextController === null && textController) {
+            if (fragmentInfoTextController === null && textController && subtitlesEnabled) {
                 fragmentInfoTextController = this.system.getObject("fragmentInfoController");
                 fragmentInfoTextController.initialize("text", this.fragmentController, textController);
             }
