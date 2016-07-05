@@ -1195,6 +1195,10 @@ MediaPlayer.dependencies.Stream = function() {
                             // In case of live streams, refresh manifest before activating subtitles
                             this.system.mapHandler("streamsComposed", undefined, streamsComposed.bind(this), true);
                             this.system.notify("manifestUpdate");
+                            if (this.manifestExt.getIsDynamic(manifest) && fragmentInfoTextController === null && fragmentInfoVideoController !== null) {
+                                fragmentInfoTextController = this.system.getObject("fragmentInfoController");
+                                fragmentInfoTextController.initialize("text", this.fragmentController, textController);
+                            }
                         } else {
                             streamsComposed.call(this);
                         }
