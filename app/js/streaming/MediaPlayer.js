@@ -911,11 +911,7 @@ MediaPlayer = function () {
          */
         pause: function () {
             _isPlayerInitialized();
-            if (!this.isLive()) {
-                videoModel.pause();
-            } else {
-                throw new Error('MediaPlayer.pause(): pause is impossible on live stream');
-            }
+            videoModel.pause();
         },
 
         /**
