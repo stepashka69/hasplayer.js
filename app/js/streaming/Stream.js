@@ -422,6 +422,9 @@ MediaPlayer.dependencies.Stream = function() {
             startStreamTime = -1;
             this.metricsModel.addPlayList("video", new Date().getTime(), this.videoModel.getCurrentTime(), "pause");
             suspend.call(this);
+            if (manifest.name === 'MSS' && this.manifestExt.getIsDynamic(manifest)) {
+                startFragmentInfoControllers.call(this);
+            }
         },
 
         onError = function(event) {
