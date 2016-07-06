@@ -125,6 +125,12 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.debug.info("[Stream] Seek: " + time);
 
+            // In case of live streams and then DVR seek, then we start the fragmentInfoControllers
+            // (check if seek not due to stream loading or reloading)
+            if (this.manifestExt.getIsDynamic(manifest) && !isReloading && (this.videoModel.getCurrentTime() !== 0)) {
+                startFragmentInfoControllers.call(this);
+            }
+
             // Stream is starting playing => fills the buffers before setting <video> current time
             if (autoplay === true) {
                 // 1- seeks the buffer controllers at the desired time
@@ -820,12 +826,6 @@ MediaPlayer.dependencies.Stream = function() {
 
             // Unmap "bufferUpdated" handler
             this.system.unmapHandler("bufferUpdated");
-
-            // In case of live streams and then DVR seek, then we start the fragmentInfoControllers
-            // (check if seek not due to stream loading or reloading)
-            if (this.manifestExt.getIsDynamic(manifest) && !isReloading && (this.videoModel.getCurrentTime() !== 0)) {
-                startFragmentInfoControllers.call(this);
-            }
 
             // Set current time on video if 'play' event has already been raised.
             // If 'play' event has not yet been raised, the the current time will be set afterwards
