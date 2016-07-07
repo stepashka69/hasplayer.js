@@ -224,21 +224,21 @@
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV1",
-            "url": "http://mobiletv.orangetv-test.ro/streaming/1.m3u8",
+            "url": "http://93.122.181.13/streaming/1.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV2",
-            "url": "http://mobiletv.orangetv-test.ro/streaming/2.m3u8",
+            "url": "http://93.122.181.13/streaming/2.m3u8",
             "browsers": "cdsbi"
         },
         {
             "type": "Live",
             "protocol": "HLS",
             "name": "VIMTV3",
-            "url": "http://mobiletv.orangetv-test.ro/streaming/3.m3u8",
+            "url": "http://93.122.181.13/streaming/3.m3u8",
             "browsers": "cdsbi"
         },
         {
