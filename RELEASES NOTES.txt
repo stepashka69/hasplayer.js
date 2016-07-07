@@ -1,6 +1,7 @@
 ### Release Notes v1.3.7 (2016/07/07)
 * Bugs fixing:
 * - Fast zapping error (consolidate load and reset process)
+* - Correct MediaPlayer.load() when multiple plugins are loaded
 * - Patch for Safari which faces an issue with MSE buffer removing
 * - Correct display of subtitles on multiple lines
 * - Correct display of subtitles with no layout and style
