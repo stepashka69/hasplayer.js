@@ -1,9 +1,9 @@
 var orangeHasPlayer = null,
     metricsAgent = null,
     adsPlayer = null,
+    adsMode = false,
     config = null,
     video = null,
-    videoPlayerContainer = null,
     currentStreamInfos = null,
     confMetricsAgent = {
         'name': 'Prisme (local)',
@@ -29,7 +29,6 @@ var orangeHasPlayer = null,
 function createHasPlayer(isSubtitleExternDisplay) {
     orangeHasPlayer = new MediaPlayer();
     video = document.getElementById('player');
-    videoPlayerContainer = document.getElementById('VideoPlayerContainer');
 
     orangeHasPlayer.init(video);
     orangeHasPlayer.setDebug(true);
@@ -42,15 +41,20 @@ function createHasPlayer(isSubtitleExternDisplay) {
 
     // Load plugins
     if (typeof AdsPlayer == 'function') {
-        adsPlayer = new AdsPlayer(document.getElementById('VideoModule'));
+        adsPlayer = new AdsPlayer(document.getElementById('adsplayer-container'));
+        adsPlayer.addEventListener('start', onAdsPlayerToggle);
+        adsPlayer.addEventListener('end', onAdsPlayerToggle);
+        adsPlayer.addEventListener('play', onAdsPlayerPlayPause);
+        adsPlayer.addEventListener('pause', onAdsPlayerPlayPause);
+        adsPlayer.addEventListener('click', onAdsPlayerClick);
         orangeHasPlayer.addPlugin(adsPlayer);
-        registerAdsPlayerEvents();
     }
 
     orangeHasPlayer.setDefaultAudioLang('fra');
     orangeHasPlayer.setDefaultSubtitleLang('fre');
     orangeHasPlayer.enableSubtitles(false);
     registerHasPlayerEvents();
+    registerVisibilityChange();
 }
 
 function registerHasPlayerEvents() {
@@ -71,15 +75,25 @@ function registerHasPlayerEvents() {
     orangeHasPlayer.addEventListener('manifestUrlUpdate', onManifestUrlUpdate);
 }
 
-function registerAdsPlayerEvents() {
-    if (adsPlayer) {
-        adsPlayer.addEventListener('adStart',function(){
-            videoPlayerContainer.style.visibility = 'hidden';
-        });
-        adsPlayer.addEventListener('adEnd',function(){
-            videoPlayerContainer.style.visibility = 'visible';
-        });
+function registerVisibilityChange() {
+
+    // Set the name of the hidden property and the change event for visibility
+    var hidden, visibilityChange; 
+    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+    } else if (typeof document.mozHidden !== "undefined") {
+        hidden = "mozHidden";
+        visibilityChange = "mozvisibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
     }
+
+    document.addEventListener(visibilityChange, onVisibilityChange, false);
 }
 
 function loadHasPlayerConfig(fileUrl) {
@@ -269,4 +283,44 @@ function changePlayerState() {
 function setSeekValue(seekTime) {
     orangeHasPlayer.seek(seekTime);
 }
-/**********************************************************************************************************************/
+
+/********************************************************************************************************************
+ *
+ *
+ *                   AdsPlayer Events
+ *
+ *
+ **********************************************************************************************************************/
+
+function onAdsPlayerToggle(e) {
+    console.log("adsplayer - " + e.type);
+    adsMode = (e.type === 'start');
+    document.getElementById('video-player-container').style.display = adsMode ? 'none' : 'block';
+    document.getElementById('adsplayer-container').style.display = adsMode ? 'block' : 'none';
+}
+
+function onAdsPlayerPlayPause(e) {
+    console.log("adsplayer - " + e.type);
+    var play = (e.type === 'play');
+    handleAdsPlayerPlayState(play);
+}
+
+function onAdsPlayerClick(e) {
+    console.log("adsplayer - " + e.type);
+    if (e.data.uri) {
+        window.open(e.data.uri);
+    }
+}
+
+function onVisibilityChange() {
+    if (adsMode) {
+        console.log("adsplayer - visibility change: " + document.hidden);
+        if (document.hidden) {
+            adsPlayer.pause();
+        } else {
+            adsPlayer.play();
+        }
+    }
+}
+
+

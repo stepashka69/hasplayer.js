@@ -1,0 +1,5 @@
+{
+    "login_url":"https://ssl-tb1n.orange.fr/WT/userinfo/?serv=VODOOB&info=dsn,cooses&wt-email=qualif.newtv2@orange.fr&wt-pwd=Passwd1&wt-cvt=4&wt-cooses&wt-mco=MCO=OFR",
+    "playable_videos_url":"http://video-a-la-demande-deveat.orange.fr/vod-webapp/v5/VODPC2/user/playablevideos/{video_id}?dojo.preventCache=1465394333457&uniqueId=Windows10-x64-InternetExplorer&statsId=VODPC_WIN_vod_IE_11_WindowsNT%2010.0&giftId=",
+    "video_id" : "CHEVALDEGUEW0066196_H_ESTTVQW_1"
+}

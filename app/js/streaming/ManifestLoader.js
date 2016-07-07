@@ -19,6 +19,7 @@ MediaPlayer.dependencies.ManifestLoader = function() {
         retryAttempts = DEFAULT_RETRY_ATTEMPTS,
         retryInterval = DEFAULT_RETRY_INTERVAL,
         retryCount = 0,
+        retryTimeout = null,
         deferred = null,
         request = null,
 
@@ -65,9 +66,14 @@ MediaPlayer.dependencies.ManifestLoader = function() {
         },
 
         _abort = function() {
+
             if (request !== null && request.readyState > 0 && request.readyState < 4) {
                 this.debug.log("[ManifestLoader] Manifest download abort.");
                 request.abort();
+            } else if (retryTimeout) {
+                clearTimeout(retryTimeout);
+                retryTimeout = null;
+                deferred.reject();
             }
 
             this.parser.abort();
@@ -119,12 +125,18 @@ MediaPlayer.dependencies.ManifestLoader = function() {
 
                     self.parser.parse(_getDecodedResponseText(request.responseText), baseUrl).then(
                         function(manifest) {
-                            manifest.mpdUrl = url;
-                            manifest.mpdLoadedTime = mpdLoadedTime;
-                            self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
-                            deferred.resolve(manifest);
+                            if (manifest) {
+                                manifest.mpdUrl = url;
+                                manifest.mpdLoadedTime = mpdLoadedTime;
+                                self.metricsModel.addManifestUpdate("stream", manifest.type, requestTime, mpdLoadedTime, manifest.availabilityStartTime);
+                                deferred.resolve(manifest);
+                            } else {
+                                deferred.reject();
+                            }
                         },
                         function(error) {
+                            // Check if reject is due to other issue than manifest parsing
+                            // (for example HLS variant steam playlist download error) 
                             if (error && error.name && error.message) {
                                 deferred.reject(error);
                             } else {
@@ -165,7 +177,7 @@ MediaPlayer.dependencies.ManifestLoader = function() {
                 } else {
                     retryCount++;
                     if (retryAttempts > 0 && retryCount <= retryAttempts) {
-                        setTimeout(function() {
+                        retryTimeout = setTimeout(function() {
                             _load.call(self, url);
                         }, retryInterval);
                     } else {
@@ -182,6 +194,7 @@ MediaPlayer.dependencies.ManifestLoader = function() {
             };
 
             try {
+                request = new XMLHttpRequest();
                 request.onload = onload;
                 request.onloadend = report;
                 request.onerror = report;

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>TVM VOD</title>
+    <style>
+        input {
+            display: block;
+            margin: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<script language="javascript">
+
+var login_url,
+    playable_videos_url,
+    video_id,
+    hasplayer_application;
+
+var load = function() {
+
+    login_url = document.getElementById('login_url');
+    playable_videos_url = document.getElementById('playable_videos_url');
+    video_id = document.getElementById('video_id');
+    hasplayer_application = document.getElementById('hasplayer_application');
+
+    //hasplayer_application.value = "http://tv-has.orange-labs.fr/hasplayer_orange/dev/samples/DASH-IF/index.html";
+    hasplayer_application.value = "http://10.194.60.243/dash.js/OrangeForge/hasplayer.js/samples/Dash-IF/index.html";
+
+    var orangetvConfigReq = new XMLHttpRequest();
+    var orangetvConfig;
+    orangetvConfigReq.onload = function() {
+        if (orangetvConfigReq.status === 200) {
+            orangetvConfig = JSON.parse(orangetvConfigReq.responseText);
+            login_url.value = orangetvConfig.login_url;
+            playable_videos_url.value = orangetvConfig.playable_videos_url;
+            video_id.value = orangetvConfig.video_id;
+        }
+    };
+    orangetvConfigReq.open("GET", "tvmvod_config.json", true);
+    orangetvConfigReq.setRequestHeader("Content-type", "application/json");
+    orangetvConfigReq.send();
+};
+
+var sendJsonReq = function (url, callback) {
+
+    if (!url || url.length === 0) {
+        callback();
+    }
+
+    var req = new XMLHttpRequest();
+
+    req.onload = function() {
+        if (req.status === 200) {
+            callback(req.responseText);
+        }
+    };
+    req.open("GET", url, true);
+    req.withCredentials=true;
+    req.setRequestHeader("Content-type", "application/json");
+    req.send();
+};
+
+var getStreamFromTVMv1 = function (response) {
+    var stream = {
+        'url': response.streamUrl,
+        'protData': {
+            'com.microsoft.playready': {
+                laURL: response.licenseRetrievalURL,
+                cdmData: response.drmToken
+            },
+            'com.widevine.alpha': {
+                laURL: response.licenseRetrievalURL,
+                cdmData: response.drmToken
+            }
+        }
+    };
+    return stream;
+};
+
+var getStreamFromTVMv2 = function (response) {
+    var stream = {
+            'url': response.url
+        },
+        protectionData,
+        protData = {};
+
+    if (response.protectionData) {
+        for (var i = 0; i < response.protectionData.length; i++) {
+            protectionData = response.protectionData[i];
+            if (protectionData.keySystem === 'com.microsoft.playready' || protectionData.keySystem === 'com.widevine.alpha') {
+                var ksData = {};
+                ksData.laURL = protectionData.laUrl;
+                if (response.drmToken && protectionData.keySystem === 'com.microsoft.playready') {
+                    ksData.cdmData = response.drmToken;
+                }
+                protData[protectionData.keySystem] = ksData;
+            }
+        }
+        stream.protData = protData;
+    }
+
+    return stream;
+};
+
+function play() {
+    var url = playable_videos_url.value.replace('{video_id}', video_id.value);
+
+    sendJsonReq(login_url.value, function() {
+        sendJsonReq(url, function (response) {
+            var videoInfos = JSON.parse(response),
+                stream;
+
+            if (videoInfos.error) {
+                alert(videoInfos.error.code + ' - ' + videoInfos.error.message);
+            } else {
+                if (videoInfos.response.streamUrl) {
+                    stream = getStreamFromTVMv1(videoInfos.response);
+                } else {
+                    stream = getStreamFromTVMv2(videoInfos.response);
+                }
+                window.open(hasplayer_application.value + "?autoplay=true&stream=" + btoa(JSON.stringify(stream)), "hasplayer.js");
+            }
+        });
+    });
+}
+
+</script>
+
+<body onload="load()">
+    login_url: <input type="text" class="form-control" placeholder="login url" id="login_url"><br/>
+    playable_videos_url: <input type="text" class="form-control" placeholder="playable_videos_url url" id="playable_videos_url"><br/>
+    video_id: <input type="text" class="form-control" placeholder="video id" id="video_id"><br/>
+    hasplayer_application: <input type="text" class="form-control" placeholder="hasplayer_application" id="hasplayer_application"><br/>
+    <button type="button" onclick="play()" style="border-radius: 0;">Play</button><br/>
+</body>
+</html>

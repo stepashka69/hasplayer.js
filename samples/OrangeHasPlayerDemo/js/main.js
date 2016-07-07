@@ -175,6 +175,13 @@ var handleVideoEnd = function(){
     handleBuffering(false);
 };
 
+
+///////////////////////////////////////////////////////////////////////
+// AdsPlayer
+var handleAdsPlayerPlayState = function(state) {
+    playerPanel.setAdsPlayerPlayingState(state);
+};
+
 /**********************************************************************************************************************/
 
 var reset = function() {

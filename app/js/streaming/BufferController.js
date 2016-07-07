@@ -41,7 +41,6 @@ MediaPlayer.dependencies.BufferController = function() {
         bufferLevel = 0,
         isQuotaExceeded = false,
         rejectedBytes = null,
-        fragmentDuration = 0,
         appendingRejectedData = false,
         mediaSource,
         type,
@@ -85,6 +84,11 @@ MediaPlayer.dependencies.BufferController = function() {
         currentSequenceNumber = -1,
 
         segmentDuration = NaN,
+
+        // Patch for Safari: do not remove past buffer in live use case
+        // since it generates MEDIA_ERROR_DECODE while appending new segment
+        isSafari = (fingerprint_browser().name === "Safari"),
+
 
         sendRequest = function() {
 
@@ -157,6 +161,9 @@ MediaPlayer.dependencies.BufferController = function() {
             }
 
             if (isBufferingCompleted) {
+                if(data.mimeType === "application/ttml+xml"){
+                    return;
+                }
                 isBufferingCompleted = false;
             }
 
@@ -333,10 +340,6 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.chunkMissingCount = 0;
             }
 
-            if (!fragmentDuration && !isNaN(request.duration)) {
-                fragmentDuration = request.duration;
-            }
-
             // ORANGE: add request and representations in function parameters, used by MssFragmentController
             data = self.fragmentController.process(response.data, request, availableRepresentations);
             if (data) {
@@ -437,7 +440,10 @@ MediaPlayer.dependencies.BufferController = function() {
 
                                     isQuotaExceeded = false;
 
-                                    if (isDynamic && bufferLevel > 1) {
+                                    // Patch for Safari: do not remove past buffer in live use case
+                                    // since it generates MEDIA_ERROR_DECODE while appending new segment
+
+                                    if (isDynamic && bufferLevel > 1 && !isSafari) {
                                         // In case of live streams, remove outdated buffer parts and requests
                                         // (checking bufferLevel ensure buffer is not empty or back to current time)
                                         removeBuffer.call(self, -1, getWorkingTime.call(self) - 30).then(
@@ -617,22 +623,6 @@ MediaPlayer.dependencies.BufferController = function() {
 
         },
 
-        /*checkGapBetweenBuffers= function() {
-            var leastLevel = this.bufferExt.getLeastBufferLevel(),
-                acceptableGap = fragmentDuration * 2,
-                actualGap = bufferLevel - leastLevel;
-
-            // if the gap betweeen buffers is too big we should create a promise that prevents appending data to the current
-            // buffer and requesting new segments until the gap will be reduced to the suitable size.
-            if (actualGap > acceptableGap && !deferredBuffersFlatten) {
-                fragmentsToLoad = 0;
-                deferredBuffersFlatten = Q.defer();
-            } else if ((actualGap < acceptableGap) && deferredBuffersFlatten) {
-                deferredBuffersFlatten.resolve();
-                deferredBuffersFlatten = null;
-            }
-        },*/
-
         isRunning = function() {
             var self = this;
             if (started) {
@@ -657,6 +647,7 @@ MediaPlayer.dependencies.BufferController = function() {
             var self = this,
                 deferred = Q.defer(),
                 removedTime = 0,
+                fragmentDuration,
                 startClearing;
 
             // do not remove any data until the quota is exceeded
@@ -816,10 +807,10 @@ MediaPlayer.dependencies.BufferController = function() {
 
             // Check if running state
             if (!isRunning.call(self)) {
-                return;
+                return Q.when(null);
             }
 
-            // Check if initialization segment for current quality has not already been stored
+            // Check if initialization segment for current quality has already been loaded and stored
             if (initializationData[quality]) {
                 self.debug.info("[BufferController][" + type + "] Buffer initialization segment, quality = ", quality);
                 appendToBuffer.call(this, initializationData[quality], quality).then(
@@ -833,7 +824,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 );
                 return Q.when(null);
             } else {
-                // if we have not loaded the init segment for the current quality, do it
+                // Get init segment request for the current
                 return this.indexHandler.getInitRequest(availableRepresentations[quality]);
             }
         },
@@ -863,8 +854,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 self.debug.log("[BufferController][" + type + "] loadNextFragment for time: " + segmentTime);
                 self.indexHandler.getSegmentRequestForTime(_currentRepresentation, segmentTime).then(onFragmentRequest.bind(self), function (){
                     currentDownloadQuality = -1;
-                    doStop.call(self);
-                    signalSegmentBuffered.call(self);
+                    signalStreamComplete.call(self);
                 });
             }
         },
@@ -902,13 +892,14 @@ MediaPlayer.dependencies.BufferController = function() {
                 // If live HLS, then try to refresh playlist
                 if (isDynamic) {
                     if (manifest.name === "M3U") {
-                        // HLS use case => update current representation playlist
                         updatePlayListForRepresentation.call(self, currentDownloadQuality).then(
                             function() {
                                 _currentRepresentation = getRepresentationForQuality.call(self, currentDownloadQuality);
                                 updateCheckBufferTimeout.call(self, 0);
                             }, function(err) {
-                                self.errHandler.sendError(err.name, err.message, err.data);
+                                if (err) {
+                                    self.errHandler.sendError(err.name, err.message, err.data);
+                                }
                             }
                         );
                     }
@@ -1024,28 +1015,24 @@ MediaPlayer.dependencies.BufferController = function() {
                     bufferFragment.call(self);
                 } else {
                     // Determine the timeout delay before checking again the buffer
-                    delay = bufferLevel - minBufferTime;
-                    self.debug.log("[BufferController][" + type + "] Check buffer in " + delay + " seconds");
+                    delay = bufferLevel - minBufferTime + 0.5; // + 0.5 to ensure buffer level will be inferior to minBufferTime
                     updateCheckBufferTimeout.call(self, delay);
                 }
             }
         },
 
         updateCheckBufferTimeout = function(delay) {
-            var self = this,
-                delayMs = Math.max((delay * 1000), 2000);
+            var self = this;
 
-            self.debug.log("[BufferController][" + type + "] Check buffer delta = " + delayMs + " ms");
+            delay = Math.max(delay, (segmentDuration / 2));
 
-            /* if (trickModeEnabled) {
-                delayMs = 500;
-            }*/
+            this.debug.log("[BufferController][" + type + "] Check buffer in = " + delay.toFixed(3) + " ms (bufferLevel = " + bufferLevel + ")");
 
             clearTimeout(bufferTimeout);
             bufferTimeout = setTimeout(function() {
                 bufferTimeout = null;
                 checkIfSufficientBuffer.call(self);
-            }, delayMs);
+            }, (delay * 1000));
         },
 
         cancelCheckBufferTimeout = function() {
@@ -1138,7 +1125,9 @@ MediaPlayer.dependencies.BufferController = function() {
                 },
                 function(err) {
                     signalSegmentBuffered();
-                    self.errHandler.sendError(err.name, err.message, err.data);
+                    if (err) {
+                        self.errHandler.sendError(err.name, err.message, err.data);                        
+                    }
                 }
             );
 
@@ -1151,9 +1140,11 @@ MediaPlayer.dependencies.BufferController = function() {
                 representation,
                 idx;
 
+            
             // Check if running state
             if (!isRunning.call(self)) {
-                return;
+                deferred.reject();
+                return deferred.promise;
             }
 
             idx = this.manifestExt.getDataIndex(data, manifest, periodInfo.index);
@@ -1293,8 +1284,6 @@ MediaPlayer.dependencies.BufferController = function() {
             _currentRepresentation = getRepresentationForQuality.call(self, self.abrController.getPlaybackQuality(type, data).quality);
 
             if (_currentRepresentation) {
-                fragmentDuration = _currentRepresentation.segmentDuration;
-
                 self.indexHandler.setIsDynamic(isDynamic);
                 if (minBufferTime === -1) {
                     minBufferTime = self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer);
@@ -1392,6 +1381,7 @@ MediaPlayer.dependencies.BufferController = function() {
                 //for xml subtitles file, reset cues and restart buffering
                 if (type === 'text' && (data.mimeType === 'application/ttml+xml')) {
                     buffer.abort();
+                    isBufferingCompleted = false;
                     doStart.call(self);
                 }
             }

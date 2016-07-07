@@ -138,7 +138,7 @@ MediaPlayer.utils.TTMLParser = function() {
             // R001 - A document must contain a tt element.
             // R002 - A document must contain both a head and body element.
             // R003 - A document must contain both a styling and a layout element.
-            if (nodeTt && nodeHead && nodeLayout && nodeStyling && nodeBody) {
+            if (nodeTt && nodeHead && /*nodeLayout && nodeStyling &&*/ nodeBody) {
                 passed = true;
             }
 
@@ -614,14 +614,16 @@ MediaPlayer.utils.TTMLParser = function() {
                                     }
 
                                     if (startTime === previousStartTime && endTime === previousEndTime) {
-                                        captionArray.pop();
-                                        caption = {
-                                            start: startTime,
-                                            end: endTime,
-                                            data: regions[i - 1].textContent + '\n' + region.textContent,
-                                            line: 80,
-                                            style: cssStyle
-                                        };
+                                        if (region.textContent !== "") {
+                                            var lastCaption = captionArray.pop();
+                                            caption = {
+                                                start: startTime,
+                                                end: endTime,
+                                                data: lastCaption.data + '\n' + region.textContent,
+                                                line: 80,
+                                                style: cssStyle
+                                            };
+                                        }
                                     } else {
                                         textNodes = this.domParser.getChildNodes(region, '#text');
 
@@ -637,7 +639,9 @@ MediaPlayer.utils.TTMLParser = function() {
                                         };
                                         textValue = "";
                                     }
-                                    captionArray.push(caption);
+                                    if (caption !== null) {
+                                        captionArray.push(caption);
+                                    }
                                 }
                             }
                         }

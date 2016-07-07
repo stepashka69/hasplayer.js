@@ -476,45 +476,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="panel" id="rightvPanel" ng-show="showRIGHTv">
-                    <div class="panel-heading panel-top">
-                        <span class="panel-title">RIGHTv</span>
-                    </div>
-                    <div class="panel-body">
-                        service_url: <input type="text" class="form-control" placeholder="service url" ng-model="rightv_service_url">
-                        login_url: <input type="text" class="form-control" placeholder="login url" ng-model="rightv_login_url">
-                        order_url: <input type="text" class="form-control" placeholder="order url" ng-model="rightv_order_url">
-                        video_playing_infos_url: <input type="text" class="form-control" placeholder="video playing infos url" ng-model="rightv_video_playing_infos_url">
-                        licenser_base_url: <input type="text" class="form-control" placeholder="licenser base url" ng-model="licenser_base_url">
-                        video_external_id: <input type="text" class="form-control" placeholder="video_external_id" ng-model="video_external_id">
-                        <button class="btn btn-primary" ng-disabled="!video_external_id" type="button" ng-click="doGetVideoPlayingInfo()" style="border-radius: 0;">GetVideoPlayingInfo</button>
-                    </div>
-                </div>
-
-                <div class="panel" id="webtv-vodPanel" ng-show="showWEBTVVod">
-                    <div class="panel-heading panel-top">
-                        <span class="panel-title">VOD WebTV</span>
-                    </div>
-                    <div class="panel-body">
-                        login_url: <input type="text" class="form-control" placeholder="login url" ng-model="webtv_login_url">
-                        playable_videos_url: <input type="text" class="form-control" placeholder="video playing infos url" ng-model="webtv_video_playing_infos_url">
-                        <button class="btn btn-primary" ng-disabled="!video_external_id" type="button" ng-click="doGetVODWebtvInfo()" style="border-radius: 0;">Get VOD playing Info</button>
-                    </div>
-                </div>
-
-
-                <div class="panel" id="orangeVodPanel" ng-show="showOrangeTV">
-                    <div class="panel-heading panel-top">
-                        <span class="panel-title">Orange VOD</span>
-                    </div>
-                    <div class="panel-body">
-                        playable_videos_url: <input type="text" class="form-control" placeholder="playable videos url" ng-model="orangetv_playable_videos_url">
-                        video_url: <input type="text" class="form-control" placeholder="video id" ng-model="orangetv_video_id">
-                        <button class="btn btn-primary" ng-disabled="!orangetv_video_id" type="button" ng-click="doGetPlayableVideo()" style="border-radius: 0;">GetVideoPlayingInfo</button>
-                    </div>
-                </div>
-
                 <button ng-show="!videojsIsOn" ng-click="activateVideoJS()" class="btn btn-default btn-xs" style="border-radius: 0; width: 100%;">Use the VideoJS skin</button>
             </div>
 

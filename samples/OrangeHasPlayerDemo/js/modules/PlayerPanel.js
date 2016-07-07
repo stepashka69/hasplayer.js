@@ -49,6 +49,11 @@ var PlayerPanel = function(isSubtitleExternDisplay) {
     this.subtitlesCSSStyle = null;
     this.subTitles = null;
     this.isSubtitleExternDisplay = isSubtitleExternDisplay;
+
+    // AdsPlayer
+    this.adsplayerPlayPauseButton = null;
+    this.adsplayerFullscreenButton = null;
+
 };
 
 PlayerPanel.prototype.init = function() {
@@ -100,6 +105,10 @@ PlayerPanel.prototype.init = function() {
     this.smallErrorMessage = document.getElementById('smallMessageError');
     this.longErrorMessage = document.getElementById('longMessageError');
 
+    // AdsPlayer
+    this.adsplayerPlayPauseButton = document.getElementById('adsplayer-play-pause');
+    this.adsplayerFullscreenButton = document.getElementById('adsplayer-fullscreen');
+
     this.setupEventListeners();
 };
 
@@ -136,6 +145,11 @@ PlayerPanel.prototype.setupEventListeners = function() {
 
     this.video.addEventListener('waiting', this.onWaiting.bind(this));
     this.video.addEventListener('playing', this.onPlaying.bind(this));
+
+    // AdsPlayer
+    this.adsplayerPlayPauseButton.addEventListener('click', this.onAdsPlayerPlayPauseButtonClicked.bind(this));
+    this.adsplayerFullscreenButton.addEventListener('click', this.onAdsPlayerFullscreenButtonClicked.bind(this));
+
 
     minivents.on('subtitle-radio-clicked', this.onSubtitleEnableChanged.bind(this));
 };
@@ -661,4 +675,47 @@ PlayerPanel.prototype.reset = function() {
     this.showBarsTimed();
     this.nbSubtitlesToDisplay = 0;
     this.cleanSubtitlesDiv();
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// AdsPlayer
+
+PlayerPanel.prototype.setAdsPlayerPlayingState = function(value) {
+    this.adsplayerPlayPauseButton.innerText = value ? 'Pause': 'Play';
+};
+
+PlayerPanel.prototype.onAdsPlayerPlayPauseButtonClicked = function() {
+    if (this.adsplayerPlayPauseButton.innerText === 'Play') {
+        adsPlayer.play();
+    } else {
+        adsPlayer.pause();
+    }
+};
+
+PlayerPanel.prototype.onAdsPlayerFullscreenButtonClicked = function() {
+    if (!document.fullscreenElement && // alternative standard method
+        !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
+        if (this.playerContainer.requestFullscreen) {
+            this.playerContainer.requestFullscreen();
+        } else if (this.playerContainer.msRequestFullscreen) {
+            this.playerContainer.msRequestFullscreen();
+        } else if (this.playerContainer.mozRequestFullScreen) {
+            this.playerContainer.mozRequestFullScreen();
+        } else if (this.playerContainer.webkitRequestFullscreen) {
+            this.playerContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+        document.getElementById('demo-player-container').className = 'demo-player-fullscreen';
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+        document.getElementById('demo-player-container').className = 'demo-player';
+    }
 };

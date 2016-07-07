@@ -125,6 +125,12 @@ MediaPlayer.dependencies.Stream = function() {
 
             this.debug.info("[Stream] Seek: " + time);
 
+            // In case of live streams and then DVR seek, then we start the fragmentInfoControllers
+            // (check if seek not due to stream loading or reloading)
+            if (this.manifestExt.getIsDynamic(manifest) && !isReloading && (this.videoModel.getCurrentTime() !== 0)) {
+                startFragmentInfoControllers.call(this);
+            }
+
             // Stream is starting playing => fills the buffers before setting <video> current time
             if (autoplay === true) {
                 // 1- seeks the buffer controllers at the desired time
@@ -365,9 +371,23 @@ MediaPlayer.dependencies.Stream = function() {
                 fragmentInfoAudioController.initialize("audio", this.fragmentController, audioController);
             }
 
-            if (fragmentInfoTextController === null && textController) {
+            if (fragmentInfoTextController === null && textController && subtitlesEnabled) {
                 fragmentInfoTextController = this.system.getObject("fragmentInfoController");
                 fragmentInfoTextController.initialize("text", this.fragmentController, textController);
+            }
+        },
+
+        stopFragmentInfoControllers = function() {
+            if (fragmentInfoVideoController) {
+                fragmentInfoVideoController.stop();
+            }
+
+            if (fragmentInfoAudioController) {
+                fragmentInfoAudioController.stop();
+            }
+
+            if (fragmentInfoTextController) {
+                fragmentInfoTextController.stop();
             }
         },
 
@@ -422,6 +442,9 @@ MediaPlayer.dependencies.Stream = function() {
             startStreamTime = -1;
             this.metricsModel.addPlayList("video", new Date().getTime(), this.videoModel.getCurrentTime(), "pause");
             suspend.call(this);
+            if (manifest.name === 'MSS' && this.manifestExt.getIsDynamic(manifest)) {
+                startFragmentInfoControllers.call(this);
+            }
         },
 
         onError = function(event) {
@@ -504,7 +527,7 @@ MediaPlayer.dependencies.Stream = function() {
                     if (seekValue < self.getStartTime()) {
                         seekValue = self.getStartTime();
                     } else if (seekValue >= self.videoModel.getDuration()) {
-                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;                       
+                        seekValue = self.videoModel.getDuration() - tmMinSeekStep;
                         tmEndDetected = true;
                     }
                     if (delay > 0) {
@@ -668,24 +691,12 @@ MediaPlayer.dependencies.Stream = function() {
                 videoController.stop();
             }
 
-            if (fragmentInfoVideoController) {
-                fragmentInfoVideoController.stop();
-            }
-
             if (audioController) {
                 audioController.stop();
             }
 
-            if (fragmentInfoAudioController) {
-                fragmentInfoAudioController.stop();
-            }
-
             if (textController) {
                 textController.stop();
-            }
-
-            if (fragmentInfoTextController) {
-                fragmentInfoTextController.stop();
             }
         },
 
@@ -816,12 +827,6 @@ MediaPlayer.dependencies.Stream = function() {
             // Unmap "bufferUpdated" handler
             this.system.unmapHandler("bufferUpdated");
 
-            // In case of live streams and then DVR seek, then we start the fragmentInfoControllers
-            // (check if seek not due to stream loading or reloading)
-            if (this.manifestExt.getIsDynamic(manifest) && !isReloading && (this.videoModel.getCurrentTime() !== 0)) {
-                startFragmentInfoControllers.call(this);
-            }
-
             // Set current time on video if 'play' event has already been raised.
             // If 'play' event has not yet been raised, the the current time will be set afterwards
             if (!this.videoModel.isPaused()) {
@@ -868,7 +873,7 @@ MediaPlayer.dependencies.Stream = function() {
 
             manifest = self.manifestModel.getValue();
             periodInfo = updatedPeriodInfo;
-            self.debug.log("Manifest updated... set new data on buffers.");
+            self.debug.log("[Stream] Manifest updated ... set new data on buffers.");
 
             if (videoController) {
                 videoData = videoController.getData();
@@ -1099,6 +1104,8 @@ MediaPlayer.dependencies.Stream = function() {
 
             stopBuffering.call(this);
 
+            stopFragmentInfoControllers.call(this);
+
             pause.call(this);
 
             // Trick mode seeking timeout
@@ -1192,6 +1199,10 @@ MediaPlayer.dependencies.Stream = function() {
                             // In case of live streams, refresh manifest before activating subtitles
                             this.system.mapHandler("streamsComposed", undefined, streamsComposed.bind(this), true);
                             this.system.notify("manifestUpdate");
+                            if (this.manifestExt.getIsDynamic(manifest) && fragmentInfoTextController === null && fragmentInfoVideoController !== null) {
+                                fragmentInfoTextController = this.system.getObject("fragmentInfoController");
+                                fragmentInfoTextController.initialize("text", this.fragmentController, textController);
+                            }
                         } else {
                             streamsComposed.call(this);
                         }

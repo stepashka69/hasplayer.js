@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>RIGHTv</title>
+    <style>
+        input {
+            display: block;
+            margin: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<script language="javascript">
+
+var rightv_service_url;
+var rightv_login_url;
+var rightv_order_url;
+var rightv_video_playing_infos_url;
+var licenser_base_url;
+var video_external_id;
+var hasplayer_application;
+
+var load = function() {
+
+    rightv_service_url = document.getElementById('rightv_service_url');
+    rightv_login_url = document.getElementById('rightv_login_url');
+    rightv_order_url = document.getElementById('rightv_order_url');
+    rightv_video_playing_infos_url = document.getElementById('rightv_video_playing_infos_url');
+    licenser_base_url = document.getElementById('licenser_base_url');
+    video_external_id = document.getElementById('video_external_id');
+    hasplayer_application = document.getElementById('hasplayer_application');
+
+    hasplayer_application.value = "http://tv-has.orange-labs.fr/hasplayer_orange/dev/samples/DASH-IF/index.html";
+
+    var rightvConfigReq = new XMLHttpRequest();
+    var rightvConfig;
+    rightvConfigReq.onload = function() {
+        if (rightvConfigReq.status === 200) {
+            rightvConfig = JSON.parse(rightvConfigReq.responseText);
+            rightv_service_url.value = rightvConfig.service_url;
+            rightv_login_url.value = rightvConfig.login_url;
+            rightv_order_url.value = rightvConfig.order_url;
+            rightv_video_playing_infos_url.value = rightvConfig.video_playing_infos_url;
+            licenser_base_url.value = rightvConfig.licenser_base_url;
+            video_external_id.value = rightvConfig.video_external_id;
+        }
+    };
+    rightvConfigReq.open("GET", "rightv_config.json", true);
+    rightvConfigReq.setRequestHeader("Content-type", "application/json");
+    rightvConfigReq.send();
+};
+
+var sendJsonReq = function (url, callback) {
+    var req = new XMLHttpRequest();
+
+    req.onload = function() {
+        if (req.status === 200) {
+            callback(req.responseText);
+        }
+    };
+    req.open("GET", url, true);
+    req.withCredentials=true;
+    req.setRequestHeader("Content-type", "application/json");
+    req.send();
+};
+
+function play() {
+    sendJsonReq(rightv_service_url.value, function (/*response*/) {
+        sendJsonReq(rightv_login_url.value, function (/*response*/) {
+            sendJsonReq(rightv_order_url.value + '&external_video_id=' + video_external_id.value, function (/*response*/) {
+                sendJsonReq(rightv_video_playing_infos_url.value + '&video_external_id=' + video_external_id.value, function (response) {
+                    var videoInfos = JSON.parse(response);
+                    if (videoInfos.response.status === 'FAILURE') {
+                        alert(videoInfos.response.code + ' - ' + videoInfos.response.message);
+                    } else {
+                        var stream = {
+                            'url': videoInfos.response.url,
+                            'protData': {
+                                'com.microsoft.playready': {
+                                    laURL: licenser_base_url.value + 'drm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                                },
+                                'com.widevine.alpha': {
+                                    laURL: licenser_base_url.value + 'widevinedrm?token=' + window.encodeURIComponent(videoInfos.response.token)
+                                }
+                            }
+                        };
+                        var streamB64 = btoa(JSON.stringify(stream));
+                        window.open(hasplayer_application.value + "?autoplay=true&stream=" + streamB64, "hasplayer.js");
+                    }
+                });
+            });
+        });
+    });
+}
+
+</script>
+
+<body onload="load()">
+    service_url: <input type="text" class="form-control" placeholder="service url" id="rightv_service_url"><br/>
+    login_url: <input type="text" class="form-control" placeholder="login url" id="rightv_login_url"><br/>
+    order_url: <input type="text" class="form-control" placeholder="order url" id="rightv_order_url"><br/>
+    video_playing_infos_url: <input type="text" class="form-control" placeholder="video playing infos url" id="rightv_video_playing_infos_url"><br/>
+    licenser_base_url: <input type="text" class="form-control" placeholder="licenser base url" id="licenser_base_url"><br/>
+    video_external_id: <input type="text" class="form-control" placeholder="video_external_id" id="video_external_id"><br/>
+    hasplayer_application: <input type="text" class="form-control" placeholder="hasplayer_application" id="hasplayer_application"><br/>
+    <button type="button" onclick="play()" style="border-radius: 0;">Play</button><br/>
+</body>
+</html>

@@ -32,13 +32,13 @@ The build task can be configured in order to select supported protocol(s) and to
 For example:
 
 1. No hls support, no EME support:
-    * npm build -hls=false -protection=false
+    * npm run build -hls=false -protection=false
 2. No hls support, no MSS support:
-    * npm build -hls=false -mss=false
+    * npm run build -hls=false -mss=false
 
 ## Demo
 
-A builded version of the hasplayer.js and samples is available ah this address:
+A builded version of the hasplayer.js and samples is available at this address:
 
 http://orange-opensource.github.io/hasplayer.js
 
