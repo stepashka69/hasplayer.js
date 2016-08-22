@@ -257,10 +257,13 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         return datas;
     },
 
-    getSpecificAudioData: function(manifest, periodIndex, language) {
+    getAudioTracksData: function(manifest, periodIndex, language) {
         "use strict";
         var i,
-            datas;
+            datas,
+            currentData,
+            languageDatas = [],
+            allDatas = [];
 
 
         if (!manifest || periodIndex < 0) {
@@ -273,13 +276,15 @@ Dash.dependencies.DashManifestExtensions.prototype = {
         }
 
         for (i = 0; i < datas.length; i += 1) {
+            currentData = this.processAdaptation(datas[i]);
+            allDatas.push(currentData);
             if (datas[i].lang === language) {
-                return this.processAdaptation(datas[i]);
+                languageDatas.push(currentData);
             }
         }
 
         //if the specific language has not been found, return the first one.
-        return this.processAdaptation(datas[0]);
+        return languageDatas.length > 0 ? languageDatas : allDatas;
     },
 
     getSpecificTextData: function(manifest, periodIndex, language) {
@@ -313,7 +318,7 @@ Dash.dependencies.DashManifestExtensions.prototype = {
 
         while ((codec === null) && (i < adaptation.Representation_asArray.length)) {
             representation = adaptation.Representation_asArray[i];
-            if (representation.codecs !== null && representation.codecs !== "") {
+            if (representation.codecs) {
                 codec = (representation.mimeType + ';codecs="' + representation.codecs + '"');
             }
             i++;

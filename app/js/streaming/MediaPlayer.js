@@ -1239,14 +1239,14 @@ MediaPlayer = function () {
             var selectedTrack = _getSelectedTrackFromType(type);
 
             if (selectedTrack &&
-                ((track.id && track.id === selectedTrack.id) ||
+                ((track.id && track.id === selectedTrack.id) &&
                  (track.lang && track.lang === selectedTrack.lang))) {
                 this.debug.log("[MediaPlayer] " + type + " track [" + track.id + " - " + track.lang + "] is already selected");
                 return;
             }
 
             for (var i = 0; i < _tracks.length; i += 1) {
-                if ((track.id && track.id === _tracks[i].id) ||
+                if ((track.id && track.id === _tracks[i].id) &&
                     (track.lang && track.lang === _tracks[i].lang)) {
                     _selectTrackFromType(type, _tracks[i]);
                     return;
